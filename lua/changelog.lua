@@ -113,7 +113,7 @@
 ??/03/2018 (03/??/2018)
 
 - Added BASE_7MM
-- Added gred_7mm effect
+- Added a new 20mm effect
 - Added a new Hellfire model (thanks to damik)
 - Fixed shockwave_ent
 - Updated BOMB_2000GP : changed explosion sound and renamed the spawn menu icon to 2000LB GP
