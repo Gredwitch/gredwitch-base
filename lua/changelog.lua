@@ -1,3 +1,4 @@
+--[[
 15/10/2017 (10/15/2017)
 
 - Added POD_MGUNNER (POD_GUNNER with green tracers)
@@ -127,3 +128,4 @@
 - Updated particles : Day of Infamy and Insurgency effects will now look better, won't disapear and won't override each other
 - Renamed BASE_MG to BASE_12MM
 - Removed shockwave_sound_lowsh
+--]]
