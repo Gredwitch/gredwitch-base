@@ -108,7 +108,7 @@ local function gredsettings( CPanel )
 		net.SendToServer();
 	end
 	
-	local hebullet = CPanel:AddControl( "CheckBox", { Label = "Should light MGs have a blast radius? (Kills tanks!)", Command = "gred_he_impact" } );
+	local hebullet = CPanel:AddControl( "CheckBox", { Label = "Should light 12mm have a blast radius? (Kills tanks!)", Command = "gred_he_impact" } );
 	hebullet.OnChange = function( panel, bVal ) 
 		if( LocalPlayer():IsSuperAdmin() and !JustMade ) then
 			if( ( bVal and 1 or 0 ) == cvars.Number( "gred_he_impact" ) ) then return end
