@@ -1,0 +1,6 @@
+{
+"title" : "[WAC] SPAD XIII",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}

@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/props_vehicles/spad_xiii/mask"
+	"$translucent" 1
+	"$nocull" 1
+}

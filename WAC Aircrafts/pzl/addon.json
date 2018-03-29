@@ -1,0 +1,6 @@
+{
+"title" : "[WAC] PZL P.11c",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}

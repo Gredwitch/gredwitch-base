@@ -1,0 +1,6 @@
+{
+"title" : "[WAC] Junkers Ju-87D Stuka",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}

@@ -1,0 +1,11 @@
+"VertexlitGeneric"
+{
+
+	"$basetexture" "models\kali\vehicles\bo\MIG17\veh_jet_mig17_decal"
+	"$halflambert" "1"				
+	"$nocull" 1	
+	"$translucent" 1	
+
+}
+
+
