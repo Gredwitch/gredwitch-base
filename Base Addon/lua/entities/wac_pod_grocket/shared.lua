@@ -70,8 +70,7 @@ function ENT:fireRocket(pos, ang)
 		if ph:IsValid() then
 			ph:AddVelocity(self:GetVelocity())
 			ph:AddAngleVelocity(Vector(30,0,0))
-			ph:EnableCollisions(false)
-			timer.Simple(0.3, function() ph:EnableCollisions(true) end)
+			ph:EnableCollisions(true)
 		end
 		--[[constraint.NoCollide(self.aircraft, rocket, 0, 0)
 		constraint.NoCollide(self.aircraft.wheels[i], rocket, 0, 0)

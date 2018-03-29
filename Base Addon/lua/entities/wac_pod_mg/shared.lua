@@ -39,7 +39,9 @@ function ENT:fireBullet(pos)
 	--print(ShootAng)
 	local b=ents.Create(self.BulletType)
 	b:SetPos(pos2)
-	if self.BulletType == "wac_base_mg" then
+	if self.BulletType == "wac_base_12mm" then
+		ang = ang + Angle(math.Rand(-0.5,0.5), math.Rand(-0.5,0.5), math.Rand(-0.5,0.5))
+	elseif self.BulletType == "wac_base_12mm" then
 		ang = ang + Angle(math.Rand(-1,1), math.Rand(-1,1), math.Rand(-1,1))
 	elseif self.BulletType == "wac_base_20mm" then
 		ang = ang + Angle(math.Rand(-2,2), math.Rand(-2,2), math.Rand(-2,2))
@@ -108,11 +110,11 @@ function ENT:stop()
 		self.sounds.stop:SetSoundLevel(110)
 		self.shooting = false
 		if self.Brrt == 1 then
-			timer.Simple(2.5, function() self.aircraft:EmitSound("wac/a10/brrt.wav",0, math.random(80,120), 1, CHAN_AUTO) end)											
+			timer.Create("gred_brrt",2.5, 1,function() self.aircraft:EmitSound("wac/a10/brrt.wav",0, math.random(80,120), 1, CHAN_AUTO) end)
+			self:CallOnRemove(("StopBrrt"), function() timer.Remove("gred_brrt") end)
 		end
 	end
 end
-
 function ENT:drawCrosshair()
 	surface.SetDrawColor(255,255,255,150)
 	local center = {x=ScrW()/2, y=ScrH()/2}

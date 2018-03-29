@@ -152,7 +152,7 @@ ENT.Explode=function(self,tr)
 		bullet.TracerName = nil
 		bullet.Dir = self.Entity:GetForward()
 		bullet.Spread = Vector(0,0,0)
-		bullet.Src = pos
+		bullet.Src = self.Entity:GetPos()
 		self:FireBullets( bullet, false )
 		
 		hitang = tr.HitNormal:Angle()+Angle(90,0,0)
