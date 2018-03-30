@@ -3,6 +3,36 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 
+local ExploSnds = {}
+ExploSnds[1]                         =  "explosions/doi_ty_01.wav"
+ExploSnds[2]                         =  "explosions/doi_ty_02.wav"
+ExploSnds[3]                         =  "explosions/doi_ty_03.wav"
+ExploSnds[4]                         =  "explosions/doi_ty_04.wav"
+
+local CloseExploSnds = {}
+CloseExploSnds[1]                         =  "explosions/doi_ty_01_close.wav"
+CloseExploSnds[2]                         =  "explosions/doi_ty_02_close.wav"
+CloseExploSnds[3]                         =  "explosions/doi_ty_03_close.wav"
+CloseExploSnds[4]                         =  "explosions/doi_ty_04_close.wav"
+
+local DistExploSnds = {}
+DistExploSnds[1]                         =  "explosions/doi_ty_01_dist.wav"
+DistExploSnds[2]                         =  "explosions/doi_ty_02_dist.wav"
+DistExploSnds[3]                         =  "explosions/doi_ty_03_dist.wav"
+DistExploSnds[4]                         =  "explosions/doi_ty_03_dist.wav"
+
+local WaterExploSnds = {}
+WaterExploSnds[1]                         =  "explosions/doi_ty_01_water.wav"
+WaterExploSnds[2]                         =  "explosions/doi_ty_02_water.wav"
+WaterExploSnds[3]                         =  "explosions/doi_ty_03_water.wav"
+WaterExploSnds[4]                         =  "explosions/doi_ty_04_water.wav"
+
+local CloseWaterExploSnds = {}
+CloseWaterExploSnds[1]                         =  "explosions/doi_ty_01_closewater.wav"
+CloseWaterExploSnds[2]                         =  "explosions/doi_ty_02_closewater.wav"
+CloseWaterExploSnds[3]                         =  "explosions/doi_ty_03_closewater.wav"
+CloseWaterExploSnds[4]                         =  "explosions/doi_ty_04_closewater.wav"
+
 function ENT:Initialize()
 	math.randomseed(CurTime())
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
@@ -19,26 +49,41 @@ function ENT:Initialize()
 	self.sound = CreateSound(self.Entity, "")
 	self.matType = MAT_DIRT
 	self.hitAngle = Angle(270, 0, 0)
+	self.ExplosionSound                  =  table.Random(CloseExploSnds)
+	self.FarExplosionSound				 =  table.Random(ExploSnds)
+	self.DistExplosionSound				 =  table.Random(DistExploSnds)
+	self.WaterExplosionSound			 =  table.Random(CloseWaterExploSnds)
+	self.WaterFarExplosionSound			 =  table.Random(WaterExploSnds)
 end
 
 function ENT:Explode(tr)
 	if self.Exploded then return end
 	self.Exploded = true
-	util.BlastDamage(self, self.Owner or self, self:GetPos(), self.Radius, self.Damage)
-	local explode = ents.Create("env_physexplosion")
-	explode:SetPos(self:GetPos())
-	explode:Spawn()
-	explode:SetKeyValue("magnitude", self.Damage*99)
-	explode:SetKeyValue("radius", self.Radius*2.5)
-	explode:SetKeyValue("spawnflags","19")
-	explode:Fire("Explode", 0, 0)
-	ParticleEffect("ins_rpg_explosion",self:GetPos(),Angle(self.hitAngle, -90, 0),nil)
-	self.Entity:EmitSound( "explosions/doi_ty_1.wav",100, 100,1, CHAN_AUTO )
-	self.Entity:Remove()
-end
+	pos = self:GetPos()
+	util.BlastDamage(self,self.Owner or self,pos,self.Radius*1.5,self.Damage)
+    if(self:WaterLevel() >= 1) then --Not working
+		if tr2.Hit then
+			ParticleEffect("ins_water_explosion", tr2.HitPos, Angle(-90,0,0), nil)
+			self.ExplosionSound =  self.WaterExplosionSound
+			self.FarExplosionSound = self.WaterFarExplosionSound 
+		end
+	end
+	ParticleEffect("doi_mortar_explosion",pos,Angle(self.hitAngle, -90, 0),nil)
+	local ent = ents.Create("shockwave_sound_lowsh")
+	ent:SetPos( pos ) 
+	ent:Spawn()
+	ent:Activate()
+	ent:SetVar("GBOWNER", ply)
+	ent:SetVar("MAX_RANGE",self.Damage*(self.Radius*1.5))
+	ent:SetVar("NOFARSOUND",0)
+	ent:SetVar("SHOCKWAVE_INCREMENT",200)
+	ent:SetVar("DELAY",0.01)
+	ent:SetVar("SOUNDCLOSE", self.ExplosionSound)
+	ent:SetVar("SOUND", self.FarExplosionSound)
+	ent:SetVar("SOUNDFAR", self.DistExplosionSound)
+	ent:SetVar("Shocktime", 0)
+	self:Remove()
 
-function ENT:OnRemove()
-	self.sound:Stop()
 end
 
 function ENT:StartRocket()
@@ -72,6 +117,10 @@ function ENT:StartRocket()
 	self.phys:EnableCollisions(false)
 end
 
+function ENT:OnRemove()
+	self.sound:Stop()
+end
+
 function ENT:GetFuelMul()
 	self.MaxFuel=self.MaxFuel or self.Fuel or 0
 	if self.Fuel then
@@ -86,15 +135,18 @@ function ENT:PhysicsUpdate(ph)
 		start = self.OldPos,
 		endpos = self:GetPos(),
 		filter = {self,self.Owner,self.Launcher},
-		mask = CONTENTS_SOLID + CONTENTS_MOVEABLE + CONTENTS_OPAQUE + CONTENTS_DEBRIS + CONTENTS_HITBOX + CONTENTS_MONSTER + CONTENTS_WINDOW-- + CONTENTS_WATER,
+		mask = CONTENTS_SOLID + CONTENTS_MOVEABLE + CONTENTS_OPAQUE + CONTENTS_DEBRIS + CONTENTS_HITBOX + CONTENTS_MONSTER + CONTENTS_WINDOW
 	}
 	local tr = util.TraceLine(trd)
+	
 	local trd2 = {
-		start = self.OldPos,
-		endpos = self:GetPos(),
-		filter = {self,self.Owner,self.Launcher},
-		mask = CONTENTS_WATER,
+		start   = tr.HitPos,
+		endpos  = tr.endpos,
+		filter  = {self,self.Owner,self.Launcher},
+		mask    = MASK_WATER + CONTENTS_TRANSLUCENT
 	}
+	local tr2 = util.TraceLine(trd2)
+	
 	if tr.Hit and !self.Exploded then
 		if tr.HitSky then self:Remove() return end
 		util.Decal("Scorch", tr.HitPos + tr.HitNormal, tr.HitPos - tr.HitNormal)

@@ -165,7 +165,7 @@ function ENT:Initialize()
 		self.Engines = 1
 		self.engineHealth = Healthslider
 		self.EngineHealth = Healthslider
-	end -- --[[
+	end --[[
 	print("---------------------------------------------------------------")
 	print("Engines	  				",self.Engines)
 	print("Healthslider				",Healthslider)
@@ -173,7 +173,7 @@ function ENT:Initialize()
 	print("self.Engines*Healthslider		",self.Engines*Healthslider)
 	print("engineHealth				",self.engineHealth)
 	print("EngineHealth				",self.EngineHealth)
-	print("---------------------------------------------------------------")-- --]]
+	print("---------------------------------------------------------------")--]]
 	
 end
 

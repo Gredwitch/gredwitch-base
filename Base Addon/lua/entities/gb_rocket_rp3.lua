@@ -45,7 +45,7 @@ ENT.RocketTrail                      =  "rockettrail"
 ENT.RocketBurnoutTrail               =  "grenadetrail"
 ENT.Effect                           =  "doi_mortar_explosion"
 ENT.EffectAir                        =  "doi_mortar_explosion"
-ENT.EffectWater                      =  "water_torpedo" 
+ENT.EffectWater                      =  "ins_water_explosion" 
 
 ENT.ExplosionSound                   =  table.Random(CloseExploSnds)
 ENT.FarExplosionSound				 =  table.Random(ExploSnds)

@@ -45,7 +45,6 @@ end
 
 net.Receive( "gred_net_sound_lowsh", function( len, pl )
 	local sound = net.ReadString()
-	print(sound)
 	LocalPlayer():EmitSound(sound)
 end );
 

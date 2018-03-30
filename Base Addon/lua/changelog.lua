@@ -121,6 +121,7 @@
 - Updated BASE_12MM : impact sound volume will now vary according to the guns fire rate
 - Updated BASE_20MM : updated the impact effect and the impact sound effects
 - Updated POD_MG and POD_GUNNER : the bullets will now be faster and the tracers will now look better
+- Updated BASE_GROCKET : Updated the sounds and the effect
 - Updated shockwave_sound_lowsh / every BOMB_ and every ROCKET_ : reworked the sound system
 - Updated materials
 - Updated gred_convars and gred_stmenu : added "realistic health" stuff

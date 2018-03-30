@@ -11,12 +11,16 @@ function ENT:Initialize()
 	self.phys = self.Entity:GetPhysicsObject()
 	if self.phys:IsValid() then
 		self.phys:SetMass(5)
-		self.phys:EnableCollisions(false)
+		self.phys:EnableCollisions(true)
 	end	
 	if (self.phys:IsValid()) then
 		self.phys:Wake()
 		self.phys:EnableGravity(true)
 	end
+	if self.Speed == nil then self.Speed = 1000 end
+	if self.Damage == nil then self.Damage = 40 end
+	if self.Radius == nil then self.Radius = 70 end
+	if self.Owner == nil then self.Owner = ply end
 	self.oldpos=self:GetPos()-self:GetAngles():Forward()*self.Speed
 	self:SetNotSolid(true)
 	self.cbt={}
@@ -24,31 +28,63 @@ function ENT:Initialize()
 	self.cbt.armor=500
 	self.cbt.maxhealth=5000
 	self:SetNWInt("gunRPM", self.gunRPM)--Prevents earrape
+	self:SetNWBool("sequential", self.sequential)--Prevents earrape
+	self:SetNWInt("npod", self.npod)--Prevents earrape
 	self:SetColor(255,255,255,0)
-	self:SetRenderMode(RENDERMODE_TRANSALPHA)
+	self:SetRenderMode(RENDERMODE_GLOW)
 	if self.npod == nil then self.npod = 1 end
 	self.startTime=CurTime()
 	self.canThink=true
 	self.IsBullet=true
 	self:NextThink(CurTime())
+	--self.phys:EnableCollisions(false)
 end
 
 ENT.Explode=function(self,tr)
 	if self.Exploded then return end
 	self.Exploded = true
 	if !tr.HitSky then
-		self.Owner = self.Owner or self.Entity
-		local explode=ents.Create("env_physexplosion")
-		explode:SetPos(tr.HitPos)
-		explode:Spawn()
-		explode:SetOwner(self.Owner)
-		explode:SetKeyValue("magnitude", self.Damage*6)
-		explode:SetKeyValue("radius", self.Radius*8)
-		explode:Fire("Explode", 0, 0)
-		ParticleEffect("30cal_impact",tr.HitPos,Angle(tr.HitNormal:Angle()),nil)
-		self.Entity:EmitSound( "impactsounds/30mm_1.wav",140, math.random(90,120),1, CHAN_AUTO )
+		if GetConVarNumber("gred_he_impact") >= 1 then
+			local explode=ents.Create("env_physexplosion")
+			explode:SetPos(tr.HitPos)
+			explode:SetOwner(self.Owner)
+			explode:Spawn()
+			explode:SetKeyValue("magnitude", self.Damage*3)
+			explode:SetKeyValue("radius", self.Radius*1.5)
+			explode:Fire("Explode", 0, 0)
+			self.Owner = self.Owner or self.Entity
+			util.BlastDamage(self, self.Owner, tr.HitPos, self.Radius, self.Damage)
+		else
+			local bullet = {}
+			bullet.Attacker = self.Owner
+			bullet.Callback = nil
+			bullet.Damage = self.Damage*3
+			bullet.Force = self.Radius*5
+			bullet.HullSize = 0
+			bullet.Num = 1
+			bullet.Tracer = 0
+			bullet.AmmoType = "12.7mm"
+			bullet.TracerName = nil
+			bullet.Dir = self.Entity:GetForward()
+			bullet.Spread = Vector(0,0,0)
+			bullet.Src = self.Entity:GetPos()
+			self:FireBullets( bullet, false )
+		end
+		ParticleEffect("doi_gunrun_impact",tr.HitPos,tr.HitNormal:Angle(),nil)
+		local d
+		if self.gunRPM >= 4000 then d = (self.gunRPM / 20000) else d = (self.gunRPM / 5000) end
+		if self.gunRPM >= 1000 then
+			self.Entity:EmitSound( "impactsounds/gun_impact_"..math.random(1,14)..".wav",100, 100,d, CHAN_AUTO )
+			
+		elseif !self.sequential then
+			d = 1 / self.npod
+			self.Entity:EmitSound( "impactsounds/gun_impact_"..math.random(1,14)..".wav",100, 100,d, CHAN_AUTO )--self.Entity:EmitSound( "impactsounds/concrete_bullet_impact_0"..math.random(1,5)..".wav",100, 100,1, CHAN_AUTO )
+		else
+			self.Entity:EmitSound( "impactsounds/gun_impact_"..math.random(1,14)..".wav",100, 100,1, CHAN_AUTO )
+		end
+		--print(d)
+		--print(self.Damage*2)
 	end
-	self.Entity:Remove()
 end
 
 function ENT:PhysicsUpdate(ph)
@@ -70,6 +106,7 @@ function ENT:PhysicsUpdate(ph)
 	local tr = util.TraceLine(trace)
 	if tr.Hit then
 		self.Explode(self,tr)
+		self:Remove()
 	elseif (self.canThink or speed>50) and !self.NoTele then
 		self.Entity:SetPos(pos + difference)
 	end
@@ -82,10 +119,9 @@ function ENT:PhysicsUpdate(ph)
 	local tr2 = util.TraceLine(trdat2)
 	if tr2.Hit then
 		if GetConVarNumber("gred_water_impact") == 1 then
-			ParticleEffect("water_medium",tr2.HitPos,Angle(0,0,0),nil)
+			ParticleEffect("impact_water",tr2.HitPos,Angle(-90,0,0),nil)
 		end
 		self.Entity:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",100, 100,1, CHAN_AUTO )
-		self:Remove()
 	end
 	
 end
