@@ -1,8 +1,7 @@
 
 ENT.Base = "wac_hc_base"
 ENT.Type = "anim"
-ENT.Author = wac.author
-ENT.Category = wac.aircraft.spawnCategory
+ENT.Author = "Gredwitch"
 ENT.Spawnable = true
 ENT.AdminSpawnable = true
 ENT.Category			= "Gredwitch's Stuff"
@@ -21,7 +20,7 @@ ENT.BackRotor = {
 	pos = Vector(-217,9,73), 
 }
 
-ENT.EngineForce = 80
+ENT.EngineForce = 70
 ENT.Weight = 1300
 
 ENT.SmokePos = Vector(-90,0,50)
@@ -60,25 +59,28 @@ ENT.Weapons = {
 				Vector(40,40,30),
 				Vector(40,-40,30),
 			},
-			Ammo = 1,
 			Sounds = {
 				shoot = "warkanum/minigun_shoot.wav",
 				stop = "warkanum/minigun_wind_stop.wav",
 			},
-			Firerate = 4000,
+			BulletType = "wac_base_7mm",
+			Ammo = 1,
 			TkAmmo = 0,
+			Sequential = false,
+			FireRate = 4000
 		}
 	},
 	["Hydra 70"] = {
 		class = "wac_pod_grocket",
 		info = {
 			Pods = {
-				Vector(50,50,40),
-				Vector(50,-50,40),
+				Vector(200,50,40),
+				Vector(200,-50,40),
 			},
-			Sequential = false,
+			Sequential = true,
+			FireRate = 500,
+			Ammo = 1,
 			TkAmmo = 0,
-			
 		}
 	}
 }

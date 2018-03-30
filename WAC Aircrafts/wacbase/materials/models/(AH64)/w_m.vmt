@@ -1,0 +1,12 @@
+vertexLitGeneric
+{
+	"$basetexture" "models/(AH64)/2w_m"
+	"$surfaceprop" "metal"
+	"$bumpmap"	"models/(AH64)/w_m_n"
+	"$phong" "1"
+	"$phongexponent" "5"
+	"$phongboost" "0.1"	
+	"$phongfresnelranges"	"[2 3 3]"
+	//"$phongexponenttexture" "models/Apache/w_m_spec"
+	"$selfillum" 0
+}

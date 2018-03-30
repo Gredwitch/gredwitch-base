@@ -98,6 +98,7 @@ ENT.Weapons = {
 				Vector(88.41,54.2,57.56),
 			},
 			Ammo = 2,
+			BulletType = "wac_base_7mm",
 			TkAmmo = 0,
 			FireRate = 3900,
 			Sounds = {

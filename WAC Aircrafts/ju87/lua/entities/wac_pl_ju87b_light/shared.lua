@@ -55,9 +55,9 @@ ENT.Weapons = {
 				Vector(85,-71.05,65),
 				Vector(85,71.05,65),
 			},
-			FireRate = 1200,
-			Sequential = false,
-			Ammo = 425,
+			FireRate = 1000,
+			BulletType = "wac_base_7mm",
+			Ammo = 2000,
 			Sounds = {
 				shoot = "WAC/stuka/gun.wav",
 				stop = "WAC/stuka/gunstop.wav",
@@ -89,6 +89,7 @@ ENT.Weapons = {
 	            shoot3p = "",
             	spin = "wac/fw190/shoot_start.wav"
             },
+			BulletType = "wac_base_7mm",
 			ShootPos = Vector(-80,0,100),
 			Ammo = 1400,
 			ShootOffset = Vector(50, 5, 55)

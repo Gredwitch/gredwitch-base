@@ -73,6 +73,7 @@ ENT.Weapons = {
 				stop = "wac/sbu1/browning_end.wav",
 			},
 			Ammo = 1,
+			BulletType = "wac_base_7mm",
 			TkAmmo = 0,
 		}
 	},

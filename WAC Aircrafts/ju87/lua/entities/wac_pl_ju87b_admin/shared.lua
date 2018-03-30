@@ -58,8 +58,7 @@ ENT.Weapons = {
 				Vector(85,-71.05,65),
 				Vector(85,71.05,65),
 			},
-			FireRate = 1200,
-			Sequential = true,
+			FireRate = 1000,
 			Ammo = 1,
 			TkAmmo = 0,
 			Sounds = {
@@ -90,6 +89,7 @@ ENT.Weapons = {
             },
 			ShootPos = Vector(-80,0,100),
 			Ammo = 1,
+			BulletType = "wac_base_7mm",
 			TkAmmo = 0,
 			ShootOffset = Vector(40, 5, 55),
 		}

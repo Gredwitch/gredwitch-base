@@ -1,0 +1,6 @@
+{
+"title" : "[WAC] Messerschmitt Me 262 Sturmvogel",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}

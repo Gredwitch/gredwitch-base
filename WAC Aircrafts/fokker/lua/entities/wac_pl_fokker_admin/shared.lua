@@ -70,6 +70,7 @@ ENT.Weapons = {
 				Vector(80,-5.426,30),
 				Vector(80,5.426,30)
 			},
+			BulletType = "wac_base_7mm",
 			Sounds = {
 				shoot = "wac/sbu1/browning_start.wav",
 				stop = "wac/sbu1/browning_end.wav",

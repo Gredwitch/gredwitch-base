@@ -74,6 +74,7 @@ ENT.Weapons = {
 				shoot = "WAC/Spitfire/gun.wav",
 				stop = "WAC/Spitfire/gun_stop.wav",
 			},
+			BulletType = "wac_base_7mm",
 			Sequential = false,
 			FireRate = 500,
 			TkAmmo = 0,

@@ -135,6 +135,7 @@ ENT.Weapons = {
 			},
 			Ammo = 300,
 			FireRate = 850,
+			BulletType = "wac_base_7mm",
 			Sounds = {
 				shoot = "WAC/uh60l/gun.wav",
 				stop = "WAC/uh60l/gun_stop.wav",
@@ -147,6 +148,7 @@ ENT.Weapons = {
 			ShootPos = Vector(-15,62,34),
 			ShootOffset = Vector(24,57,38),
 			FireRate = 850,
+			BulletType = "wac_base_7mm",
 			Ammo = 300,
 			Sounds = {
 				spin = "WAC/uh60l/gun.wav",

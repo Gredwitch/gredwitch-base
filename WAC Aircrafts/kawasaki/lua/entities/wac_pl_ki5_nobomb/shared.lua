@@ -67,6 +67,7 @@ ENT.Weapons = {
 			FireRate = 500,
 			Sequential = false,
 			Ammo = 425,
+			BulletType = "wac_base_7mm",
 			Sounds = {
 				shoot = "WAC/stuka/gun.wav",
 				stop = "WAC/stuka/gun_stop.wav",

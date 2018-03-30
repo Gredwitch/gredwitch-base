@@ -1,0 +1,24 @@
+VertexLitGeneric
+{
+$baseTexture "models/codww2\planes\Thunderbolt/Thunderbolt_part2"
+"$bumpmap" "models/codww2\planes\Thunderbolt/Thunderbolt_part2_normal"
+					
+    "$surfaceprop" "metal"
+
+"$phong" "1"
+ "$phongexponent" 12
+ "$phongboost" "1"
+ "$phongfresnelranges" "[0.25 0.15 0.05]"
+
+$rimlight 1
+ $rimlightexponent 0.5
+ $rimlightboost .1
+
+	"$phongexponenttexture" "models\codww2\planes\Thunderbolt\Thunderbolt_part2_exp"
+	"$phongboost" "2"						
+	"$phongfresnelranges"	"[ .2 1.2 8]"	
+
+	"$PhongAlbedoTint" "1"	
+
+	"$nocull" "1"
+}

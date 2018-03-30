@@ -65,7 +65,7 @@ ENT.Weapons = {
 			},
 			FireRate = 500,
 			TkAmmo = 0,
-			--BulletType = "wac_base_7mm",
+			BulletType = "wac_base_7mm",
 			Sequential = false,
 			Ammo = 425,
 			Sounds = {

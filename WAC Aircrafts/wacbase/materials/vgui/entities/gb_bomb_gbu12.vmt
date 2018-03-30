@@ -1,0 +1,5 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "vgui/entities/gb_bomb_gbu12"
+	"$translucent" 1
+}

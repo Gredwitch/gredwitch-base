@@ -1,0 +1,6 @@
+{
+"title" : "[WAC] F/A-18F Super Hornet",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}

@@ -75,10 +75,11 @@ ENT.Weapons = {
 				shoot = "WAC/bf109/gun.wav",
 				stop = "WAC/bf109/gun_stop.wav",
 			},
-			FireRate = 500,
-			Ammo = 1,
+			FireRate = 4000,
+			BulletType = "wac_base_7mm",
+			Ammo = 4000,
 			TkAmmo = 0,
-			Sequential = true
+			Sequential = true,
 
 			}
 		}

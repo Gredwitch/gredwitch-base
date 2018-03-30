@@ -1,0 +1,1 @@
+print("Gredwitch's Base addon has been verified.")

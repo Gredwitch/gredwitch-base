@@ -1,0 +1,6 @@
+{
+"title" : "[WAC] More realist A-10C",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}

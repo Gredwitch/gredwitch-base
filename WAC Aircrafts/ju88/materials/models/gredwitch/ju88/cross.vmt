@@ -1,0 +1,7 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/gredwitch/ju88/cross"
+	"$translucent" 1
+        "$model"         1
+    "$surfaceprop" "metal"
+}

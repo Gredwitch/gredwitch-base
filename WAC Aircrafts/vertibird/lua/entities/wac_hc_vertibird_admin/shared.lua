@@ -113,6 +113,7 @@ ENT.Weapons = {
 				stop = "warkanum/minigun_wind_stop.wav"
 			},
 			Ammo = 1,
+			BulletType = "wac_base_7mm",
 			TkAmmo = 0,
 			Sequential = true,
 			FireRate = 3000

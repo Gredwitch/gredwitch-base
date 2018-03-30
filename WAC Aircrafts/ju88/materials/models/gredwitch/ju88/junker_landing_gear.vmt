@@ -1,0 +1,6 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/gredwitch/ju88/Junker_landing_gear"
+        "$model"         1
+    "$surfaceprop" "metal"
+}

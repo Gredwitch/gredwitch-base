@@ -65,6 +65,7 @@ ENT.Weapons = {
 				Vector(30,2,30),
 			},
 			FireRate = 500,
+			BulletType = "wac_base_7mm",
 			Sequential = false,
 			TkAmmo = 0,
 			Ammo = 425,

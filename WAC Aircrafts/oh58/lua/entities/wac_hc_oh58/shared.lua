@@ -48,6 +48,7 @@ ENT.Weapons = {
 				Vector(20,43,23),
 			},
 			Ammo = 800,
+			BulletType = "wac_base_7mm",
 			Sounds = {
 				shoot = "Warkanum/minigun_shoot.wav",
 				stop = "Warkanum/minigun_wind_stop.wav",

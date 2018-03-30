@@ -72,6 +72,7 @@ ENT.Weapons = {
 			},
 			FireRate = 500,
 			Sequential = true,
+			BulletType = "wac_base_7mm",
 			Ammo = 600,
 			Sounds = {
 				shoot = "WAC/a6m2/gun2.wav",
