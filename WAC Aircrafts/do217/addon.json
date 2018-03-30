@@ -1,0 +1,6 @@
+{
+"title" : "[WAC] Dornier Do 217N-1",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}
