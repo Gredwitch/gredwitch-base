@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	$basetexture 			"models/b-25j/b_25_gunsight"
+	"$translucent" 1
+}
