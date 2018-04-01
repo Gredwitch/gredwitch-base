@@ -1,0 +1,6 @@
+{
+"title" : "[HAB] H-VAP 3",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}
