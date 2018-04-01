@@ -2,7 +2,7 @@ if not wac then return end
 
 ENT.Base 				= "wac_hc_base"
 ENT.Type 				= "anim"
-ENT.PrintName			= "[WAC] UH-1D Gunship"
+ENT.PrintName			= "[WAC]UH-1D Gunship"
 ENT.Author				= "Gredwitch"
 ENT.Category			= "Gredwitch's Stuff"
 ENT.Spawnable			= true
@@ -88,6 +88,7 @@ ENT.Weapons = {
 			Ammo = 400,
 			FireRate = 550,
 			Sequential = true,
+			BulletType = "wac_base_7mm",
 			Sounds = {
 				shoot = "huey/gun.wav",
 				stop = "huey/gun_stop.wav"
