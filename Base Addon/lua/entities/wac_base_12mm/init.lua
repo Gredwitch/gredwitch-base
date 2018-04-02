@@ -44,32 +44,24 @@ ENT.Explode=function(self,tr)
 	if self.Exploded then return end
 	self.Exploded = true
 	if !tr.HitSky then
-		if GetConVarNumber("gred_he_impact") >= 1 then
-			local explode=ents.Create("env_physexplosion")
-			explode:SetPos(tr.HitPos)
-			explode:SetOwner(self.Owner)
-			explode:Spawn()
-			explode:SetKeyValue("magnitude", self.Damage*3)
-			explode:SetKeyValue("radius", self.Radius*1.5)
-			explode:Fire("Explode", 0, 0)
-			self.Owner = self.Owner or self.Entity
+		self.Owner = self.Owner or self.Entity
+		if GetConVarNumber("gred_12mm_he_impact") >= 1 then
 			util.BlastDamage(self, self.Owner, tr.HitPos, self.Radius, self.Damage)
-		else
-			local bullet = {}
-			bullet.Attacker = self.Owner
-			bullet.Callback = nil
-			bullet.Damage = self.Damage*3
-			bullet.Force = self.Radius*5
-			bullet.HullSize = 0
-			bullet.Num = 1
-			bullet.Tracer = 0
-			bullet.AmmoType = "12.7mm"
-			bullet.TracerName = nil
-			bullet.Dir = self.Entity:GetForward()
-			bullet.Spread = Vector(0,0,0)
-			bullet.Src = self.Entity:GetPos()
-			self:FireBullets( bullet, false )
 		end
+		local bullet = {}
+		bullet.Attacker = self.Owner
+		bullet.Callback = nil
+		bullet.Damage = self.Damage*3
+		bullet.Force = self.Radius*5
+		bullet.HullSize = 0
+		bullet.Num = 1
+		bullet.Tracer = 0
+		bullet.AmmoType = "12.7mm"
+		bullet.TracerName = nil
+		bullet.Dir = self.Entity:GetForward()
+		bullet.Spread = Vector(0,0,0)
+		bullet.Src = self.Entity:GetPos()
+		self:FireBullets( bullet, false )
 		ParticleEffect("doi_gunrun_impact",tr.HitPos,tr.HitNormal:Angle(),nil)
 		local d
 		if self.gunRPM >= 4000 then d = (self.gunRPM / 20000) else d = (self.gunRPM / 5000) end
@@ -82,8 +74,6 @@ ENT.Explode=function(self,tr)
 		else
 			self.Entity:EmitSound( "impactsounds/gun_impact_"..math.random(1,14)..".wav",100, 100,1, CHAN_AUTO )
 		end
-		--print(d)
-		--print(self.Damage*2)
 	end
 end
 

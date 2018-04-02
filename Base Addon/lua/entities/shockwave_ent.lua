@@ -27,7 +27,7 @@ if SERVER then
 		 self:SetUseType( ONOFF_USE ) 
 		 self.Bursts = 0
 		 self.CURRENTRANGE = 0
-		 self.GBOWNER = self:GetVar("GBOWNER")
+		 self.GBOWNER = ply--self:GetVar("GBOWNER")
 		 self.SOUND = self:GetVar("SOUND")
 		self.DEFAULT_PHYSFORCE  = self:GetVar("DEFAULT_PHYSFORCE")
 		self.DEFAULT_PHYSFORCE_PLYAIR  = self:GetVar("DEFAULT_PHYSFORCE_PLYAIR")
@@ -67,8 +67,14 @@ function ENT:Think()
 		 if (v:IsValid() or v:IsPlayer()) and (v.forcefielded==false or v.forcefielded==nil) then
 			local i = 0
 			 while i < v:GetPhysicsObjectCount() do
+				 if self.GBOWNER == nil then
+					self.GBOWNER = self
+				 end
+				 if !self.GBOWNER:IsValid() then
+					self.GBOWNER = self
+				 end
 				local dmg = DamageInfo()
-				util.BlastDamage(self, self, pos, self.MAX_RANGE, self.SHOCKWAVEDAMAGE)
+				util.BlastDamage(self, self.GBOWNER, pos, self.MAX_RANGE, self.SHOCKWAVEDAMAGE)
 				local ent = ents.Create("env_physexplosion")
 				ent:SetPos( pos ) 
 				ent:Spawn()
@@ -79,12 +85,6 @@ function ENT:Think()
 				ent:Remove()
 				 dmg:SetDamage(1)
 				 dmg:SetDamageType(DMG_BLAST)
-				 if self.GBOWNER == nil then
-					self.GBOWNER = table.Random(player.GetAll())
-				 end
-				 if !self.GBOWNER:IsValid() then
-					self.GBOWNER = table.Random(player.GetAll())
-				 end
 				 dmg:SetAttacker(self.GBOWNER)
 					 if (v:IsValid()) then
 					 phys = v:GetPhysicsObjectNum(i)

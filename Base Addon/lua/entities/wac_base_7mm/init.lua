@@ -140,11 +140,15 @@ ENT.Explode=function(self,tr)
 	if self.Exploded then return end
 	self.Exploded = true
 	if !tr.HitSky then
+		self.Owner = self.Owner or self.Entity
+		if GetConVarNumber("gred_7mm_he_impact") >= 1 then
+			util.BlastDamage(self, self.Owner, tr.HitPos, self.Radius*1.5, self.Damage*2)
+		end
 		local bullet = {}
 		bullet.Attacker = self.Owner
 		bullet.Callback = nil
 		bullet.Damage = self.Damage*2
-		bullet.Force = self.Radius*5
+		bullet.Force = self.Radius*1.5
 		bullet.HullSize = 0
 		bullet.Num = 1
 		bullet.Tracer = 0

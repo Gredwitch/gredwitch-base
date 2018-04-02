@@ -309,28 +309,29 @@ function ENT:OnTakeDamage(dmginfo)
 end
 
 function ENT:PhysicsCollide( data, physobj )
+	 timer.Simple(0,function()
      if(self.Exploded) then return end
      if(!self:IsValid()) then return end
 	 if(self.Life <= 0) then return end
-	 
-	 if(GetConVar("gred_fragility"):GetInt() >= 1) then
-	     if(!self.Fired and !self.Burnt and !self.Arming and !self.Armed ) and (data.Speed > self.ImpactSpeed * 5) then --and !self.Arming and !self.Armed
-		     if(math.random(0,9) == 1) then
-			     self:Launch()
-		         self:EmitSound(damagesound)
-			 else
-			     self:Arm()
-				 self:EmitSound(damagesound)
+		 if(GetConVar("gred_fragility"):GetInt() >= 1) then
+			 if(!self.Fired and !self.Burnt and !self.Arming and !self.Armed ) and (data.Speed > self.ImpactSpeed * 5) then --and !self.Arming and !self.Armed
+				 if(math.random(0,9) == 1) then
+					 self:Launch()
+					 self:EmitSound(damagesound)
+				 else
+					 self:Arm()
+					 self:EmitSound(damagesound)
+				 end
 			 end
-	     end
-	 end
+		 end
 
-	 if(!self.Armed) then return end
-		
-	 if (data.Speed > self.ImpactSpeed )then
-		 self.Exploded = true
-		 self:Explode()
-	 end
+		 if(!self.Armed) then return end
+			
+		 if (data.Speed > self.ImpactSpeed )then
+			 self.Exploded = true
+			 self:Explode()
+		 end
+	end)
 end
 
 function ENT:Launch()

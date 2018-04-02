@@ -110,7 +110,7 @@
 - Updated every BOMB_ : removed useless code
 - Removed RAPE SWEP
 
-??/03/2018 (03/??/2018)
+30/03/2018 (03/30/2018)
 
 - Added BASE_7MM
 - Added a new 20mm effect
@@ -129,4 +129,14 @@
 - Updated particles : Day of Infamy and Insurgency effects will now look better, won't disapear and won't override each other
 - Renamed BASE_MG to BASE_12MM
 - Removed shockwave_sound_lowsh
+
+??/04/2018 (04/??/2018)
+
+- Updated BASE_7MM : buffed it and added an explosive damage options
+- Updated gred_stmenu : fixed the whole spawnmenu options
+- Updated BASE_ROCKET and BASE_BOMB : fixed "Changing collision rules within a callback is likely to cause crashes!" error
+- Updated shockwave_sound_lowsh : reduced maximum sound range
+- Updated shockwave_ent : fixed random errors
+- Updated gred_convars : removed useless convars and added new convars for 7mm MGs
+
 --]]

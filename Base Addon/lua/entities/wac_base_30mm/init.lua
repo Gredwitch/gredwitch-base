@@ -38,13 +38,21 @@ ENT.Explode=function(self,tr)
 	self.Exploded = true
 	if !tr.HitSky then
 		self.Owner = self.Owner or self.Entity
-		local explode=ents.Create("env_physexplosion")
-		explode:SetPos(tr.HitPos)
-		explode:Spawn()
-		explode:SetOwner(self.Owner)
-		explode:SetKeyValue("magnitude", self.Damage*6)
-		explode:SetKeyValue("radius", self.Radius*8)
-		explode:Fire("Explode", 0, 0)
+		util.BlastDamage(self, self.Owner, tr.HitPos, self.Radius*6, self.Damage*8)
+		local bullet = {}
+		bullet.Attacker = self.Owner
+		bullet.Callback = nil
+		bullet.Damage = self.Damage*8
+		bullet.Force = self.Radius*4.5
+		bullet.HullSize = 0
+		bullet.Num = 1
+		bullet.Tracer = 0
+		bullet.AmmoType = "12.7mm"
+		bullet.TracerName = nil
+		bullet.Dir = self.Entity:GetForward()
+		bullet.Spread = Vector(0,0,0)
+		bullet.Src = self.Entity:GetPos()
+		self:FireBullets( bullet, false )
 		ParticleEffect("30cal_impact",tr.HitPos,Angle(tr.HitNormal:Angle()),nil)
 		self.Entity:EmitSound( "impactsounds/30mm_1.wav",140, math.random(90,120),1, CHAN_AUTO )
 	end

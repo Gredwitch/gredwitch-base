@@ -577,7 +577,7 @@ end
 function ENT:RocketAlert()
 	if self.rotorRpm > 0.1 then
 		local b=false
-		local rockets = ents.FindByClass("rpg_missile")
+		local rockets = ents.FindByClass("rpg_missile","base_rocket")
 		table.Merge(rockets, ents.FindByClass("wac_w_rocket"))
 		for _, e in pairs(rockets) do
 			if e:GetPos():Distance(self:GetPos()) < 2000 then b = true break end

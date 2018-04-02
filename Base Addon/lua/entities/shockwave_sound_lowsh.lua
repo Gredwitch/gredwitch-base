@@ -73,7 +73,7 @@ function ENT:Think()
 				end
 			end
 		end
-		for k, v in pairs(ents.FindInSphere(pos,self.CURRENTRANGE*16)) do 
+		for k, v in pairs(ents.FindInSphere(pos,self.CURRENTRANGE*14)) do 
 			if v:IsPlayer() then
 				if !(table.HasValue(self.FILTER,v)) then
 					if self.NOFARSOUND == 0 then
@@ -99,7 +99,7 @@ function ENT:Think()
 				end
 			end
 		end
-		for k, v in pairs(ents.FindInSphere(pos,self.CURRENTRANGE+(self.CURRENTRANGE*25))) do
+		for k, v in pairs(ents.FindInSphere(pos,self.CURRENTRANGE+(self.CURRENTRANGE*23))) do
 			 if v:IsPlayer() then
 				if !(table.HasValue(self.FILTER,v)) then
 					if self.NOFARSOUND == 0 then
@@ -133,8 +133,6 @@ function ENT:OnRemove()
 		for k, v in pairs(self.FILTER) do
 			if !v:IsValid() then return end
 			v:SetNWBool("waiting", true)
-			--timer.Remove("gred_sound_far")
-			--timer.Remove("gred_sound_dist")
 		end
 	end
 end

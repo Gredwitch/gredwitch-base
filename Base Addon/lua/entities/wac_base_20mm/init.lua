@@ -44,33 +44,48 @@ ENT.Explode=function(self,tr)
 	if self.Exploded then return end
 	self.Exploded = true
 	if !tr.HitSky then
-		self.Owner = self.Owner or self.Entity
-		local explode=ents.Create("env_physexplosion")
+		--[[local explode=ents.Create("env_physexplosion")
 		explode:SetPos(tr.HitPos)
 		explode:SetOwner(self.Owner)
 		explode:Spawn()
 		explode:SetKeyValue("magnitude", self.Damage*4)
 		explode:SetKeyValue("radius", self.Radius*4)
 		explode:Fire("Explode", 0, 0)
-		--timer.Simple(1,function() explode:Remove() end)
+		timer.Simple(1,function() explode:Remove() end)--]]
 		self.Owner = self.Owner or self.Entity
-		util.BlastDamage(self, self.Owner, tr.HitPos, self.Radius, self.Damage)
+		util.BlastDamage(self, self.Owner, tr.HitPos, self.Radius*4, self.Damage*4)
+		local bullet = {}
+		bullet.Attacker = self.Owner
+		bullet.Callback = nil
+		bullet.Damage = self.Damage*3
+		bullet.Force = self.Radius*5
+		bullet.HullSize = 0
+		bullet.Num = 1
+		bullet.Tracer = 0
+		bullet.AmmoType = "12.7mm"
+		bullet.TracerName = nil
+		bullet.Dir = self.Entity:GetForward()
+		bullet.Spread = Vector(0,0,0)
+		bullet.Src = self.Entity:GetPos()
+		self:FireBullets( bullet, false )
 		ParticleEffect("gred_20mm",tr.HitPos,Angle(tr.HitNormal:Angle(),0,0),nil)
 		
+		
 		local d
-		--if self.gunRPM >= 4000 then d = (self.gunRPM / 10000) else d = (self.gunRPM / 5000) end
+		--[[if self.gunRPM >= 4000 then d = (self.gunRPM / 10000) else d = (self.gunRPM / 5000) end
 		d = 1
 		if self.gunRPM >= 1000 then
 			self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,d, CHAN_AUTO )
 			
 		elseif !self.sequential then
-			--d = 1 / self.npod
+			d = 1 / self.npod
 			self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,d, CHAN_AUTO )--self.Entity:EmitSound( "impactsounds/concrete_bullet_impact_0"..math.random(1,5)..".wav",100, 100,1, CHAN_AUTO )
 		else
 			self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,1, CHAN_AUTO )
 		end
-		--print(d)
-		--print(self.Damage*2)
+		print(d)
+		print(self.Damage*2)--]]
+		self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,1, CHAN_AUTO )
 	end
 	self.Entity:Remove()
 end

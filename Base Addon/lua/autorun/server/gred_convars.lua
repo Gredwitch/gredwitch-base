@@ -28,8 +28,12 @@ if GetConVar("gred_water_impact") == nil then
 	CreateClientConVar("gred_water_impact", "1", true,{ FCVAR_ARCHIVE } )
 end
 
-if GetConVar("gred_he_impact") == nil then
-	CreateConVar("gred_he_impact", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
+if GetConVar("gred_12mm_he_impact") == nil then
+	CreateConVar("gred_12mm_he_impact", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
+end
+
+if GetConVar("gred_7mm_he_impact") == nil then
+	CreateConVar("gred_7mm_he_impact", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
 end
 
 if GetConVar("gred_tracers") == nil then
@@ -50,14 +54,6 @@ end
 
 if GetConVar("gred_multiple_fire_effect") == nil then
 	CreateClientConVar("gred_multiple_fire_effects", "1", true,{ FCVAR_ARCHIVE } )
-end
-
-if GetConVar("gred_rocket_explode_waterimpact") == nil then
-	CreateClientConVar("gred_rocket_explode_waterimpact", "1", true,{ FCVAR_ARCHIVE } )
-end
-
-if GetConVar("gred_bomb_explode_waterimpact") == nil then
-	CreateClientConVar("gred_bomb_explode_waterimpact", "1", true,{ FCVAR_ARCHIVE } )
 end
 
 if GetConVar("gred_healthslider") == nil then
