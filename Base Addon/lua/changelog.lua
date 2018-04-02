@@ -137,6 +137,6 @@
 - Updated BASE_ROCKET and BASE_BOMB : fixed "Changing collision rules within a callback is likely to cause crashes!" error
 - Updated shockwave_sound_lowsh : reduced maximum sound range
 - Updated shockwave_ent : fixed random errors
-- Updated gred_convars : removed useless convars and added new convars for 7mm MGs
+- Updated gred_convars
 
 --]]

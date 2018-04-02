@@ -13,7 +13,7 @@ if GetConVar("gred_fragility") == nil then
 end
 
 if GetConVar("gred_shockwave_unfreeze") == nil then
-	CreateConVar("gred_shockwave_unfreeze", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
+	CreateConVar("gred_shockwave_unfreeze", "0", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
 end
 
 if GetConVar("gred_decals") == nil then
@@ -49,7 +49,7 @@ if GetConVar("gred_jets_speed") == nil then
 end
 
 if GetConVar("gred_fire_effect") == nil then
-	CreateClientConVar("gred_fire_effect", "1", true,{ FCVAR_ARCHIVE } )
+	CreateClientConVar("gred_fire_effect", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
 end
 
 if GetConVar("gred_multiple_fire_effect") == nil then
