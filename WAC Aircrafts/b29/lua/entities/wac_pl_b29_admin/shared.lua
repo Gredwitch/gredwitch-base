@@ -1,26 +1,13 @@
 if not wac then return end
-function ENT:MovePlayerView(k,p,md)
-	if p.wac_air_resetview then md:SetViewAngles(Angle(0,90,0)) p.wac_air_resetview=false end
-	local freeView = md:GetViewAngles()
-	if !self.Seats or !self.Seats[k] then return end
-	if (k==1 and p:GetInfo("wac_cl_air_mouse")=="1" and !p.wac.viewFree) then
-		freeView.p = freeView.p-freeView.p*FrameTime()*6
-		freeView.y = freeView.y-(freeView.y-90)*FrameTime()*6
-	else
-		freeView.p = math.Clamp(freeView.p,-90,90)
-	end
-	freeView.y = (freeView.y)
-	md:SetViewAngles(freeView)
-end
 ENT.Base = "wac_pl_base"
 ENT.Type = "anim"
 ENT.Category = "Gredwitch's Stuff"
 ENT.Spawnable = true
 ENT.AdminSpawnable = true
-ENT.PrintName = "[WAC]B-29 Super Fortress"
-ENT.Model				= "models/gredwitch/b29_fixed.mdl"
+ENT.PrintName = "[WAC]B-29 Super Fortress (Admin)"
+ENT.Model				= "models/gredwitch/b29/b29.mdl"
 ENT.RotorPhModel		= "models/props_junk/sawblade001a.mdl"
-ENT.RotorModel			= "models/sentry/spitfire_prop.mdl"
+ENT.RotorModel			= "models/gredwitch/b29/b29_prop.mdl"
 ENT.Weight			= 25800
 ENT.EngineForce		= 8800
 ENT.rotorPos 	= Vector(290,-165,115)
@@ -36,7 +23,7 @@ ENT.OtherRotorPos={
 }
 
 ENT.Agility = {
-	Thrust = 13
+	Thrust = 16
 }
 
 ENT.thirdPerson = {
@@ -46,46 +33,22 @@ ENT.thirdPerson = {
 
 ENT.Wheels={
 	{
-		mdl="models/wac/fsx/b17g_rw.mdl",
-		pos=Vector(89,-145,28),
-		friction=0,
-		mass=100,
+		mdl="models/gredwitch/b29/b29_wl.mdl",
+		pos=Vector(69,168,26),
+		friction=5,
+		mass=500,
 	},
 	{
-		mdl="models/wac/fsx/b17g_rw.mdl",
-		pos=Vector(89,-185,28),
-		friction=0,
-		mass=100,
+		mdl="models/gredwitch/b29/b29_wr.mdl",
+		pos=Vector(69,-168,26),
+		friction=5,
+		mass=500,
 	},
 	{
-		mdl="models/wac/fsx/b17g_lw.mdl",
-		pos=Vector(89,145,28),
-		friction=0,
-		mass=100,
-	},
-	{
-		mdl="models/wac/fsx/b17g_lw.mdl",
-		pos=Vector(89,185,28),
-		friction=0,
-		mass=100,
-	},
-	{
-		mdl="models/wac/fsx/b17g_bw.mdl",
-		pos=Vector(490,10,18),
-		friction=0,
-		mass=100,
-	},
-	{
-		mdl="models/wac/fsx/b17g_bw.mdl",
-		pos=Vector(490,-10,18),
-		friction=0,
-		mass=100,
-	},
-	{
-		mdl="models/wac/fsx/b17g_bw.mdl",
-		pos=Vector(-500,0,86),
-		friction=0,
-		mass=1,
+		mdl="models/gredwitch/b29/b29_wf.mdl",
+		pos=Vector(491,0,17),
+		friction=5,
+		mass=2000,
 	},
 }
 
@@ -93,7 +56,7 @@ ENT.Seats = {
 	{
 		pos=Vector(450,25,110),
 		exit=Vector(500,100,20),
-		weapons = {"500lb bombs"},
+		weapons = {"Front dorsal M2 Brownings","500lb bombs"},
 	},
 	{
 		pos=Vector(450,-25,110),
@@ -102,7 +65,12 @@ ENT.Seats = {
 	{
 		pos=Vector(490,0,90),
 		exit=Vector(500,-100,20),
-		weapons = {"500lb bombs"},
+	},
+	{
+		pos=Vector(-21,0,135),
+		ang=Angle(0,180,0),
+		weapons = {"Rear dorsal M2 Brownings"},
+		exit=Vector(500,-100,20),
 	}
 }
 
@@ -111,9 +79,9 @@ ENT.Weapons = {
 		class = "wac_pod_gbomb",
 		info = {
 			Pods = {
-				Vector(200,-20,105), -- Front
+				Vector(270,0,60),
 				
-				Vector(80,0,60), --Back
+				Vector(80,0,60),
 				
 			},
 			Kind = "gb_bomb_500gp",
@@ -122,7 +90,51 @@ ENT.Weapons = {
 			    fire = "bomb/bomb_whistle_0"..math.random(1,4)..".wav"
 			}
 		}
+	},
+	["Rear dorsal M2 Brownings"] = {
+		class = "wac_pod_gunner",
+		info = {
+			ShootPos = Vector(-82,0,174),
+			ShootOffset = Vector(0,0,0),
+			FireRate = 3400,
+			TkAmmo = 0,
+			Ammo = 1
+		}
+	},
+	["Front dorsal M2 Brownings"] = {
+		class = "wac_pod_mg",
+		info = {
+			Pods = {
+				Vector(400,0,171)
+			},
+			FireRate = 3400,
+			Sounds = {
+				shoot = "WAC/b29/b29_shoot.wav",
+				stop = "WAC/b29/b29_stop.wav",
+			},
+			TkAmmo = 0,
+			Ammo = 1
+		}
 	}
+}
+
+ENT.WeaponAttachments={
+	gun = {
+		model = "models/gredwitch/b29/b29_turrets.mdl",
+		pos = Vector(-79,0,176),
+		restrictPitch = true,
+	}
+	
+}
+
+ENT.Camera = {
+	model = "models/mm1/box.mdl",
+	pos = Vector(-78,0,176),
+	offset = Vector(0,0,0),
+	viewPos = Vector(20,0,10),
+	minAng = Angle(-60, -360,0),
+	maxAng = Angle(25, 360,0),
+	seat = 4
 }
 
 ENT.Sounds={

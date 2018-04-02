@@ -7,7 +7,7 @@ ENT.AdminSpawnable = true
 ENT.PrintName = "[WAC]B-29 Super Fortress"
 ENT.Model				= "models/gredwitch/b29/b29.mdl"
 ENT.RotorPhModel		= "models/props_junk/sawblade001a.mdl"
-ENT.RotorModel			= "models/sentry/spitfire_prop.mdl"
+ENT.RotorModel			= "models/gredwitch/b29/b29_prop.mdl"
 ENT.Weight			= 25800
 ENT.EngineForce		= 8800
 ENT.rotorPos 	= Vector(290,-165,115)
@@ -23,7 +23,7 @@ ENT.OtherRotorPos={
 }
 
 ENT.Agility = {
-	Thrust = 18
+	Thrust = 16
 }
 
 ENT.thirdPerson = {
@@ -56,7 +56,7 @@ ENT.Seats = {
 	{
 		pos=Vector(450,25,110),
 		exit=Vector(500,100,20),
-		weapons = {"Front M2 Brownings","500lb bombs"},
+		weapons = {"Front dorsal M2 Brownings","500lb bombs"},
 	},
 	{
 		pos=Vector(450,-25,110),
@@ -69,7 +69,7 @@ ENT.Seats = {
 	{
 		pos=Vector(-21,0,135),
 		ang=Angle(0,180,0),
-		weapons = {"Back M2 Brownings"},
+		weapons = {"Rear dorsal M2 Brownings"},
 		exit=Vector(500,-100,20),
 	}
 }
@@ -124,25 +124,25 @@ ENT.Weapons = {
 			}
 		}
 	},
-	["Back M2 Brownings"] = {
+	["Rear dorsal M2 Brownings"] = {
 		class = "wac_pod_gunner",
 		info = {
 			ShootPos = Vector(-82,0,174),
 			ShootOffset = Vector(0,0,0),
-			FireRate = 2000,
-			Ammo = 400
+			FireRate = 3400,
+			Ammo = 500
 		}
 	},
-	["Front M2 Brownings"] = {
+	["Front dorsal M2 Brownings"] = {
 		class = "wac_pod_mg",
 		info = {
 			Pods = {
 				Vector(400,0,171)
 			},
-			FireRate = 2000,
+			FireRate = 3400,
 			Sounds = {
-				shoot = "WAC/cannon/viper_cannon_1p.wav",
-				stop = ""
+				shoot = "WAC/b29/b29_shoot.wav",
+				stop = "WAC/b29/b29_stop.wav",
 			},
 			Ammo = 400
 		}
@@ -152,7 +152,8 @@ ENT.Weapons = {
 ENT.WeaponAttachments={
 	gun = {
 		model = "models/gredwitch/b29/b29_turrets.mdl",
-		pos = Vector(-79,0,176)
+		pos = Vector(-79,0,176),
+		restrictPitch = true,
 	}
 	
 }
@@ -162,8 +163,8 @@ ENT.Camera = {
 	pos = Vector(-78,0,176),
 	offset = Vector(0,0,0),
 	viewPos = Vector(20,0,10),
-	minAng = Angle(-180, -180, -180),
-	maxAng = Angle(180, 180, 180),
+	minAng = Angle(-60, -360,0),
+	maxAng = Angle(25, 360,0),
 	seat = 4
 }
 

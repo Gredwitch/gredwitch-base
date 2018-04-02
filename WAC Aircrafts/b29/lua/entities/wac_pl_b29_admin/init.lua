@@ -5,16 +5,13 @@ AddCSLuaFile("shared.lua")
 function ENT:SpawnFunction(p, tr)
 	if (!tr.Hit) then return end
 	local e = ents.Create(ClassName)
-	e:SetPos(tr.HitPos + tr.HitNormal*120)
+	e:SetPos(tr.HitPos + tr.HitNormal*16+Vector(0,0,200))
 	e.Owner = p
 	e:Spawn()
 	e:Activate()
 	e:SetSkin(math.random(0,4))
 	return e
 end
-
-ENT.EngineHealth = 300
-ENT.engineHealth = 300
 
 ENT.AutomaticFrameAdvance = true
 
@@ -83,52 +80,42 @@ function ENT:PhysicsUpdate(ph)
 		self:base("wac_pl_base").PhysicsUpdate(self,ph)
 	
 	if self:GetNWInt("seat_1_actwep") == 2 then
-		self:SetBodygroup(2,1)
+		self:SetBodygroup(21,0)
 	else
-		self:SetBodygroup(2,0)
+		self:SetBodygroup(21,1)
 	end
-	
 	if self.rotorRpm > 0.8 and self.rotorRpm < 0.89 and IsValid(self.rotorModel) then
-		self.rotorModel:SetBodygroup(1,1)
-	elseif self.rotorRpm > 0.9 and IsValid(self.rotorModel) then
-		self.rotorModel:SetBodygroup(1,2)
+		self.rotorModel:SetBodygroup(0,1)
 	elseif self.rotorRpm < 0.8 and IsValid(self.rotorModel) then
-		self.rotorModel:SetBodygroup(1,0)
+		self.rotorModel:SetBodygroup(0,0)
 	end
 	
-	if self.rotorRpm > 0.5 and self.rotorRpm < 0.89 and IsValid(self.rotorModel) then
-		self.rotorModel:SetBodygroup(1,2)
-	elseif self.rotorRpm > 0.9 and IsValid(self.rotorModel) then
-		self.rotorModel:SetBodygroup(1,3)
-	elseif self.rotorRpm < 0.8 and IsValid(self.rotorModel) then
-		self.rotorModel:SetBodygroup(1,1)
+	for i=1,3 do
+		if self.rotorRpm > 0.8 and self.rotorRpm < 0.89 and IsValid(self.OtherRotorsModel[i]) then
+			self.OtherRotorsModel[i]:SetBodygroup(0,1)
+		elseif self.rotorRpm < 0.8 and IsValid(self.OtherRotorsModel[i]) then
+			self.OtherRotorsModel[i]:SetBodygroup(0,0)
+		end
 	end
-	
-	if self.rotorRpm > 0.5 and self.rotorRpm < 0.89 and IsValid(self.OtherRotorModel) then
-		self.OtherRotorModel:SetBodygroup(1,2)
-	elseif self.rotorRpm > 0.9 and IsValid(self.OtherRotorModel) then
-		self.OtherRotorModel:SetBodygroup(1,3)
-	elseif self.rotorRpm < 0.8 and IsValid(self.OtherRotorModel) then
-		self.OtherRotorModel:SetBodygroup(1,1)
-	end
-	
-	local trace=util.QuickTrace(self:LocalToWorld(Vector(0,0,62)), self:LocalToWorld(Vector(0,0,50)), {self, self.wheels[1], self.wheels[2], self.wheels[3], self.wheels[4], self.wheels[5], self.wheels[6], self.wheels[7], self.rotor})
+	local trace=util.QuickTrace(self:LocalToWorld(Vector(0,0,62)), self:LocalToWorld(Vector(0,0,50)), {self, self.wheels[1], self.wheels[2], self.wheels[3], self.rotor})
 	local phys=self:GetPhysicsObject()
 	if IsValid(phys) and not self.disabled then
-		if self.controls.throttle>0 and self.rotorRpm>0 and phys:GetVelocity():Length() > 800 then
-			for i=1,7 do 
+		if self.controls.throttle>0 and self.rotorRpm>0.8 and phys:GetVelocity():Length() > 1600 and trace.HitPos:Distance( self:LocalToWorld(Vector(0,0,62)) ) > 50 then
+			self:SetBodygroup(4,1)
+			for i=1,3 do 
 				self.wheels[i]:SetRenderMode(RENDERMODE_TRANSALPHA)
 				self.wheels[i]:SetColor(Color(255,255,255,0))
 				self.wheels[i]:SetSolid(SOLID_NONE)
-				self:SetBodygroup(2,1)
 			end
-		elseif self.controls.throttle<0 then
-			for i=1,7 do 
-				self.wheels[i]:SetRenderMode(RENDERMODE_NORMAL)
-				self.wheels[i]:SetColor(Color(255,255,255,255))
-				self.wheels[i]:SetSolid(SOLID_VPHYSICS)
-				self:SetBodygroup(2,0)
+		elseif self.controls.throttle<0 and trace.HitPos:Distance( self:LocalToWorld(Vector(0,0,62)) ) > 50 then
+			if self.wheels then
+				for i=1,3 do 
+					self.wheels[i]:SetRenderMode(RENDERMODE_NORMAL)
+					self.wheels[i]:SetColor(Color(255,255,255,255))
+					self.wheels[i]:SetSolid(SOLID_VPHYSICS)
+				end
 			end
+			self:SetBodygroup(4,0)
 		end
 	end
 	
@@ -159,8 +146,4 @@ function ENT:PhysicsUpdate(ph)
 			v.phys:AddAngleVelocity(Vector(0,0,-brake + lvel.x*lvel.x/500000)*self.rotorDir*phm)
 		end
 	end
-end
-
-function ENT:Think()
-	self:base("wac_pl_base").Think(self)
 end
