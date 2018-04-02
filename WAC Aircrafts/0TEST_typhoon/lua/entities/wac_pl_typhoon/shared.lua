@@ -12,7 +12,7 @@ ENT.Model	    = "models/gredwitch/typhoon/typhoon.mdl"
 ENT.RotorPhModel	= "models/props_junk/sawblade001a.mdl"
 ENT.RotorModel	= "models/gredwitch/typhoon/typhoon_prop.mdl"
 
-ENT.rotorPos	= Vector(115,0,-35)
+ENT.rotorPos	= Vector(112,0,-35)
 ENT.TopRotorDir	= 1
 ENT.EngineForce	= 13000
 ENT.Weight	    = 6000
@@ -39,13 +39,13 @@ ENT.Wheels={
 		mass=550,
 	},
 	{
-		mdl="models/gredwitch/p47d/p47d_wl.mdl",
+		mdl="models/gredwitch/typhoon/typhoon_wr.mdl",
 		pos=Vector(40,100,-110),
 		friction=0,
 		mass=550,
 	},
 	{
-		mdl="models/gredwitch/p47d/p47d_wr.mdl",
+		mdl="models/gredwitch/typhoon/typhoon_wl.mdl",
 		pos=Vector(40,-100,-110),
 		friction=0,
 		mass=550,
