@@ -1,0 +1,6 @@
+{
+"title" : "[WAC] Shenyang J-8C",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}

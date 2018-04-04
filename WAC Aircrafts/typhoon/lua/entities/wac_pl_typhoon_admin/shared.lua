@@ -34,19 +34,19 @@ ENT.Agility = {
 ENT.Wheels={
 	{
 		mdl="models/gredwitch/p47d/p47d_wb.mdl",
-		pos=Vector(-203,0,-65),
+		pos=Vector(-203,0,-70),
 		friction=0,
 		mass=550,
 	},
 	{
 		mdl="models/gredwitch/typhoon/typhoon_wl.mdl",
-		pos=Vector(51.2412,86.5,-100),
+		pos=Vector(51.2412,86.5,-106),
 		friction=0,
 		mass=550,
 	},
 	{
 		mdl="models/gredwitch/typhoon/typhoon_wr.mdl",
-		pos=Vector(51.2411,-86.5,-100),
+		pos=Vector(51.2411,-86.5,-106),
 		friction=0,
 		mass=550,
 	},
