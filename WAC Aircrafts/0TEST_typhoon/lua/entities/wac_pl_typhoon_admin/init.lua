@@ -5,7 +5,7 @@ AddCSLuaFile("shared.lua")
 function ENT:SpawnFunction(ply, tr)
 	if (!tr.Hit) then return end
 	local ent=ents.Create(ClassName)
-	ent:SetPos(tr.HitPos+tr.HitNormal*16+Vector(0,0,200))
+	ent:SetPos(tr.HitPos+tr.HitNormal*16+Vector(0,0,150))
 	ent:Spawn()
 	ent:Activate()
 	ent.Owner=ply
@@ -44,7 +44,6 @@ function ENT:PhysicsUpdate(ph)
 	if IsValid(phys) and not self.disabled then
 		if self.controls.throttle>0 and self.rotorRpm>0.8 and phys:GetVelocity():Length() > 1600 and trace.HitPos:Distance( self:LocalToWorld(Vector(0,0,62)) ) > 50 then
 			self:SetBodygroup(1,1)
-			self:SetBodygroup(2,1)
 			for i=1,3 do 
 				self.wheels[i]:SetRenderMode(RENDERMODE_TRANSALPHA)
 				self.wheels[i]:SetColor(Color(255,255,255,0))
@@ -59,7 +58,6 @@ function ENT:PhysicsUpdate(ph)
 				end
 			end
 			self:SetBodygroup(1,0)
-			self:SetBodygroup(2,0)
 		end
 	end
 end
@@ -71,10 +69,11 @@ function ENT:addRotors()
 end
 
 function ENT:Think()
-self:base("wac_pl_base").Think(self)
+	self:base("wac_pl_base").Think(self)
 
-if self.engineHealth <= 0 then
-timer.Simple( 5, function() if IsValid(self) then self:Remove() end end )
-end
+	if self.engineHealth <= 0 then
+		self.rotorModel:SetModel("models/mm1/box.mdl")
+		self:SetBodygroup(11,1)
+	end
 
 end

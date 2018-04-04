@@ -39,14 +39,14 @@ ENT.Wheels={
 		mass=550,
 	},
 	{
-		mdl="models/gredwitch/typhoon/typhoon_wr.mdl",
-		pos=Vector(40,100,-110),
+		mdl="models/gredwitch/typhoon/typhoon_wl.mdl",
+		pos=Vector(51.2412,86.5,-100),
 		friction=0,
 		mass=550,
 	},
 	{
-		mdl="models/gredwitch/typhoon/typhoon_wl.mdl",
-		pos=Vector(40,-100,-110),
+		mdl="models/gredwitch/typhoon/typhoon_wr.mdl",
+		pos=Vector(51.2411,-86.5,-100),
 		friction=0,
 		mass=550,
 	},
