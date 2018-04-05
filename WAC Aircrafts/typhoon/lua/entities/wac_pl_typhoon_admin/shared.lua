@@ -33,7 +33,7 @@ ENT.Agility = {
 
 ENT.Wheels={
 	{
-		mdl="models/gredwitch/p47d/p47d_wb.mdl",
+		mdl="models/gredwitch/typhoon/typhoon_wb.mdl",
 		pos=Vector(-203,0,-70),
 		friction=0,
 		mass=550,
@@ -75,8 +75,8 @@ ENT.Weapons = {
 		    Ammo = 1,
 			TkAmmo = 0,
 			Sounds = {
-				shoot = "WAC/p47/gun.wav",
-				stop = "WAC/p47/gun_stop.wav",
+				shoot = "wac/typhoon/typhoon_shoot.wav",
+				stop = "wac/typhoon/typhoon_stop.wav",
 			}
 		}
 	},
@@ -99,9 +99,9 @@ ENT.Weapons = {
 
 
 ENT.Sounds={
-	Start="WAC/P51/Start.wav",
-	Blades="WAC/P51/external.wav",
-	Engine="radio/american.wav",
+	Start="wac/typhoon/typhoon_start.wav",
+	Blades="wac/typhoon/typhoon_internal.wav",
+	Engine="wac/typhoon/typhoon_external.wav",
 	MissileAlert="",
 	MissileShoot="",
 	MinorAlarm="",

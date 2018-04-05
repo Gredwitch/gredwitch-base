@@ -1,62 +1,44 @@
 
 include("shared.lua")
+AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 
-function ENT:SpawnFunction(ply, tr)
+function ENT:SpawnFunction(p, tr)
 	if (!tr.Hit) then return end
-	local ent=ents.Create(ClassName)
-	ent:SetPos(tr.HitPos+tr.HitNormal*170)
-	ent:Spawn()
-	ent:Activate()
-	Skin = math.random(0,1)
-	ent:SetSkin(Skin)
-	ent.Owner=ply	
-	self.Sounds=table.Copy(sndt)
-
-	return ent
+	local e = ents.Create(ClassName)
+	e:SetPos(tr.HitPos + tr.HitNormal*16)
+	e.Owner = p
+	e:Spawn()
+	e:Activate()
+	return e
 end
+
+ENT.AutomaticFrameAdvance = true
 
 ENT.Aerodynamics = {
 	Rotation = {
-		Front = Vector(0, 0.5, 0),
-		Right = Vector(0, 0, 40), -- Rotate towards flying direction
-		Top = Vector(0, 0, 0)
+		Front = Vector(0, 1, 0),
+		Right = Vector(0, 0, 20), -- Rotate towards flying direction
+		Top = Vector(0, -40, 0)
 	},
 	Lift = {
-		Front = Vector(0, 0, 13.25), -- Go up when flying forward
+		Front = Vector(0, 0, 35), -- Go up when flying forward
 		Right = Vector(0, 0, 0),
-		Top = Vector(0, 0, -0.25)
+		Top = Vector(0, 0, -0.5)
 	},
 	Rail = Vector(1, 5, 20),
 	Drag = {
 		Directional = Vector(0.01, 0.01, 0.01),
-		Angular = Vector(0.01, 0.01, 0.01)
+		Angular = Vector(0.05, 0.2, 0.1)
 	}
 }
-
 function ENT:PhysicsUpdate(ph)
-	self:base("wac_pl_base").PhysicsUpdate(self,ph)
+		self:base("wac_pl_base").PhysicsUpdate(self,ph)
 	
-	if self:GetNWInt("seat_3_actwep") == 1 then
+	if self.active then
 		self:SetBodygroup(5,1)
 	else
 		self:SetBodygroup(5,0)
-	end
-	
-	if self.rotorRpm > 0.5 and self.rotorRpm < 0.89 and IsValid(self.rotorModel) then
-		self.rotorModel:SetBodygroup(1,2)
-	elseif self.rotorRpm > 0.9 and IsValid(self.rotorModel) then
-		self.rotorModel:SetBodygroup(1,3)
-	elseif self.rotorRpm < 0.8 and IsValid(self.rotorModel) then
-		self.rotorModel:SetBodygroup(1,1)
-	end
-	
-	if self.rotorRpm > 0.5 and self.rotorRpm < 0.89 and IsValid(self.OtherRotorModel) then
-		self.OtherRotorModel:SetBodygroup(1,2)
-	elseif self.rotorRpm > 0.9 and IsValid(self.OtherRotorModel) then
-		self.OtherRotorModel:SetBodygroup(1,3)
-	elseif self.rotorRpm < 0.8 and IsValid(self.OtherRotorModel) then
-		self.OtherRotorModel:SetBodygroup(1,1)
 	end
 	
 	local geardown,t1=self:LookupSequence("geardown")
@@ -67,7 +49,7 @@ function ENT:PhysicsUpdate(ph)
 		if self.controls.throttle>0 and self.rotorRpm>0.5 and phys:GetVelocity():Length() > 1500 and trace.HitPos:Distance( self:LocalToWorld(Vector(0,0,62)) ) > 50  and self:GetSequence() != gearup then
 			self:ResetSequence(gearup) 
 			self:SetPlaybackRate(1.0)
-			self:SetBodygroup(4,1)
+			self:SetBodygroup(1,1)
 			for i=1,3 do 
 				self.wheels[i]:SetRenderMode(RENDERMODE_TRANSALPHA)
 				self.wheels[i]:SetColor(Color(255,255,255,0))
@@ -85,7 +67,7 @@ function ENT:PhysicsUpdate(ph)
 						self.wheels[i]:SetColor(Color(255,255,255,255))
 						self.wheels[i]:SetSolid(SOLID_VPHYSICS)
 					end
-					self:SetBodygroup(4,0)
+					self:SetBodygroup(1,0)
 				end
 			end)
 		end
@@ -124,7 +106,7 @@ function ENT:addRotors()
 	self.OtherRotor = ents.Create("prop_physics")
 	self.OtherRotor:SetModel("models/props_junk/sawblade001a.mdl")
 	self.OtherRotor:SetPos(self:LocalToWorld(self.OtherRotorPos))
-	self.OtherRotor:SetAngles(self:GetAngles() + Angle(90, 90, 90))
+	self.OtherRotor:SetAngles(self:GetAngles() + Angle(90, 0, 0))
 	self.OtherRotor:SetOwner(self.Owner)
 	self.OtherRotor:Spawn()
 	self.OtherRotor:SetNotSolid(true)
