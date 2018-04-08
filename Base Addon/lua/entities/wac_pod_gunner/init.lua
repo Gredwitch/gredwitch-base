@@ -37,14 +37,6 @@ function ENT:fire()
 	b.Width=0--1
 	b.Damage=40
 	b.Radius=70
-	constraint.NoCollide(self.aircraft,b,0,0)
-	constraint.NoCollide(self,b,0,0)
-	constraint.NoCollide(self.aircraft.wheels[i],b,0,0)
-	constraint.NoCollide(self.aircraft.camera,b,0,0)
-	constraint.NoCollide(self.aircraft.topRotor,b,0,0)
-	constraint.NoCollide(self.aircraft.topRotor2,b,0,0)
-	constraint.NoCollide(self.aircraft.backRotor,b,0,0)
-	constraint.NoCollide(self.aircraft.rotor,b,0,0)
 	b.gunRPM=self.FireRate
 	b:Spawn()
 	if tracer >= tracerConvar then
@@ -66,6 +58,12 @@ function ENT:fire()
 	util.Effect("MuzzleEffect", effectdata)
 	--util.ScreenShake( self.aircraft:GetPos(), 100, 100, 0.3, 500 )
 	tracer = tracer + 1
+	for _,e in pairs(self.aircraft.wheels) do
+		if IsValid(e) then
+		constraint.NoCollide(e,rocket,0,0)
+		end
+	end
+	constraint.NoCollide(self.aircraft,rocket,0,0)
 end
 
 function ENT:canFire()

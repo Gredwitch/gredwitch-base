@@ -57,7 +57,12 @@ function ENT:fireRocket(pos, ang)
 		end
 		self:StopSound( "fire" )
 		self:EmitSound( "fire" )
-		constraint.NoCollide(self.aircraft, rocket, 0, 0)
+		for _,e in pairs(self.aircraft.wheels) do
+			if IsValid(e) then
+				constraint.NoCollide(e,rocket,0,0)
+			end
+		end
+		constraint.NoCollide(self.aircraft,rocket,0,0)
 	else
 		local rocket = ents.Create( self.Kind )
 		rocket:SetPos(self:LocalToWorld(pos))
@@ -70,14 +75,13 @@ function ENT:fireRocket(pos, ang)
 		if ph:IsValid() then
 			ph:AddVelocity(self:GetVelocity())
 			ph:AddAngleVelocity(Vector(30,0,0))
-			ph:EnableCollisions(true)
 		end
-		--[[constraint.NoCollide(self.aircraft, rocket, 0, 0)
-		constraint.NoCollide(self.aircraft.wheels[i], rocket, 0, 0)
-		constraint.NoCollide(self.WeaponAttachments, rocket, 0, 0)
-		constraint.NoCollide(self.aircraft.topRotor, rocket, 0, 0)
-		constraint.NoCollide(self.aircraft.topRotor2, rocket, 0, 0)
-		constraint.NoCollide(self.aircraft.backRotor, rocket, 0, 0)--]]
+		for _,e in pairs(self.aircraft.wheels) do
+			if IsValid(e) then
+				constraint.NoCollide(e,rocket,0,0)
+			end
+		end
+		constraint.NoCollide(self.aircraft,rocket,0,0)
 	end
 end
 

@@ -171,7 +171,7 @@ function ENT:Explode()
 		 local trace = util.TraceLine(tracedata)
 	     
 		 if trace.HitWorld then
-		    if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion" or self.Effect == "ins_rpg_explosion" then 
+		    if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion" or self.Effect == "ins_rpg_explosion" or self.Effect == "ins_c4_explosion" then
 				ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil)
 				ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
 				--[[local Beffect = self:CreateParticleEffect(self.Effect,2, { attachtype = 2  } )--self.Effect,0,nil)--{1,self,pos})
@@ -181,7 +181,7 @@ function ENT:Explode()
 				ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
 			end
 		 else 
-		    if self.EffectAir == "doi_artillery_explosion" or self.EffectAir == "doi_stuka_explosion" or self.EffectAir == "ins_rpg_explosion" then 
+		    if self.EffectAir == "doi_artillery_explosion" or self.EffectAir == "doi_stuka_explosion" or self.EffectAir == "ins_rpg_explosion" or self.EffectAir == "ins_c4_explosion" then
 				ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
 			else
 				ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)

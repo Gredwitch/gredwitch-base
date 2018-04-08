@@ -79,6 +79,13 @@ function ENT:fireBullet(pos)
 	util.Effect("MuzzleEffect", effectdata)
 	--util.ScreenShake( self.aircraft:GetPos(), 100, 100, 0.3, 500 )
 	tracer = tracer + 1
+	for _,e in pairs(self.aircraft.wheels) do
+		if IsValid(e) then
+			constraint.NoCollide(e,b,0,0)
+		end
+	end
+	constraint.NoCollide(self.aircraft,b,0,0)
+	constraint.NoCollide(self.aircraft.rotor,b,0,0)
 end
 
 

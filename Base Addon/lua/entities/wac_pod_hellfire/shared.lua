@@ -64,7 +64,12 @@ function ENT:fireRocket(pos, ang)
 	end
 	self.sounds.fire:Stop()
 	self.sounds.fire:Play()
-	constraint.NoCollide(self.aircraft, rocket, 0, 0)
+	for _,e in pairs(self.aircraft.wheels) do
+		if IsValid(e) then
+			constraint.NoCollide(e,rocket,0,0)
+		end
+	end
+	constraint.NoCollide(self.aircraft,rocket,0,0)
 end
 
 

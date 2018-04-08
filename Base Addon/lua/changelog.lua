@@ -130,7 +130,7 @@
 - Renamed BASE_MG to BASE_12MM
 - Removed shockwave_sound_lowsh
 
-??/04/2018 (04/??/2018)
+02/04/2018 (04/02/2018)
 
 - Updated BASE_7MM : buffed it and added an explosive damage options
 - Updated gred_stmenu : fixed the whole spawnmenu options
@@ -138,5 +138,15 @@
 - Updated shockwave_sound_lowsh : reduced maximum sound range
 - Updated shockwave_ent : fixed random errors
 - Updated gred_convars
+
+??/04/2018 (04/??/2018)
+
+- Added a new 500LB GP model (thanks to damik)
+- Updated particles : fixed the Day of Infamy and Insurgency particles being white
+- Updated gred_stmenu
+- Updated gred_convars
+- Updated BASE_7MM : added compatibility with the Insurgency particles
+- Updated POD_GROCKET / POD_MIS / POD_MG / POD_GUNNER : projectiles won't collide with the aircraft
+- Updated materials
 
 --]]

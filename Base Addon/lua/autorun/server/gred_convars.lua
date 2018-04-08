@@ -67,3 +67,7 @@ end
 if GetConVar("gred_enableenginehealth") == nil then
 	CreateConVar("gred_enableenginehealth", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
 end
+
+if GetConVar("gred_insparticles") == nil then
+	CreateConVar("gred_insparticles", "0", { FCVAR_ARCHIVE } )
+end

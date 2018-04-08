@@ -1,22 +1,3 @@
---[[	local gred_multiple_fire_effect = CreateClientConVar("gred_multiple_fire_effects", "1", true,{ FCVAR_ARCHIVE } )
-	local gred_decals = CreateClientConVar("gred_decals", "1", true,{ FCVAR_ARCHIVE } )
-	local gred_water_impact = CreateClientConVar("gred_water_impact", "1", true,{ FCVAR_ARCHIVE } )
-	
-	local gred_easyuse = CreateConVar("gred_easyuse", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-	local gred_maxforcefield_range = CreateConVar("gred_maxforcefield_range", "5000", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-	local gred_fragility = CreateConVar("gred_fragility", "1", {FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-	local gred_shockwave_unfreeze = CreateConVar("gred_shockwave_unfreeze", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-	local gred_sound_shake = CreateConVar("gred_sound_shake", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-	local gred_12mm_he_impact = CreateConVar("gred_12mm_he_impact", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-	local gred_7mm_he_impact = CreateConVar("gred_7mm_he_impact", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-	local gred_tracers = CreateConVar("gred_tracers", "5", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-	local gred_oldrockets = CreateConVar("gred_oldrockets", "0", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-	local gred_jets_speed = CreateConVar("gred_jets_speed", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-	local gred_fire_effect = CreateConVar("gred_fire_effect", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-	local gred_healthslider = CreateConVar("gred_healthslider", "100", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-	local gred_enablehealth = CreateConVar("gred_enablehealth", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-	local gred_enableenginehealth = CreateConVar("gred_enableenginehealth", "1", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
---]]
 local function gredsettings( CPanel )
 	CPanel:ClearControls()
 	sounds={}
@@ -83,30 +64,10 @@ local function gredsettings( CPanel )
 	
 	CPanel:AddControl( "CheckBox", { Label = "Use health per engine sysetm?", Command = "gred_enableenginehealth" } );
 	
+	CPanel:AddControl( "CheckBox", { Label = "Use Insurgency impact effects for 7mm MGs?", Command = "gred_insparticles" } );
+	
 	CPanel:NumSlider( "Default engine health", "gred_healthslider", 1, 1000, 0 );
-	--[[
-	local reset = vgui.Create( "DImageButton" );
-	reset:SetImage( "hud/options_reset.png" );
-	reset:SetSize( 200, 100 );
-	reset.DoClick = function()
-		gred_maxforcefield_range:SetInt(5000)
-		gred_fragility:SetInt(1)
-		gred_shockwave_unfreeze:SetInt(1)
-		gred_decals:SetInt(1)
-		gred_sound_shake:SetInt(1)
-		
-		gred_water_impact:SetInt(1)
-		gred_7mm_he_impact:SetInt(1)
-		gred_tracers:SetInt(5)
-		gred_oldrockets:SetInt(0)
-		gred_jets_speed:SetInt(1)
-		gred_fire_effect:SetInt(1)
-		gred_multiple_fire_effect:SetInt(1)
-		gred_healthslider:SetInt(100)
-		gred_enablehealth:SetInt(1)
-		gred_enableenginehealth:SetInt(1)
-	end
-	CPanel:AddPanel( reset );--]]
+	
 end
 
 

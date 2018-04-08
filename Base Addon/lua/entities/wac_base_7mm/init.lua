@@ -163,82 +163,159 @@ ENT.Explode=function(self,tr)
 		hitpos = tr.HitPos
 		
 		local HitMat = util.GetSurfacePropName(tr.SurfaceProps)
-		
-		if     materials[HitMat] == 1 then
-			ParticleEffect("doi_impact_concrete",hitpos,hitang,nil)
-		
-		elseif materials[HitMat] == 2 then
-			ParticleEffect("doi_impact_dirt",hitpos,hitang,nil)
+		if GetConVarNumber("gred_insparticles") == 0 then
+			if     materials[HitMat] == 1 then
+				ParticleEffect("doi_impact_concrete",hitpos,hitang,nil)
 			
-		elseif materials[HitMat] == 3 then
-			--ParticleEffect("doi_impact_glass",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 4 then
-			ParticleEffect("doi_impact_glass",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 5 then
-			ParticleEffect("doi_impact_metal",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 6 then
-			ParticleEffect("doi_impact_sand",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 7 then
-			ParticleEffect("doi_impact_snow",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 8 then
-			ParticleEffect("doi_impact_leaves",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 9 then
-			ParticleEffect("doi_impact_wood",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 10 then
-			ParticleEffect("doi_impact_grass",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 11 then
-			ParticleEffect("doi_impact_tile",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 12 then
-			ParticleEffect("doi_impact_plastic",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 13 then
-			ParticleEffect("doi_impact_rock",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 14 then
-			ParticleEffect("doi_impact_gravel",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 15 then
-			ParticleEffect("doi_impact_mud",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 16 then
-			ParticleEffect("doi_impact_fruit",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 17 then
-			ParticleEffect("doi_impact_asphalt",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 18 then
-			ParticleEffect("doi_impact_cardboard",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 19 then
-			ParticleEffect("doi_impact_rubber",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 20 then
-			ParticleEffect("doi_impact_carpet",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 21 then
-			ParticleEffect("doi_impact_brick",hitpos,hitang,nil)
-			
-		elseif materials[HitMat] == 22 then
-			ParticleEffect("doi_impact_leaves",hitpos,hitang,nil)
+			elseif materials[HitMat] == 2 then
+				ParticleEffect("doi_impact_dirt",hitpos,hitang,nil)
 				
-		elseif materials[HitMat] == 23 then
-			ParticleEffect("doi_impact_paper",hitpos,hitang,nil)
+			elseif materials[HitMat] == 3 then
+				--ParticleEffect("doi_impact_glass",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 4 then
+				ParticleEffect("doi_impact_glass",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 5 then
+				ParticleEffect("doi_impact_metal",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 6 then
+				ParticleEffect("doi_impact_sand",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 7 then
+				ParticleEffect("doi_impact_snow",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 8 then
+				ParticleEffect("doi_impact_leaves",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 9 then
+				ParticleEffect("doi_impact_wood",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 10 then
+				ParticleEffect("doi_impact_grass",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 11 then
+				ParticleEffect("doi_impact_tile",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 12 then
+				ParticleEffect("doi_impact_plastic",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 13 then
+				ParticleEffect("doi_impact_rock",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 14 then
+				ParticleEffect("doi_impact_gravel",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 15 then
+				ParticleEffect("doi_impact_mud",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 16 then
+				ParticleEffect("doi_impact_fruit",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 17 then
+				ParticleEffect("doi_impact_asphalt",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 18 then
+				ParticleEffect("doi_impact_cardboard",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 19 then
+				ParticleEffect("doi_impact_rubber",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 20 then
+				ParticleEffect("doi_impact_carpet",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 21 then
+				ParticleEffect("doi_impact_brick",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 22 then
+				ParticleEffect("doi_impact_leaves",hitpos,hitang,nil)
 					
-		elseif materials[HitMat] == 24 then
-			ParticleEffect("doi_impact_computer",hitpos,hitang,nil)
-			
+			elseif materials[HitMat] == 23 then
+				ParticleEffect("doi_impact_paper",hitpos,hitang,nil)
+						
+			elseif materials[HitMat] == 24 then
+				ParticleEffect("doi_impact_computer",hitpos,hitang,nil)
+				
+			else
+				ParticleEffect("doi_impact_asphalt",hitpos,hitang,nil)
+				
+			end
 		else
-			ParticleEffect("doi_impact_asphalt",hitpos,hitang,nil)
+			if     materials[HitMat] == 1 then
+				ParticleEffect("impact_concrete",hitpos,hitang,nil)
 			
+			elseif materials[HitMat] == 2 then
+				ParticleEffect("impact_dirt",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 3 then
+				--ParticleEffect("impact_glass",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 4 then
+				ParticleEffect("impact_glass",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 5 then
+				ParticleEffect("impact_metal",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 6 then
+				ParticleEffect("impact_sand",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 7 then
+				ParticleEffect("impact_snow",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 8 then
+				ParticleEffect("impact_leaves",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 9 then
+				ParticleEffect("impact_wood",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 10 then
+				ParticleEffect("impact_grass",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 11 then
+				ParticleEffect("impact_tile",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 12 then
+				ParticleEffect("impact_plastic",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 13 then
+				ParticleEffect("impact_rock",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 14 then
+				ParticleEffect("impact_gravel",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 15 then
+				ParticleEffect("impact_mud",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 16 then
+				ParticleEffect("impact_fruit",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 17 then
+				ParticleEffect("impact_asphalt",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 18 then
+				ParticleEffect("impact_cardboard",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 19 then
+				ParticleEffect("impact_rubber",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 20 then
+				ParticleEffect("impact_carpet",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 21 then
+				ParticleEffect("impact_brick",hitpos,hitang,nil)
+				
+			elseif materials[HitMat] == 22 then
+				ParticleEffect("impact_leaves",hitpos,hitang,nil)
+					
+			elseif materials[HitMat] == 23 then
+				ParticleEffect("impact_paper",hitpos,hitang,nil)
+						
+			elseif materials[HitMat] == 24 then
+				ParticleEffect("impact_computer",hitpos,hitang,nil)
+				
+			else
+				ParticleEffect("impact_concrete",hitpos,hitang,nil)
+			end
 		end
 	end
 end
