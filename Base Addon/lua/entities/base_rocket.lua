@@ -234,6 +234,7 @@ function ENT:Explode()
 		 if trace.HitWorld then
 		    if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion" or self.Effect == "ins_rpg_explosion" or self.Effect == "doi_mortar_explosion" then 
 				ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil) 
+				ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
 			else
 				ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
 			end

@@ -172,7 +172,8 @@ function ENT:Explode()
 	     
 		 if trace.HitWorld then
 		    if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion" or self.Effect == "ins_rpg_explosion" then 
-				ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil) 
+				ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil)
+				ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
 				--[[local Beffect = self:CreateParticleEffect(self.Effect,2, { attachtype = 2  } )--self.Effect,0,nil)--{1,self,pos})
 				Beffect:SetControlPoint(4,Vector(114,114,114))
 				Beffect:StartEmission()--]]
