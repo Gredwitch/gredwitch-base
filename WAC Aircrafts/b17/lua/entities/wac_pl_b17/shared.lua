@@ -37,6 +37,9 @@ ENT.OtherRotorPos={
 	Vector(107.323,255.276,-15.354)
 }
 
+ENT.thirdPerson = {
+	distance = 1200
+}
 ENT.Agility = {
 	Thrust = 14
 }

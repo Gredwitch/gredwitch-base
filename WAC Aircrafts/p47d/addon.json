@@ -1,0 +1,6 @@
+{
+"title" : "[PREVIEW/ALPHA][WAC] Republic P-47D Thunderbolt",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}
