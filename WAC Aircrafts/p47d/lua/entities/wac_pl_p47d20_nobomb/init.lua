@@ -75,10 +75,14 @@ end
 function ENT:Think()
 	self:base("wac_pl_base").Think(self)
 	if self.engineHealth <= 20 then
-		if self:GetSkin() == 0 then self:SetSkin(4) elseif self:GetSkin() == 1 then self:SetSkin(5) elseif self:GetSkin() == 2 then self:SetSkin(6) elseif self:GetSkin() == 2 then self:SetSkin(7) end
+		if self:GetSkin() == 0 then self:SetSkin(4) elseif self:GetSkin() == 1 then self:SetSkin(5) elseif self:GetSkin() == 2 then self:SetSkin(6) elseif self:GetSkin() == 3	then self:SetSkin(7) end
 	else
 		if self:GetSkin() == 4 then self:SetSkin(0) elseif self:GetSkin() == 5 then self:SetSkin(1) elseif self:GetSkin() == 6 then self:SetSkin(2) elseif self:GetSkin() == 7 then self:SetSkin(3) end
 	end
-	self:SetBodygroup(18,1)
-	self:SetBodygroup(19,1)
+	self.rotorModel:SetSkin(self:GetSkin())
+	for i=1,3 do 
+		self.wheels[i]:SetSkin(self:GetSkin())
+	end
+	self:SetBodygroup(18,0)
+	self:SetBodygroup(19,0)
 end

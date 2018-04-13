@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models/gredwitch/gladiator/gladiator_canopy"
+	"$model" 1
+	"$surfaceprop" "glass"
+	"$translucent" 1
+} 
