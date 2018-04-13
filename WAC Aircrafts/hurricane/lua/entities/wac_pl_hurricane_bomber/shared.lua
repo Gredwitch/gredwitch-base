@@ -79,8 +79,8 @@ ENT.Weapons = {
 			Ammo = 2800,
 			Sequential = true,
 			Sounds = {
-				shoot = "WAC/P51/gun.wav",
-				stop = "WAC/P51/gun_stop.wav"
+				shoot = "WAC/hurricane/shoot.wav",
+				stop = "WAC/hurricane/stop.wav",
 			}
 		}
 	},
@@ -98,9 +98,9 @@ ENT.Weapons = {
 }
 
 ENT.Sounds={
-	Start="WAC/P51/Start.wav",
-	Blades="WAC/P51/external.wav",
-	Engine="radio/american.wav",
+	Start="WAC/hurricane/Start.wav",
+	Blades="WAC/hurricane/external.wav",
+	Engine="WAC/hurricane/internal.wav",
 	MissileAlert="",
 	MissileShoot="",
 	MinorAlarm="",
