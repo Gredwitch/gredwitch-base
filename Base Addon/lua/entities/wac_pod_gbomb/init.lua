@@ -14,22 +14,16 @@ if SERVER then
 		for k,v in pairs(self.Pods) do
 			local bomb = ents.Create( self.Kind )
 			bomb:SetPos(self.aircraft:LocalToWorld(v))
-			bomb:SetCollisionGroup(20)
 		    bomb:SetAngles(self.aircraft:GetAngles())
 		    bomb:Spawn()
 		    bomb:Activate()
 			bomb.phys=bomb:GetPhysicsObject()
 		    bomb.phys:SetMass(self.mass)
 		    bomb.weld=constraint.Weld(bomb,self.aircraft,0,0,0,true)
+			bomb.phys:SetMass(1)
+			bomb:SetCollisionGroup(20)
 		    self.bombs[#self.bombs+1]=bomb
 			self.allbombs[#self.allbombs+1]=bomb
-		end
-		for a,b in pairs(self.bombs) do
-			for c,d in pairs(self.bombs) do
-				if not b==d then
-					constraint.NoCollide(b,d,0,0)
-				end
-			end
 		end
 	end
 end
@@ -78,15 +72,16 @@ function ENT:dropBomb(bomb)
 	if bomb.weld then
 		bomb.weld:Remove()
 		bomb.weld=nil
-		bomb.phys:AddAngleVelocity(Vector(5000,1000,5000))
 	end
 	bomb.ShouldExplodeOnImpact = true
-	bomb.phys:AddVelocity(self.aircraft.phys:GetVelocity())
 	self.aircraft:EmitSound(self.Sounds.fire)
-	timer.Simple(1,function()
-		if IsValid(bomb) then
+	bomb.phys:AddVelocity(self.aircraft.phys:GetVelocity())
+			bomb.phys:SetMass(bomb.Mass)
+	timer.Simple(1, function()
+		if IsValid(bomb) and IsValid(bomb.phys) then
 			bomb.dropping=true
 			bomb.Armed = true
+			bomb:SetCollisionGroup(0)
 		end
 	end)
 end

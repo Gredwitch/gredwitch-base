@@ -10,7 +10,7 @@ ENT.Author			                 =  "Gredwitch"
 ENT.Contact		                     =  "qhamitouche@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 
-ENT.Model                            =  "models/gredwitch/500lbgp.mdl"
+ENT.Model                            =  "models/damik/p-47d thunderbolt/500lb.mdl"
 ENT.Effect                           =  "doi_stuka_explosion"                  
 ENT.EffectAir                        =  "doi_stuka_explosion"
 ENT.EffectWater                      =  "ins_water_explosion"

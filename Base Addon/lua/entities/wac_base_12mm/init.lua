@@ -51,7 +51,7 @@ ENT.Explode=function(self,tr)
 		local bullet = {}
 		bullet.Attacker = self.Owner
 		bullet.Callback = nil
-		bullet.Damage = self.Damage*3
+		if GetConVarNumber("gred_12mm_he_impact") >= 1 then bullet.Damage = 0 else bullet.Damage = self.Damage*3 end
 		bullet.Force = self.Radius*5
 		bullet.HullSize = 0
 		bullet.Num = 1

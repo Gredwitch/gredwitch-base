@@ -214,10 +214,15 @@ function ENT:Explode()
 			 
 		 local tr2 = util.TraceLine(trdat2)
 			 
-	     if tr2.Hit then
-		     ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
-		 end
-		 if self.WaterExplosionSound == nil then else 
+	    if tr2.Hit then
+			if self.EffectWater == "ins_water_explosion" then
+				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
+			else
+				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
+			end
+		end
+		
+		if self.WaterExplosionSound == nil then else 
 			self.ExplosionSound = self.WaterExplosionSound 
 		end
 		if self.WaterFarExplosionSound == nil then else  
