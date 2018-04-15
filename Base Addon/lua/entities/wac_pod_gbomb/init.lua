@@ -18,9 +18,10 @@ if SERVER then
 		    bomb:Spawn()
 		    bomb:Activate()
 			bomb.phys=bomb:GetPhysicsObject()
-		    bomb.phys:SetMass(self.mass)
 		    bomb.weld=constraint.Weld(bomb,self.aircraft,0,0,0,true)
-			bomb.phys:SetMass(1)
+			if GetConVarNumber("gred_bombs_mass") == 0 then
+				bomb.phys:SetMass(1)
+			end
 			bomb:SetCollisionGroup(20)
 		    self.bombs[#self.bombs+1]=bomb
 			self.allbombs[#self.allbombs+1]=bomb
@@ -76,7 +77,7 @@ function ENT:dropBomb(bomb)
 	bomb.ShouldExplodeOnImpact = true
 	self.aircraft:EmitSound(self.Sounds.fire)
 	bomb.phys:AddVelocity(self.aircraft.phys:GetVelocity())
-			bomb.phys:SetMass(bomb.Mass)
+	bomb.phys:SetMass(bomb.Mass)
 	timer.Simple(1, function()
 		if IsValid(bomb) and IsValid(bomb.phys) then
 			bomb.dropping=true

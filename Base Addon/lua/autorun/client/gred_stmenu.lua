@@ -20,6 +20,7 @@ local function gredsettings( CPanel )
 	end
 	CPanel:AddPanel( logo );
 	
+	
 	CPanel:AddControl( "CheckBox", { Label = "Should all bombs unweld and unfreeze?", Command = "gred_shockwave_unfreeze" } );
 	
 	CPanel:NumSlider( "Forcefield Max Range", "gred_maxforcefield_range", 10, 10000, 0 );
@@ -32,7 +33,7 @@ local function gredsettings( CPanel )
 
 	CPanel:AddControl( "CheckBox", { Label = "Should there be sound shake?", Command = "gred_sound_shake" } );
 
-	------------------------------PLANE SETTINGS-------------------------------
+	------------------------------PLANES SETTINGS-------------------------------
 	local plane = vgui.Create( "DImageButton" );
 	plane:SetImage( "hud/planes_settings.png" );
 	plane:SetSize( 200, 80 );
@@ -40,19 +41,12 @@ local function gredsettings( CPanel )
 		local psnd = Sound( table.Random(psounds) );
 		surface.PlaySound( psnd );
 	end
-
 	CPanel:AddPanel( plane );
 	
 	
-	CPanel:NumSlider( "Tracer ammo apparition", "gred_tracers", 0, 20, 0 );
-	
-	CPanel:AddControl( "CheckBox", { Label = "Shooting on water creates impact effects?", Command = "gred_water_impact" } );
-	
-	CPanel:AddControl( "CheckBox", { Label = "Should 12mm MGs have a blast radius? (Kills tanks!)", Command = "gred_12mm_he_impact" } );
-	
-	CPanel:AddControl( "CheckBox", { Label = "Should 7mm MGs have a blast radius? (Kills tanks!)", Command = "gred_7mm_he_impact" } );
-	
 	CPanel:AddControl( "CheckBox", { Label = "Use old rockets?", Command = "gred_oldrockets" } );
+	
+	CPanel:AddControl( "CheckBox", { Label = "Should bombs affect the aircraft's maniabillity?", Command = "gred_bombs_mass" } );
 
 	CPanel:AddControl( "CheckBox", { Label = "Should jets be very fast?", Command = "gred_jets_speed" } );
 
@@ -64,10 +58,19 @@ local function gredsettings( CPanel )
 	
 	CPanel:AddControl( "CheckBox", { Label = "Use health per engine sysetm?", Command = "gred_enableenginehealth" } );
 	
-	CPanel:AddControl( "CheckBox", { Label = "Use Insurgency impact effects for 7mm MGs?", Command = "gred_insparticles" } );
-	
 	CPanel:NumSlider( "Default engine health", "gred_healthslider", 1, 1000, 0 );
 	
+	------------------------------BULLETS SETTINGS-------------------------------
+	
+	CPanel:AddControl( "CheckBox", { Label = "Shooting on water creates impact effects?", Command = "gred_water_impact" } );
+	
+	CPanel:AddControl( "CheckBox", { Label = "Should 12mm MGs have a blast radius? (Kills tanks!)", Command = "gred_12mm_he_impact" } );
+	
+	CPanel:AddControl( "CheckBox", { Label = "Should 7mm MGs have a blast radius? (Kills tanks!)", Command = "gred_7mm_he_impact" } );
+	
+	CPanel:AddControl( "CheckBox", { Label = "Use Insurgency impact effects for 7mm MGs?", Command = "gred_insparticles" } );
+	
+	CPanel:NumSlider( "Tracer ammo apparition", "gred_tracers", 0, 20, 0 );
 end
 
 

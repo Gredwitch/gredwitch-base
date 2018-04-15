@@ -71,3 +71,7 @@ end
 if GetConVar("gred_insparticles") == nil then
 	CreateConVar("gred_insparticles", "0", { FCVAR_ARCHIVE } )
 end
+
+if GetConVar("gred_bombs_mass") == nil then
+	CreateConVar("gred_bombs_mass", "0", { FCVAR_ARCHIVE } )
+end
