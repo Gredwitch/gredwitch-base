@@ -75,7 +75,7 @@ ENT.Weapons = {
 			FireRate = 1000,
 			Sequential = false,
 			BulletType = "wac_base_7mm",
-			Ammo = 1
+			Ammo = 1,
 			TkAmmo = 0
 		}
 	}

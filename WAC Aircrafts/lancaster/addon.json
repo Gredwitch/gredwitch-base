@@ -1,0 +1,6 @@
+{
+"title" : "[WAC] Avro Lancaster B Mk III",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}
