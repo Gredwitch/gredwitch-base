@@ -139,7 +139,7 @@
 - Updated shockwave_ent : fixed random errors
 - Updated gred_convars
 
-??/04/2018 (04/??/2018)
+08/04/2018 (04/08/2018)
 
 - Added a new 500LB GP model (thanks to damik)
 - Updated particles : fixed the Day of Infamy and Insurgency particles being white
@@ -148,5 +148,11 @@
 - Updated BASE_7MM : added compatibility with the Insurgency particles
 - Updated POD_GROCKET / POD_MIS / POD_MG / POD_GUNNER : projectiles won't collide with the aircraft
 - Updated materials
+
+15/04/2018 (04/15/2018)
+
+- Added gred_overwrite_wac : this should fix WAC not getting overridden
+- Updated POD_GBOMB : bombs shouldn't affect the aircraft's maniabillity anymore
+- Updated BASE_ROCKET / BASE_GBOMB : fixed the Insurgency water explosion effect being in the wrong angle
 
 --]]

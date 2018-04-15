@@ -70,9 +70,8 @@ ENT.Explode=function(self,tr)
 		self:FireBullets( bullet, false )
 		ParticleEffect("gred_20mm",tr.HitPos,Angle(tr.HitNormal:Angle(),0,0),nil)
 		
-		
-		local d
-		--[[if self.gunRPM >= 4000 then d = (self.gunRPM / 10000) else d = (self.gunRPM / 5000) end
+		--[[local d
+		if self.gunRPM >= 4000 then d = (self.gunRPM / 10000) else d = (self.gunRPM / 5000) end
 		d = 1
 		if self.gunRPM >= 1000 then
 			self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,d, CHAN_AUTO )
