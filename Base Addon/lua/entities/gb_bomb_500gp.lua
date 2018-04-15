@@ -10,8 +10,8 @@ ENT.Author			                 =  "Gredwitch"
 ENT.Contact		                     =  "qhamitouche@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 
-ENT.Model                            =  "models/damik/p-47d thunderbolt/500lb.mdl"
-ENT.Effect                           =  "doi_stuka_explosion"                  
+ENT.Model                            =  "models/damik/500lb.mdl"
+ENT.Effect                           =  "doi_stuka_explosion"
 ENT.EffectAir                        =  "doi_stuka_explosion"
 ENT.EffectWater                      =  "ins_water_explosion"
 ENT.ArmSound                         =  "npc/roller/mine/rmine_blip3.wav"            
@@ -21,8 +21,8 @@ ENT.ExplosionSound                   =  "explosions/doi_stuka_close.wav"
 ENT.FarExplosionSound				 =  "explosions/doi_stuka_far.wav"
 ENT.DistExplosionSound				 =  "explosions/doi_stuka_dist.wav"
 
-ENT.WaterExplosionSound                   =  "explosions/doi_stuka_closewater.wav"
-ENT.WaterFarExplosionSound				  =  "explosions/doi_stuka_farwater.wav"
+ENT.WaterExplosionSound              =  "explosions/doi_stuka_closewater.wav"
+ENT.WaterFarExplosionSound			 =  "explosions/doi_stuka_farwater.wav"
 ENT.RSound							 =	0
 
 ENT.ShouldUnweld                     =  true
