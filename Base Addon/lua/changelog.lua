@@ -153,6 +153,8 @@
 
 - Added gred_overwrite_wac : this should fix WAC not getting overridden
 - Updated impact_fx_ins : smoke is now way less thick
+- Updated gred_convars
+- Updated gred_stmenu
 - Updated POD_GBOMB : bombs shouldn't affect the aircraft's maniabillity anymore
 - Updated BASE_ROCKET / BASE_GBOMB : fixed the Insurgency water explosion effect being in the wrong angle
 
