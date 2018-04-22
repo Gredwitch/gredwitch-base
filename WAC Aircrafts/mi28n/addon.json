@@ -1,0 +1,6 @@
+{
+"title" : "[WAC] Mil Mi-28N",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}
