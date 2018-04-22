@@ -35,9 +35,9 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Int", 0, "Kind" );
 end
 
-function ENT:canFire()
-	return IsValid(self:GetTarget())
-end
+-- function ENT:canFire()
+	-- return IsValid(self:GetTarget())
+-- end
 
 
 function ENT:fireRocket(pos, ang)
@@ -59,11 +59,11 @@ function ENT:fireRocket(pos, ang)
 		rocket.target = self:GetTarget()
 		rocket.targetOffset = self:GetTargetOffset()
 		rocket.calcTarget = function(r)
-			if !IsValid(r.target) then
-				return r:GetPos() + r:GetForward()*100
-			else
+			-- if !IsValid(r.target) then
+				-- return r:GetPos() + r:GetForward()*100
+			-- else
 				return r.target:LocalToWorld(r.targetOffset)
-			end
+			-- end
 		end
 		rocket:Spawn()
 		rocket:Activate()
@@ -106,11 +106,10 @@ if SERVER then
 			local pos = self.aircraft:LocalToWorld(self.aircraft.Camera.pos)
 			local dir = ang:Forward()
 			local tr = util.QuickTrace(pos+dir*20, dir*self.MaxRange, self)
-			if tr.Hit and !tr.HitWorld then
+			if tr.HitSky then return
+			elseif tr.Hit then
 				self:SetTarget(tr.Entity)
 				self:SetTargetOffset(tr.Entity:WorldToLocal(tr.HitPos))
-			else
-				self:SetTarget(nil)
 			end
 		end
 		return self:baseThink()
@@ -142,7 +141,7 @@ function ENT:drawCrosshair()
 	draw.Text({
 		text = (
 			self:GetNextShot() <= CurTime() and self:GetAmmo() > 0
-			and (IsValid(self:GetTarget()) and "LOCK" or "NO LOCK")
+			and (IsValid(self:GetTarget()) and "LOCK" or "READY")
 			or "MSL NOT READY"
 		),
 		font = "HudHintTextLarge",

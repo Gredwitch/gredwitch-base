@@ -64,19 +64,21 @@ function ENT:fireBullet(pos)
 	b.gunRPM=self.FireRate
 	b:Spawn()
 	if tracer >= tracerConvar then
-		util.SpriteTrail(b, 0, Color(255,255,0), false, 5, 5, 0.05, 1/(15+1)*0.5, "trails/laser.vmt")
+		--[[util.SpriteTrail(b, 0, Color(255,255,0), false, 5, 5, 0.05, 1/(15+1)*0.5, "trails/laser.vmt")
 		util.SpriteTrail(b, 0, b.col, false, 13/2, 13/8, 13/350, 1/13/2*0.5, "trails/smoke.vmt")
-		--util.SpriteTrail(b, 0, b.col, false, 13/2, 13/8, 13/40, 1/13/2*0.5, "trails/smoke.vmt")	
-		--util.SpriteTrail(b, 0, Color(255,255,0), false, 5, 0, 0.05, 1/(15+1)*0.5, "trails/laser.vmt")
+		util.SpriteTrail(b, 0, b.col, false, 13/2, 13/8, 13/40, 1/13/2*0.5, "trails/smoke.vmt")	
+		util.SpriteTrail(b, 0, Color(255,255,0), false, 5, 0, 0.05, 1/(15+1)*0.5, "trails/laser.vmt")--]]
 		tracer = 0
 	end
 	b.Owner=self.seat
 	local effectdata=EffectData()
+
 	effectdata:SetOrigin(self:LocalToWorld(pos))
 	effectdata:SetAngles(ang)
 	effectdata:SetEntity(self)
 	effectdata:SetScale(3)
-	util.Effect("MuzzleEffect", effectdata)
+	--util.Effect("MuzzleEffect", effectdata)
+	ParticleEffect("weapon_tracers_smoke",self:LocalToWorld(pos),ang,nil)
 	--util.ScreenShake( self.aircraft:GetPos(), 100, 100, 0.3, 500 )
 	tracer = tracer + 1
 	for _,e in pairs(self.aircraft.wheels) do

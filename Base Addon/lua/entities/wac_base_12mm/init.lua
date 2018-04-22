@@ -37,6 +37,8 @@ function ENT:Initialize()
 	self.canThink=true
 	self.IsBullet=true
 	self:NextThink(CurTime())
+	ParticleEffectAttach("weapon_tracers_smoke",PATTACH_ABSORIGIN_FOLLOW,self.Entity,1)
+	--ParticleEffect("weapon_tracers_red",self:GetPos(),self:GetAngles()-Angle(90,0,0),nil)
 	--self.phys:EnableCollisions(false)
 end
 
@@ -113,6 +115,7 @@ function ENT:PhysicsUpdate(ph)
 		end
 		self.Entity:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",100, 100,1, CHAN_AUTO )
 	end
+	--ParticleEffect("weapon_tracers",po,self:GetAngles(),self.Entity)
 	
 end
 
