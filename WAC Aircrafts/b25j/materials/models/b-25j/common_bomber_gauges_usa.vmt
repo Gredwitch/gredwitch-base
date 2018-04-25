@@ -1,0 +1,9 @@
+"VertexLitGeneric"
+{
+	$basetexture 			"models/b-25j/common_bomber_gauges_usa_c"
+	$phong 		 			"1"
+	$bumpmap	 			"models/b-25j/common_bomber_gauges_usa_n"
+	$phongexponenttexture	"models/b-25j/common_bomber_gauges_usa_phong"
+	$phongboost				1.0
+	$phongfresnelranges		"[0 0.5 1]"
+}

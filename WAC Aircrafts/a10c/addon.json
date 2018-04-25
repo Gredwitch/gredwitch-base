@@ -1,0 +1,6 @@
+{
+"title" : "[WAC] A-10C Thunderbolt II",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}

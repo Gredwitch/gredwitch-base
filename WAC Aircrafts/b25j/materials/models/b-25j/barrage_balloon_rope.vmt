@@ -1,0 +1,10 @@
+"VertexlitGeneric"
+{
+
+	"$basetexture" "models\b-25j\rope"
+	"$bumpmap" "models\b-25j\rope_n"
+	"$halflambert" "1"				
+	"$nocull" 1
+                "$alphatest" 1		
+
+}
