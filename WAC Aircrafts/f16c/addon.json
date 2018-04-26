@@ -1,0 +1,6 @@
+{
+"title" : "[WAC] Better F-16 Fighting Falcon",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+}

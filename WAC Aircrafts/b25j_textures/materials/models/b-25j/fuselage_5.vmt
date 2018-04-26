@@ -1,0 +1,9 @@
+"VertexLitGeneric"
+{
+	$basetexture 			"models/b-25j/pbj_1j_usmc_blue_a"
+	$phong 		 			"1"
+	$bumpmap	 			"models/b-25j/pbj_1j_usmc_blue_n"
+	$phongexponenttexture	"models/b-25j/pbj_1j_usmc_blue_phong"
+	$phongboost				1.0
+	$phongfresnelranges		"[0 0.5 1]"
+}
