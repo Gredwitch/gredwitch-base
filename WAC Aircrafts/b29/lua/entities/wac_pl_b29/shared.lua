@@ -128,7 +128,7 @@ ENT.Weapons = {
 		class = "wac_pod_gunner",
 		info = {
 			ShootPos = Vector(-82,0,174),
-			ShootOffset = Vector(0,0,0),
+			ShootOffset = Vector(50,0,0),
 			FireRate = 3400,
 			Ammo = 500
 		}
@@ -153,7 +153,7 @@ ENT.WeaponAttachments={
 	gun = {
 		model = "models/gredwitch/b29/b29_turrets.mdl",
 		pos = Vector(-79,0,176),
-		restrictPitch = true,
+		-- restrictPitch = true,
 	}
 	
 }

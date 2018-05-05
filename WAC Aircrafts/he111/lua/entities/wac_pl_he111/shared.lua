@@ -126,8 +126,8 @@ ENT.Weapons = {
 	            shoot3p = "",
             	spin = "wac/he111/spin.wav"
             },
-			ShootPos = Vector(-80,0,50),
-			ShootOffset = Vector(0,0,0),
+			ShootPos = Vector(-50,0,45),
+			ShootOffset = Vector(30,0,0),
 			Sequential = true,
 			BulletType = "wac_base_7mm",
 			Ammo = 1850,
@@ -136,30 +136,18 @@ ENT.Weapons = {
 	}
 }
 ENT.WeaponAttachments={
-	
-	gunMount1 = {
-		model = "models/gredwitch/he111/he111_mg81.mdl",
-		pos = Vector(-47.7841,0,40.6234),
-		restrictPitch = true,
-	},
 	gun = {
 		model = "models/gredwitch/he111/he111_mg81.mdl",
 		pos = Vector(-47.7841,0,40.6234),
 		localTo = "gunMount",
 	},
 	
-	radar1 = {
-		model = "models/mm1/box.mdl",
-		pos = Vector(-47.7841,0,40.6234),
-		restrictPitch = true,
-	},
-	
 }
 
 ENT.Camera = {
-	model = "models/mm1/box.mdl",
-	pos = Vector(-90,0,80),
-	offset = Vector(0,0,0),
+	model = "models/mm1/box.mdl", 
+	pos = Vector(-90,0,48),
+	offset = Vector(-50,0,48), 
 	viewPos = Vector(0,0,0),
 	minAng = Angle(-60, -360,0),
 	maxAng = Angle(25, 360,0),

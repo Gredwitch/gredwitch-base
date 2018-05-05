@@ -135,8 +135,8 @@ ENT.Weapons = {
 	["M2 Browning turret"] = {
 		class = "wac_pod_gunner",
 		info = {
-			ShootPos = Vector(-540,0,20),
-			ShootOffset = Vector(50, 0, 0),
+			ShootPos = Vector(-520,0,25),
+			ShootOffset = Vector(40, 0, 0),
 			FireRate = 1700,
 			Ammo = 1,
 			TkAmmo = 0,
@@ -151,28 +151,20 @@ ENT.Weapons = {
 
 ENT.WeaponAttachments={
 
-	gunMount1 = {
+	gun = {
 		model = "models/gredwitch/lancaster/lancaster_turret.mdl",
 		pos =  Vector(-513.901,0,21.4862),
-		restrictPitch = true,
-	},
-	
-	gun = {
-		model = "models/mm1/box.mdl",
-		pos = Vector(-513.901,0,21.4862),
-		localTo = "gunMount1",
 	},
 	
 }
 
-
 ENT.Camera = {
 	model = "models/mm1/box.mdl",
-	pos = Vector(-560,0,30),
+	pos = Vector(-520,0,30),
 	offset = Vector(0,0,0),
 	viewPos = Vector(10, 0, 10),
-	minAng = Angle(-30, -180,0),
-	maxAng = Angle(30,180,0),
+	minAng = Angle(-60, -360,0),
+	maxAng = Angle(25, 360,0),
 	seat = 3
 }
 

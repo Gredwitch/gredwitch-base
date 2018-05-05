@@ -137,15 +137,13 @@ ENT.WeaponAttachments={
 
 	gunMount1 = {
 		model = "models/gredwitch/b-17e/b-17e_gunmount.mdl",
-		pos = Vector(43.3282,-2.88671,61.2132),
-		restrictPitch = false,
+		pos = Vector(43.3282,-2.88671,61.2132),-- 43
+		restrictPitch = true,
 	},
 	
 	gun = {
 		model = "models/gredwitch/b-17e/b-17e_gun.mdl",
-		pos = Vector(0,0,0),--Vector(34.4722,-1.86747,57.6693),
-		localTo = "gunMount",
-		restrictPitch = false,
+		pos = Vector(43.4722,-1.86747,57.6693), --34
 	},
 	
 }
