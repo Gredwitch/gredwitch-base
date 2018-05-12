@@ -218,7 +218,6 @@ ENT.Camera = {
 	maxAng = Angle(180, 180, 180),
 	seat = 5
 }
-
 ENT.Sounds={
 	Start="wac/b17g/startup.wav",
 	Blades="wac/b17g/exterior.wav",

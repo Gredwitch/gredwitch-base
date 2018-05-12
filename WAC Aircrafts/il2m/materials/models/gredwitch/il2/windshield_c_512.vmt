@@ -1,0 +1,12 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/gredwitch/il2/windshield_c_512"
+	"$bumpmap" "models/gredwitch/il2/windshield_b_512"
+	
+	"$normalmapalphaenvmapmask" "1"
+	"$phong" 					"1"
+	"$phongexponent" 			"69"
+	"$phongboost"   			"0.1"
+	"$phongfresnelranges"   	"[8 4 8]"
+	"$translucent" 1
+}
