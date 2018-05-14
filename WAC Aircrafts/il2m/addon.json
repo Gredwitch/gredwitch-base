@@ -1,6 +1,6 @@
 {
-"title" : "[WAC] Macchi M.C.205 Veltro",
+"title" : "[WAC] Iliouchine Il-2M Sturmovik",
 "type" : "vehicle",
 "tags" : ["fun","realism"],
-"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+"ignore" : ["*.psd", "*.ini", "*.svn*"]
 }

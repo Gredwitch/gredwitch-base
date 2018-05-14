@@ -2,5 +2,5 @@
 "title" : "[WAC] Macchi M.C.205 Veltro",
 "type" : "vehicle",
 "tags" : ["fun","realism"],
-"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+"ignore" : ["*.psd", "*.ini", "*.svn*"]
 }
