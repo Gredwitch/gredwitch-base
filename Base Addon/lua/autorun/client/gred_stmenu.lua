@@ -33,6 +33,8 @@ local function gredsettings( CPanel )
 
 	CPanel:AddControl( "CheckBox", { Label = "Should there be sound shake?", Command = "gred_sound_shake" } );
 
+	CPanel:AddControl( "CheckBox", { Label = "Use GBombs style explosion?", Command = "gred_bombs_nocustomexplosion" } );
+
 	------------------------------PLANES SETTINGS-------------------------------
 	local plane = vgui.Create( "DImageButton" );
 	plane:SetImage( "hud/planes_settings.png" );
@@ -62,15 +64,26 @@ local function gredsettings( CPanel )
 	
 	------------------------------BULLETS SETTINGS-------------------------------
 	
-	CPanel:AddControl( "CheckBox", { Label = "Shooting on water creates impact effects?", Command = "gred_water_impact" } );
+	
+	CPanel:AddControl( "CheckBox", { Label = "Use an alternative muzzleflash?", Command = "gred_altmuzzleeffect" } );
 	
 	CPanel:AddControl( "CheckBox", { Label = "Should 12mm MGs have a blast radius? (Kills tanks!)", Command = "gred_12mm_he_impact" } );
 	
 	CPanel:AddControl( "CheckBox", { Label = "Should 7mm MGs have a blast radius? (Kills tanks!)", Command = "gred_7mm_he_impact" } );
 	
+	CPanel:NumSlider( "Tracer ammo apparition", "gred_tracers", 0, 20, 0 );
+	
 	CPanel:AddControl( "CheckBox", { Label = "Use Insurgency impact effects for 7mm MGs?", Command = "gred_insparticles" } );
 	
-	CPanel:NumSlider( "Tracer ammo apparition", "gred_tracers", 0, 20, 0 );
+	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 7mm MGs?", Command = "gred_noparticles_7mm" } );
+	
+	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 12mm MGs?", Command = "gred_noparticles_12mm" } );
+	
+	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 20mm cannons?", Command = "gred_noparticles_20mm" } );
+	
+	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 30mm cannons?", Command = "gred_noparticles_30mm" } );
+	
+	CPanel:AddControl( "CheckBox", { Label = "Disable water impact effects?", Command = "gred_water_impact" } );
 end
 
 

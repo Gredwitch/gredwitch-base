@@ -20,12 +20,12 @@ function ENT:fire()
 	local tr = util.QuickTrace(self:LocalToWorld(self.aircraft.Camera.pos) + dir*20, dir*999999999, {self, self.aircraft})
 	local ang = (tr.HitPos - pos):Angle()
 	local b = ents.Create(self.BulletType)
-	if self.BulletType == "wac_base_12mm" then
+	if self.BulletType == "wac_base_7mm" then
 		ang = ang + Angle(math.Rand(-0.5,0.5), math.Rand(-0.5,0.5), math.Rand(-0.5,0.5))
 	elseif self.BulletType == "wac_base_12mm" then
 		ang = ang + Angle(math.Rand(-1,1), math.Rand(-1,1), math.Rand(-1,1))
 	elseif self.BulletType == "wac_base_20mm" then
-		ang = ang + Angle(math.Rand(-2,2), math.Rand(-2,2), math.Rand(-2,2))
+		ang = ang + Angle(math.Rand(-1.4,1.4), math.Rand(-1.4,1.4), math.Rand(-1.4,1.4))
 	elseif self.BulletType == "wac_base_30mm" then
 		ang = ang + Angle(math.Rand(-3,3), math.Rand(-3,3), math.Rand(-3,3))
 	end

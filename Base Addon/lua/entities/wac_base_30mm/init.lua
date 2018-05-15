@@ -53,7 +53,9 @@ ENT.Explode=function(self,tr)
 		bullet.Spread = Vector(0,0,0)
 		bullet.Src = self.Entity:GetPos()
 		self:FireBullets( bullet, false )
-		ParticleEffect("30cal_impact",tr.HitPos,Angle(tr.HitNormal:Angle()),nil)
+		if GetConVarNumber("gred_noparticles_30mm") == 0 then
+			ParticleEffect("30cal_impact",tr.HitPos,Angle(tr.HitNormal:Angle()),nil)
+		end
 		self.Entity:EmitSound( "impactsounds/30mm_1.wav",140, math.random(90,120),1, CHAN_AUTO )
 	end
 	self.Entity:Remove()

@@ -73,5 +73,29 @@ if GetConVar("gred_insparticles") == nil then
 end
 
 if GetConVar("gred_bombs_mass") == nil then
-	CreateConVar("gred_bombs_mass", "0", { FCVAR_ARCHIVE } )
+	CreateConVar("gred_bombs_mass", "0", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
+end
+
+if GetConVar("gred_bombs_nocustomexplosion") == nil then
+	CreateConVar("gred_bombs_nocustomexplosion", "0", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
+end
+
+if GetConVar("gred_noparticles_7mm") == nil then
+	CreateConVar("gred_noparticles_7mm", "0", { FCVAR_ARCHIVE } )
+end
+
+if GetConVar("gred_noparticles_12mm") == nil then
+	CreateConVar("gred_noparticles_12mm", "0", { FCVAR_ARCHIVE } )
+end
+
+if GetConVar("gred_noparticles_20mm") == nil then
+	CreateConVar("gred_noparticles_20mm", "0", { FCVAR_ARCHIVE } )
+end
+
+if GetConVar("gred_noparticles_30mm") == nil then
+	CreateConVar("gred_noparticles_30mm", "0", { FCVAR_ARCHIVE } )
+end
+
+if GetConVar("gred_altmuzzleeffect") == nil then
+	CreateConVar("gred_altmuzzleeffect", "0", { FCVAR_ARCHIVE } )
 end

@@ -22,6 +22,7 @@ if SERVER then
 			if GetConVarNumber("gred_bombs_mass") == 0 then
 				bomb.phys:SetMass(1)
 			end
+			bomb.Owner = self.seat
 			bomb:SetCollisionGroup(20)
 		    self.bombs[#self.bombs+1]=bomb
 			self.allbombs[#self.allbombs+1]=bomb

@@ -68,8 +68,9 @@ ENT.Explode=function(self,tr)
 		bullet.Spread = Vector(0,0,0)
 		bullet.Src = self.Entity:GetPos()
 		self:FireBullets( bullet, false )
-		ParticleEffect("gred_20mm",tr.HitPos,Angle(tr.HitNormal:Angle(),0,0),nil)
-		
+		if GetConVarNumber("gred_noparticles_20mm") == 0 then
+			ParticleEffect("gred_20mm",tr.HitPos,Angle(tr.HitNormal:Angle(),0,0),nil)
+		end
 		--[[local d
 		if self.gunRPM >= 4000 then d = (self.gunRPM / 10000) else d = (self.gunRPM / 5000) end
 		d = 1

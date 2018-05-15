@@ -140,14 +140,15 @@ ENT.Explode=function(self,tr)
 	if self.Exploded then return end
 	self.Exploded = true
 	if !tr.HitSky then
-		self.Owner = self.Owner or self.Entity
-		if GetConVarNumber("gred_7mm_he_impact") >= 1 then
-			util.BlastDamage(self, self.Owner, tr.HitPos, self.Radius*1.5, self.Damage*2)
-		end
 		local bullet = {}
 		bullet.Attacker = self.Owner
 		bullet.Callback = nil
-		if GetConVarNumber("gred_7mm_he_impact") >= 1 then bullet.Damage = 0 else bullet.Damage = self.Damage*2 end
+		if GetConVarNumber("gred_12mm_he_impact") >= 1 then 
+			bullet.Damage = 0 
+			util.BlastDamage(self, self.Owner, tr.HitPos, self.Radius, self.Damage)
+		else 
+			bullet.Damage = self.Damage 
+		end
 		bullet.Force = self.Radius*1.5
 		bullet.HullSize = 0
 		bullet.Num = 1
@@ -163,7 +164,7 @@ ENT.Explode=function(self,tr)
 		hitpos = tr.HitPos
 		
 		local HitMat = util.GetSurfacePropName(tr.SurfaceProps)
-		if GetConVarNumber("gred_insparticles") == 0 then
+		if GetConVarNumber("gred_insparticles") == 0 and GetConVarNumber("gred_noparticles_7mm") == 0 then
 			if     materials[HitMat] == 1 then
 				ParticleEffect("doi_impact_concrete",hitpos,hitang,nil)
 			
@@ -240,7 +241,7 @@ ENT.Explode=function(self,tr)
 				ParticleEffect("doi_impact_asphalt",hitpos,hitang,nil)
 				
 			end
-		else
+		elseif GetConVarNumber("gred_insparticles") == 1 and GetConVarNumber("gred_noparticles_7mm") == 0 then
 			if     materials[HitMat] == 1 then
 				ParticleEffect("impact_concrete",hitpos,hitang,nil)
 			
@@ -316,7 +317,7 @@ ENT.Explode=function(self,tr)
 			else
 				ParticleEffect("impact_concrete",hitpos,hitang,nil)
 			end
-		end
+		elseif GetConVarNumber("gred_noparticles_7mm") == 1 then end
 	end
 end
 

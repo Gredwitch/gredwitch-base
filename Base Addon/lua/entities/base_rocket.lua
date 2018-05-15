@@ -4,7 +4,7 @@ sound.Add( {
 	name = "RP3_Engine",
 	channel = CHAN_STATIC,
 	volume = 1.0,
-	level = 120,
+	level = 90,
 	pitch = {100},
 	sound = "gunsounds/rpg_rocket_loop.wav"
 } )
@@ -13,7 +13,7 @@ sound.Add( {
 	name = "Hydra_Engine",
 	channel = CHAN_STATIC,
 	volume = 1.0,
-	level = 120,
+	level = 90,
 	pitch = {100},
 	sound = "wac/rocket_idle.wav"
 } )
@@ -22,7 +22,7 @@ sound.Add( {
 	name = "Nebelwerfer_Fire",
 	channel = CHAN_STATIC,
 	volume = 1.0,
-	level = 120,
+	level = 90,
 	pitch = {80,140},
 	sound = "gunsounds/nebelwerfer_rocket.wav"
 } )
@@ -374,7 +374,7 @@ function ENT:Launch()
 		 self.Ignition = true
 		 self:Arm()
 		 local pos = self:GetPos()
-		 sound.Play(self.StartSound, pos, 160, 130,1)
+		 sound.Play(self.StartSound, pos, 120, 130,1)
 	     self:EmitSound(self.EngineSound)
 		 self:SetNetworkedBool("EmitLight",true)
 		 self:SetNetworkedBool("self.Ignition",true)

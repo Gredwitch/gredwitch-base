@@ -158,4 +158,11 @@
 - Updated POD_GBOMB : bombs shouldn't affect the aircraft's maniabillity anymore
 - Updated BASE_ROCKET / BASE_GBOMB : fixed the Insurgency water explosion effect being in the wrong angle
 
+??/??/2018 (??/??/2018)
+
+- Updated POD_MG : fixed the sounds sometimes not playing / reduced the gun sounds's volume / updated the bullet spread with 20mm guns
+- Updated POD_GUNNER : updated the bullet spread with 20mm guns
+- Updated BASE_ROCKET : reduced the firing sound volume
+- Updated gred_convars / gred_stmenu : added a bunch of effects related options
+- Removed useless POD_TURRET
 --]]

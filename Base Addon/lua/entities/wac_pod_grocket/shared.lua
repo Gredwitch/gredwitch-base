@@ -19,7 +19,7 @@ sound.Add( {
 	name = "fire",
 	channel = CHAN_WEAPON,
 	volume = 1.0,
-	level = 110,
+	level = 120,
 	pitch = { 100 },
 	sound = "gunsounds/rocket.wav"
 } )

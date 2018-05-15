@@ -56,7 +56,7 @@ ENT.RSound   						 =  1
 ENT.DEFAULT_PHYSFORCE                = 500
 ENT.DEFAULT_PHYSFORCE_PLYAIR         = 500
 ENT.DEFAULT_PHYSFORCE_PLYGROUND      = 5000
-ENT.GBOWNER                          =  nil
+ENT.GBOWNER                          = ENT.Owner
 
 
 function ENT:Initialize()
@@ -125,7 +125,7 @@ function ENT:Explode()
 	ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
 	ent:SetVar("DEFAULT_PHYSFORCE_PLYAIR", self.DEFAULT_PHYSFORCE_PLYAIR)
 	ent:SetVar("DEFAULT_PHYSFORCE_PLYGROUND", self.DEFAULT_PHYSFORCE_PLYGROUND)
-	ent:SetVar("GBOWNER", self.GBOWNER)
+	ent:SetVar("GBOWNER", self.Owner)
 	ent:SetVar("SHOCKWAVEDAMAGE",self.ExplosionDamage)
 	ent:SetVar("MAX_RANGE",self.ExplosionRadius)
 	ent:SetVar("SHOCKWAVE_INCREMENT",100)
@@ -197,7 +197,7 @@ function ENT:Explode()
 	ent:SetPos( pos ) 
 	ent:Spawn()
 	ent:Activate()
-	ent:SetVar("GBOWNER", self.GBOWNER)
+	ent:SetVar("GBOWNER", self.Owner)
 	ent:SetVar("MAX_RANGE",self.ExplosionDamage*self.ExplosionRadius)
 	if self.RSound == nil then ent:SetVar("NOFARSOUND",1) else
 		ent:SetVar("NOFARSOUND",self.RSound) 
@@ -212,7 +212,7 @@ function ENT:Explode()
 	 
 	 if self.IsNBC then
 	     local nbc = ents.Create(self.NBCEntity)
-		 nbc:SetVar("GBOWNER",self.GBOWNER)
+		 nbc:SetVar("GBOWNER",self.Owner)
 		 nbc:SetPos(self:GetPos())
 		 nbc:Spawn()
 		 nbc:Activate()
