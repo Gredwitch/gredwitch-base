@@ -1,7 +1,7 @@
 
-AddCSLuaFile( "cl_init.lua" )
-AddCSLuaFile( "shared.lua" )
-include( 'shared.lua' )
+AddCSLuaFile("cl_init.lua")
+AddCSLuaFile("shared.lua")
+include		('shared.lua')
 
 ENT.turretBaseModel="models/gredwitch/mg81z/mg81z_tripod.mdl"
 
@@ -13,22 +13,20 @@ function ENT:CreateEmplacement()
 	turretBase:Spawn()
 	self.turretBase=turretBase
 	
-	constraint.NoCollide(self.turretBase,self,0,0)
-	
 	local shootPos=ents.Create("prop_dynamic")
-	shootPos:SetModel("models/hunter/blocks/cube025x025x025.mdl")
-	shootPos:SetAngles(self:GetAngles())
-	shootPos:SetPos(self:GetPos()-Vector(0,0,0))
+	shootPos:SetModel("models/mm1/box.mdl")
+	shootPos:SetAngles(self:GetAttachment(self:LookupAttachment("muzzle")).Ang)
+	shootPos:SetPos(self:GetAttachment(self:LookupAttachment("muzzle")).Pos)
 	shootPos:Spawn()
 	shootPos:SetCollisionGroup(COLLISION_GROUP_WORLD)
 	self.shootPos=shootPos
 	shootPos:SetParent(self)
-    shootPos:Fire("setparentattachment","muzzle")
 	shootPos:SetNoDraw(false)
 	shootPos:DrawShadow(false)
-	--shootPos:SetColor(Color(0,0,0,0))
+    shootPos:Fire("setparentattachment","muzzle")
 	self:SetDTEntity(1,shootPos)
 	
+	constraint.NoCollide(self.turretBase,self,0,0)
 end
 
 
@@ -42,22 +40,15 @@ ENT.Shooter=nil --player.GetHumans()[1]
 ENT.ShooterLast=nil
 
 
-
-
-
 function ENT:Initialize()
-	
 	self:SetModel("models/gredwitch/mg81z/mg81z_gun.mdl")
 	
 	self.Entity:PhysicsInit( SOLID_VPHYSICS )
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
 	self.Entity:SetSolid( SOLID_VPHYSICS )
 	self.Entity:SetCollisionGroup( COLLISION_GROUP_DEBRIS )
-	
 	local phys = self.Entity:GetPhysicsObject()
-	
 	if IsValid( phys ) then
-	
 		phys:Wake()
 		phys:SetVelocity( Vector( 0, 0, 0 ) )
 	end
@@ -71,29 +62,36 @@ function ENT:Initialize()
 	self.ShotSound=Sound("hmg_fire_turret")
 	self:SetUseType(SIMPLE_USE)
 	self.MuzzleAttachment=self:LookupAttachment("muzzle")
+	self.Muzzle2Attachment=self:LookupAttachment("muzzle2")
 	self.HookupAttachment=self:LookupAttachment("hookup")
 	self:DropToFloor()
 	
 	self.shootPos:SetRenderMode(RENDERMODE_TRANSCOLOR)
 	self.shootPos:SetColor(Color(255,255,255,1))
+	if (SERVER) then
+	greencolor = Color(0,255,0)
+	bcolor = Color(255,255,0)
+	num1   = 5
+	num2   = 0.05
+	num3   = 1 / (15 + 1)
+	num4   = 13 / 2
+	num5   = 13 / 8
+	num6   = 13 / 350
+	num7   = 1 / 13 / 2 * 0.5
+	end
 end
 
 
 
 function ENT:OnRemove()
-	
-	--> On remove fix!
 	if self.Shooter != nil then
-
 		net.Start("TurretBlockAttackToggle")
 		net.WriteBit(false)
 		net.Send(self.Shooter)
 		self:SetShooter(nil)
 		self:FinishShooting()
 		self.Shooter=nil
-
 	end
-	
 	SafeRemoveEntity(self.turretBase)
 end
 
@@ -126,7 +124,6 @@ end
 
 
 function ENT:PhysicsSimulate( phys, deltatime )
-	
 	phys:Wake()
  
 	self.ShadowParams.secondstoarrive = 0.01 
@@ -141,6 +138,4 @@ function ENT:PhysicsSimulate( phys, deltatime )
 	self.ShadowParams.deltatime = deltatime
  
 	phys:ComputeShadowControl(self.ShadowParams)
-	
- 
 end
