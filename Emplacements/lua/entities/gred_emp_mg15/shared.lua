@@ -2,18 +2,18 @@ ENT.Type 				= "anim"
 ENT.Base 				= "base_anim"
 
 ENT.Category			= "Gredwitch's Stuff"
-ENT.PrintName 			= "[EMP]MG 81Z"
+ENT.PrintName 			= "[EMP]MG 15"
 ENT.Author				= "Gredwitch"
 ENT.Spawnable			= true
 ENT.AdminSpawnable		= false
 
 ENT.tracer 				= 0
-ENT.TurretFloatHeight	= 3
-ENT.TurretModelOffset	= Vector(0,0,40)
+ENT.TurretFloatHeight	= 0
+ENT.TurretModelOffset	= Vector(0,0,0)
 ENT.TurretTurnMax		= -1
 
 ENT.LastShot			= 0
-ENT.ShotInterval		= 0.0375
+ENT.ShotInterval		= 0.057
 
 function ENT:SetupDataTables()
 	self:DTVar("Entity",0,"Shooter")
@@ -58,31 +58,19 @@ function ENT:ShooterStillValid()
 	
 	return IsValid(shooter) and shooter:Alive() and ((self:GetPos()+self.TurretModelOffset):Distance(shooter:GetShootPos())<=60)
 end
-
 function ENT:DoShot()
 	if self.LastShot+self.ShotInterval<CurTime() then
-	self:EmitSound("shootMG81Z")
+		self:EmitSound("shootMG15")
 		if SERVER then
 			local shoot1Pos=self:GetAttachment(self.MuzzleAttachment).Pos
 			local shoot1Ang=self:GetAttachment(self.MuzzleAttachment).Ang
-			local shoot2Pos=self:GetAttachment(self.Muzzle2Attachment).Pos
-			local shoot2Ang=self:GetAttachment(self.Muzzle2Attachment).Ang
 			if GetConVarNumber("gred_altmuzzleeffect") == 1 then
 				ParticleEffect("muzzleflash_mg42_3p",shoot1Pos,shoot1Ang,nil)
-				ParticleEffect("muzzleflash_mg42_3p",shoot2Pos,shoot2Ang,nil)
 			else
 				local effectdata = EffectData()
 				effectdata:SetStart(shoot1Pos)
 				effectdata:SetOrigin(shoot1Pos)
 				effectdata:SetAngles(shoot1Ang)
-				effectdata:SetEntity(self)
-				effectdata:SetScale( 1 )
-				util.Effect( "MuzzleEffect", effectdata )
-				
-				local effectdata = EffectData()
-				effectdata:SetStart(shoot2Pos)
-				effectdata:SetOrigin(shoot2Pos)
-				effectdata:SetAngles(shoot2Ang)
 				effectdata:SetEntity(self)
 				effectdata:SetScale( 1 )
 				util.Effect( "MuzzleEffect", effectdata )
@@ -92,11 +80,9 @@ function ENT:DoShot()
 			
 			local shoot1Pos=self:GetAttachment(self.MuzzleAttachment).Pos
 			local shoot1Ang=self:GetAttachment(self.MuzzleAttachment).Ang
-			local shoot2Pos=self:GetAttachment(self.Muzzle2Attachment).Pos
-			local shoot2Ang=self:GetAttachment(self.Muzzle2Attachment).Ang
 			local tracerConvar = GetConVarNumber("gred_tracers")
-			local b=ents.Create("wac_base_7mm")
 			
+			local b=ents.Create("wac_base_7mm") 
 			ang = shoot1Ang + Angle(math.Rand(-0.5,0.5), math.Rand(-0.5,0.5), math.Rand(-0.5,0.5))
 			b:SetPos(shoot1Pos)
 			b:SetAngles(ang)
@@ -110,27 +96,10 @@ function ENT:DoShot()
 			b.Owner= self.Shooter
 			b:Spawn()
 			
-			local btwo=ents.Create("wac_base_7mm")
-			
-			ang = shoot2Ang + Angle(math.Rand(-0.5,0.5), math.Rand(-0.5,0.5), math.Rand(-0.5,0.5))
-			btwo:SetPos(shoot2Pos)
-			btwo:SetAngles(ang)
-			btwo.Speed=1000
-			btwo.Size=0
-			btwo.Width=0
-			btwo.Damage=40
-			btwo.Radius=70
-			btwo.sequential=1
-			btwo.gunRPM=3600
-			btwo.Owner= self.Shooter
-			btwo:Spawn()
-			
 			self.tracer = self.tracer + 1
 			if self.tracer >= tracerConvar then
 				util.SpriteTrail(b, 0, bcolor, false, num1, num1, num2, num3, "trails/laser.vmt")
 				util.SpriteTrail(b, 0, greencolor, false, num4, num5, num6, num7, "trails/smoke.vmt")
-				util.SpriteTrail(btwo, 0, bcolor, false, num1, num1, num2, num3, "trails/laser.vmt")
-				util.SpriteTrail(btwo, 0, greencolor, false, num4, num5, num6, num7, "trails/smoke.vmt")
 				self.tracer = 0
 			end
 		self:GetPhysicsObject():ApplyForceCenter( self:GetRight()*50000 )
@@ -179,7 +148,7 @@ function ENT:Think()
 				self:DoShot()
 			end
 			if !self.Firing then
-				self:StopSound("shootMG81Z")
+				self:StopSound("shootMG15")
 			end
 			self:NextThink(CurTime())
 			return true

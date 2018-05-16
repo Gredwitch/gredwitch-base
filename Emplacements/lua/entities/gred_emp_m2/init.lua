@@ -3,7 +3,7 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include		('shared.lua')
 
-ENT.turretBaseModel="models/gredwitch/mg81z/mg81z_tripod.mdl"
+ENT.turretBaseModel="models/gredwitch/m2browning/m2_tripod.mdl"
 
 function ENT:CreateEmplacement()
 	local turretBase=ents.Create("prop_physics")
@@ -41,7 +41,7 @@ ENT.ShooterLast=nil
 
 
 function ENT:Initialize()
-	self:SetModel("models/gredwitch/mg81z/mg81z_gun.mdl")
+	self:SetModel("models/gredwitch/m2browning/m2_gun.mdl")
 	
 	self.Entity:PhysicsInit( SOLID_VPHYSICS )
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
@@ -52,7 +52,7 @@ function ENT:Initialize()
 		phys:Wake()
 		phys:SetVelocity( Vector( 0, 0, 0 ) )
 	end
-
+	
 	self.ShadowParams = {}
 	
 	self:StartMotionController()
@@ -61,14 +61,13 @@ function ENT:Initialize()
 	end
 	self:SetUseType(SIMPLE_USE)
 	self.MuzzleAttachment=self:LookupAttachment("muzzle")
-	self.Muzzle2Attachment=self:LookupAttachment("muzzle2")
 	self.HookupAttachment=self:LookupAttachment("hookup")
 	self:DropToFloor()
-	
+	self:SetPos(self:GetPos()+Vector(0,0,-20))
 	self.shootPos:SetRenderMode(RENDERMODE_TRANSCOLOR)
 	self.shootPos:SetColor(Color(255,255,255,1))
 	if (SERVER) then
-		greencolor = Color(0,255,0)
+		redcolor = Color(248,152,29) 
 		bcolor = Color(255,255,0)
 		num1   = 5
 		num2   = 0.05
@@ -79,12 +78,12 @@ function ENT:Initialize()
 		num7   = 1 / 13 / 2 * 0.5
 	end
 	sound.Add( {
-		name = "shootMG81Z",
+		name = "shootM2BROWNING",
 		channel = CHAN_WEAPON,
 		volume = 1.0,
 		level = 100,
 		pitch = {100},
-		sound = "gred_emp/mg81z/shoot.wav"
+		sound = "gred_emp/m2/shoot.wav"
 	} )
 end
 

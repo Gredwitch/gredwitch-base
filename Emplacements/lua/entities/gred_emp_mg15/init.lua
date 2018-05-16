@@ -21,7 +21,7 @@ function ENT:CreateEmplacement()
 	shootPos:SetCollisionGroup(COLLISION_GROUP_WORLD)
 	self.shootPos=shootPos
 	shootPos:SetParent(self)
-	shootPos:SetNoDraw(false)
+	shootPos:SetNoDraw(true)
 	shootPos:DrawShadow(false)
     shootPos:Fire("setparentattachment","muzzle")
 	self:SetDTEntity(1,shootPos)
@@ -41,7 +41,7 @@ ENT.ShooterLast=nil
 
 
 function ENT:Initialize()
-	self:SetModel("models/gredwitch/mg81z/mg81z_gun.mdl")
+	self:SetModel("models/gredwitch/mg15/mg15_gun.mdl")
 	
 	self.Entity:PhysicsInit( SOLID_VPHYSICS )
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
@@ -52,23 +52,20 @@ function ENT:Initialize()
 		phys:Wake()
 		phys:SetVelocity( Vector( 0, 0, 0 ) )
 	end
-
-	self.ShadowParams = {}
 	
+	self.ShadowParams = {}
 	self:StartMotionController()
 	if not IsValid(self.turretBase) then
 		self:CreateEmplacement()
 	end
 	self:SetUseType(SIMPLE_USE)
 	self.MuzzleAttachment=self:LookupAttachment("muzzle")
-	self.Muzzle2Attachment=self:LookupAttachment("muzzle2")
 	self.HookupAttachment=self:LookupAttachment("hookup")
 	self:DropToFloor()
-	
 	self.shootPos:SetRenderMode(RENDERMODE_TRANSCOLOR)
 	self.shootPos:SetColor(Color(255,255,255,1))
 	if (SERVER) then
-		greencolor = Color(0,255,0)
+		greencolor = Color(0,255,0) 
 		bcolor = Color(255,255,0)
 		num1   = 5
 		num2   = 0.05
@@ -79,12 +76,12 @@ function ENT:Initialize()
 		num7   = 1 / 13 / 2 * 0.5
 	end
 	sound.Add( {
-		name = "shootMG81Z",
+		name = "shootMG15",
 		channel = CHAN_WEAPON,
 		volume = 1.0,
 		level = 100,
 		pitch = {100},
-		sound = "gred_emp/mg81z/shoot.wav"
+		sound = "gred_emp/mg15/shoot.wav"
 	} )
 end
 
