@@ -1,9 +1,0 @@
-"VertexLitGeneric"
-{
-	$basetexture 			"models/b-25j/b_25j_20_usaaf_olive_tex2_c"
-	$phong 		 			"1"
-	$bumpmap	 			"models/b-25j/b_25j_20_usaaf_olive_tex2_n"
-	$phongexponenttexture	"models/b-25j/b_25j_20_usaaf_olive_tex2_phong"
-	$phongboost				1.0
-	$phongfresnelranges		"[0 0.5 1]"
-}

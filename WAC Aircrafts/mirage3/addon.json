@@ -1,6 +1,0 @@
-{
-"title" : "[WAC] Dassault Mirage III",
-"type" : "vehicle",
-"tags" : ["fun","realism"],
-"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
-}

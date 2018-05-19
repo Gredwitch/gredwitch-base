@@ -1,6 +1,0 @@
-"VertexlitGeneric"
-{
-	"$basetexture" "models/sentry/Apache/xpak_apache_c1"
-	"$bumpmap" "models/sentry/Apache/xpak_apache_b"
-	"$nocull" "1"
-}

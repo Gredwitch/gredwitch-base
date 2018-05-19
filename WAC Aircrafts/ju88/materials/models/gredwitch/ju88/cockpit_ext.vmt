@@ -1,8 +1,0 @@
-"VertexlitGeneric"
-{
-	"$basetexture" "models/gredwitch/ju88/cockpit_ext"
-        "$model"         1
-	"$translucent" 1
-	"$nocull" 1
-    "$surfaceprop" "metal"
-}

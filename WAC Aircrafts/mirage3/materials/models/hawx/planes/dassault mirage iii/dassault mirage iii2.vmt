@@ -1,9 +1,0 @@
-"VertexLitGeneric"
-{
-	"$baseTexture" "models/hawx/planes/Dassault Mirage III/Dassault Mirage III2"
-
-	"$phong" "1"
-	"$phongboost" "1"	
-	"$phongfresnelranges"	"[1 1 1]"
-	"$phongalbedotint" "1"
-}

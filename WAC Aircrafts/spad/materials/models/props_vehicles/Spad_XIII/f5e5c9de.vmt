@@ -1,9 +1,0 @@
-"VertexlitGeneric"
-{
-	"$basetexture" "models/props_vehicles/spad_xiii/f5e5c9de"
-	"$bumpmap" "dev/flat_normal"
- 	"$phong" "1"
-	"$phongexponent" "80"
-	"$phongboost"	"1"
-	"$phongfresnelranges"	"[.15 .45 1]"
-}

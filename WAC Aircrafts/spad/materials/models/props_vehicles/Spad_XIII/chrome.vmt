@@ -1,9 +1,0 @@
-"VertexLitGeneric"
-{
-	"$basetexture" "models/props_vehicles/spad_xiii/f5e5c9de"
-	"$surfaceprop" "metal"	
-	"$envmap" "env_cubemap"
-	"$envmapcontrast" 1
-	"$envmapsaturation" 1
-	"$envmaptint" "[ 0.75 0.75 0.75 ]"
-}
