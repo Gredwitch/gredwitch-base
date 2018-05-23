@@ -6,4 +6,6 @@
  - Step 2 : unzip the file you downloaded
  - Step 4 : put the "Base Addon" folder in your gmod addons folder (C:\Program
    Files (x86)\Steam\steamapps\common\GarrysMod\garrysmod\addons)
+# HOW TO HELP
 
+[You can give me your money here.](https://www.paypal.me/gredwitch)
