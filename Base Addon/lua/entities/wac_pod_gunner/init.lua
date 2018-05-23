@@ -55,8 +55,22 @@ function ENT:fire()
 	self.sounds.shoot3p:Stop()
 	self.sounds.shoot3p:Play()
 	self.sounds.shoot3p:SetSoundLevel(110)
-	util.Effect("MuzzleEffect", effectdata)
-	--util.ScreenShake( self.aircraft:GetPos(), 100, 100, 0.3, 500 )
+	LtWPOS = self:LocalToWorld(pos)
+	if CLIENT or game.SinglePlayer() then
+		if GetConVarNumber("gred_altmuzzleeffect") == 1 then
+			ParticleEffect("muzzleflash_sparks_variant_6",LtWPOS,ang,nil)
+			ParticleEffect("muzzleflash_1p_glow",LtWPOS,ang,nil)
+			ParticleEffect("muzzleflash_m590_1p_core",LtWPOS,ang,nil)
+			ParticleEffect("muzzleflash_smoke_small_variant_1",LtWPOS,ang,nil)
+		else
+			local effectdata=EffectData()
+			effectdata:SetOrigin(LtWPOS)
+			effectdata:SetAngles(ang)
+			effectdata:SetEntity(self.aircraft)
+			effectdata:SetScale(3)
+			util.Effect("MuzzleEffect", effectdata)
+		end
+	end
 	tracer = tracer + 1
 	for _,e in pairs(self.aircraft.wheels) do
 		if IsValid(e) then

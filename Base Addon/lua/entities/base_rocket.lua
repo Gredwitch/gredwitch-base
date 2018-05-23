@@ -19,6 +19,15 @@ sound.Add( {
 } )
 
 sound.Add( {
+	name = "V1_Engine",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 90,
+	pitch = {100},
+	sound = "gunsounds/v1_loop.wav"
+} )
+
+sound.Add( {
 	name = "Nebelwerfer_Fire",
 	channel = CHAN_STATIC,
 	volume = 1.0,
@@ -32,56 +41,56 @@ ExploSnds[1]                      =  "chappi/imp0.wav"
 local damagesound                    =  "weapons/rpg/shotdown.wav"
 
 
-ENT.Spawnable		            	 =  false     
-ENT.AdminSpawnable		             =  false       
+ENT.Spawnable		            	 =  false
+ENT.AdminSpawnable		             =  false
 
-ENT.PrintName		                 =  "natsu"            
-ENT.Author			                 =  "natsu"       
-ENT.Contact			                 =  "crap" 
-ENT.Category                         =  "Explosives"   
+ENT.PrintName		                 =  "Gredwitch's Rocket base"
+ENT.Author			                 =  "Gredwitch"
+ENT.Contact			                 =  "qhamitouche@gmail.com"
+ENT.Category                         =  "Gredwitch's Stuff"
 
-ENT.Model                            =  ""            
-ENT.RocketTrail                      =  ""            
-ENT.RocketBurnoutTrail               =  ""            
-ENT.Effect                           =  ""            
-ENT.EffectAir                        =  ""            
-ENT.EffectWater                      =  "" 
+ENT.Model                            =  ""
+ENT.RocketTrail                      =  ""
+ENT.RocketBurnoutTrail               =  ""
+ENT.Effect                           =  ""
+ENT.EffectAir                        =  ""
+ENT.EffectWater                      =  ""
      
 ENT.ExplosionSound                   =  ENT.ExplosionSound
 ENT.FarExplosionSound				 =  ENT.ExplosionSound
 ENT.DistExplosionSound				 =  ENT.ExplosionSound
 
 ENT.WaterExplosionSound				 =	nil
-ENT.WaterFarExplosionSound			 =  nil  
+ENT.WaterFarExplosionSound			 =  nil
     
-ENT.StartSound                       =  ""            
-ENT.ArmSound                         =  ""            
-ENT.ActivationSound                  =  ""      
-ENT.EngineSound                      =  "Missile.Ignite"  
-ENT.NBCEntity                        =  "" 
+ENT.StartSound                       =  ""
+ENT.ArmSound                         =  ""
+ENT.ActivationSound                  =  ""
+ENT.EngineSound                      =  "Missile.Ignite"
+ENT.NBCEntity                        =  ""
 
-ENT.ShouldUnweld                     =  false          
-ENT.ShouldIgnite                     =  false         
-ENT.UseRandomSounds                  =  false     
-ENT.SmartLaunch                      =  true     
-ENT.Timed                            =  false 
+ENT.ShouldUnweld                     =  false
+ENT.ShouldIgnite                     =  false
+ENT.UseRandomSounds                  =  false
+ENT.SmartLaunch                      =  true
+ENT.Timed                            =  false
 ENT.IsNBC                            =  false
 
-ENT.ExplosionDamage                  =  0            
-ENT.ExplosionRadius                  =  0             
-ENT.PhysForce                        =  0             
-ENT.SpecialRadius                    =  0             
-ENT.MaxIgnitionTime                  =  5             
-ENT.Life                             =  20            
-ENT.MaxDelay                         =  2            
-ENT.TraceLength                      =  500           
-ENT.ImpactSpeed                      =  500           
-ENT.Mass                             =  0   
-ENT.EnginePower                      =  0             
-ENT.FuelBurnoutTime                  =  0             
-ENT.IgnitionDelay                    =  0                        
-ENT.RotationalForce                  =  25            
-ENT.ArmDelay                         =  2             
+ENT.ExplosionDamage                  =  0
+ENT.ExplosionRadius                  =  0
+ENT.PhysForce                        =  0
+ENT.SpecialRadius                    =  0
+ENT.MaxIgnitionTime                  =  5
+ENT.Life                             =  20
+ENT.MaxDelay                         =  2
+ENT.TraceLength                      =  500
+ENT.ImpactSpeed                      =  500
+ENT.Mass                             =  0
+ENT.EnginePower                      =  0
+ENT.FuelBurnoutTime                  =  0
+ENT.IgnitionDelay                    =  0
+ENT.RotationalForce                  =  25
+ENT.ArmDelay                         =  2
 ENT.ForceOrientation                 =  "NORMAL"
 ENT.Timer                            =  0
 
@@ -237,14 +246,18 @@ function ENT:Explode()
 		 local trace = util.TraceLine(tracedata)
 	     
 		 if trace.HitWorld then
-		    if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion" or self.Effect == "ins_rpg_explosion" or self.Effect == "doi_mortar_explosion" then 
+		    if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion"
+			or self.Effect == "ins_rpg_explosion" or self.Effect == "doi_mortar_explosion" 
+			or self.Effect == "gred_mortar_explosion" or self.Effect == "gred_ap_impact" then 
 				ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil) 
 				ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
 			else
 				ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
 			end
 		 else 
-		    if self.EffectAir == "doi_artillery_explosion" or self.EffectAir == "doi_stuka_explosion" or self.EffectAir == "ins_rpg_explosion" or self.EffectAir == "doi_mortar_explosion" then 
+		    if self.EffectAir == "doi_artillery_explosion" or self.EffectAir == "doi_stuka_explosion"
+			or self.EffectAir == "ins_rpg_explosion" or self.EffectAir == "doi_mortar_explosion" 
+			or self.Effect == "gred_mortar_explosion" or self.Effect == "gred_ap_impact" then 
 				ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
 			else
 				ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)
@@ -277,6 +290,7 @@ function ENT:Explode()
 		 nbc:Activate()
 	 end
 	self:StopSound(self.EngineSound)
+	self:StopSound(self.StartSound)
 	self:Remove()
 end
 function ENT:OnTakeDamage(dmginfo)

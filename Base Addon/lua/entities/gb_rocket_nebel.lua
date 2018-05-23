@@ -67,7 +67,7 @@ ENT.SmartLaunch                      =  true
 ENT.Timed                            =  false 
 
 ENT.ExplosionDamage                  =  300
-ENT.ExplosionRadius                  =  500
+ENT.ExplosionRadius                  =  600
 ENT.PhysForce                        =  300
 ENT.SpecialRadius                    =  500
 ENT.MaxIgnitionTime                  =  0

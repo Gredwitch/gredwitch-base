@@ -32,8 +32,8 @@ CloseWaterExploSnds[2]                         =  "explosions/doi_generic_02_clo
 CloseWaterExploSnds[3]                         =  "explosions/doi_generic_03_closewater.wav"
 CloseWaterExploSnds[4]                         =  "explosions/doi_generic_04_closewater.wav"
 
-ENT.Spawnable		            	 =  true         
-ENT.AdminSpawnable		             =  true 
+ENT.Spawnable		            	 =  false         
+ENT.AdminSpawnable		             =  false 
 
 ENT.PrintName		                 =  "[TORPEDOES]Test Topredo"
 ENT.Author			                 =  ""

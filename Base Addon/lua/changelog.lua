@@ -160,9 +160,18 @@
 
 ??/??/2018 (??/??/2018)
 
+- Added gb_rocket_v1
+- Added a new Nebelwerfer rocket model
 - Updated POD_MG : fixed the sounds sometimes not playing / reduced the gun sounds's volume / updated the bullet spread with 20mm guns
+- Updated POD_GBOMB : added compatibility with the V1 "Flying Bomb"
 - Updated POD_GUNNER : updated the bullet spread with 20mm guns
 - Updated BASE_ROCKET : reduced the firing sound volume
 - Updated gred_convars / gred_stmenu : added a bunch of effects related options
+- Updated BASE_7MM : fixed the radius not disabling with the options
+- Updated BASE_20MM : updated the particles / added air burst stuff
+- Updated gred_stmenu and gred_convars : switched some convars to client only
+- Updated particles : fixed the Insurgency particles smoke, added my own particles
+- Updated gb_rocket_105mm to gb_rocket_81mm
+- Fixed the mortar shell's collision model
 - Removed useless POD_TURRET
 --]]

@@ -52,7 +52,7 @@ ENT.Explode=function(self,tr)
 		bullet.Callback = nil
 		if GetConVarNumber("gred_12mm_he_impact") >= 1 then 
 			bullet.Damage = 0 
-			util.BlastDamage(self, self.Owner, tr.HitPos, self.Radius, self.Damage)
+			util.BlastDamage(self, self.Owner, tr.HitPos, self.Radius, self.Damage*3)
 		else 
 			bullet.Damage = self.Damage*3 
 		end
@@ -66,8 +66,11 @@ ENT.Explode=function(self,tr)
 		bullet.Spread = Vector(0,0,0)
 		bullet.Src = self.Entity:GetPos()
 		self:FireBullets( bullet, false )
-		if GetConVarNumber("gred_noparticles_12mm") == 0 then
-			ParticleEffect("doi_gunrun_impact",tr.HitPos,tr.HitNormal:Angle(),nil)
+		
+		if CLIENT or game.SinglePlayer() then
+			if GetConVarNumber("gred_noparticles_12mm") == 0 then
+				ParticleEffect("doi_gunrun_impact",tr.HitPos,tr.HitNormal:Angle(),nil)
+			end
 		end
 		local d
 		if self.gunRPM >= 4000 then d = (self.gunRPM / 20000) else d = (self.gunRPM / 5000) end

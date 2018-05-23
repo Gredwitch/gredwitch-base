@@ -1100,134 +1100,187 @@ function ENT:DamageEngine(amt)
 			self.sounds.MinorAlarm:Play()
 		end
 		if !self.Smoke and self.engineHealth>0 then
-			self.Smoke = self:CreateSmoke()
-		end
-		if self.engineHealth < 50 then
-			if !self.sounds.LowHealth:IsPlaying() then
-				self.sounds.LowHealth:Play()
+			if (GetConVar("gred_fire_effect"):GetInt() >= 1) then
+				local smokey = ents.Create("prop_dynamic")
+				smokey:SetPos(self:LocalToWorld(self.FirePos))
+				smokey:SetModel("models/mm1/box.mdl")
+				smokey:SetParent(self.Entity)
+				smokey:Spawn()
+				ParticleEffectAttach("gred_plane_oilleak", 1, smokey, 0)
+			elseif (GetConVar("gred_fire_effect"):GetInt() <= 0) then
+				self.Smoke = self:CreateSmoke()
 			end
-			if self.engineHealth < 20 and !self.EngineFire then
-				if (GetConVar("gred_fire_effect"):GetInt() >= 1) then
-					local fire = ents.Create("env_fire")
-					fire:SetPos(self:LocalToWorld(self.FirePos))
-					fire:Spawn()
-					fire:SetParent(self.Entity)
-					ParticleEffectAttach("fire_large_01", 1, fire, 0)
-					if self.OtherRotors and (GetConVar("gred_multiple_fire_effects"):GetInt() >= 1) then
-						ParticleEffectAttach("fire_large_01", 1, self.OtherRotors[1], 0)
-						ParticleEffectAttach("fire_large_01", 1, self.OtherRotors[2], 0)
-						if self.OtherRotors[3] then ParticleEffectAttach("fire_large_01", 1, self.OtherRotors[3], 0) end
-					elseif self.OtherRotor and (GetConVar("gred_multiple_fire_effects"):GetInt() >= 1) then
-						ParticleEffectAttach("fire_large_01", 1, self.OtherRotor, 0)
-					elseif self.rotor2 and (GetConVar("gred_multiple_fire_effects"):GetInt() >= 1) then
-						ParticleEffectAttach("fire_large_01", 1, self.rotor2, 0)
-					elseif self.topRotor2 and (GetConVar("gred_multiple_fire_effects"):GetInt() >= 1) then
-						ParticleEffectAttach("fire_large_01", 1, self.topRotor2, 0)
-					end
-				else
-					local fire = ents.Create("env_fire_trail")
-					fire:SetPos(self:LocalToWorld(self.FirePos))
-					fire:Spawn()
-					fire:SetParent(self.Entity)
-					if self.OtherRotors and (GetConVar("gred_multiple_fire_effects"):GetInt() >= 1) then
-						local fire1 = ents.Create("env_fire_trail")
-						fire1:SetPos(self:LocalToWorld(self.OtherRotorPos[1]))
-						fire1:Spawn()
-						fire1:SetParent(self.Entity)
-						local fire2 = ents.Create("env_fire_trail")
-						fire2:SetPos(self:LocalToWorld(self.OtherRotorPos[2]))
-						fire2:Spawn()
-						fire2:SetParent(self.Entity)
-						if self.OtherRotors[3] then
-							local fire3 = ents.Create("env_fire_trail")
-							fire3:SetPos(self:LocalToWorld(self.OtherRotorPos[3]))
-							fire3:Spawn()
-							fire3:SetParent(self.Entity)
+		end
+		if self.engineHealth < 70  then
+			if (GetConVar("gred_multiple_fire_effects"):GetInt() >= 1) and (GetConVar("gred_fire_effect"):GetInt() >= 1) then
+				if self.OtherRotors then if self.OtherRotors[1] then
+					ParticleEffectAttach("gred_plane_oilleak", 1, self.OtherRotors[1], 0) end
+				end
+				if self.OtherRotor then 
+					ParticleEffectAttach("gred_plane_oilleak", 1, self.OtherRotor, 0)
+				end
+			end
+			if self.engineHealth < 50 then
+				if !self.sounds.LowHealth:IsPlaying() then
+					self.sounds.LowHealth:Play()
+					if (GetConVar("gred_multiple_fire_effects"):GetInt() >= 1) and (GetConVar("gred_fire_effect"):GetInt() >= 1) then
+						if self.OtherRotors then if self.OtherRotors[2] then
+							ParticleEffectAttach("gred_plane_oilleak", 1, self.OtherRotors[2], 0)
+						end end
+						if self.rotor2 then
+							ParticleEffectAttach("gred_plane_oilleak", 1, self.rotor2, 0)
 						end
-					elseif self.OtherRotor and (GetConVar("gred_multiple_fire_effects"):GetInt() >= 1) then
-						local fire4 = ents.Create("env_fire_trail")
-						fire4:SetPos(self:LocalToWorld(self.OtherRotorPos))
-						fire4:Spawn()
-						fire4:SetParent(self.Entity)
-					elseif self.rotor2 and (GetConVar("gred_multiple_fire_effects"):GetInt() >= 1) then
-						local fire5 = ents.Create("env_fire_trail")
-						fire5:SetPos(self:LocalToWorld(self.rotorPos2))
-						fire5:Spawn()
-						fire5:SetParent(self.Entity)
-					elseif self.topRotor2 and (GetConVar("gred_multiple_fire_effects"):GetInt() >= 1) then
-						local fire6 = ents.Create("env_fire_trail")
-						fire6:SetPos(self:LocalToWorld(self.TopRotor2.pos))
-						fire6:Spawn()
-						fire6:SetParent(self.Entity)
+						if self.topRotor2 then
+							ParticleEffectAttach("gred_plane_oilleak", 1, self.topRotor2, 0)
+						end
+					end
+					if self.engineHealth < 30 then
+						if (GetConVar("gred_multiple_fire_effects"):GetInt() >= 1) and (GetConVar("gred_fire_effect"):GetInt() >= 1) and self.OtherRotors then if self.OtherRotors[3] then
+							ParticleEffectAttach("gred_plane_oilleak", 1, self.OtherRotors[3], 0) end
+						end
+						if self.engineHealth < 20 and !self.EngineFire then
+							if (GetConVar("gred_fire_effect"):GetInt() >= 1) then
+								self:StopParticles()
+								local fire = ents.Create("prop_dynamic")
+								fire:SetPos(self:LocalToWorld(self.FirePos))
+								fire:SetModel("models/mm1/box.mdl")
+								fire:SetParent(self.Entity)
+								fire:Spawn()
+								ParticleEffectAttach("fire_large_01", 1, fire, 0)
+								if (GetConVar("gred_multiple_fire_effects"):GetInt() >= 1) then
+									if self.OtherRotors then
+										if self.OtherRotors[1] then
+											ParticleEffectAttach("fire_large_01", 1, self.OtherRotors[1], 0)
+										end
+										if self.OtherRotors[3] then
+											ParticleEffectAttach("fire_large_01", 1, self.OtherRotors[2], 0)
+										end
+										if self.OtherRotors[2] then
+											ParticleEffectAttach("fire_large_01", 1, self.OtherRotors[3], 0)
+										end
+									end
+									if self.OtherRotor then
+										ParticleEffectAttach("fire_large_01", 1, self.OtherRotor, 0)
+									end
+									if self.rotor2 then
+										ParticleEffectAttach("fire_large_01", 1, self.rotor2, 0)
+									end
+									if self.topRotor2 then
+										ParticleEffectAttach("fire_large_01", 1, self.topRotor2, 0)
+									end
+								end
+							elseif (GetConVar("gred_fire_effect"):GetInt() <= 0) then
+								local fire = ents.Create("env_fire_trail")
+								fire:SetPos(self:LocalToWorld(self.FirePos))
+								fire:Spawn()
+								fire:SetParent(self.Entity)
+								if (GetConVar("gred_multiple_fire_effects"):GetInt() >= 1) then
+									if self.OtherRotors then
+										if self.OtherRotors[1] then
+											local fire1 = ents.Create("env_fire_trail")
+											fire1:SetPos(self:LocalToWorld(self.OtherRotorPos[1]))
+											fire1:Spawn()
+											fire1:SetParent(self.Entity)
+										end
+										if self.OtherRotors[2] then
+											local fire2 = ents.Create("env_fire_trail")
+											fire2:SetPos(self:LocalToWorld(self.OtherRotorPos[2]))
+											fire2:Spawn()
+											fire2:SetParent(self.Entity)
+										end
+										if self.OtherRotors[3] then
+											local fire3 = ents.Create("env_fire_trail")
+												fire3:SetPos(self:LocalToWorld(self.OtherRotorPos[3]))
+											fire3:Spawn()
+											fire3:SetParent(self.Entity)
+										end
+									end
+									if self.OtherRotor then
+										local fire4 = ents.Create("env_fire_trail")
+										fire4:SetPos(self:LocalToWorld(self.OtherRotorPos))
+										fire4:Spawn()
+										fire4:SetParent(self.Entity)
+									end
+									if self.rotor2 then
+										local fire5 = ents.Create("env_fire_trail")
+										fire5:SetPos(self:LocalToWorld(self.rotorPos2))
+										fire5:Spawn()
+										fire5:SetParent(self.Entity)
+									end
+									if self.topRotor2 then
+										local fire6 = ents.Create("env_fire_trail")
+										fire6:SetPos(self:LocalToWorld(self.TopRotor2.pos))
+										fire6:Spawn()
+										fire6:SetParent(self.Entity)
+									end
+								end
+							end
+							self.sounds.LowHealth:Play()
+							self.EngineFire = fire
+							if self.engineHealth < 10 then 
+								self.engineDead = true 
+								self:setEngine(false) 
+								if self.engineHealth <= 0 and !self.disabled then
+									self.disabled = true
+									self.engineRpm = 0
+									self.rotorRpm = 0
+									local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
+									for k, p in pairs(self.passengers) do
+										if p and p:IsValid() then
+											p:TakeDamage(p:Health() + 20, lasta, self.Entity)
+										end
+									end
+									for k,v in pairs(self.seats) do
+										v:Remove()
+									end
+									self.passengers={}
+									self:StopAllSounds()
+
+									self:setVar("rotorRpm", 0)
+									self:setVar("engineRpm", 0)
+									self:setVar("up", 0)
+
+									self.IgnoreDamage = false
+									--[[ this affects the base class
+									for name, vec in pairs(self.Aerodynamics.Rotation) do
+										vec = VectorRand()*100
+									end
+									for name, vec in pairs(self.Aerodynamics.Lift) do
+										vec = VectorRand()
+									end
+									self.Aerodynamics.Rail = Vector(0.5, 0.5, 0.5)
+									]]
+									local effectdata = EffectData()
+									effectdata:SetStart(self.Entity:GetPos())
+									effectdata:SetOrigin(self.Entity:GetPos())
+									effectdata:SetScale(1)
+									util.Effect("Explosion", effectdata)
+									util.Effect("HelicopterMegaBomb", effectdata)
+									util.Effect("cball_explode", effectdata)
+									util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), 300, 300)
+									self:setEngine(false)
+									if self.Smoke then
+										self.Smoke:Remove()
+										self.Smoke=nil
+									end
+									if self.RotorWash then
+										self.RotorWash:Remove()
+										self.RotorWash=nil
+									end
+									self:SetNWBool("locked", true)
+								end
+							end
+						end 
 					end
 				end
-				self.sounds.LowHealth:Play()
-				self.EngineFire = fire
 			end
-			if self.engineHealth < 10 then 
-				self.engineDead = true 
-				self:setEngine(false) 
-			end
-
-			if self.engineHealth < 0 and !self.disabled then
-				self.disabled = true
-				self.engineRpm = 0
-				self.rotorRpm = 0
-				local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
-				for k, p in pairs(self.passengers) do
-					if p and p:IsValid() then
-						p:TakeDamage(p:Health() + 20, lasta, self.Entity)
-					end
-				end
-
-				for k,v in pairs(self.seats) do
-					v:Remove()
-				end
-				self.passengers={}
-				self:StopAllSounds()
-
-				self:setVar("rotorRpm", 0)
-				self:setVar("engineRpm", 0)
-				self:setVar("up", 0)
-
-				self.IgnoreDamage = false
-				--[[ this affects the base class
-					for name, vec in pairs(self.Aerodynamics.Rotation) do
-						vec = VectorRand()*100
-					end
-					for name, vec in pairs(self.Aerodynamics.Lift) do
-						vec = VectorRand()
-					end
-					self.Aerodynamics.Rail = Vector(0.5, 0.5, 0.5)
-				]]
-				local effectdata = EffectData()
-				effectdata:SetStart(self.Entity:GetPos())
-				effectdata:SetOrigin(self.Entity:GetPos())
-				effectdata:SetScale(1)
-				util.Effect("Explosion", effectdata)
-				util.Effect("HelicopterMegaBomb", effectdata)
-				util.Effect("cball_explode", effectdata)
-				util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), 300, 300)
-				self:setEngine(false)
-				if self.Smoke then
-					self.Smoke:Remove()
-					self.Smoke=nil
-				end
-				if self.RotorWash then
-					self.RotorWash:Remove()
-					self.RotorWash=nil
-				end
-				--[[self:SetNWBool("locked", true)
-				ParticleEffectAttach("1000lb_air", 1, self.Entity, 0)
-				timer.Simple( 0.1, function() self:Remove() end)--]]
-			end
+		end 
+		if self.Smoke then
+			local rcol = math.Clamp(self.engineHealth*3.4, 0, 170)
+			self.Smoke:SetKeyValue("rendercolor", rcol.." "..rcol.." "..rcol)
 		end
+		self:SetNWFloat("health", self.engineHealth)
 	end
-	if self.Smoke then
-		local rcol = math.Clamp(self.engineHealth*3.4, 0, 170)
-		self.Smoke:SetKeyValue("rendercolor", rcol.." "..rcol.." "..rcol)
-	end
-	self:SetNWFloat("health", self.engineHealth)
 end
 
 function ENT:CreateSmoke()
@@ -1265,6 +1318,7 @@ end
 
 function ENT:OnRemove()
 	self:StopAllSounds()
+	self:StopParticles()
 	for _,p in pairs(self.passengers) do
 		if IsValid(p) then
 			p:SetNWInt("wac_passenger_id",0)

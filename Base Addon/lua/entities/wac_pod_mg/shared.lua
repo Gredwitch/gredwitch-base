@@ -77,18 +77,20 @@ function ENT:fireBullet(pos)
 	end
 	b.Owner=self.seat
 	LtWPOS = self:LocalToWorld(pos)
-	if GetConVarNumber("gred_altmuzzleeffect") == 1 then
-		ParticleEffect("muzzleflash_sparks_variant_6",LtWPOS,ang,nil)
-		ParticleEffect("muzzleflash_1p_glow",LtWPOS,ang,nil)
-		ParticleEffect("muzzleflash_m590_1p_core",LtWPOS,ang,nil)
-		ParticleEffect("muzzleflash_smoke_small_variant_1",LtWPOS,ang,nil)
-	else
-		local effectdata=EffectData()
-		effectdata:SetOrigin(LtWPOS)
-		effectdata:SetAngles(ang)
-		effectdata:SetEntity(self.aircraft)
-		effectdata:SetScale(3)
-		util.Effect("MuzzleEffect", effectdata)
+	if CLIENT or game.SinglePlayer() then
+		if GetConVarNumber("gred_altmuzzleeffect") == 1 then
+			ParticleEffect("muzzleflash_sparks_variant_6",LtWPOS,ang,nil)
+			ParticleEffect("muzzleflash_1p_glow",LtWPOS,ang,nil)
+			ParticleEffect("muzzleflash_m590_1p_core",LtWPOS,ang,nil)
+			ParticleEffect("muzzleflash_smoke_small_variant_1",LtWPOS,ang,nil)
+		else
+			local effectdata=EffectData()
+			effectdata:SetOrigin(LtWPOS)
+			effectdata:SetAngles(ang)
+			effectdata:SetEntity(self.aircraft)
+			effectdata:SetScale(3)
+			util.Effect("MuzzleEffect", effectdata)
+		end
 	end
 	tracer = tracer + 1
 	

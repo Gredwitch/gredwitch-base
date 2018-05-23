@@ -30,3 +30,5 @@ game.AddParticles( "particles/water_impact.pcf")
 game.AddParticles( "particles/explosion_fx_ins.pcf")
 game.AddParticles( "particles/weapon_fx_tracers.pcf" )
 game.AddParticles( "particles/weapon_fx_ins.pcf" )
+
+game.AddParticles( "particles/gred_particles.pcf" )

@@ -1,5 +1,7 @@
-"LightmappedGeneric"
+"UnlitGeneric"
 {
-	"$basetexture" "vgui/entities/gb_bomb_gbu12"
-	"$translucent" 1
+	"$basetexture"			"VGUI/entities/gb_bomb_gbu12.vmt"
+	"$vertexcolor" 			1
+	"$vertexalpha" 			1
+	"$nolod" 				1
 }

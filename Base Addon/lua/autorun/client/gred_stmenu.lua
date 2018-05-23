@@ -1,3 +1,15 @@
+AddCSLuaFile()
+
+CreateClientConVar("gred_decals", "1")
+CreateClientConVar("gred_sound_shake", "1")
+CreateClientConVar("gred_water_impact", "1")
+CreateClientConVar("gred_insparticles", "0")
+CreateClientConVar("gred_noparticles_7mm", "0")
+CreateClientConVar("gred_noparticles_12mm", "0")
+CreateClientConVar("gred_noparticles_20mm", "0")
+CreateClientConVar("gred_noparticles_30mm", "0")
+CreateClientConVar("gred_altmuzzleeffect", "0")
+
 local function gredsettings( CPanel )
 	CPanel:ClearControls()
 	sounds={}

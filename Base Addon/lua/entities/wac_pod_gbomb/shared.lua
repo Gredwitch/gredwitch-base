@@ -15,6 +15,7 @@ ENT.mode = false
 ENT.Kind = ""
 ENT.mass = 250
 ENT.Admin = 0
+ENT.Rocket = 0
 ENT.Sounds = {
 	fire = "wac/stuka/dropbomb.wav"
 }
@@ -23,6 +24,7 @@ function ENT:SetupDataTables()
     self:base("wac_pod_base").SetupDataTables(self)
 	self:NetworkVar( "Entity", 0, "Kind" );
 	self:NetworkVar( "Int", 0, "Admin" );
+	self:NetworkVar( "Int", 0, "Rocket" );
 end
 
 function ENT:drawCrosshair()

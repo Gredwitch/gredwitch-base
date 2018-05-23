@@ -68,7 +68,6 @@ end
 
 
 function ENT:dropBomb(bomb)
-	local BaseClass = baseclass.Get( "base_bomb" )
 	if !self:takeAmmo(1) then return end
 	if not IsValid(bomb) then return end
 	if bomb.weld then
@@ -83,6 +82,7 @@ function ENT:dropBomb(bomb)
 		if IsValid(bomb) and IsValid(bomb.phys) then
 			bomb.dropping=true
 			bomb.Armed = true
+			if self.Rocket == 1 then bomb:Launch() end
 			bomb:SetCollisionGroup(0)
 		end
 	end)
