@@ -158,10 +158,15 @@
 - Updated POD_GBOMB : bombs shouldn't affect the aircraft's maniabillity anymore
 - Updated BASE_ROCKET / BASE_GBOMB : fixed the Insurgency water explosion effect being in the wrong angle
 
-??/??/2018 (??/??/2018)
+24/05/2018 (05/24/2018)
 
 - Added gb_rocket_v1
 - Added a new Nebelwerfer rocket model
+- Fixed the mortar shell's collision model
+- Fixed the water impacts spawning on your face
+- Fixed some missing particles errors
+- Fixed the artillery SWEPs
+- Fixed error related to the bullet's ownership
 - Updated POD_MG : fixed the sounds sometimes not playing / reduced the gun sounds's volume / updated the bullet spread with 20mm guns
 - Updated POD_GBOMB : added compatibility with the V1 "Flying Bomb"
 - Updated POD_GUNNER : updated the bullet spread with 20mm guns
@@ -172,6 +177,7 @@
 - Updated gred_stmenu and gred_convars : switched some convars to client only
 - Updated particles : fixed the Insurgency particles smoke, added my own particles
 - Updated gb_rocket_105mm to gb_rocket_81mm
-- Fixed the mortar shell's collision model
+- Updated WAC_HC_BASE
+- Upated the materials
 - Removed useless POD_TURRET
 --]]

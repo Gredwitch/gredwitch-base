@@ -131,7 +131,9 @@ function ENT:Initialize()
 	 self.Burnt    = false
 	 self.Ignition = false
 	 self.Arming   = false
-	 if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
+		
+	if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
+	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
 	end
 end
 
@@ -223,11 +225,13 @@ function ENT:Explode()
 			 
 		 local tr2 = util.TraceLine(trdat2)
 			 
-	    if tr2.Hit then
-			if self.EffectWater == "ins_water_explosion" then
-				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
-			else
-				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
+	    if CLIENT or not game.IsDedicated() then
+			if tr2.Hit then
+				if self.EffectWater == "ins_water_explosion" then
+					ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
+				else
+					ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
+				end
 			end
 		end
 		
@@ -244,25 +248,28 @@ function ENT:Explode()
 		 tracedata.filter   = self.Entity
 				
 		 local trace = util.TraceLine(tracedata)
-	     
-		 if trace.HitWorld then
-		    if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion"
-			or self.Effect == "ins_rpg_explosion" or self.Effect == "doi_mortar_explosion" 
-			or self.Effect == "gred_mortar_explosion" or self.Effect == "gred_ap_impact" then 
-				ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil) 
-				ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
-			else
-				ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
-			end
-		 else 
-		    if self.EffectAir == "doi_artillery_explosion" or self.EffectAir == "doi_stuka_explosion"
-			or self.EffectAir == "ins_rpg_explosion" or self.EffectAir == "doi_mortar_explosion" 
-			or self.Effect == "gred_mortar_explosion" or self.Effect == "gred_ap_impact" then 
-				ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
-			else
-				ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)
-			end
-		 end
+	     if CLIENT or not game.IsDedicated() then
+			 if trace.HitWorld then
+				if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion"
+				or self.Effect == "ins_rpg_explosion" or self.Effect == "doi_mortar_explosion" 
+				or self.Effect == "gred_mortar_explosion" or self.Effect == "gred_ap_impact"
+				or self.Effect == "gred_20mm_explosion" or self.Effect == "ins_c4_explosion" then
+					ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil) 
+					ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
+				else
+					ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
+				end
+			 else 
+				if self.EffectAir == "doi_artillery_explosion" or self.EffectAir == "doi_stuka_explosion"
+				or self.EffectAir == "ins_rpg_explosion" or self.EffectAir == "doi_mortar_explosion" 
+				or self.Effect == "gred_mortar_explosion" or self.Effect == "gred_ap_impact" 
+				or self.Effect == "gred_20mm_explosion" or self.Effect == "ins_c4_explosion" then 
+					ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
+				else
+					ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)
+				end
+			 end
+		end
      end
 	 
 	local ent = ents.Create("shockwave_sound_lowsh")
@@ -392,14 +399,14 @@ function ENT:Launch()
 	     self:EmitSound(self.EngineSound)
 		 self:SetNetworkedBool("EmitLight",true)
 		 self:SetNetworkedBool("self.Ignition",true)
-		 ParticleEffectAttach(self.RocketTrail,PATTACH_ABSORIGIN_FOLLOW,self,1)
+		if self.RocketTrail != "" then ParticleEffectAttach(self.RocketTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
 		 if(self.FuelBurnoutTime != 0) then 
 	         timer.Simple(self.FuelBurnoutTime,function()
 		         if not self:IsValid() then return end 
 		         self.Burnt = true
 		         self:StopParticles()
 		         self:StopSound(self.EngineSound)
-	             ParticleEffectAttach(self.RocketBurnoutTrail,PATTACH_ABSORIGIN_FOLLOW,self,1)
+	            if self.RocketBurnoutTrail != "" then ParticleEffectAttach(self.RocketBurnoutTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
              end)	 
 		 end
      end)		 

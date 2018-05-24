@@ -1,14 +1,15 @@
 AddCSLuaFile()
-
-CreateClientConVar("gred_decals", "1")
-CreateClientConVar("gred_sound_shake", "1")
-CreateClientConVar("gred_water_impact", "1")
-CreateClientConVar("gred_insparticles", "0")
-CreateClientConVar("gred_noparticles_7mm", "0")
-CreateClientConVar("gred_noparticles_12mm", "0")
-CreateClientConVar("gred_noparticles_20mm", "0")
-CreateClientConVar("gred_noparticles_30mm", "0")
-CreateClientConVar("gred_altmuzzleeffect", "0")
+if CLIENT then
+	CreateClientConVar("gred_decals", "1")
+	CreateClientConVar("gred_sound_shake", "1")
+	CreateClientConVar("gred_water_impact", "1")
+	CreateClientConVar("gred_insparticles", "0")
+	CreateClientConVar("gred_noparticles_7mm", "0")
+	CreateClientConVar("gred_noparticles_12mm", "0")
+	CreateClientConVar("gred_noparticles_20mm", "0")
+	CreateClientConVar("gred_noparticles_30mm", "0")
+	CreateClientConVar("gred_altmuzzleeffect", "0")
+end
 
 local function gredsettings( CPanel )
 	CPanel:ClearControls()
@@ -45,7 +46,7 @@ local function gredsettings( CPanel )
 
 	CPanel:AddControl( "CheckBox", { Label = "Should there be sound shake?", Command = "gred_sound_shake" } );
 
-	CPanel:AddControl( "CheckBox", { Label = "Use GBombs style explosion?", Command = "gred_bombs_nocustomexplosion" } );
+	-- CPanel:AddControl( "CheckBox", { Label = "Use GBombs style explosion?", Command = "gred_bombs_nocustomexplosion" } );
 
 	------------------------------PLANES SETTINGS-------------------------------
 	local plane = vgui.Create( "DImageButton" );

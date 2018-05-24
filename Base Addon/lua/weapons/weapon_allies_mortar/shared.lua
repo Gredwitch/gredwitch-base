@@ -117,7 +117,7 @@ function SWEP:PrimaryAttack()
 		local ArtiStrike = ents.Create("gred_arti_ent")
 		ArtiStrike:SetPos(spawnpos)
 		ArtiStrike.ShellType		= "gb_rocket_81mm"
-		ArtiStrike.Delay	    	= 10
+		ArtiStrike.Delay	    	= self.strikedalay
 		ArtiStrike.ShellCount		= 20
 		ArtiStrike.RandomPos		= 500
 		ArtiStrike.Owner			= self.Owner

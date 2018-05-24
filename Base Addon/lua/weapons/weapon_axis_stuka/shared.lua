@@ -7,7 +7,7 @@ SWEP.Purpose				= ""
 SWEP.Instructions				= ""
 SWEP.MuzzleAttachment			= "1" 	-- Should be "1" for CSS models or "muzzle" for hl2 models
 SWEP.ShellEjectAttachment			= "2" 	-- Should be "2" for CSS models or "1" for hl2 models
-SWEP.PrintName				= "[AXIS] Stuka strike"
+SWEP.PrintName				= "[AXIS]Stuka strike"
 SWEP.Slot				= 4				-- Slot in the weapon selection menu
 SWEP.SlotPos				= 35			-- Position in the slot
 SWEP.DrawAmmo				= true		-- Should draw the default HL2 ammo counter
@@ -118,7 +118,7 @@ if  (!self:CanPrimaryAttack()) then return end
 		local ArtiStrike = ents.Create("gred_arti_ent")
 		ArtiStrike:SetPos(spawnpos)
 		ArtiStrike.ShellType		= "gb_bomb_sc500"
-		ArtiStrike.Delay	    	= 5
+		ArtiStrike.Delay	    	= self.strikedalay
 		ArtiStrike.ShellCount		= 1
 		ArtiStrike.RandomPos		= 0
 		ArtiStrike.Owner			= self.Owner

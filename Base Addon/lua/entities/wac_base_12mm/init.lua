@@ -46,7 +46,10 @@ ENT.Explode=function(self,tr)
 	if self.Exploded then return end
 	self.Exploded = true
 	if !tr.HitSky then
-		self.Owner = self.Owner or self.Entity
+		if not IsValid(self.Owner) then 
+			if IsValid(self.Entity) then self.Owner = self.Entity
+			else self.Owner = nil end
+		end
 		local bullet = {}
 		bullet.Attacker = self.Owner
 		bullet.Callback = nil
@@ -67,7 +70,7 @@ ENT.Explode=function(self,tr)
 		bullet.Src = self.Entity:GetPos()
 		self:FireBullets( bullet, false )
 		
-		if CLIENT or game.SinglePlayer() then
+		if CLIENT or not game.IsDedicated() then
 			if GetConVarNumber("gred_noparticles_12mm") == 0 then
 				ParticleEffect("doi_gunrun_impact",tr.HitPos,tr.HitNormal:Angle(),nil)
 			end
@@ -112,12 +115,12 @@ function ENT:PhysicsUpdate(ph)
 	
 	local trdat2   = {}
     trdat2.start   = pos
-	trdat2.endpos  = pos-difference
+	trdat2.endpos  = pos+difference
 	trdat2.filter  = self
 	trdat2.mask    = MASK_WATER
 	local tr2 = util.TraceLine(trdat2)
 	if tr2.Hit then
-		if GetConVarNumber("gred_water_impact") == 1 then
+		if GetConVarNumber("gred_water_impact") == 1 and (CLIENT or not game.IsDedicated()) then
 			ParticleEffect("impact_water",tr2.HitPos,Angle(-90,0,0),nil)
 		end
 		self.Entity:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",100, 100,1, CHAN_AUTO )

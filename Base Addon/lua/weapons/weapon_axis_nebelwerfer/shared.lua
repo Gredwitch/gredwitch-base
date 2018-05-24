@@ -118,8 +118,8 @@ function SWEP:PrimaryAttack()
 		local ArtiStrike = ents.Create("gred_arti_ent")
 		ArtiStrike:SetPos(spawnpos)
 		ArtiStrike.ShellType		= "gb_rocket_nebel"
-		ArtiStrike.Delay	    	= 10
-		ArtiStrike.ShellCount		= 12
+		ArtiStrike.Delay	    	= self.strikedalay
+		ArtiStrike.ShellCount		= 18
 		ArtiStrike.RandomPos		= 800
 		ArtiStrike.Owner			= self.Owner
 		ArtiStrike.Team				= "Axis"
@@ -127,7 +127,7 @@ function SWEP:PrimaryAttack()
 		
 		ArtiStrike.FireRate			= 1
 		ArtiStrike.LoopTimerTime1	= 1.7
-		ArtiStrike.LoopTimerTime2	= 2.5
+		ArtiStrike.LoopTimerTime1	= 2.2
 		
 		ArtiStrike:Spawn()
 		ArtiStrike:Activate()

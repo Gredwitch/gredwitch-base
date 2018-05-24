@@ -37,7 +37,10 @@ ENT.Explode=function(self,tr)
 	if self.Exploded then return end
 	self.Exploded = true
 	if !tr.HitSky then
-		self.Owner = self.Owner or self.Entity
+		if not IsValid(self.Owner) then 
+			if IsValid(self.Entity) then self.Owner = self.Entity
+			else self.Owner = nil end
+		end
 		util.BlastDamage(self, self.Owner, tr.HitPos, self.Radius*6, self.Damage*8)
 		local bullet = {}
 		bullet.Attacker = self.Owner
@@ -53,7 +56,7 @@ ENT.Explode=function(self,tr)
 		bullet.Spread = Vector(0,0,0)
 		bullet.Src = self.Entity:GetPos()
 		self:FireBullets( bullet, false )
-		if CLIENT or game.SinglePlayer() then
+		if CLIENT or not game.IsDedicated() then
 			if GetConVarNumber("gred_noparticles_30mm") == 0 then
 				ParticleEffect("30cal_impact",tr.HitPos,Angle(tr.HitNormal:Angle()),nil)
 			end
@@ -88,12 +91,12 @@ function ENT:PhysicsUpdate(ph)
 	
 	local trdat2   = {}
     trdat2.start   = pos
-	trdat2.endpos  = pos-difference
+	trdat2.endpos  = pos+difference
 	trdat2.filter  = self
 	trdat2.mask    = MASK_WATER
 	local tr2 = util.TraceLine(trdat2)
 	if tr2.Hit then
-		if GetConVarNumber("gred_water_impact") == 1 then
+		if GetConVarNumber("gred_water_impact") == 1 and (CLIENT or not game.IsDedicated()) then
 			ParticleEffect("water_medium",tr2.HitPos,Angle(0,0,0),nil)
 		end
 		self.Entity:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",100, 100,1, CHAN_AUTO )

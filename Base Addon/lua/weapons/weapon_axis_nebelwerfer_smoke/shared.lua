@@ -95,7 +95,7 @@ SWEP.NextShoot = 0
 function SWEP:PrimaryAttack()
 	if  ( !self:CanPrimaryAttack() ) then return end
 	
-	self.Weapon:EmitSound("/radio/allied/artillerybegin"..(math.random(1,6))..".ogg")
+	self.Weapon:EmitSound("/radio/axis/artillerybeginsmoke"..(math.random(1,5))..".ogg")
 	self.Weapon:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 	self:TakePrimaryAmmo(1)
 	self.Owner:ChatPrint("[GREDWITCH'S SWEPS]Nebelwerfer smoke strike begins in "..(self.strikedalay).." seconds")
@@ -123,7 +123,7 @@ function SWEP:PrimaryAttack()
 		local ArtiStrike = ents.Create("gred_arti_ent")
 		ArtiStrike:SetPos(spawnpos)
 		ArtiStrike.ShellType		= "gb_rocket_nebel"
-		ArtiStrike.Delay	    	= 10
+		ArtiStrike.Delay	    	= self.strikedalay
 		ArtiStrike.ShellCount		= 12
 		ArtiStrike.RandomPos		= 800
 		ArtiStrike.Owner			= self.Owner
@@ -132,7 +132,7 @@ function SWEP:PrimaryAttack()
 		ArtiStrike.Smoke			= true
 		ArtiStrike.FireRate			= 1
 		ArtiStrike.LoopTimerTime1	= 1.7
-		ArtiStrike.LoopTimerTime1	= 2.5
+		ArtiStrike.LoopTimerTime1	= 2.2
 		
 		ArtiStrike:Spawn()
 		ArtiStrike:Activate()

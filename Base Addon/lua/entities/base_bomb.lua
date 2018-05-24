@@ -56,30 +56,32 @@ ENT.RSound   						 =  1
 ENT.DEFAULT_PHYSFORCE                = 500
 ENT.DEFAULT_PHYSFORCE_PLYAIR         = 500
 ENT.DEFAULT_PHYSFORCE_PLYGROUND      = 5000
-ENT.GBOWNER                          = ENT.Owner
+ENT.GBOWNER                          = nil
 
 
 function ENT:Initialize()
- if (SERVER) then
-     self:LoadModel()
-	 self:PhysicsInit( SOLID_VPHYSICS )
-	 self:SetSolid( SOLID_VPHYSICS )
-	 self:SetMoveType( MOVETYPE_VPHYSICS )
-	 self:SetUseType( ONOFF_USE )
-	 local phys = self:GetPhysicsObject()
-	 local skincount = self:SkinCount()
-	 if (phys:IsValid()) then
-		 phys:SetMass(self.Mass)
-		 phys:Wake()
-     end
-	 if (skincount > 0) then
-	     self:SetSkin(math.random(0,skincount))
-	 end
-	 self.Armed    = false
-	 self.Exploded = false
-	 self.Used     = false
-	 self.Arming   = false
-	  if !(WireAddon == nil) then self.Inputs   = Wire_CreateInputs(self, { "Arm", "Detonate" }) end
+	if (SERVER) then
+		self:LoadModel()
+		self:PhysicsInit( SOLID_VPHYSICS )
+		self:SetSolid( SOLID_VPHYSICS )
+		self:SetMoveType( MOVETYPE_VPHYSICS )
+		self:SetUseType( ONOFF_USE )
+		local phys = self:GetPhysicsObject()
+		local skincount = self:SkinCount()
+		if (phys:IsValid()) then
+			phys:SetMass(self.Mass)
+			phys:Wake()
+		end
+		if (skincount > 0) then
+			self:SetSkin(math.random(0,skincount))
+		end
+		self.Armed    = false
+		self.Exploded = false
+		self.Used     = false
+		self.Arming   = false
+		
+		if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
+		if !(WireAddon == nil) then self.Inputs   = Wire_CreateInputs(self, { "Arm", "Detonate" }) end
 	end
 end
 
@@ -125,7 +127,7 @@ function ENT:Explode()
 	ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
 	ent:SetVar("DEFAULT_PHYSFORCE_PLYAIR", self.DEFAULT_PHYSFORCE_PLYAIR)
 	ent:SetVar("DEFAULT_PHYSFORCE_PLYGROUND", self.DEFAULT_PHYSFORCE_PLYGROUND)
-	ent:SetVar("GBOWNER", self.Owner)
+	ent:SetVar("GBOWNER", self.GBOWNER)
 	ent:SetVar("SHOCKWAVEDAMAGE",self.ExplosionDamage)
 	ent:SetVar("MAX_RANGE",self.ExplosionRadius)
 	ent:SetVar("SHOCKWAVE_INCREMENT",100)
@@ -135,27 +137,29 @@ function ENT:Explode()
 	
 	
 	if(self:WaterLevel() >= 1) then
-		 local trdata   = {}
-		 local trlength = Vector(0,0,9000)
+		local trdata   = {}
+		local trlength = Vector(0,0,9000)
 
-		 trdata.start   = pos
-		 trdata.endpos  = trdata.start + trlength
-		 trdata.filter  = self
-		 local tr = util.TraceLine(trdata) 
+		trdata.start   = pos
+		trdata.endpos  = trdata.start + trlength
+		trdata.filter  = self
+		local tr = util.TraceLine(trdata) 
 
-		 local trdat2   = {}
-		 trdat2.start   = tr.HitPos
-		 trdat2.endpos  = trdata.start - trlength
-		 trdat2.filter  = self
-		 trdat2.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
+		local trdat2   = {}
+		trdat2.start   = tr.HitPos
+		trdat2.endpos  = trdata.start - trlength
+		trdat2.filter  = self
+		trdat2.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
 			 
-		 local tr2 = util.TraceLine(trdat2)
-			 
-	    if tr2.Hit then
-			if self.EffectWater == "ins_water_explosion" then
-				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
-			else
-				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
+		local tr2 = util.TraceLine(trdat2)
+		
+	    if CLIENT or not game.IsDedicated() then
+			if tr2.Hit then
+				if self.EffectWater == "ins_water_explosion" then
+					ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
+				else
+					ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
+				end
 			end
 		end
 		 
@@ -174,30 +178,29 @@ function ENT:Explode()
 				
 		 local trace = util.TraceLine(tracedata)
 	     
-		 if trace.HitWorld then
-		    if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion" or self.Effect == "ins_rpg_explosion" or self.Effect == "ins_c4_explosion" then
-				ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil)
-				ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
-				--[[local Beffect = self:CreateParticleEffect(self.Effect,2, { attachtype = 2  } )--self.Effect,0,nil)--{1,self,pos})
-				Beffect:SetControlPoint(4,Vector(114,114,114))
-				Beffect:StartEmission()--]]
-			else
-				ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
+	    if CLIENT or not game.IsDedicated() then
+			if trace.HitWorld then
+				if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion" or self.Effect == "ins_rpg_explosion" or self.Effect == "ins_c4_explosion" then
+					ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil)
+					ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
+				else
+					ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
+				end
+			else 
+				if self.EffectAir == "doi_artillery_explosion" or self.EffectAir == "doi_stuka_explosion" or self.EffectAir == "ins_rpg_explosion" or self.EffectAir == "ins_c4_explosion" then
+					ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
+				else
+					ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)
+				end
 			end
-		 else 
-		    if self.EffectAir == "doi_artillery_explosion" or self.EffectAir == "doi_stuka_explosion" or self.EffectAir == "ins_rpg_explosion" or self.EffectAir == "ins_c4_explosion" then
-				ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
-			else
-				ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)
-			end
-		 end
-     end
+		end
+    end
 	 
 	local ent = ents.Create("shockwave_sound_lowsh")
 	ent:SetPos( pos ) 
 	ent:Spawn()
 	ent:Activate()
-	ent:SetVar("GBOWNER", self.Owner)
+	ent:SetVar("GBOWNER", self.GBOWNER)
 	ent:SetVar("MAX_RANGE",self.ExplosionDamage*self.ExplosionRadius)
 	if self.RSound == nil then ent:SetVar("NOFARSOUND",1) else
 		ent:SetVar("NOFARSOUND",self.RSound) 
@@ -212,7 +215,7 @@ function ENT:Explode()
 	 
 	 if self.IsNBC then
 	     local nbc = ents.Create(self.NBCEntity)
-		 nbc:SetVar("GBOWNER",self.Owner)
+		 nbc:SetVar("GBOWNER",self.GBOWNER)
 		 nbc:SetPos(self:GetPos())
 		 nbc:Spawn()
 		 nbc:Activate()
@@ -276,9 +279,9 @@ function ENT:PhysicsCollide( data, physobj )
 end
 
 function ENT:Arm()
-     if(!self:IsValid()) then return end
-	 if(self.Exploded) then return end
-	 if(self.Armed) then return end
+    if(!self:IsValid()) then return end
+	if(self.Exploded) then return end
+	if(self.Armed) then return end
 	 self.Arming = true
 	 self.Used = true
 	 timer.Simple(self.ArmDelay, function()
