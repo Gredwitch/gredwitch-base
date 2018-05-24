@@ -1,6 +1,6 @@
 {
-"title" : "[WAC] Gredwitch's base",
+"title" : "ZGredwitch's base",
 "type" : "vehicle",
 "tags" : ["fun","realism"],
-"ignore" : ["*.psd", "*.vcproj", "*.svn*"]
+"ignore" : ["*.psd", "*.ini", "*.svn*"]
 }
