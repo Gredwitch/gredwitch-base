@@ -180,4 +180,11 @@
 - Updated WAC_HC_BASE
 - Upated the materials
 - Removed useless POD_TURRET
+
+27/05/2018 (05/27/2018)
+
+- Fixed POD_GUNNER
+- Fixed the deleted rocket sound
+- Fixed the Nebelwerfer artillery sounds not playing
+- Updated the artillery sounds
 --]]

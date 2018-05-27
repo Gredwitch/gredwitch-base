@@ -49,8 +49,10 @@ function ENT:Initialize()
 		end
 		
 		if self.Bomber then
-			timer.Create("gred_strike_bomber_wait_time",10,1,function()
+			timer.Simple(10,function()
+				if not IsValid(self) then return end
 				timer.Create("gred_bomber_firerate",0.25,self.ShellCount,function()
+					if not IsValid(self) then return end
 					self:EmitSound("bomb/bomb_whistle_0"..(math.random(1,4))..".wav", 140, 100, 1)
 					if SERVER then
 						self.Bomb = ents.Create(self.ShellType)
@@ -61,7 +63,7 @@ function ENT:Initialize()
 						self.Bomb:Spawn()
 						self.Bomb:Activate()
 						self.Bomb:Arm()
-						self:SetPos(self:GetPos()+Vector(400,0,0))
+						self:SetPos(pos+Vector(400,0,0))
 					end
 				end)
 			end)
@@ -69,13 +71,13 @@ function ENT:Initialize()
 			timer.Create("gred_strike_ent_firerate",self.FireRate,self.ShellCount,function()
 				if not IsValid(self) then return end
 				if self.ShellType == "gb_rocket_81mm" and self.Team == "Allied" then
-					self:EmitSound("artillery/105mm/distant_artillery_fire_0"..(math.random(1,4))..".wav", 0, 100, 1)
+					self:EmitSound("artillery/far/distant_artillery_fire_0"..(math.random(1,4))..".wav", 0, 100, 1)
 				elseif self.ShellType == "gb_rocket_81mm" and self.Team == "Axis" then
 				
 				elseif self.ShellType == "gb_rocket_nebel" then
-				
+						self:EmitSound("artillery/far/distant_rocket_artillery_fire_0"..(math.random(1,4))..".wav", 0, 100, 1)
 				end
-				timer.Create("gred_strike_timer3",math.Rand(self.LoopTimerTime1,self.LoopTimerTime2),1,function()
+				timer.Simple(math.random(self.LoopTimerTime1,self.LoopTimerTime2),function()
 					if not IsValid(self) then return end
 					if self.ShellType == "gb_rocket_81mm" then
 						self:EmitSound("artillery/flyby/artillery_strike_incoming_0"..(math.random(1,4))..".wav", 140, 100, 1)
@@ -84,7 +86,7 @@ function ENT:Initialize()
 					end
 					if SERVER then
 						self.Shell = ents.Create(self.ShellType)
-						self.Shell:SetPos(pos + Vector(math.Rand(-self.RandomPos,self.RandomPos),math.Rand(-self.RandomPos,self.RandomPos),0))
+						self.Shell:SetPos(pos + Vector(math.random(-self.RandomPos,self.RandomPos),math.random(-self.RandomPos,self.RandomPos),0))
 						self.Shell:SetAngles(Angle(90,0,0))
 						self.Shell.Owner = self.Owner
 						self.Shell.GBOWNER = self.Owner

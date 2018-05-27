@@ -103,8 +103,8 @@ function SWEP:PrimaryAttack()
 		trace.filter = {self.Owner}
 		local hitpos = util.TraceLine(trace).HitPos
 		
-		trace.start = hitpos + Vector(math.random(-500,500),math.random(-500,500),2048)
-		trace.endpos = trace.start + Vector(math.random(-500,500),math.random(-500,500),6144)
+		trace.start = hitpos + Vector(math.random(-700,700),math.random(-700,700),2048)
+		trace.endpos = trace.start + Vector(math.random(-700,700),math.random(-700,700),6144)
 		local traceRes = util.TraceLine(trace)
 		
 		local spawnpos
@@ -119,13 +119,13 @@ function SWEP:PrimaryAttack()
 		ArtiStrike.ShellType		= "gb_rocket_81mm"
 		ArtiStrike.Delay	    	= self.strikedalay
 		ArtiStrike.ShellCount		= 20
-		ArtiStrike.RandomPos		= 500
+		ArtiStrike.RandomPos		= 700
 		ArtiStrike.Owner			= self.Owner
 		ArtiStrike.Team				= "Allied"
 		ArtiStrike.StrikeString 	= "Mortar"
 		ArtiStrike.FireRate			= 1
 		ArtiStrike.LoopTimerTime1	= 1
-		ArtiStrike.LoopTimerTime1	= 1.5
+		ArtiStrike.LoopTimerTime2	= 1.8
 		ArtiStrike:Spawn()
 		ArtiStrike:Activate()
 		

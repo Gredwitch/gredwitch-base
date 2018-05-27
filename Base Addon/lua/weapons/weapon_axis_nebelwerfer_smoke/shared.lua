@@ -109,8 +109,8 @@ function SWEP:PrimaryAttack()
 		trace.filter = {self.Owner}
 		local hitpos = util.TraceLine(trace).HitPos
 		
-		trace.start = hitpos + Vector(math.random(-800,800),math.random(-800,800),2048)
-		trace.endpos = trace.start + Vector(math.random(-800,800),math.random(-800,800),6144)
+		trace.start = hitpos + Vector(math.random(-1200,1200),math.random(-1200,1200),2048)
+		trace.endpos = trace.start + Vector(math.random(-1200,1200),math.random(-1200,1200),6144)
 		local traceRes = util.TraceLine(trace)
 		
 		local spawnpos
@@ -125,14 +125,14 @@ function SWEP:PrimaryAttack()
 		ArtiStrike.ShellType		= "gb_rocket_nebel"
 		ArtiStrike.Delay	    	= self.strikedalay
 		ArtiStrike.ShellCount		= 12
-		ArtiStrike.RandomPos		= 800
+		ArtiStrike.RandomPos		= 1200
 		ArtiStrike.Owner			= self.Owner
 		ArtiStrike.Team				= "Axis"
 		ArtiStrike.StrikeString 	= "Nebelwerfer smoke"
 		ArtiStrike.Smoke			= true
 		ArtiStrike.FireRate			= 1
-		ArtiStrike.LoopTimerTime1	= 1.7
-		ArtiStrike.LoopTimerTime1	= 2.2
+		ArtiStrike.LoopTimerTime1	= 2
+		ArtiStrike.LoopTimerTime2	= 2.5
 		
 		ArtiStrike:Spawn()
 		ArtiStrike:Activate()

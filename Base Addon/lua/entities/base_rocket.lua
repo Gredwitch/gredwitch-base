@@ -93,7 +93,7 @@ ENT.RotationalForce                  =  25
 ENT.ArmDelay                         =  2
 ENT.ForceOrientation                 =  "NORMAL"
 ENT.Timer                            =  0
-
+ENT.Smoke							 =  false
 
 ENT.LightEmitTime                    =  0
 ENT.LightRed                         =  0
@@ -169,44 +169,45 @@ function ENT:TriggerInput(iname, value)
 end          
 
 function ENT:Explode()
-     if not self.Exploded then return end
-	 local pos = self:LocalToWorld(self:OBBCenter())
-	 
-	  	 local ent = ents.Create("shockwave_ent")
-	 ent:SetPos( pos ) 
-	 ent:Spawn()
-	 ent:Activate()
-	 ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
-	 ent:SetVar("DEFAULT_PHYSFORCE_PLYAIR", self.DEFAULT_PHYSFORCE_PLYAIR)
-	 ent:SetVar("DEFAULT_PHYSFORCE_PLYGROUND", self.DEFAULT_PHYSFORCE_PLYGROUND)
-	 ent:SetVar("GBOWNER", self.GBOWNER)
-	 ent:SetVar("MAX_RANGE",self.ExplosionRadius)
-	 ent:SetVar("SHOCKWAVEDAMAGE",self.ExplosionDamage)
-	 ent:SetVar("SHOCKWAVE_INCREMENT",100)
-	 ent:SetVar("DELAY",0.01)
-	 ent.trace=self.TraceLength
-	 ent.decal=self.Decal
-	 
-	 for k, v in pairs(ents.FindInSphere(pos,self.SpecialRadius)) do
-	     if v:IsValid() then
-		     --local phys = v:GetPhysicsObject()
-			 local i = 0
-		     while i < v:GetPhysicsObjectCount() do
-			 phys = v:GetPhysicsObjectNum(i)	  
-             if (phys:IsValid()) then		
-		 	     local mass = phys:GetMass()
-				 local F_ang = self.PhysForce
-				 local dist = (pos - v:GetPos()):Length()
-				 local relation = math.Clamp((self.SpecialRadius - dist) / self.SpecialRadius, 0, 1)
-				 local F_dir = (v:GetPos() - pos):GetNormal() * self.PhysForce
+    if not self.Exploded then return end
+	local pos = self:LocalToWorld(self:OBBCenter())
+	
+	if not self.Smoke then
+	local ent = ents.Create("shockwave_ent")
+		ent:SetPos( pos ) 
+		ent:Spawn()
+		ent:Activate()
+		ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
+		ent:SetVar("DEFAULT_PHYSFORCE_PLYAIR", self.DEFAULT_PHYSFORCE_PLYAIR)
+		ent:SetVar("DEFAULT_PHYSFORCE_PLYGROUND", self.DEFAULT_PHYSFORCE_PLYGROUND)
+		ent:SetVar("GBOWNER", self.GBOWNER)
+		ent:SetVar("MAX_RANGE",self.ExplosionRadius)
+		ent:SetVar("SHOCKWAVEDAMAGE",self.ExplosionDamage)
+		ent:SetVar("SHOCKWAVE_INCREMENT",100)
+		ent:SetVar("DELAY",0.01)
+		ent.trace=self.TraceLength
+		ent.decal=self.Decal
+	end
+	for k, v in pairs(ents.FindInSphere(pos,self.SpecialRadius)) do
+	    if v:IsValid() then
+		    --local phys = v:GetPhysicsObject()
+			local i = 0
+		    while i < v:GetPhysicsObjectCount() do
+			phys = v:GetPhysicsObjectNum(i)	  
+            if (phys:IsValid()) then		
+		 	    local mass = phys:GetMass()
+				local F_ang = self.PhysForce
+				local dist = (pos - v:GetPos()):Length()
+				local relation = math.Clamp((self.SpecialRadius - dist) / self.SpecialRadius, 0, 1)
+				local F_dir = (v:GetPos() - pos):GetNormal() * self.PhysForce
 				   
-				 phys:AddAngleVelocity(Vector(F_ang, F_ang, F_ang) * relation)
-				 phys:AddVelocity(F_dir)
-		     end
-			 i = i + 1
-			 end
-		 end
-	 end
+				phys:AddAngleVelocity(Vector(F_ang, F_ang, F_ang) * relation)
+				phys:AddVelocity(F_dir)
+		    end
+			i = i + 1
+			end
+		end
+	end
 	 
      if(self:WaterLevel() >= 1) then
 		 local trdata   = {}
