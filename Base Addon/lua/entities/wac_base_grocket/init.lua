@@ -59,18 +59,17 @@ end
 function ENT:Explode(tr)
 	if self.Exploded then return end
 	self.Exploded = true
-	pos = self:GetPos()
-	util.BlastDamage(self,self.Owner or self,pos,self.Radius*1.5,self.Damage)
+	
     if(self:WaterLevel() >= 1) then --Not working
 		if tr2.Hit then
 			ParticleEffect("ins_water_explosion", tr2.HitPos, Angle(-90,0,0), nil)
 			self.ExplosionSound =  self.WaterExplosionSound
-			self.FarExplosionSound = self.WaterFarExplosionSound 
+			self.FarExplosionSound = self.WaterFarExplosionSound
 		end
 	end
 	ParticleEffect("doi_mortar_explosion",pos,Angle(self.hitAngle, -90, 0),nil)
 	local ent = ents.Create("shockwave_sound_lowsh")
-	ent:SetPos( pos ) 
+	ent:SetPos(pos)
 	ent:Spawn()
 	ent:Activate()
 	ent:SetVar("GBOWNER", ply)
@@ -125,19 +124,20 @@ end
 
 function ENT:PhysicsUpdate(ph)
 	if !self.Started or self.HasNoFuel then return end
+	pos = self:GetPos()
 	local trd = {
 		start = self.OldPos,
-		endpos = self:GetPos(),
+		endpos = pos,
 		filter = {self,self.Owner,self.Launcher},
 		mask = CONTENTS_SOLID + CONTENTS_MOVEABLE + CONTENTS_OPAQUE + CONTENTS_DEBRIS + CONTENTS_HITBOX + CONTENTS_MONSTER + CONTENTS_WINDOW
 	}
 	local tr = util.TraceLine(trd)
 	
 	local trd2 = {
-		start   = tr.HitPos,
-		endpos  = tr.endpos,
-		filter  = {self,self.Owner,self.Launcher},
-		mask    = MASK_WATER + CONTENTS_TRANSLUCENT
+		start   = self.OldPos,
+		endpos  = pos,
+		filter  = self,
+		mask    = MASK_WATER
 	}
 	local tr2 = util.TraceLine(trd2)
 	

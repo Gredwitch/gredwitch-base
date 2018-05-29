@@ -184,7 +184,11 @@
 27/05/2018 (05/27/2018)
 
 - Fixed POD_GUNNER
+- Fixed the bombing runs in gred_arti_ent
 - Fixed the deleted rocket sound
 - Fixed the Nebelwerfer artillery sounds not playing
-- Updated the artillery sounds
+- Fixed POD_MIS : fixed the Fire and Forget type of missile
+- Fixed and updated the artillery sounds
+- Fixed the missing mm1/box material error
+- Removed unused POD_HELLFIRE and POD_HYDRA
 --]]

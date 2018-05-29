@@ -208,70 +208,72 @@ function ENT:Explode()
 			end
 		end
 	end
-	 
-     if(self:WaterLevel() >= 1) then
-		 local trdata   = {}
-		 local trlength = Vector(0,0,9000)
+	
+	if CLIENT or not game.IsDedicated() then
+		if(self:WaterLevel() >= 1) then
+			local trdata   = {}
+			local trlength = Vector(0,0,9000)
 
-		 trdata.start   = pos
-		 trdata.endpos  = trdata.start + trlength
-		 trdata.filter  = self
-		 local tr = util.TraceLine(trdata) 
+			trdata.start   = pos
+			trdata.endpos  = trdata.start + trlength
+			trdata.filter  = self
+			local tr = util.TraceLine(trdata) 
 
-		 local trdat2   = {}
-		 trdat2.start   = tr.HitPos
-		 trdat2.endpos  = trdata.start - trlength
-		 trdat2.filter  = self
-		 trdat2.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
-			 
-		 local tr2 = util.TraceLine(trdat2)
-			 
-	    if CLIENT or not game.IsDedicated() then
-			if tr2.Hit then
-				if self.EffectWater == "ins_water_explosion" then
-					ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
-				else
-					ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
+			local trdat2   = {}
+			trdat2.start   = tr.HitPos
+			trdat2.endpos  = trdata.start - trlength
+			trdat2.filter  = self
+			trdat2.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
+				 
+			local tr2 = util.TraceLine(trdat2)
+				 
+			if CLIENT or not game.IsDedicated() then
+				if tr2.Hit then
+					if self.EffectWater == "ins_water_explosion" then
+						ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
+					else
+						ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
+					end
 				end
 			end
-		end
-		
-		if self.WaterExplosionSound == nil then else 
-			self.ExplosionSound = self.WaterExplosionSound 
-		end
-		if self.WaterFarExplosionSound == nil then else  
-			self.FarExplosionSound = self.WaterFarExplosionSound 
-		end
-     else
-		 local tracedata    = {}
-	     tracedata.start    = pos
-		 tracedata.endpos   = tracedata.start - Vector(0, 0, self.TraceLength)
-		 tracedata.filter   = self.Entity
-				
-		 local trace = util.TraceLine(tracedata)
-	     if CLIENT or not game.IsDedicated() then
-			 if trace.HitWorld then
+			
+			if self.WaterExplosionSound == nil then else 
+				self.ExplosionSound = self.WaterExplosionSound 
+			end
+			if self.WaterFarExplosionSound == nil then else  
+				self.FarExplosionSound = self.WaterFarExplosionSound 
+			end
+		else
+			local tracedata    = {}
+			tracedata.start    = pos
+			tracedata.endpos   = tracedata.start - Vector(0, 0, self.TraceLength)
+			tracedata.filter   = self.Entity
+			
+			local trace = util.TraceLine(tracedata)
+			if trace.HitWorld then
 				if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion"
 				or self.Effect == "ins_rpg_explosion" or self.Effect == "doi_mortar_explosion" 
 				or self.Effect == "gred_mortar_explosion" or self.Effect == "gred_ap_impact"
-				or self.Effect == "gred_20mm_explosion" or self.Effect == "ins_c4_explosion" then
+				or self.Effect == "gred_20mm" or self.Effect == "ins_c4_explosion"
+				or self.Effect == "gred_50mm" or self.Effect == "gred" then
 					ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil) 
 					ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
 				else
 					ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
 				end
-			 else 
+			else 
 				if self.EffectAir == "doi_artillery_explosion" or self.EffectAir == "doi_stuka_explosion"
 				or self.EffectAir == "ins_rpg_explosion" or self.EffectAir == "doi_mortar_explosion" 
 				or self.Effect == "gred_mortar_explosion" or self.Effect == "gred_ap_impact" 
-				or self.Effect == "gred_20mm_explosion" or self.Effect == "ins_c4_explosion" then 
+				or self.Effect == "gred_20mm" or self.Effect == "ins_c4_explosion"
+				or self.Effect == "gred_50mm" or self.Effect == "gred" then
 					ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
 				else
 					ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)
 				end
-			 end
+			end
 		end
-     end
+    end
 	 
 	local ent = ents.Create("shockwave_sound_lowsh")
 	ent:SetPos( pos ) 

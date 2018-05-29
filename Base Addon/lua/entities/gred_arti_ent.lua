@@ -55,6 +55,8 @@ function ENT:Initialize()
 					if not IsValid(self) then return end
 					self:EmitSound("bomb/bomb_whistle_0"..(math.random(1,4))..".wav", 140, 100, 1)
 					if SERVER then
+						npos = self:GetPos()
+						bpos = npos + Vector(400,0,0)
 						self.Bomb = ents.Create(self.ShellType)
 						self.Bomb:SetPos(self:GetPos())
 						self.Bomb:SetAngles(Angle(0,0,0))
@@ -63,7 +65,9 @@ function ENT:Initialize()
 						self.Bomb:Spawn()
 						self.Bomb:Activate()
 						self.Bomb:Arm()
-						self:SetPos(pos+Vector(400,0,0))
+						self:SetPos(bpos)
+						self:SetPos(bpos)
+						
 					end
 				end)
 			end)

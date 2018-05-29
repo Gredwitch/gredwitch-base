@@ -1,8 +1,8 @@
 ENT.Base = "wac_pod_base"
 ENT.Type = "anim"
 ENT.PrintName = ""
-ENT.Author = wac.author
-ENT.Category = wac.aircraft.spawnCategory
+ENT.Author = "Gredwitch"
+ENT.Category = ""
 ENT.Contact = ""
 ENT.Purpose = ""
 ENT.Instructions = ""
