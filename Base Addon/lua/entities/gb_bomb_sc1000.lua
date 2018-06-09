@@ -11,7 +11,7 @@ ENT.Author			                 =  "Gredwitch"
 ENT.Contact		                     =  "qhamitouche@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 
-ENT.Model                            =  "models/gredwitch/sc1000.mdl"                      
+ENT.Model                            =  "models/gredwitch/bombs/sc1000.mdl"                      
 ENT.Effect                           =  "1000lb_explosion"                  
 ENT.EffectAir                        =  "1000lb_explosion"                   
 ENT.EffectWater                      =  "water_huge"

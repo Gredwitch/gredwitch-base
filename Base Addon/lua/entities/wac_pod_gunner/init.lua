@@ -8,8 +8,24 @@ function ENT:Initialize()
 	self.sounds.spin:ChangeVolume(0,0.1)
 	self.sounds.spin:Play()
 	self:SetSpinSpeed(0)
+	
 	if tracer == nil then tracer = 0 end
 	tracerConvar=GetConVarNumber("gred_tracers")
+	
+	bcolor = Color(255,255,0)
+	num1   = 5
+	num2   = 0.05
+	num3   = 1 / (15 + 1)
+	num4   = 13 / 2
+	num5   = 13 / 8
+	num6   = 13 / 350
+	num7   = 1 / 13 / 2 * 0.5
+	
+	if	   self.TracerColor == "Red" then tracercolor=Color(255,0,0) 
+	elseif self.TracerColor == "Green" then tracercolor=Color(0,255,0) 
+	elseif self.TracerColor == "Yellow" then tracercolor=Color(0,255,0) 
+	end
+	
 	self.basePodThink = self:base("wac_pod_base").Think
 end
 
@@ -18,43 +34,37 @@ function ENT:fire()
 	local dir = self.aircraft:getCameraAngles():Forward()
 	local pos = self.aircraft:LocalToWorld(self.ShootPos) + dir*self.ShootOffset.x
 	local tr = util.QuickTrace(self:LocalToWorld(self.aircraft.Camera.pos) + dir*20, dir*999999999, {self, self.aircraft})
-	local ang = (tr.HitPos - pos):Angle()
-	local b = ents.Create(self.BulletType)
+	
 	if self.BulletType == "wac_base_7mm" then
-		ang = ang + Angle(math.Rand(-0.5,0.5), math.Rand(-0.5,0.5), math.Rand(-0.5,0.5))
+		spread = Angle(math.Rand(-0.5,0.5), math.Rand(-0.5,0.5), math.Rand(-0.5,0.5))
 	elseif self.BulletType == "wac_base_12mm" then
-		ang = ang + Angle(math.Rand(-1,1), math.Rand(-1,1), math.Rand(-1,1))
+		spread = Angle(math.Rand(-1,1), math.Rand(-1,1), math.Rand(-1,1))
 	elseif self.BulletType == "wac_base_20mm" then
-		ang = ang + Angle(math.Rand(-1.4,1.4), math.Rand(-1.4,1.4), math.Rand(-1.4,1.4))
+		spread = Angle(math.Rand(-1.4,1.4), math.Rand(-1.4,1.4), math.Rand(-1.4,1.4))
 	elseif self.BulletType == "wac_base_30mm" then
-		ang = ang + Angle(math.Rand(-3,3), math.Rand(-3,3), math.Rand(-3,3))
+		spread = Angle(math.Rand(-3,3), math.Rand(-3,3), math.Rand(-3,3))
 	end
+	
+	local ang = (tr.HitPos - pos):Angle() + spread
+	local b = ents.Create("gred_base_bullet")
 	b:SetPos(pos)
 	b:SetAngles(ang)
-	if self.TracerColor == "Red" then b.col=Color(255,0,0) elseif self.TracerColor == "Green" then b.col=Color(0,255,0) end
 	b.Speed=1000
-	b.Size=0--13
-	b.Width=0--1
+	b.Size=0
+	b.col = tracercolor
+	b.Caliber = self.BulletType
+	b.Width=0
 	b.Damage=40
 	b.Radius=70
 	b.gunRPM=self.FireRate
 	b:Spawn()
 	if tracer >= tracerConvar then
-		util.SpriteTrail(b, 0, Color(255,255,0), false, 5, 5, 0.05, 1/(15+1)*0.5, "trails/laser.vmt")
-		util.SpriteTrail(b, 0, b.col, false, 13/2, 13/8, 13/350, 1/13/2*0.5, "trails/smoke.vmt")
+		util.SpriteTrail(b, 0, bcolor, false, num1, num1, num2, num3, "trails/laser.vmt")
+		util.SpriteTrail(b, 0, b.col, false, num4, num5, num6, num7, "trails/smoke.vmt")
 		tracer = 0
 	end
-	b.Owner=self.seat
-	local effectdata = EffectData()
-	effectdata:SetOrigin(pos)
-	effectdata:SetAngles(ang)
-	effectdata:SetScale(1.5)
-	self.sounds.shoot1p:Stop()
-	self.sounds.shoot1p:Play()
-	self.sounds.shoot1p:SetSoundLevel(110)
-	self.sounds.shoot3p:Stop()
-	self.sounds.shoot3p:Play()
-	self.sounds.shoot3p:SetSoundLevel(110)
+	tracer = tracer + 1
+	
 	if GetConVarNumber("gred_altmuzzleeffect") == 1 and (CLIENT or not game.IsDedicated()) then
 		ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
 		ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
@@ -68,7 +78,15 @@ function ENT:fire()
 		effectdata:SetScale(3)
 		util.Effect("MuzzleEffect", effectdata)
 	end
-	tracer = tracer + 1
+	
+	b.Owner=self.seat
+	self.sounds.shoot1p:Stop()
+	self.sounds.shoot1p:Play()
+	self.sounds.shoot1p:SetSoundLevel(110)
+	self.sounds.shoot3p:Stop()
+	self.sounds.shoot3p:Play()
+	self.sounds.shoot3p:SetSoundLevel(110)
+	
 	for _,e in pairs(self.aircraft.wheels) do
 		if IsValid(e) then
 		constraint.NoCollide(e,rocket,0,0)

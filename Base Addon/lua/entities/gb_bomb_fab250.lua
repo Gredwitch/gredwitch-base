@@ -28,7 +28,7 @@ ENT.Author			                 =  "Gredwitch"
 ENT.Contact		                     =  "qhamitouche@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 
-ENT.Model                            =  "models/gredwitch/fab250.mdl"
+ENT.Model                            =  "models/gredwitch/bombs/fab250.mdl"
 ENT.Effect                           =  "doi_artillery_explosion"
 ENT.EffectAir                        =  "doi_artillery_explosion"
 ENT.EffectWater                      =  "ins_water_explosion"

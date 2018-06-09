@@ -11,20 +11,13 @@ ENT.Author			                 =  "Gredwitch"
 ENT.Contact		                     =  "qhamitouche@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 
-ENT.Model                            =  "models/doi/plane_bomb.mdl"
-ENT.Effect                           =  "doi_stuka_explosion"                  
-ENT.EffectAir                        =  "doi_stuka_explosion"
-ENT.EffectWater                      =  "ins_water_explosion"
+ENT.Model                            =  "models/gredwitch/bombs/sc500.mdl"
+ENT.Effect                           =  "AAA"             
+ENT.EffectAir                        =  "AAA"
+ENT.EffectWater                      =  "water_huge"
+ENT.ExplosionSound                   =  "explosions/gbomb_3.mp3"
 ENT.ArmSound                         =  "npc/roller/mine/rmine_blip3.wav"            
-ENT.ActivationSound                  =  "buttons/button14.wav"
-
-ENT.ExplosionSound                   =  "explosions/doi_stuka_close.wav"
-ENT.FarExplosionSound				 =  "explosions/doi_stuka_far.wav"
-ENT.DistExplosionSound				 =  "explosions/doi_stuka_dist.wav"
-
-ENT.WaterExplosionSound                   =  "explosions/doi_stuka_closewater.wav"
-ENT.WaterFarExplosionSound				  =  "explosions/doi_stuka_farwater.wav"
-ENT.RSound							 =	0
+ENT.ActivationSound                  =  "buttons/button14.wav"     
 
 ENT.ShouldUnweld                     =  true
 ENT.ShouldIgnite                     =  false
@@ -34,19 +27,19 @@ ENT.UseRandomSounds                  =  false
 ENT.UseRandomModels                  =  false
 ENT.Timed                            =  false
 
-ENT.ExplosionDamage                  =  500
-ENT.PhysForce                        =  500
-ENT.ExplosionRadius                  =  1500
-ENT.SpecialRadius                    =  1500
+ENT.ExplosionDamage                  =  1000
+ENT.PhysForce                        =  1000
+ENT.ExplosionRadius                  =  3500
+ENT.SpecialRadius                    =  3500
 ENT.MaxIgnitionTime                  =  0 
-ENT.Life                             =  50
+ENT.Life                             =  100
 ENT.MaxDelay                         =  0                                 
 ENT.TraceLength                      =  100
 ENT.ImpactSpeed                      =  200
 ENT.Mass                             =  500
 ENT.ArmDelay                         =  0.1   
 ENT.Timer                            =  0
-ENT.RSound							 = 0
+
 ENT.Shocktime                        = 0
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 

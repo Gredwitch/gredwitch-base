@@ -36,7 +36,7 @@ function ENT:Initialize()
 	num6   = 13 / 350
 	num7   = 1 / 13 / 2 * 0.5
 	
-	if	   self.TracerColor == "Red" then tracercolor=Color(248,152,29) 
+	if	   self.TracerColor == "Red" then tracercolor=Color(255,0,0) 
 	elseif self.TracerColor == "Green" then tracercolor=Color(0,255,0) 
 	elseif self.TracerColor == "Yellow" then tracercolor=Color(0,255,0) 
 	end
@@ -46,6 +46,7 @@ function ENT:fireBullet(pos)
 	if !self:takeAmmo(self.TkAmmo) then return end
 	if not self.seat then return end
 	local pos2=self.aircraft:LocalToWorld(pos+Vector(self.aircraft:GetVelocity():Length()*0.6,0,0))
+	
 	if self.BulletType == "wac_base_7mm" then
 		spread = Angle(math.Rand(-0.5,0.5), math.Rand(-0.5,0.5), math.Rand(-0.5,0.5))
 	elseif self.BulletType == "wac_base_12mm" then
@@ -55,12 +56,14 @@ function ENT:fireBullet(pos)
 	elseif self.BulletType == "wac_base_30mm" then
 		spread = Angle(math.Rand(-3,3), math.Rand(-3,3), math.Rand(-3,3))
 	end
+	
 	local ang = self.aircraft:GetAngles()+Angle(axis,axis,0) + spread
-	local b=ents.Create(self.BulletType)
+	local b=ents.Create("gred_base_bullet")
 	b:SetPos(pos2)
 	b:SetAngles(ang)
 	b.col = tracercolor
 	b.Speed=1000
+	b.Caliber = self.BulletType
 	b.Size=0
 	b.Width=0
 	b.Damage=40

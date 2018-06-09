@@ -40,7 +40,7 @@ ENT.Author			                 =  ""
 ENT.Contact			                 =  ""
 ENT.Category                         =  "Gredwitch's Stuff"
 
-ENT.Model                            =  "models/gredwitch/artillery_shell.mdl"
+ENT.Model                            =  "models/gredwitch/bombs/artillery_shell.mdl"
 ENT.RocketTrail                      =  ""
 ENT.RocketBurnoutTrail               =  ""
 ENT.Effect                           =  "gred_mortar_explosion"

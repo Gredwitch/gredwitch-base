@@ -191,4 +191,11 @@
 - Fixed and updated the artillery sounds
 - Fixed the missing mm1/box material error
 - Removed unused POD_HELLFIRE and POD_HYDRA
+
+??/06/2018
+
+- Added GRED_BASE_BULLET : optimized the bullets as much as possible
+- Updated POD_GUNNER / POD_MG : optimized them as much as possible
+- Updated the models paths
+- Removed BASE_7MM / BASE_12MM / BASE_20MM / BASE_30MM
 --]]
