@@ -48,75 +48,6 @@ ENT.Timer                            =  0
 
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
-function ENT:Explode()
-	local ent = ents.Create("base_napalm")
-	local pos = self:GetPos()
-	ent:SetPos( pos )
-	ent:Spawn()
-	ent:Activate()
-	ent:SetVar("GBOWNER",self.GBOWNER)
-	
-	local ent = ents.Create("shockwave_ent")
-	ent:SetPos( pos ) 
-	ent:Spawn()
-	ent:Activate()
-	ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
-	ent:SetVar("DEFAULT_PHYSFORCE_PLYAIR", self.DEFAULT_PHYSFORCE_PLYAIR)
-	ent:SetVar("DEFAULT_PHYSFORCE_PLYGROUND", self.DEFAULT_PHYSFORCE_PLYGROUND)
-	ent:SetVar("GBOWNER", self.GBOWNER)
-	ent:SetVar("SHOCKWAVEDAMAGE",self.ExplosionDamage)
-	ent:SetVar("MAX_RANGE",self.ExplosionRadius)
-	ent:SetVar("SHOCKWAVE_INCREMENT",100)
-	ent:SetVar("DELAY",0.01)
-	ent.trace=self.TraceLength
-	ent.decal=self.Decal
-	for k, v in pairs(ents.FindInSphere(pos,1700)) do
-		if v:IsPlayer() or v:IsNPC() then
-			if v:GetClass()=="npc_helicopter" then return end
-			v:Ignite(6,0)
-		else
-			local phys = self:GetPhysicsObject()
-			if phys:IsValid() then
-				v:Ignite(12,0)
-			end
-		end
-	end
-	local tracedata    = {}
-	tracedata.start    = pos
-	tracedata.endpos   = tracedata.start - Vector(0, 0, self.TraceLength)
-	tracedata.filter   = self.Entity
-				
-	local trace = util.TraceLine(tracedata)
-	if trace.Hit then
-		ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
-    end
-	 
-	local ent = ents.Create("shockwave_sound_lowsh")
-	ent:SetPos( pos ) 
-	ent:Spawn()
-	ent:Activate()
-	ent:SetVar("GBOWNER", self.GBOWNER)
-	ent:SetVar("MAX_RANGE",self.ExplosionDamage*self.ExplosionRadius)
-	if self.RSound == nil then ent:SetVar("NOFARSOUND",1) else
-		ent:SetVar("NOFARSOUND",self.RSound) 
-	end
-	ent:SetVar("SHOCKWAVE_INCREMENT",200)
-	
-	ent:SetVar("DELAY",0.01)
-	ent:SetVar("SOUNDCLOSE", self.ExplosionSound)
-	ent:SetVar("SOUND", self.FarExplosionSound)
-	ent:SetVar("SOUNDFAR", self.DistExplosionSound)
-	ent:SetVar("Shocktime", 0)
-	 
-	 if self.IsNBC then
-	     local nbc = ents.Create(self.NBCEntity)
-		 nbc:SetVar("GBOWNER",self.GBOWNER)
-		 nbc:SetPos(self:GetPos())
-		 nbc:Spawn()
-		 nbc:Activate()
-	 end
-     self:Remove()
-end
 
 function ENT:SpawnFunction( ply, tr )
      if ( !tr.Hit ) then return end
@@ -128,4 +59,13 @@ function ENT:SpawnFunction( ply, tr )
      ent:Activate()
 
      return ent
+end
+
+function ENT:AddOnExplode()
+	local ent = ents.Create("base_napalm")
+	local pos = self:GetPos()
+	ent:SetPos(pos)
+	ent:Spawn()
+	ent:Activate()
+	ent:SetVar("GBOWNER",self.GBOWNER)
 end

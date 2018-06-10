@@ -50,6 +50,7 @@ ENT.FarExplosionSound				 =  table.Random(ExploSnds)
 ENT.DistExplosionSound				 =  table.Random(DistExploSnds)
 ENT.WaterExplosionSound				 =  table.Random(CloseWaterExploSnds)
 ENT.WaterFarExplosionSound			 =  table.Random(WaterExploSnds)
+ENT.AngEffect						 =	true
 ENT.RSound							 =	0
 
 ENT.ArmSound                         =  "npc/roller/mine/rmine_blip3.wav"

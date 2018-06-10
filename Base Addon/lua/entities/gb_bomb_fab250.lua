@@ -32,6 +32,7 @@ ENT.Model                            =  "models/gredwitch/bombs/fab250.mdl"
 ENT.Effect                           =  "doi_artillery_explosion"
 ENT.EffectAir                        =  "doi_artillery_explosion"
 ENT.EffectWater                      =  "ins_water_explosion"
+ENT.AngEffect						 =	true
 
 ENT.ExplosionSound                   =  table.Random(CloseExploSnds)
 ENT.FarExplosionSound				 =  table.Random(ExploSnds)

@@ -22,6 +22,7 @@ ENT.EffectWater                      =  ""
 ENT.ArmSound                         =  ""
 ENT.ActivationSound                  =  ""
 ENT.NBCEntity                        =  ""
+ENT.AngEffect						 =	false
 
 ENT.ExplosionSound                   =  ""
 ENT.FarExplosionSound				 =  ""
@@ -116,10 +117,13 @@ function ENT:LoadModel()
 	 end
 end
 
+function ENT:AddOnExplode()
+end
+
 function ENT:Explode()
 	if !self.Exploded then return end
 	local pos = self:LocalToWorld(self:OBBCenter())
-
+	self:AddOnExplode()
 	local ent = ents.Create("shockwave_ent")
 	ent:SetPos( pos ) 
 	ent:Spawn()
@@ -180,14 +184,14 @@ function ENT:Explode()
 	     
 	    if CLIENT or not game.IsDedicated() then
 			if trace.HitWorld then
-				if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion" or self.Effect == "ins_rpg_explosion" or self.Effect == "ins_c4_explosion" then
+				if self.AngEffect then
 					ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil)
 					ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
 				else
 					ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
 				end
 			else 
-				if self.EffectAir == "doi_artillery_explosion" or self.EffectAir == "doi_stuka_explosion" or self.EffectAir == "ins_rpg_explosion" or self.EffectAir == "ins_c4_explosion" then
+				if self.AngEffect then
 					ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
 				else
 					ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)

@@ -17,7 +17,8 @@ ENT.EffectAir                        =  "AAA"
 ENT.EffectWater                      =  "water_huge"
 ENT.ExplosionSound                   =  "explosions/gbomb_3.mp3"
 ENT.ArmSound                         =  "npc/roller/mine/rmine_blip3.wav"            
-ENT.ActivationSound                  =  "buttons/button14.wav"     
+ENT.ActivationSound                  =  "buttons/button14.wav"
+ENT.AngEffect						 =	true
 
 ENT.ShouldUnweld                     =  true
 ENT.ShouldIgnite                     =  false

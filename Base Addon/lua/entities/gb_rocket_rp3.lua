@@ -44,6 +44,7 @@ ENT.Model                            =  "models/doi/ty_missile.mdl"
 ENT.RocketTrail                      =  "rockettrail"
 ENT.RocketBurnoutTrail               =  "grenadetrail"
 ENT.Effect                           =  "doi_mortar_explosion"
+ENT.AngEffect						 =	true
 ENT.EffectAir                        =  "doi_mortar_explosion"
 ENT.EffectWater                      =  "ins_water_explosion" 
 

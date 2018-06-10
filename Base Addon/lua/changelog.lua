@@ -196,6 +196,8 @@
 
 - Added GRED_BASE_BULLET : optimized the bullets as much as possible
 - Updated POD_GUNNER / POD_MG : optimized them as much as possible
+- Updated BASE_NAPALM : Updated some stuff so it can be used by WP rounds
 - Updated the models paths
+- Updated BASE_ROCKET / BASE_BOMB
 - Removed BASE_7MM / BASE_12MM / BASE_20MM / BASE_30MM
 --]]

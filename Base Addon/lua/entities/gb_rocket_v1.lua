@@ -10,7 +10,7 @@ ENT.Author			                 =  ""
 ENT.Contact			                 =  ""
 ENT.Category                         =  "Gredwitch's Stuff"
 
-ENT.Model                            =  "models/gredwitch/v1.mdl"
+ENT.Model                            =  "models/gredwitch/bombs/v1.mdl"
 ENT.RocketTrail                      =  "fire_jet_01"
 ENT.RocketBurnoutTrail               =  ""
 ENT.Effect                           =  "500lb_ground"

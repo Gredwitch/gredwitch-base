@@ -14,6 +14,7 @@ ENT.Model                            =  "models/damik/500lb.mdl"
 ENT.Effect                           =  "doi_stuka_explosion"
 ENT.EffectAir                        =  "doi_stuka_explosion"
 ENT.EffectWater                      =  "ins_water_explosion"
+ENT.AngEffect						 =	true
 ENT.ArmSound                         =  "npc/roller/mine/rmine_blip3.wav"            
 ENT.ActivationSound                  =  "buttons/button14.wav"
 

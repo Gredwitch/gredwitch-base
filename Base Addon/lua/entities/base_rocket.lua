@@ -59,6 +59,7 @@ ENT.EffectWater                      =  ""
 ENT.ExplosionSound                   =  ENT.ExplosionSound
 ENT.FarExplosionSound				 =  ENT.ExplosionSound
 ENT.DistExplosionSound				 =  ENT.ExplosionSound
+ENT.AngEffect						 =	false
 
 ENT.WaterExplosionSound				 =	nil
 ENT.WaterFarExplosionSound			 =  nil
@@ -168,10 +169,13 @@ function ENT:TriggerInput(iname, value)
      end
 end          
 
+function ENT:AddOnExplode()
+end
+
 function ENT:Explode()
     if not self.Exploded then return end
 	local pos = self:LocalToWorld(self:OBBCenter())
-	
+	self:AddOnExplode()
 	if not self.Smoke then
 	local ent = ents.Create("shockwave_ent")
 		ent:SetPos( pos ) 
@@ -251,22 +255,14 @@ function ENT:Explode()
 			
 			local trace = util.TraceLine(tracedata)
 			if trace.HitWorld then
-				if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion"
-				or self.Effect == "ins_rpg_explosion" or self.Effect == "doi_mortar_explosion" 
-				or self.Effect == "gred_mortar_explosion" or self.Effect == "gred_ap_impact"
-				or self.Effect == "gred_20mm" or self.Effect == "ins_c4_explosion"
-				or self.Effect == "gred_50mm" or self.Effect == "gred" then
+				if self.AngEffect then
 					ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil) 
 					ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
 				else
 					ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
 				end
-			else 
-				if self.EffectAir == "doi_artillery_explosion" or self.EffectAir == "doi_stuka_explosion"
-				or self.EffectAir == "ins_rpg_explosion" or self.EffectAir == "doi_mortar_explosion" 
-				or self.Effect == "gred_mortar_explosion" or self.Effect == "gred_ap_impact" 
-				or self.Effect == "gred_20mm" or self.Effect == "ins_c4_explosion"
-				or self.Effect == "gred_50mm" or self.Effect == "gred" then
+			else
+				if self.AngEffect then
 					ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
 				else
 					ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)

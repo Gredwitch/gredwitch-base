@@ -53,6 +53,7 @@ ENT.DistExplosionSound				 =  table.Random(DistExploSnds)
 ENT.WaterExplosionSound				 =  table.Random(CloseWaterExploSnds)
 ENT.WaterFarExplosionSound			 =  table.Random(WaterExploSnds)
 ENT.RSound							 =	0
+ENT.AngEffect						 =	true
 
 ENT.StartSound                       =  ""
 ENT.ArmSound                         =  ""
