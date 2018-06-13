@@ -59,6 +59,7 @@ ENT.DEFAULT_PHYSFORCE_PLYAIR         = 500
 ENT.DEFAULT_PHYSFORCE_PLYGROUND      = 5000
 ENT.GBOWNER                          = nil
 
+local PLAYER = CLIENT or not game.IsDedicated()
 
 function ENT:Initialize()
 	if (SERVER) then
@@ -157,7 +158,7 @@ function ENT:Explode()
 			 
 		local tr2 = util.TraceLine(trdat2)
 		
-	    if CLIENT or not game.IsDedicated() then
+	    if PLAYER then
 			if tr2.Hit then
 				if self.EffectWater == "ins_water_explosion" then
 					ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
@@ -182,7 +183,7 @@ function ENT:Explode()
 				
 		 local trace = util.TraceLine(tracedata)
 	     
-	    if CLIENT or not game.IsDedicated() then
+	    if PLAYER then
 			if trace.HitWorld then
 				if self.AngEffect then
 					ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil)

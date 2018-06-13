@@ -1,16 +1,75 @@
 AddCSLuaFile()
+
+game.AddParticles( "particles/doi_explosion_fx.pcf")
+game.AddParticles( "particles/doi_explosion_fx_b.pcf")
+game.AddParticles( "particles/doi_explosion_fx_c.pcf")
+game.AddParticles( "particles/doi_explosion_fx_grenade.pcf")
+game.AddParticles( "particles/doi_explosion_fx_new.pcf")
+game.AddParticles( "particles/doi_impact_fx.pcf" )
+game.AddParticles( "particles/doi_weapon_fx.pcf" )
+
+game.AddParticles( "particles/gb_water.pcf")
+game.AddParticles( "particles/gb5_100lb.pcf")
+game.AddParticles( "particles/gb5_500lb.pcf")
+game.AddParticles( "particles/gb5_1000lb.pcf")
+game.AddParticles( "particles/gb5_jdam.pcf")
+game.AddParticles( "particles/gb5_large_explosion.pcf")
+game.AddParticles( "particles/gb5_napalm.pcf")
+game.AddParticles( "particles/gb5_light_bomb.pcf")
+game.AddParticles( "particles/gb5_high_explosive_2.pcf")
+game.AddParticles( "particles/gb5_high_explosive.pcf")
+game.AddParticles( "particles/neuro_tank_ap.pcf")
+
+game.AddParticles( "particles/ins_rockettrail.pcf")
+game.AddParticles( "particles/doi_rockettrail.pcf")
+game.AddParticles( "particles/mnb_flamethrower.pcf")
+game.AddParticles( "particles/impact_fx_ins.pcf" )
+game.AddParticles( "particles/environment_fx.pcf")
+game.AddParticles( "particles/water_impact.pcf")
+game.AddParticles( "particles/explosion_fx_ins.pcf")
+game.AddParticles( "particles/weapon_fx_tracers.pcf" )
+game.AddParticles( "particles/weapon_fx_ins.pcf" )
+
+game.AddParticles( "particles/gred_particles.pcf" )
+-----------------------------------------------------------
+
+
+
+local GRED_SVAR = {FCVAR_REPLICATED,FCVAR_ARCHIVE,FCVAR_SERVER_CAN_EXECUTE,FCVAR_NOTIFY}
+local GRED_CVAR = {FCVAR_USERINFO,FCVAR_ARCHIVE}
+
+if SERVER then
+	CreateConVar("gred_easyuse"					,  "1"  , GRED_SVAR)
+	CreateConVar("gred_maxforcefield_range"		, "5000", GRED_SVAR)
+	CreateConVar("gred_12mm_he_impact"			,  "1"  , GRED_SVAR)
+	CreateConVar("gred_7mm_he_impact"			,  "1"  , GRED_SVAR)
+	CreateConVar("gred_fragility"				,  "1"  , GRED_SVAR)
+	CreateConVar("gred_shockwave_unfreeze"		,  "0"  , GRED_SVAR)
+	CreateConVar("gred_tracers"					,  "5"  , GRED_SVAR)
+	CreateConVar("gred_oldrockets"				,  "0"  , GRED_SVAR)
+	CreateConVar("gred_jets_speed"				,  "1"  , GRED_SVAR)
+	CreateConVar("gred_healthslider"			, "100" , GRED_SVAR)
+	CreateConVar("gred_enablehealth"			,  "1"  , GRED_SVAR)
+	CreateConVar("gred_enableenginehealth"		,  "1"  , GRED_SVAR)
+	CreateConVar("gred_bombs_mass"				,  "0"  , GRED_SVAR)
+	CreateConVar("gred_bombs_nocustomexplosion" ,  "0"  , GRED_SVAR)
+	CreateConVar("gred_fire_effect"				,  "1"  , GRED_SVAR)
+	CreateConVar("gred_multiple_fire_effects"	,  "1"  , GRED_SVAR)
+end
 if CLIENT then
-	CreateClientConVar("gred_decals", "1")
-	CreateClientConVar("gred_sound_shake", "1")
-	CreateClientConVar("gred_water_impact", "1")
-	CreateClientConVar("gred_insparticles", "0")
-	CreateClientConVar("gred_noparticles_7mm", "0")
-	CreateClientConVar("gred_noparticles_12mm", "0")
-	CreateClientConVar("gred_noparticles_20mm", "0")
-	CreateClientConVar("gred_noparticles_30mm", "0")
-	CreateClientConVar("gred_altmuzzleeffect", "0")
+	CreateConVar("gred_decals"			 , "1" , GRED_CVAR)
+	CreateConVar("gred_decals"			 , "1" , GRED_CVAR)
+	CreateConVar("gred_sound_shake"		 , "1" , GRED_CVAR)
+	CreateConVar("gred_water_impact"	 , "1" , GRED_CVAR)
+	CreateConVar("gred_insparticles"     , "0" , GRED_CVAR)
+	CreateConVar("gred_noparticles_7mm"  , "0" , GRED_CVAR)
+	CreateConVar("gred_noparticles_12mm" , "0" , GRED_CVAR)
+	CreateConVar("gred_noparticles_20mm" , "0" , GRED_CVAR)
+	CreateConVar("gred_noparticles_30mm" , "0" , GRED_CVAR)
+	CreateConVar("gred_altmuzzleeffect"  , "0" , GRED_CVAR)
 end
 
+-----------------------------------------------------------
 local function gredsettings( CPanel )
 	CPanel:ClearControls()
 	sounds={}
@@ -46,7 +105,7 @@ local function gredsettings( CPanel )
 
 	CPanel:AddControl( "CheckBox", { Label = "Should there be sound shake?", Command = "gred_sound_shake" } );
 
-	-- CPanel:AddControl( "CheckBox", { Label = "Use GBombs style explosion?", Command = "gred_bombs_nocustomexplosion" } );
+	CPanel:AddControl( "CheckBox", { Label = "Use GBombs style explosion?", Command = "gred_bombs_nocustomexplosion" } );
 
 	------------------------------PLANES SETTINGS-------------------------------
 	local plane = vgui.Create( "DImageButton" );
@@ -77,33 +136,30 @@ local function gredsettings( CPanel )
 	
 	------------------------------BULLETS SETTINGS-------------------------------
 	
-	
 	CPanel:AddControl( "CheckBox", { Label = "Use an alternative muzzleflash?", Command = "gred_altmuzzleeffect" } );
-	
+		
 	CPanel:AddControl( "CheckBox", { Label = "Should 12mm MGs have a blast radius? (Kills tanks!)", Command = "gred_12mm_he_impact" } );
-	
+		
 	CPanel:AddControl( "CheckBox", { Label = "Should 7mm MGs have a blast radius? (Kills tanks!)", Command = "gred_7mm_he_impact" } );
 	
 	CPanel:NumSlider( "Tracer ammo apparition", "gred_tracers", 0, 20, 0 );
 	
 	CPanel:AddControl( "CheckBox", { Label = "Use Insurgency impact effects for 7mm MGs?", Command = "gred_insparticles" } );
-	
+		
 	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 7mm MGs?", Command = "gred_noparticles_7mm" } );
-	
+		
 	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 12mm MGs?", Command = "gred_noparticles_12mm" } );
-	
+		
 	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 20mm cannons?", Command = "gred_noparticles_20mm" } );
-	
+		
 	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 30mm cannons?", Command = "gred_noparticles_30mm" } );
-	
+		
 	CPanel:AddControl( "CheckBox", { Label = "Disable water impact effects?", Command = "gred_water_impact" } );
 end
 
 
 
 
-hook.Add( "PopulateToolMenu", "PopulateGbombsMenus", function()
-
+hook.Add( "PopulateToolMenu", "gred_menu", function()
 	spawnmenu.AddToolMenuOption( "Options", "Gredwitch's Base", "GredwitchSettings", "Settings", "", "", gredsettings )
-
 end );

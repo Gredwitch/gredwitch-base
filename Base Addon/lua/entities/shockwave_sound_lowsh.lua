@@ -52,6 +52,8 @@ function ENT:Think()
     if (SERVER) then
 		if !self:IsValid() then return end
 		local pos = self:GetPos()
+		if GetConVar("gred_sound_shake"):GetInt()== 1 then
+		end
 		self.CURRENTRANGE = self.CURRENTRANGE+(self.SHOCKWAVE_INCREMENT*5)
 		for k, v in pairs(ents.FindInSphere(pos,(self.CURRENTRANGE*5))) do
 			 if v:IsPlayer() then
@@ -61,15 +63,8 @@ function ENT:Think()
 						net.WriteString(self.SOUNDCLOSE)
 					net.Send(v)
 					v:SetNWString("sound", self.SOUNDCLOSE)
-					if GetConVar("gred_sound_shake"):GetInt()== 1 then
-						util.ScreenShake( v:GetPos(), 5555, 555, 1, 500 )
-					end
-					if self:GetVar("Shocktime") == nil or self:GetVar("Shocktime") <= 0 then
-						self.shocktime = 1
-					else
-						self.shocktime = self:GetVar("Shocktime")
-					end
 					table.insert(self.FILTER, v)
+					util.ScreenShake(v:GetPos(),10000,100,1.5,100)
 				end
 			end
 		end
@@ -87,15 +82,8 @@ function ENT:Think()
 						net.Send(v)
 						v:SetNWString("sound", self.SOUNDCLOSE)
 					end
-					if self:GetVar("Shocktime") == nil or self:GetVar("Shocktime") <= 0 then
-						self.shocktime = 1
-					else
-						self.shocktime = self:GetVar("Shocktime")
-					end
-					if GetConVar("gred_sound_shake"):GetInt()== 1 then
-						util.ScreenShake( v:GetPos(), 5555, 555, 1, 500 )
-					end
 					table.insert(self.FILTER, v)
+					util.ScreenShake(v:GetPos(),1000,100,1,50)
 				end
 			end
 		end
@@ -113,20 +101,13 @@ function ENT:Think()
 							net.Send(v)
 							v:SetNWString("sound", self.SOUNDCLOSE)
 					end
-					if self:GetVar("Shocktime") == nil or self:GetVar("Shocktime") <= 0 then
-						self.shocktime = 1
-					else
-						self.shocktime = self:GetVar("Shocktime")
-					end
-					if GetConVar("gred_sound_shake"):GetInt()== 1 then
-						util.ScreenShake( v:GetPos(), 5555, 555, 1, 500 )
-					end
 					table.insert(self.FILTER, v)
 				end
 			end
 		end
 	end
 end
+
 function ENT:OnRemove()
 	if SERVER then
 		if self.FILTER==nil then return end
@@ -136,6 +117,7 @@ function ENT:OnRemove()
 		end
 	end
 end
+
 function ENT:Draw()
      return false
 end

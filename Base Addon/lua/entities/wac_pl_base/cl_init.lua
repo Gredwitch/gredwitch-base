@@ -19,8 +19,13 @@ function ENT:Think()
 		if !self.sounds.Engine:IsPlaying() then
 			self.sounds.Engine:ChangePitch(0,0.1)
 			self.sounds.Engine:ChangeVolume(0.3)
-			self.sounds.Engine:SetSoundLevel(70)
+			self.sounds.Engine:SetSoundLevel(110)
 			self.sounds.Engine:Play()
+		end
+		if !self.sounds.Radio:IsPlaying() then
+			self.sounds.Radio:ChangeVolume(1)
+			self.sounds.Radio:SetSoundLevel(70)
+			self.sounds.Radio:Play()
 		end
 		if !self.sounds.Blades:IsPlaying() then
 			self.sounds.Blades:ChangePitch(0,0.1)
@@ -53,6 +58,7 @@ function ENT:Think()
 		self.sounds.Engine:ChangeVolume(volume*math.Clamp(engineVal*engineVal/4000, 0, inVehicle and 1 or 5),0.1)
 		self.sounds.Blades:ChangePitch(math.Clamp(val, 50, 150),0.1)
 		self.sounds.Blades:ChangeVolume(volume*math.Clamp(val*val/5000, 0, inVehicle and 0.4 or 5),0.1)
+		self.sounds.Radio:ChangeVolume(volume*math.Clamp(val*val/5000, 0, inVehicle and 0.4 or 5),0)
 		if self.sounds.Start then
 			self.sounds.Start:ChangeVolume(volume*math.Clamp(100 - self.engineRpm*150, 0, 100)/100,0.1)
 			self.sounds.Start:ChangePitch(100 - self.engineRpm*30,0.1)
@@ -61,6 +67,7 @@ function ENT:Think()
 	else
 		self.sounds.Engine:Stop()
 		self.sounds.Blades:Stop()
+		self.sounds.Radio:Stop()
 		if self.sounds.Start then
 			self.sounds.Start:Stop()
 		end

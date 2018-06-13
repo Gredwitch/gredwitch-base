@@ -39,7 +39,7 @@ end
 function ENT:Trace()
 	if SERVER then
 		if !self:IsValid() then return end
-		if(GetConVar("gred_decals"):GetInt() >= 1) then
+		if CLIENT and (GetConVar("gred_decals"):GetInt() >= 1) then
 			local pos = self:GetPos()
 			local tracedata    = {}
 			tracedata.start    = pos
@@ -75,19 +75,19 @@ function ENT:Think()
 				 end
 				self.Owner = self.GBOWNER
 				local dmg = DamageInfo()
-				util.BlastDamage(self, self.Owner, pos, self.MAX_RANGE, self.SHOCKWAVEDAMAGE)
-				local ent = ents.Create("env_physexplosion")
-				ent:SetPos( pos ) 
-				ent:Spawn()
-				ent:SetKeyValue("magnitude", self.SHOCKWAVEDAMAGE)
-				ent:SetKeyValue("radius", self.MAX_RANGE)
-				ent:SetKeyValue("spawnflags","19")
-				ent:Fire("Explode", 0, 0)
-				ent:Remove()
 				if GetConVarNumber("gred_bombs_nocustomexplosion") == 0 then
 					dmg:SetDamage(1)
 					dmg:SetDamageType(DMG_BLAST)
 					dmg:SetAttacker(self.Owner)
+					util.BlastDamage(self, self.Owner, pos, self.MAX_RANGE, self.SHOCKWAVEDAMAGE)
+					local ent = ents.Create("env_physexplosion")
+					ent:SetPos( pos ) 
+					ent:Spawn()
+					ent:SetKeyValue("magnitude", self.SHOCKWAVEDAMAGE)
+					ent:SetKeyValue("radius", self.MAX_RANGE)
+					ent:SetKeyValue("spawnflags","19")
+					ent:Fire("Explode", 0, 0)
+					ent:Remove()
 					if (v:IsValid()) then
 						phys = v:GetPhysicsObjectNum(i)
 						if (v:GetPhysicsObject(i):IsValid()) then

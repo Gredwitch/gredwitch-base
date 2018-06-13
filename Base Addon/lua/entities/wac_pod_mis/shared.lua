@@ -6,7 +6,7 @@ ENT.Category			= ""
 ENT.Spawnable			= false
 ENT.AdminSpawnable		= false
 ENT.Ammo				= 4
-ENT.FireRate			= 120
+ENT.FireRate			= 60
 ENT.Sequential			= true
 ENT.MaxRange			= 35400
 ENT.model				= "models/doi/ty_missile.mdl"
@@ -19,7 +19,7 @@ sound.Add( {
 	volume = 1.0,
 	level = 90,
 	pitch = { 100 },
-	sound = "gunsounds/rocket.wav"
+	sound = "gunsounds/fh2_rocket_3p.wav"
 } )
 
 function ENT:Initialize()
@@ -50,8 +50,8 @@ function ENT:fireRocket(pos, ang)
 	rocket:SetPos(self:LocalToWorld(pos))
 	rocket:SetAngles(ang)
 	rocket.Owner = self:getAttacker()
-	rocket.Damage = 557
-	rocket.Radius = 302
+	rocket.Damage = 1000
+	rocket.Radius = 400
 	rocket.Speed = 851
 	rocket.Drag = Vector(0,1,1)
 	rocket.TrailLength = 200

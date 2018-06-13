@@ -57,7 +57,7 @@ function ENT:Explode()
 	 self:StopParticles()
 	 local pos = self:LocalToWorld(self:OBBCenter())
 	 
-	 for i=0, (15-1) do
+	 for i=0, (30-1) do
 		 local ent1 = ents.Create("gb_bomb_cbubomblet") 
 		 local phys = ent1:GetPhysicsObject()
 		 ent1:SetPos( self:GetPos() ) 

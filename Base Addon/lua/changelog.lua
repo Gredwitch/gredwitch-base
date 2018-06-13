@@ -195,7 +195,10 @@
 ??/06/2018
 
 - Added GRED_BASE_BULLET : optimized the bullets as much as possible
+- Added more client-side only stuff
 - Updated POD_GUNNER / POD_MG : optimized them as much as possible
+- Updated POD_MIS : fixed the missiles not dealing any damage / added better Hellfire stuff
+- Updated BASE_GROCKET : Hellfires are somewhat more OP / Fixed the missiles dealing no damage / Added new sounds and explosion effects
 - Updated BASE_NAPALM : Updated some stuff so it can be used by WP rounds
 - Updated the models paths
 - Updated BASE_ROCKET / BASE_BOMB

@@ -108,7 +108,7 @@ ENT.RSound   						 =  1
 
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
-
+local PLAYER = CLIENT or not game.IsDedicated()
 
 function ENT:Initialize()
  if (SERVER) then
@@ -213,7 +213,7 @@ function ENT:Explode()
 		end
 	end
 	
-	if CLIENT or not game.IsDedicated() then
+	if PLAYER then
 		if(self:WaterLevel() >= 1) then
 			local trdata   = {}
 			local trlength = Vector(0,0,9000)
@@ -231,7 +231,7 @@ function ENT:Explode()
 				 
 			local tr2 = util.TraceLine(trdat2)
 				 
-			if CLIENT or not game.IsDedicated() then
+			if PLAYER then
 				if tr2.Hit then
 					if self.EffectWater == "ins_water_explosion" then
 						ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)

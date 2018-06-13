@@ -48,7 +48,6 @@ function ENT:Initialize()
 	end
 	self.sound = CreateSound(self.Entity, "")
 	self.matType = MAT_DIRT
-	self.hitAngle = Angle(270, 0, 0)
 	self.ExplosionSound                  =  table.Random(CloseExploSnds)
 	self.FarExplosionSound				 =  table.Random(ExploSnds)
 	self.DistExplosionSound				 =  table.Random(DistExploSnds)
@@ -60,29 +59,48 @@ function ENT:Explode(tr)
 	if self.Exploded then return end
 	self.Exploded = true
 	
-    if(self:WaterLevel() >= 1) then --Not working
-		if tr2.Hit then
-			ParticleEffect("ins_water_explosion", tr2.HitPos, Angle(-90,0,0), nil)
-			self.ExplosionSound =  self.WaterExplosionSound
-			self.FarExplosionSound = self.WaterFarExplosionSound
+    if(self:WaterLevel() >= 1) then
+		ParticleEffect("ins_water_explosion", WaterHitPos, Angle(-90,0,0), nil)
+		self.ExplosionSound =  self.WaterExplosionSound
+		self.FarExplosionSound = self.WaterFarExplosionSound
+	else
+		if self.calcTarget then
+			ParticleEffect("high_explosive_main_2",pos,Angle(0,0,0),nil)
+		else
+			ParticleEffect("100lb_air",pos,Angle(0,0,0),nil)
 		end
 	end
-	ParticleEffect("doi_mortar_explosion",pos,Angle(self.hitAngle, -90, 0),nil)
 	local ent = ents.Create("shockwave_sound_lowsh")
 	ent:SetPos(pos)
-	ent:Spawn()
-	ent:Activate()
-	ent:SetVar("GBOWNER", ply)
-	ent:SetVar("MAX_RANGE",self.Damage*(self.Radius*1.5))
+	ent:SetVar("GBOWNER",self.Owner)
+	ent:SetVar("MAX_RANGE",self.Damage*self.Radius)
 	ent:SetVar("NOFARSOUND",0)
 	ent:SetVar("SHOCKWAVE_INCREMENT",200)
 	ent:SetVar("DELAY",0.01)
-	ent:SetVar("SOUNDCLOSE", self.ExplosionSound)
-	ent:SetVar("SOUND", self.FarExplosionSound)
-	ent:SetVar("SOUNDFAR", self.DistExplosionSound)
+	if !self.calcTarget then
+		ent:SetVar("SOUNDCLOSE", self.ExplosionSound)
+		ent:SetVar("SOUND", self.FarExplosionSound)
+		ent:SetVar("SOUNDFAR", self.DistExplosionSound)
+	else
+		ent:SetVar("SOUND","explosions/gbomb_4.mp3")
+		ent:SetVar("SOUNDCLOSE","explosions/gbomb_4.mp3")
+		ent:SetVar("SOUND","explosions/gbomb_4.mp3")
+		ent:SetVar("SOUNDFAR","explosions/gbomb_4.mp3")
+		ent:SetVar("NOFARSOUND",1)
+	end
 	ent:SetVar("Shocktime", 0)
+	ent:Spawn()
+	ent:Activate()
+	
+	local ent = ents.Create("env_physexplosion")
+	ent:SetPos(pos) 
+	ent:Spawn()
+	ent:SetKeyValue("magnitude", self.Damage)
+	ent:SetKeyValue("radius", self.Radius)
+	ent:SetKeyValue("spawnflags","19")
+	ent:Fire("Explode", 0, 0)
+	-- ent:Remove()
 	self:Remove()
-
 end
 
 function ENT:StartRocket()
@@ -140,6 +158,7 @@ function ENT:PhysicsUpdate(ph)
 		mask    = MASK_WATER
 	}
 	local tr2 = util.TraceLine(trd2)
+	if tr2.Hit then WaterHitPos = tr2.HitPos end
 	
 	if tr.Hit and !self.Exploded then
 		if tr.HitSky then self:Remove() return end

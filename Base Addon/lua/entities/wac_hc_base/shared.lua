@@ -28,6 +28,7 @@ ENT.Sounds = {
 	Start = "HelicopterVehicle/HeliStart.mp3",
 	Blades = "vehicles/Airboat/fan_blade_idle_loop1.wav",
 	Engine = "WAC/Heli/heli_loop_int.wav",
+	Radio = "radio/american.wav",
 	MissileAlert = "HelicopterVehicle/MissileNearby.mp3",
 	MinorAlarm = "HelicopterVehicle/MinorAlarm.mp3",
 	LowHealth = "HelicopterVehicle/LowHealth.mp3",
@@ -52,6 +53,8 @@ function ENT:addSounds()
 				self.sounds[name]:SetSoundLevel(120)
 			elseif name == "Engine" then
 				self.sounds[name]:SetSoundLevel(110)
+			elseif name == "Radio" then
+				self.sounds[name]:SetSoundLevel(40)
 			end
 		end
 	end
