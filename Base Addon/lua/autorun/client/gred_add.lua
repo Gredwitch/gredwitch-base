@@ -1,5 +1,5 @@
 AddCSLuaFile()
-
+-- Adding particles
 game.AddParticles( "particles/doi_explosion_fx.pcf")
 game.AddParticles( "particles/doi_explosion_fx_b.pcf")
 game.AddParticles( "particles/doi_explosion_fx_c.pcf")
@@ -31,45 +31,64 @@ game.AddParticles( "particles/weapon_fx_tracers.pcf" )
 game.AddParticles( "particles/weapon_fx_ins.pcf" )
 
 game.AddParticles( "particles/gred_particles.pcf" )
+
+-- Precaching main particles
+PrecacheParticleSystem("gred_20mm")
+PrecacheParticleSystem("gred_20mm_airburst")
+PrecacheParticleSystem("30cal_impact")
+PrecacheParticleSystem("doi_gunrun_impact")
+PrecacheParticleSystem("doi_artillery_explosion")
+PrecacheParticleSystem("doi_stuka_explosion")
+PrecacheParticleSystem("gred_mortar_explosion")
+PrecacheParticleSystem("gred_mortar_explosion")
+PrecacheParticleSystem("ins_water_explosion")
 -----------------------------------------------------------
+-- Adding console vars
+local GRED_SVAR = {FCVAR_ARCHIVE,FCVAR_SERVER_CAN_EXECUTE,FCVAR_NOTIFY}--FCVAR_REPLICATED
+-- local GRED_CVAR = {FCVAR_USERINFO,FCVAR_ARCHIVE}
 
+CreateConVar("gred_easyuse"					,  "1"  , GRED_SVAR)
+CreateConVar("gred_maxforcefield_range"		, "5000", GRED_SVAR)
+CreateConVar("gred_12mm_he_impact"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_7mm_he_impact"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_fragility"				,  "1"  , GRED_SVAR)
+CreateConVar("gred_shockwave_unfreeze"		,  "0"  , GRED_SVAR)
+CreateConVar("gred_tracers"					,  "5"  , GRED_SVAR)
+CreateConVar("gred_oldrockets"				,  "0"  , GRED_SVAR)
+CreateConVar("gred_jets_speed"				,  "1"  , GRED_SVAR)
+CreateConVar("gred_healthslider"			, "100" , GRED_SVAR)
+CreateConVar("gred_enablehealth"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_enableenginehealth"		,  "1"  , GRED_SVAR)
+CreateConVar("gred_bombs_mass"				,  "0"  , GRED_SVAR)
+CreateConVar("gred_bombs_nocustomexplosion" ,  "0"  , GRED_SVAR)
+CreateConVar("gred_fire_effect"				,  "1"  , GRED_SVAR)
+CreateConVar("gred_multiple_fire_effects"	,  "1"  , GRED_SVAR)
+--[[
+CreateConVar("gred_decals"			 , "1" , GRED_CVAR)
+CreateConVar("gred_decals"			 , "1" , GRED_CVAR)
+CreateConVar("gred_sound_shake"		 , "1" , GRED_CVAR)
+CreateConVar("gred_water_impact"	 , "1" , GRED_CVAR)
+CreateConVar("gred_insparticles"     , "0" , GRED_CVAR)
+CreateConVar("gred_noparticles_7mm"  , "0" , GRED_CVAR)
+CreateConVar("gred_noparticles_12mm" , "0" , GRED_CVAR)
+CreateConVar("gred_noparticles_20mm" , "0" , GRED_CVAR)
+CreateConVar("gred_noparticles_30mm" , "0" , GRED_CVAR)
+CreateConVar("gred_altmuzzleeffect"  , "0" , GRED_CVAR)
+--]]
 
-
-local GRED_SVAR = {FCVAR_REPLICATED,FCVAR_ARCHIVE,FCVAR_SERVER_CAN_EXECUTE,FCVAR_NOTIFY}
-local GRED_CVAR = {FCVAR_USERINFO,FCVAR_ARCHIVE}
-
-if SERVER then
-	CreateConVar("gred_easyuse"					,  "1"  , GRED_SVAR)
-	CreateConVar("gred_maxforcefield_range"		, "5000", GRED_SVAR)
-	CreateConVar("gred_12mm_he_impact"			,  "1"  , GRED_SVAR)
-	CreateConVar("gred_7mm_he_impact"			,  "1"  , GRED_SVAR)
-	CreateConVar("gred_fragility"				,  "1"  , GRED_SVAR)
-	CreateConVar("gred_shockwave_unfreeze"		,  "0"  , GRED_SVAR)
-	CreateConVar("gred_tracers"					,  "5"  , GRED_SVAR)
-	CreateConVar("gred_oldrockets"				,  "0"  , GRED_SVAR)
-	CreateConVar("gred_jets_speed"				,  "1"  , GRED_SVAR)
-	CreateConVar("gred_healthslider"			, "100" , GRED_SVAR)
-	CreateConVar("gred_enablehealth"			,  "1"  , GRED_SVAR)
-	CreateConVar("gred_enableenginehealth"		,  "1"  , GRED_SVAR)
-	CreateConVar("gred_bombs_mass"				,  "0"  , GRED_SVAR)
-	CreateConVar("gred_bombs_nocustomexplosion" ,  "0"  , GRED_SVAR)
-	CreateConVar("gred_fire_effect"				,  "1"  , GRED_SVAR)
-	CreateConVar("gred_multiple_fire_effects"	,  "1"  , GRED_SVAR)
-end
-if CLIENT then
-	CreateConVar("gred_decals"			 , "1" , GRED_CVAR)
-	CreateConVar("gred_decals"			 , "1" , GRED_CVAR)
-	CreateConVar("gred_sound_shake"		 , "1" , GRED_CVAR)
-	CreateConVar("gred_water_impact"	 , "1" , GRED_CVAR)
-	CreateConVar("gred_insparticles"     , "0" , GRED_CVAR)
-	CreateConVar("gred_noparticles_7mm"  , "0" , GRED_CVAR)
-	CreateConVar("gred_noparticles_12mm" , "0" , GRED_CVAR)
-	CreateConVar("gred_noparticles_20mm" , "0" , GRED_CVAR)
-	CreateConVar("gred_noparticles_30mm" , "0" , GRED_CVAR)
-	CreateConVar("gred_altmuzzleeffect"  , "0" , GRED_CVAR)
-end
+CreateClientConVar("gred_decals"			 , "1" , true,true)
+CreateClientConVar("gred_decals"			 , "1" , true,true)
+CreateClientConVar("gred_sound_shake"		 , "1" , true,true)
+CreateClientConVar("gred_water_impact"	 	 , "1" , true,true)
+CreateClientConVar("gred_insparticles"     	 , "0" , true,true)
+CreateClientConVar("gred_noparticles_7mm"    , "0" , true,true)
+CreateClientConVar("gred_noparticles_12mm"   , "0" , true,true)
+CreateClientConVar("gred_noparticles_20mm"   , "0" , true,true)
+CreateClientConVar("gred_noparticles_30mm"   , "0" , true,true)
+CreateClientConVar("gred_altmuzzleeffect"    , "0" , true,true)
 
 -----------------------------------------------------------
+-- Adding the spawnmenu options
 local function gredsettings( CPanel )
 	CPanel:ClearControls()
 	sounds={}

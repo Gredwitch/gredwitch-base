@@ -77,7 +77,7 @@ function ENT:Explode(tr)
 	ent:SetVar("NOFARSOUND",0)
 	ent:SetVar("SHOCKWAVE_INCREMENT",200)
 	ent:SetVar("DELAY",0.01)
-	if !self.calcTarget then
+	if !self.hellfire then
 		ent:SetVar("SOUNDCLOSE", self.ExplosionSound)
 		ent:SetVar("SOUND", self.FarExplosionSound)
 		ent:SetVar("SOUNDFAR", self.DistExplosionSound)
@@ -99,7 +99,6 @@ function ENT:Explode(tr)
 	ent:SetKeyValue("radius", self.Radius)
 	ent:SetKeyValue("spawnflags","19")
 	ent:Fire("Explode", 0, 0)
-	-- ent:Remove()
 	self:Remove()
 end
 

@@ -68,6 +68,7 @@ function ENT:fireRocket(pos, ang)
 				return r.target:LocalToWorld(r.targetOffset)
 			end
 		else
+			r.hellfire = true
 			return r.target:LocalToWorld(r.targetOffset)
 		end
 	end

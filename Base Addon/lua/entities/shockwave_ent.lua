@@ -75,7 +75,6 @@ function ENT:Think()
 				 end
 				self.Owner = self.GBOWNER
 				local dmg = DamageInfo()
-				if GetConVarNumber("gred_bombs_nocustomexplosion") == 0 then
 					dmg:SetDamage(1)
 					dmg:SetDamageType(DMG_BLAST)
 					dmg:SetAttacker(self.Owner)
@@ -148,7 +147,6 @@ function ENT:Think()
 							 v:TakeDamageInfo(dmg)
 						 end
 					end
-				end
 			 i = i + 1
 			 end
 		 end

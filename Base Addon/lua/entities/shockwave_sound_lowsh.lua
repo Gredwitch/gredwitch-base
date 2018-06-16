@@ -52,19 +52,19 @@ function ENT:Think()
     if (SERVER) then
 		if !self:IsValid() then return end
 		local pos = self:GetPos()
-		if GetConVar("gred_sound_shake"):GetInt()== 1 then
-		end
 		self.CURRENTRANGE = self.CURRENTRANGE+(self.SHOCKWAVE_INCREMENT*5)
 		for k, v in pairs(ents.FindInSphere(pos,(self.CURRENTRANGE*5))) do
 			 if v:IsPlayer() then
 			 
 				if !(table.HasValue(self.FILTER,v)) then
+					if v:GetInfoNum("gred_sound_shake",1) == 1 then
+						util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+					end
 					net.Start("gred_net_sound_lowsh")
 						net.WriteString(self.SOUNDCLOSE)
 					net.Send(v)
 					v:SetNWString("sound", self.SOUNDCLOSE)
 					table.insert(self.FILTER, v)
-					util.ScreenShake(v:GetPos(),10000,100,1.5,100)
 				end
 			end
 		end
@@ -83,7 +83,9 @@ function ENT:Think()
 						v:SetNWString("sound", self.SOUNDCLOSE)
 					end
 					table.insert(self.FILTER, v)
-					util.ScreenShake(v:GetPos(),1000,100,1,50)
+					if v:GetInfoNum("gred_sound_shake",1) == 1 then
+						util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+					end
 				end
 			end
 		end
