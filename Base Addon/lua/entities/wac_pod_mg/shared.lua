@@ -86,7 +86,7 @@ function ENT:fireBullet(pos)
 	
 	LtWPOS = self:LocalToWorld(pos)
 	if LAN == 1 then
-		if GetConVar("gred_altmuzzleeffect"):GetInt() == 1 then
+		if GetConVar("gred_cl_altmuzzleeffect"):GetInt() == 1 then
 			ParticleEffect("muzzleflash_sparks_variant_6",LtWPOS,ang,nil)
 			ParticleEffect("muzzleflash_1p_glow",LtWPOS,ang,nil)
 			ParticleEffect("muzzleflash_m590_1p_core",LtWPOS,ang,nil)
@@ -101,7 +101,7 @@ function ENT:fireBullet(pos)
 		end
 	elseif CLIENT then
 		local ply = LocalPlayer()
-		if tonumber(ply:GetInfo("gred_altmuzzleeffect",0)) == 1 then
+		if tonumber(ply:GetInfo("gred_cl_altmuzzleeffect",0)) == 1 then
 			ParticleEffect("muzzleflash_sparks_variant_6",LtWPOS,ang,nil)
 			ParticleEffect("muzzleflash_1p_glow",LtWPOS,ang,nil)
 			ParticleEffect("muzzleflash_m590_1p_core",LtWPOS,ang,nil)

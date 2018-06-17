@@ -70,7 +70,7 @@ function ENT:fire()
 	tracer = tracer + 1
 	
 	if LAN == 1 then
-		if GetConVar("gred_altmuzzleeffect"):GetInt() == 1 then
+		if GetConVar("gred_cl_altmuzzleeffect"):GetInt() == 1 then
 			ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
 			ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
 			ParticleEffect("muzzleflash_m590_1p_core",pos,ang,nil)
@@ -80,12 +80,12 @@ function ENT:fire()
 			effectdata:SetOrigin(pos)
 			effectdata:SetAngles(ang)
 			effectdata:SetEntity(self.aircraft)
-			effectdata:SetScale(3)
+			effectdata:SetScale(1)
 			util.Effect("MuzzleEffect", effectdata)
 		end
 	elseif CLIENT then
 		local ply = LocalPlayer()
-		if tonumber(ply:GetInfo("gred_altmuzzleeffect",0)) == 1 then
+		if tonumber(ply:GetInfo("gred_cl_altmuzzleeffect",0)) == 1 then
 			ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
 			ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
 			ParticleEffect("muzzleflash_m590_1p_core",pos,ang,nil)
