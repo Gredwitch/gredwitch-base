@@ -10,7 +10,8 @@ function ENT:Initialize()
 	self:SetSpinSpeed(0)
 	
 	if tracer == nil then tracer = 0 end
-	tracerConvar=GetConVarNumber("gred_tracers")
+	tracerConvar=GetConVar("gred_sv_tracers"):GetInt()
+	LAN = GetConVar("gred_sv_lan"):GetInt()
 	
 	bcolor = Color(255,255,0)
 	num1   = 5
@@ -58,6 +59,9 @@ function ENT:fire()
 	b.Radius=70
 	b.gunRPM=self.FireRate
 	b:Spawn()
+	b:Activate()
+	b.Owner=self.seat
+	
 	if tracer >= tracerConvar then
 		util.SpriteTrail(b, 0, bcolor, false, num1, num1, num2, num3, "trails/laser.vmt")
 		util.SpriteTrail(b, 0, b.col, false, num4, num5, num6, num7, "trails/smoke.vmt")
@@ -65,34 +69,50 @@ function ENT:fire()
 	end
 	tracer = tracer + 1
 	
-	if GetConVarNumber("gred_altmuzzleeffect") == 1 and (CLIENT or not game.IsDedicated()) then
-		ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
-		ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
-		ParticleEffect("muzzleflash_m590_1p_core",pos,ang,nil)
-		ParticleEffect("muzzleflash_smoke_small_variant_1",pos,ang,nil)
-	elseif GetConVarNumber("gred_altmuzzleeffect") == 0 and (CLIENT or not game.IsDedicated()) then
-		local effectdata=EffectData()
-		effectdata:SetOrigin(pos)
-		effectdata:SetAngles(ang)
-		effectdata:SetEntity(self.aircraft)
-		effectdata:SetScale(3)
-		util.Effect("MuzzleEffect", effectdata)
+	if LAN == 1 then
+		if GetConVar("gred_altmuzzleeffect"):GetInt() == 1 then
+			ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
+			ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
+			ParticleEffect("muzzleflash_m590_1p_core",pos,ang,nil)
+			ParticleEffect("muzzleflash_smoke_small_variant_1",pos,ang,nil)
+		else
+			local effectdata=EffectData()
+			effectdata:SetOrigin(pos)
+			effectdata:SetAngles(ang)
+			effectdata:SetEntity(self.aircraft)
+			effectdata:SetScale(3)
+			util.Effect("MuzzleEffect", effectdata)
+		end
+	elseif CLIENT then
+		local ply = LocalPlayer()
+		if tonumber(ply:GetInfo("gred_altmuzzleeffect",0)) == 1 then
+			ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
+			ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
+			ParticleEffect("muzzleflash_m590_1p_core",pos,ang,nil)
+			ParticleEffect("muzzleflash_smoke_small_variant_1",pos,ang,nil)
+		else
+			local effectdata=EffectData()
+			effectdata:SetOrigin(pos)
+			effectdata:SetAngles(ang)
+			effectdata:SetEntity(self.aircraft)
+			effectdata:SetScale(1)
+			util.Effect("MuzzleEffect", effectdata)
+		end
 	end
 	
-	b.Owner=self.seat
+	for _,e in pairs(self.aircraft.wheels) do
+		if IsValid(e) then
+			constraint.NoCollide(e,b,0,0)
+		end
+	end
+	constraint.NoCollide(self.aircraft,b,0,0)
+	
 	self.sounds.shoot1p:Stop()
 	self.sounds.shoot1p:Play()
 	self.sounds.shoot1p:SetSoundLevel(110)
 	self.sounds.shoot3p:Stop()
 	self.sounds.shoot3p:Play()
 	self.sounds.shoot3p:SetSoundLevel(110)
-	
-	for _,e in pairs(self.aircraft.wheels) do
-		if IsValid(e) then
-		constraint.NoCollide(e,rocket,0,0)
-		end
-	end
-	constraint.NoCollide(self.aircraft,rocket,0,0)
 end
 
 function ENT:canFire()

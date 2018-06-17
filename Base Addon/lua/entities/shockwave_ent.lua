@@ -37,21 +37,33 @@ if SERVER then
 	end
 end
 function ENT:Trace()
-	if SERVER then
-		if !self:IsValid() then return end
-		if CLIENT and (GetConVar("gred_decals"):GetInt() >= 1) then
-			local pos = self:GetPos()
-			local tracedata    = {}
-			tracedata.start    = pos
-			tracedata.endpos   = tracedata.start - Vector(0, 0, self.trace)
-			tracedata.filter   = self.Entity
-			local trace = util.TraceLine(tracedata)
-			if self.decal==nil then 
-				self.decal="scorch_medium"
-			end
-
-			util.Decal( self.decal, tracedata.start, tracedata.endpos )
+	if !self:IsValid() then return end
+	if CLIENT then
+		if tonumber(LocalPlayer():GetInfo("gred_cl_decals")) == 0 then return end
+		local pos = self:GetPos()
+		local tracedata    = {}
+		tracedata.start    = pos
+		tracedata.endpos   = tracedata.start - Vector(0, 0, self.trace)
+		tracedata.filter   = self.Entity
+		local trace = util.TraceLine(tracedata)
+		if self.decal==nil then 
+			self.decal="scorch_medium"
 		end
+
+		util.Decal( self.decal, tracedata.start, tracedata.endpos )
+	elseif GetConVar("gred_sv_lan"):GetInt() == 1 then
+		if GetConVar("gred_cl_decals"):GetInt() == 0 then return end
+		local pos = self:GetPos()
+		local tracedata    = {}
+		tracedata.start    = pos
+		tracedata.endpos   = tracedata.start - Vector(0, 0, self.trace)
+		tracedata.filter   = self.Entity
+		local trace = util.TraceLine(tracedata)
+		if self.decal==nil then 
+			self.decal="scorch_medium"
+		end
+
+		util.Decal( self.decal, tracedata.start, tracedata.endpos )
 	end
 end
 function ENT:Think()		
@@ -102,7 +114,7 @@ function ENT:Think()
 							end
 							phys:AddAngleVelocity(Vector(F_ang, F_ang, F_ang) * relation)
 							phys:AddVelocity(F_dir)
-							if(GetConVar("gred_shockwave_unfreeze"):GetInt() >= 1) then
+							if(GetConVar("gred_sv_shockwave_unfreeze"):GetInt() >= 1) then
 								if !v.isWacAircraft then
 									phys:Wake()
 									phys:EnableMotion(true)

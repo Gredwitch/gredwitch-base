@@ -25,7 +25,8 @@ function ENT:Initialize()
 	self:base("wac_pod_base").Initialize(self)
 	
 	if tracer == nil then tracer = 0 end
-	tracerConvar=GetConVarNumber("gred_tracers")
+	tracerConvar=GetConVar("gred_sv_tracers"):GetInt()
+	LAN = GetConVar("gred_sv_lan"):GetInt()
 	
 	bcolor = Color(255,255,0)
 	num1   = 5
@@ -73,27 +74,47 @@ function ENT:fireBullet(pos)
 	constraint.NoCollide(b,self.aircraft,0,0)
 	b.gunRPM=self.FireRate
 	b:Spawn()
+	b:Activate()
+	b.Owner=self.seat
+	
 	if tracer >= tracerConvar then
 		util.SpriteTrail(b, 0, bcolor, false, num1, num1, num2, num3, "trails/laser.vmt")
 		util.SpriteTrail(b, 0, b.col, false, num4, num5, num6, num7, "trails/smoke.vmt")
 		tracer = 0
 	end
-	b.Owner=self.seat
-	LtWPOS = self:LocalToWorld(pos)
-	if GetConVarNumber("gred_altmuzzleeffect") == 1 and (CLIENT or not game.IsDedicated()) then
-		ParticleEffect("muzzleflash_sparks_variant_6",LtWPOS,ang,nil)
-		ParticleEffect("muzzleflash_1p_glow",LtWPOS,ang,nil)
-		ParticleEffect("muzzleflash_m590_1p_core",LtWPOS,ang,nil)
-		ParticleEffect("muzzleflash_smoke_small_variant_1",LtWPOS,ang,nil)
-	elseif GetConVarNumber("gred_altmuzzleeffect") == 0 and (CLIENT or not game.IsDedicated()) then
-		local effectdata=EffectData()
-		effectdata:SetOrigin(LtWPOS)
-		effectdata:SetAngles(ang)
-		effectdata:SetEntity(self.aircraft)
-		effectdata:SetScale(3)
-		util.Effect("MuzzleEffect", effectdata)
-	end
 	tracer = tracer + 1
+	
+	LtWPOS = self:LocalToWorld(pos)
+	if LAN == 1 then
+		if GetConVar("gred_altmuzzleeffect"):GetInt() == 1 then
+			ParticleEffect("muzzleflash_sparks_variant_6",LtWPOS,ang,nil)
+			ParticleEffect("muzzleflash_1p_glow",LtWPOS,ang,nil)
+			ParticleEffect("muzzleflash_m590_1p_core",LtWPOS,ang,nil)
+			ParticleEffect("muzzleflash_smoke_small_variant_1",LtWPOS,ang,nil)
+		else
+			local effectdata=EffectData()
+			effectdata:SetOrigin(LtWPOS)
+			effectdata:SetAngles(ang)
+			effectdata:SetEntity(self.aircraft)
+			effectdata:SetScale(3)
+			util.Effect("MuzzleEffect", effectdata)
+		end
+	elseif CLIENT then
+		local ply = LocalPlayer()
+		if tonumber(ply:GetInfo("gred_altmuzzleeffect",0)) == 1 then
+			ParticleEffect("muzzleflash_sparks_variant_6",LtWPOS,ang,nil)
+			ParticleEffect("muzzleflash_1p_glow",LtWPOS,ang,nil)
+			ParticleEffect("muzzleflash_m590_1p_core",LtWPOS,ang,nil)
+			ParticleEffect("muzzleflash_smoke_small_variant_1",LtWPOS,ang,nil)
+		else
+			local effectdata=EffectData()
+			effectdata:SetOrigin(LtWPOS)
+			effectdata:SetAngles(ang)
+			effectdata:SetEntity(self.aircraft)
+			effectdata:SetScale(3)
+			util.Effect("MuzzleEffect", effectdata)
+		end
+	end
 	
 	for _,e in pairs(self.aircraft.wheels) do
 		if IsValid(e) then

@@ -12,10 +12,10 @@ ENT.Contact		                     =  "qhamitouche@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 
 ENT.Model                            =  "models/gbombs/bomb_jdam.mdl"
-ENT.Effect                           =  "cloudmaker_ground"             
-ENT.EffectAir                        =  "cloudmaker_ground"
+ENT.Effect                           =  "500lb_ground"                  
+ENT.EffectAir                        =  "500lb_ground"
 ENT.EffectWater                      =  "water_huge"
-ENT.ExplosionSound                   =  "explosions/gbomb_3.mp3"
+ENT.ExplosionSound                   =  "explosions/gbomb_4.mp3"
 ENT.ArmSound                         =  "npc/roller/mine/rmine_blip3.wav"            
 ENT.ActivationSound                  =  "buttons/button14.wav"     
 
@@ -27,14 +27,14 @@ ENT.UseRandomSounds                  =  false
 ENT.UseRandomModels                  =  false
 ENT.Timed                            =  false
 
-ENT.ExplosionDamage                  =  1000
+ENT.ExplosionDamage                  =  500
 ENT.PhysForce                        =  500
-ENT.ExplosionRadius                  =  3500
-ENT.SpecialRadius                    =  3500
-ENT.MaxIgnitionTime                  =  0 
+ENT.ExplosionRadius                  =  1450
+ENT.SpecialRadius                    =  1450
+ENT.MaxIgnitionTime                  =  0
 ENT.Life                             =  100
 ENT.MaxDelay                         =  0                                 
-ENT.TraceLength                      =  100
+ENT.TraceLength                      =  1000
 ENT.ImpactSpeed                      =  200
 ENT.Mass                             =  500
 ENT.ArmDelay                         =  0.1   

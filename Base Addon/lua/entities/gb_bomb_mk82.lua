@@ -34,7 +34,7 @@ ENT.SpecialRadius                    =  1450
 ENT.MaxIgnitionTime                  =  0
 ENT.Life                             =  100
 ENT.MaxDelay                         =  0                                 
-ENT.TraceLength                      =  100
+ENT.TraceLength                      =  1000
 ENT.ImpactSpeed                      =  200
 ENT.Mass                             =  500
 ENT.ArmDelay                         =  0.1   
@@ -44,7 +44,6 @@ ENT.Shocktime                        = 0
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
 ENT.Decal                            = "scorch_big"
-
 
 function ENT:SpawnFunction( ply, tr )
      if ( !tr.Hit ) then return end

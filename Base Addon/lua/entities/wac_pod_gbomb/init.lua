@@ -19,7 +19,7 @@ if SERVER then
 		    bomb:Activate()
 			bomb.phys=bomb:GetPhysicsObject()
 		    bomb.weld=constraint.Weld(bomb,self.aircraft,0,0,0,true)
-			if GetConVarNumber("gred_bombs_mass") == 0 then
+			if GetConVar("gred_sv_bombs_mass"):GetInt() == 0 then
 				bomb.phys:SetMass(1)
 			end
 			bomb:SetCollisionGroup(20)

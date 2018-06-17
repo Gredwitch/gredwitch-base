@@ -237,7 +237,7 @@ function ENT:OnTakeDamage(dmginfo)
 	 local phys = self:GetPhysicsObject()
 	 
      if (self.Life <= 0) then return end
-	 if(GetConVar("gred_fragility"):GetInt() >= 1) then
+	 if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then
 	     if(!self.Armed and !self.Arming) then
 	         self:Arm()
 	     end
@@ -265,7 +265,7 @@ function ENT:PhysicsCollide( data, physobj )
      if(self.Exploded) then return end
      if(!self:IsValid()) then return end
 	 if(self.Life <= 0) then return end
-		 if(GetConVar("gred_fragility"):GetInt() >= 1) then
+		 if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then
 			 if(data.Speed > self.ImpactSpeed) then
 				 if(!self.Armed and !self.Arming) then
 					 self:EmitSound(damagesound)
@@ -310,7 +310,7 @@ end
 function ENT:Use( activator, caller )
      if(self.Exploded) then return end
      if(self:IsValid()) then
-	     if(GetConVar("gred_easyuse"):GetInt() >= 1) then
+	     if(GetConVar("gred_sv_easyuse"):GetInt() >= 1) then
 	         if(!self.Armed) then
 		         if(!self.Exploded) and (!self.Used) then
 		             if(activator:IsPlayer()) then

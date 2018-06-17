@@ -32,7 +32,7 @@ end
 
 function ENT:fireRocket(pos, ang)
 	if !self:takeAmmo(self.TkAmmo) then return end
-	if GetConVarNumber("gred_oldrockets") >= 1 then
+	if GetConVar("gred_sv_oldrockets"):GetInt() >= 1 then
 		local rocket = ents.Create("wac_base_grocket")
 		rocket:SetPos(self:LocalToWorld(pos))
 		rocket:SetAngles(ang)

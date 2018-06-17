@@ -196,11 +196,15 @@
 
 - Added GRED_BASE_BULLET : optimized the bullets as much as possible
 - Added more client-side only stuff
+- Added editable bullet damage / radius
+- Fixed the GBU-38 being as powerful as a 1000LB bomb
+- Fixed the explosives rarely showing decals after being exploded
 - Updated POD_GUNNER / POD_MG : optimized them as much as possible
 - Updated POD_MIS : fixed the missiles not dealing any damage / added better Hellfire stuff
 - Updated BASE_GROCKET : Hellfires are somewhat more OP / Fixed the missiles dealing no damage / Added new sounds and explosion effects
 - Updated BASE_NAPALM : Updated some stuff so it can be used by WP rounds
 - Updated the models paths
+- Updated most of the deprecated "GetConVarNumber()" functions to "GetConVar():GetInt()"
 - Updated BASE_ROCKET / BASE_BOMB
 - Removed BASE_7MM / BASE_12MM / BASE_20MM / BASE_30MM
 --]]

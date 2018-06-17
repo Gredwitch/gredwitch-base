@@ -64,7 +64,7 @@ function ENT:Explode(tr)
 		self.ExplosionSound =  self.WaterExplosionSound
 		self.FarExplosionSound = self.WaterFarExplosionSound
 	else
-		if self.calcTarget then
+		if self.hellfire then
 			ParticleEffect("high_explosive_main_2",pos,Angle(0,0,0),nil)
 		else
 			ParticleEffect("100lb_air",pos,Angle(0,0,0),nil)
@@ -77,28 +77,32 @@ function ENT:Explode(tr)
 	ent:SetVar("NOFARSOUND",0)
 	ent:SetVar("SHOCKWAVE_INCREMENT",200)
 	ent:SetVar("DELAY",0.01)
+	local expl = ents.Create("env_physexplosion")
 	if !self.hellfire then
 		ent:SetVar("SOUNDCLOSE", self.ExplosionSound)
 		ent:SetVar("SOUND", self.FarExplosionSound)
 		ent:SetVar("SOUNDFAR", self.DistExplosionSound)
+		util.BlastDamage(self,self.Owner,pos,self.Radius/2,self.Damage)
+		expl:SetKeyValue("magnitude", self.Damage)
+		expl:SetKeyValue("radius", self.Radius/2)
+		expl:SetKeyValue("spawnflags","19")
 	else
 		ent:SetVar("SOUND","explosions/gbomb_4.mp3")
 		ent:SetVar("SOUNDCLOSE","explosions/gbomb_4.mp3")
 		ent:SetVar("SOUND","explosions/gbomb_4.mp3")
 		ent:SetVar("SOUNDFAR","explosions/gbomb_4.mp3")
 		ent:SetVar("NOFARSOUND",1)
+		util.BlastDamage(self,self.Owner,pos,self.Radius*2.5,self.Damage*2)
+		expl:SetKeyValue("magnitude", self.Damage*2)
+		expl:SetKeyValue("radius", self.Radius*2.5)
+		expl:SetKeyValue("spawnflags","19")
 	end
+	expl:SetPos(pos) 
+	expl:Spawn()
+	expl:Fire("Explode", 0, 0)
 	ent:SetVar("Shocktime", 0)
 	ent:Spawn()
 	ent:Activate()
-	
-	local ent = ents.Create("env_physexplosion")
-	ent:SetPos(pos) 
-	ent:Spawn()
-	ent:SetKeyValue("magnitude", self.Damage)
-	ent:SetKeyValue("radius", self.Radius)
-	ent:SetKeyValue("spawnflags","19")
-	ent:Fire("Explode", 0, 0)
 	self:Remove()
 end
 

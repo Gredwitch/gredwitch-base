@@ -53,7 +53,7 @@ function ENT:addSounds()
 				self.sounds[name]:SetSoundLevel(120)
 			elseif name == "Engine" then
 				self.sounds[name]:SetSoundLevel(110)
-			elseif name == "Radio" then
+			elseif name == "Radio" and value != "" then
 				self.sounds[name]:SetSoundLevel(40)
 			end
 		end

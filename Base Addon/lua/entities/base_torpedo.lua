@@ -283,7 +283,7 @@ function ENT:OnTakeDamage(dmginfo)
 	 if exploDamage == true then return end
 	 if (self.Life <= 0) then return end
 	 self:TakePhysicsDamage(dmginfo)
-     if(GetConVar("gred_fragility"):GetInt() >= 1) then  
+     if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then  
 	     if(!self.Fired and !self.Burnt and !self.Arming and !self.Armed) then
 	         if(math.random(0,9) == 1) then
 		         self:Launch()
@@ -316,7 +316,7 @@ function ENT:PhysicsCollide( data, physobj )
      if(self.Exploded) then return end
      if(!self:IsValid()) then return end
 	 if(self.Life <= 0) then return end
-		 if(GetConVar("gred_fragility"):GetInt() >= 1) then
+		 if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then
 			 if(!self.Fired and !self.Burnt and !self.Arming and !self.Armed ) and (data.Speed > self.ImpactSpeed * 5) then --and !self.Arming and !self.Armed
 				 if(math.random(0,9) == 1) then
 					 self:Launch()
@@ -430,7 +430,7 @@ end
 function ENT:Use( activator, caller )
      if(self.Exploded) then return end
 	 if(self.Dumb) then return end
-	 if(GetConVar("gred_easyuse"):GetInt() >= 1) then
+	 if(GetConVar("gred_sv_easyuse"):GetInt() >= 1) then
          if(self:IsValid()) then
              if (!self.Exploded) and (!self.Burnt) and (!self.Fired) then
 	             if (activator:IsPlayer()) then
