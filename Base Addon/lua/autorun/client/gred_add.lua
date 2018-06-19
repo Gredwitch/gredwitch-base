@@ -71,7 +71,7 @@ CreateConVar("gred_sv_bullet_radius"			,  "1"  , GRED_SVAR)
 
 CreateClientConVar("gred_cl_decals"			 	, "1" , true,true)
 CreateClientConVar("gred_cl_sound_shake"		, "1" , true,true)
-CreateClientConVar("gred_cl_water_impact"	 	, "1" , true,true)
+CreateClientConVar("gred_cl_nowaterimpacts"		, "0" , true,true)
 CreateClientConVar("gred_cl_insparticles"     	, "0" , true,true)
 CreateClientConVar("gred_cl_noparticles_7mm"    , "0" , true,true)
 CreateClientConVar("gred_cl_noparticles_12mm"   , "0" , true,true)
@@ -114,7 +114,7 @@ local function gredsettings( CPanel )
 	
 	CPanel:AddControl( "CheckBox", { Label = "Should bombs arm when hit or dropped?", Command = "gred_sv_fragility" } );
 
-	CPanel:AddControl( "CheckBox", { Label = "Should there be sound shake?", Command = "gred_sv_sound_shake" } );
+	CPanel:AddControl( "CheckBox", { Label = "Should there be sound shake?", Command = "gred_cl_sound_shake" } );
 
 	------------------------------PLANES SETTINGS-------------------------------
 	local plane = vgui.Create( "DImageButton" );
@@ -151,9 +151,9 @@ local function gredsettings( CPanel )
 		
 	CPanel:AddControl( "CheckBox", { Label = "Should 7mm MGs have a blast radius? (Kills tanks!)", Command = "gred_sv_7mm_he_impact" } );
 	
-	CPanel:NumSlider("Bullet damage multiplier","gred_sv_bullet_dmg",-10,10,2);
+	CPanel:NumSlider( "Bullet damage multiplier","gred_sv_bullet_dmg",-10,10,2 );
 	
-	CPanel:NumSlider("Bullet radius multiplier","gred_sv_bullet_radius",-10,10,2);
+	CPanel:NumSlider( "Bullet radius multiplier","gred_sv_bullet_radius",-10,10,2 );
 	
 	CPanel:NumSlider( "Tracer ammo apparition", "gred_sv_tracers", 0, 20, 0 );
 	
@@ -167,9 +167,9 @@ local function gredsettings( CPanel )
 		
 	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 30mm cannons?", Command = "gred_cl_noparticles_30mm" } );
 		
-	CPanel:AddControl( "CheckBox", { Label = "Disable water impact effects?", Command = "gred_cl_water_impact" } );
-		
-	CPanel:AddControl( "CheckBox", { Label = "Enable Local Server compatibility ?", Command = "gred_sv_lan" } );
+	CPanel:AddControl( "CheckBox", { Label = "Disable water impact effects?", Command = "gred_cl_nowaterimpacts" } );
+	
+	-- CPanel:AddControl( "CheckBox", { Label = "Enable Local Server compatibility ?", Command = "gred_sv_lan" } );
 end
 
 

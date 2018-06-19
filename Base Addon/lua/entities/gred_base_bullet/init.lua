@@ -42,13 +42,13 @@ function ENT:Initialize()
 end
 
 function ENT:PhysicsUpdate(ph)
-	if !util.IsInWorld(self:GetPos()) then self:Remove() end
-	if !self.oldpos then self:Remove() return end
 	local pos=self:GetPos()
+	if !util.IsInWorld(pos) then self:Remove() end
+	if !self.oldpos then self:Remove() return end
 	local difference = (pos - self.oldpos)
 	self.oldpos = pos
-	
 	local dif = pos + difference
+	
 	local trace = {}
 	trace.start = pos
 	trace.endpos = dif
@@ -59,7 +59,7 @@ function ENT:PhysicsUpdate(ph)
 	if tr.Hit then
 		self.Explode(self,tr)
 	elseif self.canThink and !self.NoTele then
-		self.Entity:SetPos(pos + difference)
+		self.Entity:SetPos(dif)
 	end
 	
 	local trdat2   = {}
@@ -69,9 +69,10 @@ function ENT:PhysicsUpdate(ph)
 	trdat2.mask    = MASK_WATER
 	local tr2 = util.TraceLine(trdat2)
 	if tr2.Hit and !self.Exploded then
+		self:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",audioSpecs )
 		if CLIENT then
 			local ply = LocalPlayer()
-			if tonumber(ply:GetInfo("gred_cl_water_impact")) == 0 then return end
+			if tonumber(ply:GetInfo("gred_cl_nowaterimpacts")) == 1 then return end
 			if self.Caliber == "wac_base_7mm" then
 				ParticleEffect("doi_impact_water",tr2.HitPos,Angle(-90,zero,zero),nil)
 			elseif self.Caliber == "wac_base_12mm" then
@@ -82,7 +83,7 @@ function ENT:PhysicsUpdate(ph)
 				ParticleEffect("water_medium",tr2.HitPos,Angle(threeZ),nil)
 			end
 		elseif LAN then
-			if GetConVar("gred_cl_water_impact"):GetInt() == 0 then return end
+			if GetConVar("gred_cl_nowaterimpacts"):GetInt() == 1 then return end
 			if self.Caliber == "wac_base_7mm" then
 				ParticleEffect("doi_impact_water",tr2.HitPos,Angle(-90,zero,zero),nil)
 			elseif self.Caliber == "wac_base_12mm" then
@@ -93,8 +94,6 @@ function ENT:PhysicsUpdate(ph)
 				ParticleEffect("water_medium",tr2.HitPos,Angle(threeZ),nil)
 			end
 		end
-		self.Entity:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",audioSpecs )
-		self.Speed = self.Speed / 5
 	end
 end
 
