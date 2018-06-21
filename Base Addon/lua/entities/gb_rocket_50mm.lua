@@ -80,7 +80,7 @@ ENT.EnginePower                      =  99999999999999999999999999999999999999
 ENT.FuelBurnoutTime                  =  0.8
 ENT.IgnitionDelay                    =  0       
 ENT.ArmDelay                         =  0
-ENT.RotationalForce                  =  1000
+ENT.RotationalForce                  =  0
 ENT.ForceOrientation                 =  "NORMAL"       
 ENT.Timer                            =  0
 
