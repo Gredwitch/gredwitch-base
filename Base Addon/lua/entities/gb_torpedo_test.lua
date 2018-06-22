@@ -43,8 +43,8 @@ ENT.Category                         =  "Gredwitch's Stuff"
 ENT.Model                            =  "models/props_phx/torpedo.mdl"
 ENT.RocketTrail                      =  ""
 ENT.RocketBurnoutTrail               =  ""
-ENT.Effect                           =  "ins_rpg_explosion"
-ENT.EffectAir                        =  "ins_rpg_explosion"
+ENT.Effect                           =  "gred_ap_impact"
+ENT.EffectAir                        =  "gred_ap_impact"
 ENT.EffectWater                      =  "ins_water_explosion"
 
 ENT.ExplosionSound                   =  table.Random(CloseExploSnds)
@@ -60,18 +60,18 @@ ENT.EngineSound                      =  ""
 ENT.ShouldUnweld                     =  true          
 ENT.ShouldIgnite                     =  false         
 ENT.UseRandomSounds                  =  true                  
-ENT.SmartLaunch                      =  true  
+ENT.SmartLaunch                      =  false  
 ENT.Timed                            =  false 
 
-ENT.ExplosionDamage                  =  700
-ENT.ExplosionRadius                  =  200
-ENT.PhysForce                        =  200
+ENT.ExplosionDamage                  =  2000
+ENT.ExplosionRadius                  =  150
+ENT.PhysForce                        =  150
 ENT.SpecialRadius                    =  200
 ENT.MaxIgnitionTime                  =  0
 ENT.Life                             =  1            
 ENT.MaxDelay                         =  0
 ENT.TraceLength                      =  50
-ENT.ImpactSpeed                      =  100
+ENT.ImpactSpeed                      =  50
 ENT.Mass                             =  200
 ENT.EnginePower                      =  9999
 ENT.FuelBurnoutTime                  =  30
@@ -80,9 +80,9 @@ ENT.ArmDelay                         =  0
 ENT.Timer                            =  0
 
 
-ENT.DEFAULT_PHYSFORCE                = 155
-ENT.DEFAULT_PHYSFORCE_PLYAIR         = 20
-ENT.DEFAULT_PHYSFORCE_PLYGROUND      = 1000     
+ENT.DEFAULT_PHYSFORCE                = 0
+ENT.DEFAULT_PHYSFORCE_PLYAIR         = 0
+ENT.DEFAULT_PHYSFORCE_PLYGROUND      = 0     
 ENT.Shocktime                        = 2
 
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.

@@ -14,6 +14,7 @@ local materials={
 
 		boulder 				=	1,
 		concrete				=	1,
+		default					=	1,
 		concrete_block			=	1,
 		plaster					=	1,
 		pottery					=	1,

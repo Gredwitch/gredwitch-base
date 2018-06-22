@@ -5,6 +5,7 @@ include("wac/keyboard.lua")
 function ENT:Think()
 	if not self.valid then return end
 	if not self:GetNWBool("locked") then
+		local ply = LocalPlayer()
 		local mouseFlight = self:GetNWBool("active")
 		if self.sounds.Start then
 			if mouseFlight != self.IsOn then
@@ -19,12 +20,12 @@ function ENT:Think()
 		if !self.sounds.Engine:IsPlaying() then
 			self.sounds.Engine:ChangePitch(0,0.1)
 			self.sounds.Engine:ChangeVolume(0.3)
-			self.sounds.Engine:SetSoundLevel(110)
+			self.sounds.Engine:SetSoundLevel(120)
 			self.sounds.Engine:Play()
 		end
-		if !self.sounds.Radio:IsPlaying() then
+		if self.sounds.Radio and !self.sounds.Radio:IsPlaying() then
 			self.sounds.Radio:ChangeVolume(1)
-			self.sounds.Radio:SetSoundLevel(70)
+			self.sounds.Radio:SetSoundLevel(80)
 			self.sounds.Radio:Play()
 		end
 		if !self.sounds.Blades:IsPlaying() then
@@ -33,8 +34,8 @@ function ENT:Think()
 			self.sounds.Blades:Play()
 		end
 		local frt=CurTime()-self.LastThink
-		local e=LocalPlayer():GetViewEntity()
-		if !IsValid(e) then e=LocalPlayer() end
+		local e=ply:GetViewEntity()
+		if !IsValid(e) then e=ply end
 		local pos=e:GetPos()
 		local spos=self:GetPos()
 		local doppler=(pos:Distance(spos+e:GetVelocity())-pos:Distance(spos+self:GetVelocity()))/200*self.rotorRpm
@@ -46,19 +47,19 @@ function ENT:Think()
 		local engineVal = math.Clamp(self.engineRpm*100+self.engineRpm*self.smoothUp*3+doppler, 0, 200)
 		local val = math.Clamp(self.rotorRpm*100 + doppler, 0, 200)
 
-		local vehicle = LocalPlayer():GetVehicle()
+		local vehicle = ply:GetVehicle()
 		local inVehicle = false
 		if vehicle and vehicle:IsValid() and vehicle:GetNetworkedEntity("wac_aircraft") == self then
 			inVehicle = true
 		end
 
-		local volume = tonumber(LocalPlayer():GetInfo("wac_cl_air_volume"))
+		local volume = tonumber(ply:GetInfo("wac_cl_air_volume"))
 
 		self.sounds.Engine:ChangePitch(engineVal,0.1)
 		self.sounds.Engine:ChangeVolume(volume*math.Clamp(engineVal*engineVal/4000, 0, inVehicle and 1 or 5),0.1)
 		self.sounds.Blades:ChangePitch(math.Clamp(val, 50, 150),0.1)
 		self.sounds.Blades:ChangeVolume(volume*math.Clamp(val*val/5000, 0, inVehicle and 0.4 or 5),0.1)
-		self.sounds.Radio:ChangeVolume(volume*math.Clamp(val*val/5000, 0, inVehicle and 0.4 or 5),0)
+		if self.sounds.Radio then self.sounds.Radio:ChangeVolume(volume*math.Clamp(val*val/5000, 0, inVehicle and 0.4 or 5),0) end
 		if self.sounds.Start then
 			self.sounds.Start:ChangeVolume(volume*math.Clamp(100 - self.engineRpm*150, 0, 100)/100,0.1)
 			self.sounds.Start:ChangePitch(100 - self.engineRpm*30,0.1)
@@ -67,7 +68,7 @@ function ENT:Think()
 	else
 		self.sounds.Engine:Stop()
 		self.sounds.Blades:Stop()
-		self.sounds.Radio:Stop()
+		if self.sounds.Radio then self.sounds.Radio:Stop() end
 		if self.sounds.Start then
 			self.sounds.Start:Stop()
 		end

@@ -62,7 +62,7 @@ ENT.NBCEntity                        =  ""
 ENT.ShouldUnweld                     =  false
 ENT.ShouldIgnite                     =  false
 ENT.UseRandomSounds                  =  false
-ENT.SmartLaunch                      =  true
+ENT.SmartLaunch                      =  false
 ENT.Timed                            =  false
 ENT.IsNBC                            =  false
 
@@ -396,12 +396,17 @@ function ENT:Think()
 	local thrustpos = self:GetPos()
 	self:Launch()
 	ParticleEffectAttach("weapon_tracers_smoke",PATTACH_ABSORIGIN_FOLLOW,self,1)
-	if self.Fired and self:WaterLevel() >= 1 then
-	    local effectdata=EffectData()
+	if self.Fired and self:WaterLevel() > 2 then
+		self:SetAngles(Angle(0,self:GetAngles().y,0))
+	    --[[local effectdata=EffectData()
 		effectdata:SetAngles(self:GetAngles())
 		effectdata:SetOrigin(self:GetPos())
 		effectdata:SetEntity(self)
-		util.Effect("WaterSurfaceExplosion", effectdata)
+		util.Effect("WaterSurfaceExplosion", effectdata)]]
+		phys:AddVelocity(self:GetForward() * self.EnginePower)
+	elseif self.Fired and self:WaterLevel() <= 1 then
+		self:SetPos(self:GetPos()-Vector(0,0,50))
+		self:SetAngles(Angle(0,self:GetAngles().y,0))
 		phys:AddVelocity(self:GetForward() * self.EnginePower)
 	end
 end
