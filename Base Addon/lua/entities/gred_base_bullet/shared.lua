@@ -383,7 +383,7 @@ ENT.Explode=function(self,tr,ply)
 		self:FireBullets( bullet, false )
 		hitsky = tr.HitSky
 		self:CreateEffect()
-		self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",audioSpecs)
+		self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
 	end
 	self:Remove()
 end
