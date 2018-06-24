@@ -1,15 +1,16 @@
-ENT.Type = "anim"
-ENT.Base = "base_gmodentity"
-ENT.Author = "Gredwich"
-ENT.Category = ""
-ENT.Spawnable = false
-ENT.AdminSpawnable = false
+ENT.Type 			= "anim"
+ENT.Base 			= "base_gmodentity"
+ENT.Author 			= "Gredwich"
+ENT.Category 		= ""
+ENT.Spawnable		= false
+ENT.AdminSpawnable  = false
+ENT.FuzeTime		= 0
 
 local zero = 0
 local threeZ = zero,zero,zero
 local audioSpecs = 100, 100,1, CHAN_AUTO
 local null = ""
-local LAN = GetConVar("gred_sv_lan"):GetInt() == 1
+local LAN = GetConVar("gred_sv_lan"):GetInt()
 local materials={		
 
 		boulder 				=	1,
@@ -210,7 +211,7 @@ function ENT:CreateEffect()
 			if ply:GetInfoNum("gred_cl_noparticles_30mm",1) == 1 then return end
 			ParticleEffect("30cal_impact",hitpos,hitang,nil)
 		end
-	elseif LAN then
+	elseif LAN == 1 then
 		if self.Caliber == "wac_base_7mm" then
 			if GetConVar("gred_cl_noparticles_7mm",1):GetInt() == 1 then return end
 			if GetConVar("gred_cl_insparticles",1):GetInt() == 1 then pcfD = "" else pcfD = "doi_" end
@@ -312,9 +313,10 @@ ENT.Explode=function(self,tr,ply)
 		if IsValid(self.Entity) then self.Owner = self.Entity
 		else self.Owner = nil end
 	end
-	hitang = tr.HitNormal:Angle()
-	hitpos = tr.HitPos
-	
+	if self.FuzeTime == 0 then
+		hitang = tr.HitNormal:Angle()
+		hitpos = tr.HitPos
+	end
 	if self.Caliber != "wac_base_20mm" then
 		if !tr.HitSky then
 			local bullet = {}
@@ -366,7 +368,14 @@ ENT.Explode=function(self,tr,ply)
 			self:CreateEffect()
 		end
 	else
-		util.BlastDamage(self, self.Owner,hitpos, self.Radius*2, 120)
+		if self.FuzeTime > 0 then
+			hitpos = self:GetPos()
+			hitang = Angle(threeZ)
+			hitsky = true
+		else
+			hitsky = tr.HitSky
+		end
+		util.BlastDamage(self,self.Owner,hitpos,self.Radius*2, 120)
 		local bullet = {}
 		bullet.Attacker = self.Owner
 		bullet.Callback = nil
@@ -381,7 +390,6 @@ ENT.Explode=function(self,tr,ply)
 		bullet.Spread = Vector(threeZ)
 		bullet.Src = pos
 		self:FireBullets( bullet, false )
-		hitsky = tr.HitSky
 		self:CreateEffect()
 		self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
 	end

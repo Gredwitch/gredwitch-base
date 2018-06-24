@@ -38,6 +38,9 @@ function ENT:Initialize()
 	self.startTime=CurTime()
 	self.canThink=true
 	self.IsBullet=true
+	if self.Caliber == "wac_base_20mm" and self.FuzeTime > 0 then 
+		self.GetExplTime = CurTime() + self.FuzeTime 
+	end
 	self:NextThink(CurTime())
 end
 
@@ -61,7 +64,11 @@ function ENT:PhysicsUpdate(ph)
 	elseif self.canThink and !self.NoTele then
 		self.Entity:SetPos(dif)
 	end
-	
+	if self.Caliber == "wac_base_20mm" and self.FuzeTime > 0 then
+		if CurTime() >= self.GetExplTime then
+			self:Explode()
+		end
+	end
 	local trdat2   = {}
 	trdat2.start   = pos
 	trdat2.endpos  = dif
