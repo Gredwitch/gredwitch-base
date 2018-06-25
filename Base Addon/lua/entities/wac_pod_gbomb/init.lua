@@ -75,8 +75,8 @@ function ENT:dropBomb(bomb)
 	end
 	bomb.ShouldExplodeOnImpact = true
 	self.aircraft:EmitSound(self.Sounds.fire)
-	bomb.GBOWNER = self.aircraft.Owner
-	bomb.Owner = self.aircraft.Owner
+	bomb.GBOWNER = self:getAttacker()
+	bomb.Owner = self:getAttacker()
 	
 	bomb.phys:AddVelocity(self.aircraft.phys:GetVelocity())
 	bomb.phys:SetMass(bomb.Mass)

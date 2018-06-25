@@ -38,7 +38,7 @@ function ENT:fireRocket(pos, ang)
 		rocket:SetAngles(ang)
 		rocket:SetModel ( self.model )
 		rocket.model = self.model
-		rocket.Owner = self.seat:GetDriver() or self.aircraft
+		rocket.Owner = self:getAttacker()
 		rocket.Damage = math.random (250,400)
 		rocket.Radius = 700
 		rocket.Speed = 600
@@ -67,7 +67,7 @@ function ENT:fireRocket(pos, ang)
 		local rocket = ents.Create( self.Kind )
 		rocket:SetPos(self:LocalToWorld(pos))
 		rocket:SetAngles(ang)
-		rocket.Owner = self.seat:GetDriver() or self.aircraft
+		rocket.Owner = self:getAttacker()
 		rocket:Spawn()
 		rocket:Activate()
 		rocket:Launch()

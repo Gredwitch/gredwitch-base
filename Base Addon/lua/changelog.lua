@@ -192,7 +192,7 @@
 - Fixed the missing mm1/box material error
 - Removed unused POD_HELLFIRE and POD_HYDRA
 
-??/06/2018
+25/06/2018 (06/25/2018)
 
 - Added GRED_BASE_BULLET : optimized the bullets as much as possible
 - Added editable bullet damage / radius
@@ -200,6 +200,7 @@
 - Fixed the GBU-38 being as powerful as a 1000LB bomb
 - Fixed the explosives rarely showing decals after being exploded
 - Fixed some impact effects not working
+- Fixed the guns not dealing any damage to NPCs
 - Updated POD_GUNNER / POD_MG : optimized them as much as possible
 - Updated POD_MIS : fixed the missiles not dealing any damage / added better Hellfire stuff
 - Updated BASE_GROCKET : Hellfires are somewhat more OP / Fixed the missiles dealing no damage / Added new sounds and explosion effects

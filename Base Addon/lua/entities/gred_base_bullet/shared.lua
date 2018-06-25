@@ -345,7 +345,7 @@ ENT.Explode=function(self,tr,ply)
 				if GetConVarNumber("gred_sv_7mm_he_impact") >= 1 then
 					bullet.Damage = zero
 					util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
-				else 
+				else
 					bullet.Damage = self.Damage 
 				end
 				hitang = hitang+Angle(90,0,0)

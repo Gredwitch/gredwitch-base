@@ -60,7 +60,7 @@ function ENT:fire()
 	b.gunRPM=self.FireRate
 	b:Spawn()
 	b:Activate()
-	b.Owner=self.seat
+	b.Owner=self:getAttacker()
 	
 	if tracer >= tracerConvar then
 		util.SpriteTrail(b, 0, bcolor, false, num1, num1, num2, num3, "trails/laser.vmt")
