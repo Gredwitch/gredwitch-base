@@ -172,8 +172,12 @@ local function gredsettings( CPanel )
 	-- CPanel:AddControl( "CheckBox", { Label = "Enable Local Server compatibility ?", Command = "gred_sv_lan" } );
 end
 
-
-
+hook.Add( "PlayerInitialSpawn", "gred_cl_chatprint_version",function()
+	local ply = LocalPlayer()
+	ply:ChatPrint("[Gredwitch's Base] Thank you for using Gredwitch's addons!")
+	ply:ChatPrint("[Gredwitch's Base] Last main changelogs :")
+	ply:ChatPrint("[Gredwitch's Base] - Hopefully fixed the base")
+end)
 
 hook.Add( "PopulateToolMenu", "gred_menu", function()
 	spawnmenu.AddToolMenuOption( "Options", "Gredwitch's Base", "GredwitchSettings", "Settings", "", "", gredsettings )

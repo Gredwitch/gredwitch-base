@@ -29,12 +29,14 @@ game.AddDecal( "scorch_big",					"decals/scorch_big" );
 game.AddDecal( "scorch_big_2",					"decals/scorch_big_2" );
 game.AddDecal( "scorch_big_3",					"decals/scorch_big_3" );
 
-hook.Add( "Initialize", "some_unique_name",function()
-	if GetConvar("gred_sv_autolan"):GetInt() == 0 then return end
+hook.Add( "OnGamemodeLoaded", "gred_autolan_load",function()
+	if GetConVar("gred_sv_autolan"):GetInt() == 0 then return end
 	local lan = GetConVar("gred_sv_lan")
 	if !game.IsDedicated() then
 		lan:SetInt(1)
+		print("[GREDWITCH'S BASE] Server convar gred_sv_lan set to 1")
 	else
 		lan:SetInt(0)
+		print("[GREDWITCH'S BASE] Server convar gred_sv_lan set to 0")
 	end
 end)
