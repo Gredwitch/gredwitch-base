@@ -11,7 +11,7 @@ function ENT:Initialize()
 	
 	if tracer == nil then tracer = 0 end
 	tracerConvar=GetConVar("gred_sv_tracers"):GetInt()
-	LAN = GetConVar("gred_sv_lan"):GetInt()
+	LAN = GetConVar("gred_sv_lan"):GetInt() == 1 or (CLIENT or not game.IsDedicated())
 	
 	bcolor = Color(255,255,0)
 	num1   = 5
@@ -69,7 +69,7 @@ function ENT:fire()
 	end
 	tracer = tracer + 1
 	
-	if LAN == 1 then
+	if LAN then
 		if GetConVar("gred_cl_altmuzzleeffect"):GetInt() == 1 then
 			ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
 			ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)

@@ -10,7 +10,7 @@ local zero = 0
 local threeZ = zero,zero,zero
 local audioSpecs = 100, 100,1, CHAN_AUTO
 local null = ""
-local LAN = GetConVar("gred_sv_lan"):GetInt()
+local LAN = GetConVar("gred_sv_lan"):GetInt() == 1 or (CLIENT or not game.IsDedicated())
 local materials={		
 
 		boulder 				=	1,
@@ -211,7 +211,7 @@ function ENT:CreateEffect()
 			if ply:GetInfoNum("gred_cl_noparticles_30mm",1) == 1 then return end
 			ParticleEffect("30cal_impact",hitpos,hitang,nil)
 		end
-	elseif LAN == 1 then
+	elseif LAN then
 		if self.Caliber == "wac_base_7mm" then
 			if GetConVar("gred_cl_noparticles_7mm",1):GetInt() == 1 then return end
 			if GetConVar("gred_cl_insparticles",1):GetInt() == 1 then pcfD = "" else pcfD = "doi_" end

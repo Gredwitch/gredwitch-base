@@ -210,4 +210,10 @@
 - Updated most of the deprecated "GetConVarNumber()" functions to "GetConVar():GetInt()"
 - Updated BASE_ROCKET / BASE_BOMB
 - Removed BASE_7MM / BASE_12MM / BASE_20MM / BASE_30MM
+
+
+27/06/2018 (06/27/2018)
+
+- Fixed the particles not showing
+- Fixed a typo in autorun/server/gred_add.lua
 --]]

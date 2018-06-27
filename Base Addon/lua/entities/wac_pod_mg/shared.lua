@@ -1,22 +1,22 @@
-ENT.Base = "wac_pod_base"
-ENT.Type = "anim"
-ENT.PrintName = ""
-ENT.Author = wac.author
-ENT.Category = wac.aircraft.spawnCategoryC
-ENT.Contact = ""
-ENT.Purpose = ""
-ENT.Instructions = "end my life"
-ENT.Spawnable = false
-ENT.AdminSpawnable = false
-ENT.Name = "Gredwitch's MG"
-ENT.Ammo = 425
-ENT.FireRate = 9999
-ENT.Force = 200
-ENT.ShootAng = Angle(0,0,0)
-ENT.TkAmmo = 1
-ENT.TracerColor = "Red"
-ENT.BulletType = "wac_base_12mm"
-ENT.Brrt = 0
+ENT.Base 			= "wac_pod_base"
+ENT.Type 			= "anim"
+ENT.PrintName 		= ""
+ENT.Author 			= "Gredwitch"
+ENT.Category 		= "Gredwitch's Stuff"
+ENT.Contact 		= ""
+ENT.Purpose 		= ""
+ENT.Instructions 	= "end my life"
+ENT.Spawnable		= false
+ENT.AdminSpawnable	= false
+ENT.Name 			= "Gredwitch's MG"
+ENT.Ammo 			= 425
+ENT.FireRate 		= 9999
+ENT.Force 			= 200
+ENT.ShootAng 		= Angle(0,0,0)
+ENT.TkAmmo 			= 1
+ENT.TracerColor 	= "Red"
+ENT.BulletType 		= "wac_base_12mm"
+ENT.Brrt 			= 0
 ENT.Sounds = {
 	shoot = "",
 	stop = "",
@@ -26,7 +26,7 @@ function ENT:Initialize()
 	
 	if tracer == nil then tracer = 0 end
 	tracerConvar=GetConVar("gred_sv_tracers"):GetInt()
-	LAN = GetConVar("gred_sv_lan"):GetInt()
+	LAN = GetConVar("gred_sv_lan"):GetInt() == 1 or (CLIENT or not game.IsDedicated())
 	
 	bcolor = Color(255,255,0)
 	num1   = 5
@@ -85,7 +85,7 @@ function ENT:fireBullet(pos)
 	tracer = tracer + 1
 	
 	LtWPOS = self:LocalToWorld(pos)
-	if LAN == 1 then
+	if LAN then
 		if GetConVar("gred_cl_altmuzzleeffect"):GetInt() == 1 then
 			ParticleEffect("muzzleflash_sparks_variant_6",LtWPOS,ang,nil)
 			ParticleEffect("muzzleflash_1p_glow",LtWPOS,ang,nil)
