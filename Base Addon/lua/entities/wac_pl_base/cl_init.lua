@@ -1,4 +1,4 @@
-
+if not wac then return end
 include('shared.lua')
 include("wac/keyboard.lua")
 

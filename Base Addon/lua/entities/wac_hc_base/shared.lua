@@ -1,7 +1,4 @@
-
-if !wac or !wac.aircraft then
-	error("WAC scripts not loaded.")
-end
+if not wac then return end
 
 ENT.Base = "base_anim"
 ENT.Type = "anim"
