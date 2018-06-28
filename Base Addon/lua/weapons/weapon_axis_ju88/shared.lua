@@ -95,7 +95,7 @@ if  ( !self:CanPrimaryAttack() ) then return end
 	self.Weapon:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 	self:TakePrimaryAmmo(1)
 	
-	if CLIENT or game.SinglePlayer() then self.Owner:ChatPrint("[GREDWITCH'S SWEPS]Air strike begins in "..(self.strikedalay).." seconds") end
+	self.Owner:ChatPrint("[GREDWITCH'S SWEPS]Air strike begins in "..(self.strikedalay).." seconds")
 	if SERVER then
 		local PlayerPos = self.Owner:GetShootPos()
 		local PlayerAng = self.Owner:GetAimVector()

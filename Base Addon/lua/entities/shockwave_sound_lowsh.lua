@@ -52,7 +52,7 @@ function ENT:Think()
     if (SERVER) then
 		if !self:IsValid() then return end
 		local pos = self:GetPos()
-		self.CURRENTRANGE = self.CURRENTRANGE+(self.SHOCKWAVE_INCREMENT*5)
+		self.CURRENTRANGE = (self.CURRENTRANGE+(self.SHOCKWAVE_INCREMENT*5)) / GetConVar("gred_sv_soundspeed_divider"):GetInt()
 		for k, v in pairs(ents.FindInSphere(pos,(self.CURRENTRANGE*5))) do
 			 if v:IsPlayer() then
 			 
@@ -89,7 +89,7 @@ function ENT:Think()
 				end
 			end
 		end
-		for k, v in pairs(ents.FindInSphere(pos,self.CURRENTRANGE+(self.CURRENTRANGE*23))) do
+		for k, v in pairs(ents.FindInSphere(pos,self.CURRENTRANGE+(self.CURRENTRANGE*40))) do
 			 if v:IsPlayer() then
 				if !(table.HasValue(self.FILTER,v)) then
 					if self.NOFARSOUND == 0 then

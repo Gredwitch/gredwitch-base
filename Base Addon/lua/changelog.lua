@@ -216,4 +216,10 @@
 
 - Fixed the particles not showing
 - Fixed a typo in autorun/server/gred_add.lua
+
+??/06/2018 (06/??/2018)
+
+- Added a new option to customize the explosion sounds muffle
+- Fixed a bunch of serverside related things (including particles)
+- Fixed some stuff related to the SWEPs
 --]]

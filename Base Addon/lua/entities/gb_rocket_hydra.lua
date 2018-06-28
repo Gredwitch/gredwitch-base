@@ -1,5 +1,5 @@
 AddCSLuaFile()
-
+if not wac then return end
 DEFINE_BASECLASS( "base_rocket" )
 
 local ExploSnds = {}

@@ -38,32 +38,21 @@ if SERVER then
 end
 function ENT:Trace()
 	if !self:IsValid() then return end
-	if CLIENT then
-		if tonumber(LocalPlayer():GetInfo("gred_cl_decals")) == 0 then return end
-		local pos = self:GetPos()
-		local tracedata    = {}
-		tracedata.start    = pos
-		tracedata.endpos   = tracedata.start - Vector(0, 0, self.trace)
-		tracedata.filter   = self.Entity
-		local trace = util.TraceLine(tracedata)
-		if self.decal==nil then 
-			self.decal="scorch_medium"
-		end
+	if SERVER then
+		for k, ply in pairs(player.GetAll()) do
+			if tonumber(ply:GetInfo("gred_cl_decals")) == 0 then return end
+			local pos = self:GetPos()
+			local tracedata    = {}
+			tracedata.start    = pos
+			tracedata.endpos   = tracedata.start - Vector(0, 0, self.trace)
+			tracedata.filter   = self.Entity
+			local trace = util.TraceLine(tracedata)
+			if self.decal==nil then 
+				self.decal="scorch_medium"
+			end
 
-		util.Decal( self.decal, tracedata.start, tracedata.endpos )
-	elseif GetConVar("gred_sv_lan"):GetInt() == 1 then
-		if GetConVar("gred_cl_decals"):GetInt() == 0 then return end
-		local pos = self:GetPos()
-		local tracedata    = {}
-		tracedata.start    = pos
-		tracedata.endpos   = tracedata.start - Vector(0, 0, self.trace)
-		tracedata.filter   = self.Entity
-		local trace = util.TraceLine(tracedata)
-		if self.decal==nil then 
-			self.decal="scorch_medium"
+			util.Decal( self.decal, tracedata.start, tracedata.endpos )
 		end
-
-		util.Decal( self.decal, tracedata.start, tracedata.endpos )
 	end
 end
 function ENT:Think()		

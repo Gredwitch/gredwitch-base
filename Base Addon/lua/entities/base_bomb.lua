@@ -59,8 +59,6 @@ ENT.DEFAULT_PHYSFORCE_PLYAIR         = 500
 ENT.DEFAULT_PHYSFORCE_PLYGROUND      = 5000
 ENT.GBOWNER                          = nil
 
-local PLAYER = CLIENT or not game.IsDedicated()
-
 function ENT:Initialize()
 	if (SERVER) then
 		self:LoadModel()
@@ -158,13 +156,11 @@ function ENT:Explode()
 			 
 		local tr2 = util.TraceLine(trdat2)
 		
-	    if PLAYER then
-			if tr2.Hit then
-				if self.EffectWater == "ins_water_explosion" then
-					ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
-				else
-					ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
-				end
+		if tr2.Hit then
+			if self.EffectWater == "ins_water_explosion" then
+				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
+			else
+				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
 			end
 		end
 		 
@@ -183,20 +179,18 @@ function ENT:Explode()
 				
 		 local trace = util.TraceLine(tracedata)
 	     
-	    if PLAYER then
-			if trace.HitWorld then
-				if self.AngEffect then
-					ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil)
-					ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
-				else
-					ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
-				end
-			else 
-				if self.AngEffect then
-					ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
-				else
-					ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)
-				end
+		if trace.HitWorld then
+			if self.AngEffect then
+				ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil)
+				ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
+			else
+				ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
+			end
+		else 
+			if self.AngEffect then
+				ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
+			else
+				ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)
 			end
 		end
     end

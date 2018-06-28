@@ -64,10 +64,9 @@ CreateConVar("gred_sv_bombs_mass"				,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_bombs_nocustomexplosion"  ,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_fire_effect"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_multiple_fire_effects"	,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_lan"						,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_autolan"					,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_bullet_dmg"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_bullet_radius"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_soundspeed_divider"		,  "1"  , GRED_SVAR)
 
 CreateClientConVar("gred_cl_decals"			 	, "1" , true,true)
 CreateClientConVar("gred_cl_sound_shake"		, "1" , true,true)
@@ -107,6 +106,8 @@ local function gredsettings( CPanel )
 	CPanel:AddControl( "CheckBox", { Label = "Should all bombs unweld and unfreeze?", Command = "gred_sv_shockwave_unfreeze" } );
 	
 	CPanel:NumSlider( "Forcefield Max Range", "gred_sv_maxforcefield_range", 10, 10000, 0 );
+	
+	CPanel:NumSlider( "Sound muffling divider", "gred_sv_soundspeed_divider", 1, 3, 0 );
 	
 	CPanel:AddControl( "CheckBox", { Label = "Should bombs leave decals behind?", Command = "gred_cl_decals" } );
 	
@@ -168,8 +169,6 @@ local function gredsettings( CPanel )
 	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 30mm cannons?", Command = "gred_cl_noparticles_30mm" } );
 		
 	CPanel:AddControl( "CheckBox", { Label = "Disable water impact effects?", Command = "gred_cl_nowaterimpacts" } );
-	
-	-- CPanel:AddControl( "CheckBox", { Label = "Enable Local Server compatibility ?", Command = "gred_sv_lan" } );
 end
 
 hook.Add( "PlayerInitialSpawn", "gred_cl_chatprint_version",function()

@@ -104,11 +104,7 @@ ENT.LightBrightness					 =  0
 ENT.LightSize   					 =  0
 ENT.RSound   						 =  1
 
-
-
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
-
-local PLAYER = CLIENT or not game.IsDedicated()
 
 function ENT:Initialize()
  if (SERVER) then
@@ -194,7 +190,6 @@ function ENT:Explode()
 	end
 	for k, v in pairs(ents.FindInSphere(pos,self.SpecialRadius)) do
 	    if v:IsValid() then
-		    --local phys = v:GetPhysicsObject()
 			local i = 0
 		    while i < v:GetPhysicsObjectCount() do
 			phys = v:GetPhysicsObjectNum(i)	  
@@ -212,61 +207,59 @@ function ENT:Explode()
 			end
 		end
 	end
-	
-	if PLAYER then
-		if(self:WaterLevel() >= 1) then
-			local trdata   = {}
-			local trlength = Vector(0,0,9000)
+	 
+	if(self:WaterLevel() >= 1) then
+		local trdata   = {}
+		local trlength = Vector(0,0,9000)
 
-			trdata.start   = pos
-			trdata.endpos  = trdata.start + trlength
-			trdata.filter  = self
-			local tr = util.TraceLine(trdata) 
+		trdata.start   = pos
+		trdata.endpos  = trdata.start + trlength
+		trdata.filter  = self
+		local tr = util.TraceLine(trdata) 
 
-			local trdat2   = {}
-			trdat2.start   = tr.HitPos
-			trdat2.endpos  = trdata.start - trlength
-			trdat2.filter  = self
-			trdat2.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
-				 
-			local tr2 = util.TraceLine(trdat2)
-				 
-			if PLAYER then
-				if tr2.Hit then
-					if self.EffectWater == "ins_water_explosion" then
-						ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
-					else
-						ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
-					end
-				end
-			end
-			
-			if self.WaterExplosionSound == nil then else 
-				self.ExplosionSound = self.WaterExplosionSound 
-			end
-			if self.WaterFarExplosionSound == nil then else  
-				self.FarExplosionSound = self.WaterFarExplosionSound 
-			end
-		else
-			local tracedata    = {}
-			tracedata.start    = pos
-			tracedata.endpos   = tracedata.start - Vector(0, 0, self.TraceLength)
-			tracedata.filter   = self.Entity
-			
-			local trace = util.TraceLine(tracedata)
-			if trace.HitWorld then
-				if self.AngEffect then
-					ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil) 
-					ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
-				else
-					ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
-				end
+		local trdat2   = {}
+		trdat2.start   = tr.HitPos
+		trdat2.endpos  = trdata.start - trlength
+		trdat2.filter  = self
+		trdat2.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
+			 
+		local tr2 = util.TraceLine(trdat2)
+		
+		if tr2.Hit then
+			if self.EffectWater == "ins_water_explosion" then
+				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
 			else
-				if self.AngEffect then
-					ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
-				else
-					ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)
-				end
+				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
+			end
+		end
+		 
+		if self.WaterExplosionSound == nil then else 
+			self.ExplosionSound = self.WaterExplosionSound 
+		end
+		if self.WaterFarExplosionSound == nil then else  
+			self.FarExplosionSound = self.WaterFarExplosionSound 
+		end
+		
+     else
+		 local tracedata    = {}
+	     tracedata.start    = pos
+		 tracedata.endpos   = tracedata.start - Vector(0, 0, self.TraceLength)
+		 tracedata.filter   = self.Entity
+				
+		 local trace = util.TraceLine(tracedata)
+	     
+		if trace.HitWorld then
+			if self.AngEffect then
+				ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil)
+				ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
+			else
+				ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
+			end
+		else 
+			if self.AngEffect then
+				ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
+			else
+				ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)
 			end
 		end
     end
@@ -299,6 +292,7 @@ function ENT:Explode()
 	self:StopSound(self.StartSound)
 	self:Remove()
 end
+
 function ENT:OnTakeDamage(dmginfo)
      if !self:IsValid() then return end
      if self.Exploded then return end
@@ -416,7 +410,7 @@ function ENT:Think()
      if(!self.Ignition) then return end -- if there wasn't ignition, we won't fly
 	 if(self.Exploded) then return end -- if we exploded then what the fuck are we doing here
 	 if(!self:IsValid()) then return end -- if we aren't good then something fucked up
-	 local phys = self:GetPhysicsObject()  
+	 local phys = self:GetPhysicsObject()
 	 local thrustpos = self:GetPos()
 	 if(self.ForceOrientation == "RIGHT") then
 	     phys:AddVelocity(self:GetRight() * self.EnginePower) -- Continuous engine impulse
@@ -433,20 +427,9 @@ function ENT:Think()
 	 end
 	 if (self.Armed) then
         phys:AddAngleVelocity(Vector(self.RotationalForce,0,0)) -- Rotational force
-	 end--[[
-	anglePitch = phys:GetAngles().p
-	angleYaw   = phys:GetAngles().y
-	angleRoll  = phys:GetAngles().r
-	if(self.FuelBurnoutTime != 0) then 
-        timer.Simple(self.FuelBurnoutTime,function()
-	        if not self:IsValid() then return end
-			for a=anglePitch,anglePitch,-45 do
-				phys:SetAngles(Angle(anglePitch,angleYaw,a))
-			end
-		end) 
-	end--]]
+	 end
 	self:NextThink(CurTime() + 0.01)
-	 return true
+	return true
 end
 
 function ENT:Arm()

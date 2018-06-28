@@ -76,30 +76,20 @@ function ENT:PhysicsUpdate(ph)
 	trdat2.mask    = MASK_WATER
 	local tr2 = util.TraceLine(trdat2)
 	if tr2.Hit and !self.Exploded then
-		self:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",audioSpecs )
-		if CLIENT then
-			local ply = LocalPlayer()
-			if tonumber(ply:GetInfo("gred_cl_nowaterimpacts")) == 1 then return end
-			if self.Caliber == "wac_base_7mm" then
-				ParticleEffect("doi_impact_water",tr2.HitPos,Angle(-90,zero,zero),nil)
-			elseif self.Caliber == "wac_base_12mm" then
-				ParticleEffect("impact_water",tr2.HitPos,Angle(-90,zero,zero),nil)
-			elseif self.Caliber == "wac_base_20mm" then
-				ParticleEffect("water_small",tr2.HitPos,Angle(threeZ),nil)
-			elseif self.Caliber == "wac_base_30mm" then
-				ParticleEffect("water_medium",tr2.HitPos,Angle(threeZ),nil)
+		if SERVER then
+			for k, ply in pairs(player.GetAll()) do
+				if tonumber(ply:GetInfo("gred_cl_nowaterimpacts")) == 1 then return end
+				if self.Caliber == "wac_base_7mm" then
+					ParticleEffect("doi_impact_water",tr2.HitPos,Angle(-90,zero,zero),nil)
+				elseif self.Caliber == "wac_base_12mm" then
+					ParticleEffect("impact_water",tr2.HitPos,Angle(-90,zero,zero),nil)
+				elseif self.Caliber == "wac_base_20mm" then
+					ParticleEffect("water_small",tr2.HitPos,Angle(threeZ),nil)
+				elseif self.Caliber == "wac_base_30mm" then
+					ParticleEffect("water_medium",tr2.HitPos,Angle(threeZ),nil)
+				end
 			end
-		elseif LAN then
-			if GetConVar("gred_cl_nowaterimpacts"):GetInt() == 1 then return end
-			if self.Caliber == "wac_base_7mm" then
-				ParticleEffect("doi_impact_water",tr2.HitPos,Angle(-90,zero,zero),nil)
-			elseif self.Caliber == "wac_base_12mm" then
-				ParticleEffect("impact_water",tr2.HitPos,Angle(-90,zero,zero),nil)
-			elseif self.Caliber == "wac_base_20mm" then
-				ParticleEffect("water_small",tr2.HitPos,Angle(threeZ),nil)
-			elseif self.Caliber == "wac_base_30mm" then
-				ParticleEffect("water_medium",tr2.HitPos,Angle(threeZ),nil)
-			end
+			self:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",audioSpecs )
 		end
 	end
 end

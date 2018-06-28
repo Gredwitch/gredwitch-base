@@ -18,25 +18,12 @@ CreateConVar("gred_sv_bombs_mass"				,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_bombs_nocustomexplosion"  ,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_fire_effect"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_multiple_fire_effects"	,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_lan"						,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_autolan"					,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_bullet_dmg"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_bullet_radius"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_soundspeed_divider"		,  "1"  , GRED_SVAR)
 
 game.AddDecal( "scorch_small",					"decals/scorch_small" );
 game.AddDecal( "scorch_medium",					"decals/scorch_medium" );
 game.AddDecal( "scorch_big",					"decals/scorch_big" );
 game.AddDecal( "scorch_big_2",					"decals/scorch_big_2" );
 game.AddDecal( "scorch_big_3",					"decals/scorch_big_3" );
-
-hook.Add( "OnGamemodeLoaded", "gred_autolan_load",function()
-	if GetConVar("gred_sv_autolan"):GetInt() == 0 then return end
-	local lan = GetConVar("gred_sv_lan")
-	if !game.IsDedicated() then
-		lan:SetInt(1)
-		print("[GREDWITCH'S BASE] Server convar gred_sv_lan set to 1")
-	else
-		lan:SetInt(0)
-		print("[GREDWITCH'S BASE] Server convar gred_sv_lan set to 0")
-	end
-end)

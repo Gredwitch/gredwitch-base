@@ -93,7 +93,7 @@ if  (!self:CanPrimaryAttack()) then return end
 	self.Weapon:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 	self:TakePrimaryAmmo(1)
 	
-	if CLIENT or game.SinglePlayer() then self.Owner:ChatPrint("[GREDWITCH'S SWEPS]Stuka strike begins in "..(self.strikedalay).." seconds") end
+	self.Owner:ChatPrint("[GREDWITCH'S SWEPS]Stuka strike begins in "..(self.strikedalay).." seconds")
 	if SERVER then
 		local PlayerPos = self.Owner:GetShootPos()
 		local PlayerAng = self.Owner:GetAimVector()
@@ -117,7 +117,7 @@ if  (!self:CanPrimaryAttack()) then return end
 		
 		local ArtiStrike = ents.Create("gred_arti_ent")
 		ArtiStrike:SetPos(spawnpos)
-		ArtiStrike.ShellType		= "gb_bomb_sc500"
+		ArtiStrike.ShellType		= "gb_bomb_sc250"
 		ArtiStrike.Delay	    	= self.strikedalay
 		ArtiStrike.ShellCount		= 1
 		ArtiStrike.RandomPos		= 0
