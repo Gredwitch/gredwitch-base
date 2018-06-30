@@ -1,3 +1,5 @@
+if not wac then return end
+
 AddCSLuaFile("shared.lua")
 ENT.Base = "wac_pod_base"
 ENT.Type = "anim"

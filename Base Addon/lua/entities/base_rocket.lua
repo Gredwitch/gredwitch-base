@@ -168,6 +168,9 @@ end
 function ENT:AddOnExplode()
 end
 
+function ENT:AddOnThink()
+end
+
 function ENT:Explode()
     if not self.Exploded then return end
 	local pos = self:LocalToWorld(self:OBBCenter())
@@ -428,6 +431,7 @@ function ENT:Think()
 	 if (self.Armed) then
         phys:AddAngleVelocity(Vector(self.RotationalForce,0,0)) -- Rotational force
 	 end
+	self:AddOnThink()
 	self:NextThink(CurTime() + 0.01)
 	return true
 end

@@ -1,6 +1,8 @@
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 
+if not wac then return end
+
 
 function ENT:Initialize()
 	self:base("wac_pod_base").Initialize(self)

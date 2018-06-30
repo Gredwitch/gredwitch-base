@@ -1,3 +1,5 @@
+if not wac then return end
+
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 if SERVER then

@@ -1,3 +1,5 @@
+if not wac then return end
+
 ENT.Base 			= "wac_pod_base"
 ENT.Type 			= "anim"
 ENT.PrintName 		= ""
