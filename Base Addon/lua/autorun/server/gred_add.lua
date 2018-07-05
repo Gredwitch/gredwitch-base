@@ -1,6 +1,6 @@
 AddCSLuaFile()
 
-local GRED_SVAR = { FCVAR_REPLICATED,FCVAR_ARCHIVE, FCVAR_SERVER_CAN_EXECUTE, FCVAR_NOTIFY }
+local GRED_SVAR = { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_SERVER_CAN_EXECUTE, FCVAR_NOTIFY }
 
 CreateConVar("gred_sv_easyuse"					,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_maxforcefield_range"		, "5000", GRED_SVAR)

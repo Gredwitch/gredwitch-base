@@ -45,8 +45,7 @@ PrecacheParticleSystem("gred_mortar_explosion")
 PrecacheParticleSystem("ins_water_explosion")
 -----------------------------------------------------------
 -- Adding console vars
-local GRED_SVAR = {FCVAR_ARCHIVE,FCVAR_SERVER_CAN_EXECUTE,FCVAR_NOTIFY}--FCVAR_REPLICATED
--- local GRED_CVAR = {FCVAR_USERINFO,FCVAR_ARCHIVE}
+local GRED_SVAR = { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_SERVER_CAN_EXECUTE, FCVAR_NOTIFY }
 
 CreateConVar("gred_sv_easyuse"					,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_maxforcefield_range"		, "5000", GRED_SVAR)
