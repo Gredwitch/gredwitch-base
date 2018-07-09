@@ -14,13 +14,21 @@ CreateConVar("gred_jets_speed"					,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_healthslider"				, "100" , GRED_SVAR)
 CreateConVar("gred_sv_enablehealth"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_enableenginehealth"		,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_bombs_mass"				,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_bombs_nocustomexplosion"  ,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_fire_effect"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_multiple_fire_effects"	,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_bullet_dmg"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_bullet_radius"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_soundspeed_divider"		,  "1"  , GRED_SVAR)
+
+CreateConVar("gred_sv_nowaterimpacts"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_insparticles"				,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_noparticles_7mm"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_noparticles_12mm"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_noparticles_20mm"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_noparticles_20mm"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_noparticles_30mm"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_altmuzzleeffect"			,  "1"  , GRED_SVAR)
 
 game.AddDecal( "scorch_small",					"decals/scorch_small" );
 game.AddDecal( "scorch_medium",					"decals/scorch_medium" );

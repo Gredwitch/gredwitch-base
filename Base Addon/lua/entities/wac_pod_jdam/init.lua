@@ -2,9 +2,11 @@ if not wac then return end
 
 AddCSLuaFile("shared.lua")
 include("shared.lua")
+
 if SERVER then
 	function ENT:Initialize()
 		self:base("wac_pod_base").Initialize(self)
+		self.baseThink = self:base("wac_pod_base").Think
 		self.allbombs={}
 		self:ReloadBombs()
 	end
@@ -28,24 +30,7 @@ if SERVER then
 			self.allbombs[#self.allbombs+1]=bomb
 		end
 	end
-end
-
-function ENT:OnRemove()
-	self:base("wac_pod_base").Initialize(self)
-	if SERVER then
-		if self.bombs then
-			for k,v in pairs(self.allbombs) do
-				if IsValid(v) then
-					v:Remove()
-					v=nil
-				end
-			end
-		end
-	end
-end
-
-
-if SERVER then
+	
 	function ENT:Think()
 		self:base("wac_pod_base").Think(self)
 		if self.aircraft.engineHealth <= 0 then
@@ -53,6 +38,19 @@ if SERVER then
 		end
 		if self.bombs then
 			local phm=FrameTime()*66
+		end
+		local ang = self.aircraft:getCameraAngles()
+		if ang then
+			local pos = self.aircraft:LocalToWorld(self.aircraft.Camera.pos)
+			local dir = ang:Forward()
+			local tr = util.QuickTrace(pos+dir*20, dir*35400, self)
+			if tr.Hit and !tr.HitSky then
+				self:SetTarget(tr.Entity)
+				self:SetTargetOffset(tr.Entity:WorldToLocal(tr.HitPos))
+				canFire = true
+			else
+				canFire = false
+			end
 		end
 		if self:GetAmmo()<=0 and self.Admin == 0 and not self.reloadtime and ((not self.mode and IsValid(self.aircraft) and self.aircraft:GetVelocity():Length()<=50) or self.mode) then
 			self.reloadtime=CurTime()+self.reload
@@ -63,28 +61,51 @@ if SERVER then
 			self.reloadtime=nil
 			self:ReloadBombs()
 		end
+		
 	end
 end
 
+function ENT:OnRemove()
+	self:base("wac_pod_base").Initialize(self)
+	if SERVER then
+		if self.bombs then
+			for k,v in pairs(self.allbombs) do
+				if IsValid(v) then
+					if not v.dropping then
+						v:Remove()
+						v=nil
+					end
+				end
+			end
+		end
+	end
+end
 
 function ENT:dropBomb(bomb)
 	if !self:takeAmmo(1) then return end
+	if not canFire then return end
 	if not IsValid(bomb) then return end
 	if bomb.weld then
 		bomb.weld:Remove()
 		bomb.weld=nil
 	end
-	bomb.ShouldExplodeOnImpact = true
 	self.aircraft:EmitSound(self.Sounds.fire)
-	bomb.GBOWNER = self:getAttacker()
-	bomb.Owner = self:getAttacker()
 	
-	bomb.phys:AddVelocity(self.aircraft.phys:GetVelocity())
+	local vel = self.aircraft.phys:GetVelocity()
+	bomb.phys:AddVelocity(vel)
 	timer.Simple(0.01,function() if IsValid(bomb.phys) then bomb.phys:SetMass(bomb.Mass)  end end)
+	local ply = self:getAttacker()
+	bomb.GBOWNER = ply
+	bomb.dropping=true
+	bomb.Owner = ply
+	bomb.JDAM = true
+	bomb.target = self:GetTarget()
+	bomb.targetOffset = self:GetTargetOffset()
+	
 	timer.Simple(1, function()
 		if IsValid(bomb) and IsValid(bomb.phys) then
-			bomb.dropping=true
 			bomb.Armed = true
+			bomb.ShouldExplodeOnImpact = true
 			if self.Rocket == 1 then bomb:Launch() end
 			bomb:SetCollisionGroup(0)
 		end
@@ -93,6 +114,7 @@ end
 
 
 function ENT:fire()
+	if not canFire then return end
 	if self.Sequential then
 		self.currentPod = self.currentPod or 1
 		self:dropBomb(self.bombs[self.currentPod])

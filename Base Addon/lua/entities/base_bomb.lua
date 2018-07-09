@@ -53,11 +53,34 @@ ENT.Mass                             =  0
 ENT.ArmDelay                         =  0.5
 ENT.Timer                            =  0
 ENT.RSound   						 =  1
+ENT.JDAM							 =  false
 
 ENT.DEFAULT_PHYSFORCE                = 500
 ENT.DEFAULT_PHYSFORCE_PLYAIR         = 500
 ENT.DEFAULT_PHYSFORCE_PLYGROUND      = 5000
 ENT.GBOWNER                          = nil
+
+function ENT:PhysicsUpdate(ph)
+	if not self.JDAM or not self.Armed then return end
+	local pos = self:GetPos()
+	local vel = self:WorldToLocal(pos+self:GetVelocity())*0.4
+	vel.x = 0
+	ph:AddAngleVelocity(
+		ph:GetAngleVelocity()*-0.4
+		+ Vector(math.Rand(-1,1), math.Rand(-1,1), math.Rand(-1,1))*5
+		+ Vector(0, -vel.z, vel.y)
+	)
+	local target = self.target:LocalToWorld(self.targetOffset)
+	local dist = self:GetPos():Distance(target)
+	
+	local v = self:WorldToLocal(target + Vector(
+		0, 0, math.Clamp((self:GetPos()*Vector(1,1,0)):Distance(target*Vector(1,1,0))/5 - 50, 0, 1000)
+	)):GetNormal()
+	v.y = math.Clamp(v.y*10,-1,1)*1000
+	v.z = math.Clamp(v.z*10,-1,1)*1000
+	ph:AddAngleVelocity(Vector(0,-v.z,v.y))
+	ph:AddVelocity(self:GetForward() * 1 - self:LocalToWorld(vel*Vector(0.1, 1, 1))+pos)
+end
 
 function ENT:Initialize()
 	if (SERVER) then
@@ -281,24 +304,24 @@ function ENT:Arm()
     if(!self:IsValid()) then return end
 	if(self.Exploded) then return end
 	if(self.Armed) then return end
-	 self.Arming = true
-	 self.Used = true
-	 timer.Simple(self.ArmDelay, function()
-	     if !self:IsValid() then return end 
-	     self.Armed = true
-		 self.Arming = false
-		 self:EmitSound(self.ArmSound)
-		 if(self.Timed) then
-	         timer.Simple(self.Timer, function()
-	             if !self:IsValid() then return end 
-				 timer.Simple(math.Rand(0,self.MaxDelay),function()
-			         if !self:IsValid() then return end 
-			         self.Exploded = true
-			         self:Explode()
-				 end)
-	         end)
-	     end
-	 end)
+	self.Arming = true
+	self.Used = true
+	timer.Simple(self.ArmDelay, function()
+	    if !self:IsValid() then return end 
+	    self.Armed = true
+		self.Arming = false
+		self:EmitSound(self.ArmSound)
+		if(self.Timed) then
+	        timer.Simple(self.Timer, function()
+	            if !self:IsValid() then return end 
+				timer.Simple(math.Rand(0,self.MaxDelay),function()
+			        if !self:IsValid() then return end 
+			        self.Exploded = true
+			        self:Explode()
+				end)
+	        end)
+	    end
+	end)
 end	 
 
 function ENT:Use( activator, caller )

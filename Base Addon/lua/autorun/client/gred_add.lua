@@ -59,7 +59,6 @@ CreateConVar("gred_jets_speed"					,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_healthslider"				, "100" , GRED_SVAR)
 CreateConVar("gred_sv_enablehealth"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_enableenginehealth"		,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_bombs_mass"				,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_bombs_nocustomexplosion"  ,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_fire_effect"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_multiple_fire_effects"	,  "1"  , GRED_SVAR)
@@ -67,19 +66,21 @@ CreateConVar("gred_sv_bullet_dmg"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_bullet_radius"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_soundspeed_divider"		,  "1"  , GRED_SVAR)
 
+CreateConVar("gred_sv_nowaterimpacts"			,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_insparticles"				,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_noparticles_7mm"			,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_noparticles_12mm"			,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_noparticles_20mm"			,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_noparticles_20mm"			,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_noparticles_30mm"			,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_altmuzzleeffect"			,  "0"  , GRED_SVAR)
+
 CreateClientConVar("gred_cl_decals"			 	, "1" , true,true)
 CreateClientConVar("gred_cl_sound_shake"		, "1" , true,true)
-CreateClientConVar("gred_cl_nowaterimpacts"		, "0" , true,true)
-CreateClientConVar("gred_cl_insparticles"     	, "0" , true,true)
-CreateClientConVar("gred_cl_noparticles_7mm"    , "0" , true,true)
-CreateClientConVar("gred_cl_noparticles_12mm"   , "0" , true,true)
-CreateClientConVar("gred_cl_noparticles_20mm"   , "0" , true,true)
-CreateClientConVar("gred_cl_noparticles_30mm"   , "0" , true,true)
-CreateClientConVar("gred_cl_altmuzzleeffect"    , "0" , true,true)
 
 -----------------------------------------------------------
 -- Adding the spawnmenu options
-local function gredsettings( CPanel )
+local function gredsettings(CPanel)
 	CPanel:ClearControls()
 	sounds={}
 	sounds[1]="extras/terrorist/allahu.mp3"
@@ -101,19 +102,19 @@ local function gredsettings( CPanel )
 	end
 	CPanel:AddPanel( logo );
 	
-	
+	if ply:IsListenServerHost() then
 	CPanel:AddControl( "CheckBox", { Label = "Should all bombs unweld and unfreeze?", Command = "gred_sv_shockwave_unfreeze" } );
 	
 	CPanel:NumSlider( "Forcefield Max Range", "gred_sv_maxforcefield_range", 10, 10000, 0 );
 	
 	CPanel:NumSlider( "Sound muffling divider", "gred_sv_soundspeed_divider", 1, 3, 0 );
-	
+	end
 	CPanel:AddControl( "CheckBox", { Label = "Should bombs leave decals behind?", Command = "gred_cl_decals" } );
-	
+	if ply:IsListenServerHost() then
 	CPanel:AddControl( "CheckBox", { Label = "Should bombs be easily armed?", Command = "gred_sv_easyuse" } );
 	
 	CPanel:AddControl( "CheckBox", { Label = "Should bombs arm when hit or dropped?", Command = "gred_sv_fragility" } );
-
+	end
 	CPanel:AddControl( "CheckBox", { Label = "Should there be sound shake?", Command = "gred_cl_sound_shake" } );
 
 	------------------------------PLANES SETTINGS-------------------------------
@@ -126,11 +127,9 @@ local function gredsettings( CPanel )
 	end
 	CPanel:AddPanel( plane );
 	
-	
+	if ply:IsListenServerHost() then
 	CPanel:AddControl( "CheckBox", { Label = "Use old rockets?", Command = "gred_sv_oldrockets" } );
 	
-	CPanel:AddControl( "CheckBox", { Label = "Should bombs affect the aircraft's maniabillity?", Command = "gred_sv_bombs_mass" } );
-
 	CPanel:AddControl( "CheckBox", { Label = "Should jets be very fast?", Command = "gred_jets_speed" } );
 
 	CPanel:AddControl( "CheckBox", { Label = "Use alternative fire particles?", Command = "gred_sv_fire_effect" } );
@@ -145,7 +144,7 @@ local function gredsettings( CPanel )
 	
 	------------------------------BULLETS SETTINGS-------------------------------
 	
-	CPanel:AddControl( "CheckBox", { Label = "Use an alternative muzzleflash?", Command = "gred_cl_altmuzzleeffect" } );
+	CPanel:AddControl( "CheckBox", { Label = "Use an alternative muzzleflash?", Command = "gred_sv_altmuzzleeffect" } );
 		
 	CPanel:AddControl( "CheckBox", { Label = "Should 12mm MGs have a blast radius? (Kills tanks!)", Command = "gred_sv_12mm_he_impact" } );
 		
@@ -157,26 +156,26 @@ local function gredsettings( CPanel )
 	
 	CPanel:NumSlider( "Tracer ammo apparition", "gred_sv_tracers", 0, 20, 0 );
 	
-	CPanel:AddControl( "CheckBox", { Label = "Use Insurgency impact effects for 7mm MGs?", Command = "gred_cl_insparticles" } );
+	CPanel:AddControl( "CheckBox", { Label = "Use Insurgency impact effects for 7mm MGs?", Command = "gred_sv_insparticles" } );
 		
-	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 7mm MGs?", Command = "gred_cl_noparticles_7mm" } );
+	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 7mm MGs?", Command = "gred_sv_noparticles_7mm" } );
 		
-	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 12mm MGs?", Command = "gred_cl_noparticles_12mm" } );
+	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 12mm MGs?", Command = "gred_sv_noparticles_12mm" } );
 		
-	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 20mm cannons?", Command = "gred_cl_noparticles_20mm" } );
+	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 20mm cannons?", Command = "gred_sv_noparticles_20mm" } );
 		
-	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 30mm cannons?", Command = "gred_cl_noparticles_30mm" } );
+	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 30mm cannons?", Command = "gred_sv_noparticles_30mm" } );
 		
-	CPanel:AddControl( "CheckBox", { Label = "Disable water impact effects?", Command = "gred_cl_nowaterimpacts" } );
+	CPanel:AddControl( "CheckBox", { Label = "Disable water impact effects?", Command = "gred_sv_nowaterimpacts" } );
+	end
 end
-
-hook.Add( "PlayerInitialSpawn", "gred_cl_chatprint_version",function()
-	local ply = LocalPlayer()
-	ply:ChatPrint("[Gredwitch's Base] Thank you for using Gredwitch's addons!")
-	ply:ChatPrint("[Gredwitch's Base] Last main changelogs :")
-	ply:ChatPrint("[Gredwitch's Base] - Hopefully fixed the base")
-end)
 
 hook.Add( "PopulateToolMenu", "gred_menu", function()
 	spawnmenu.AddToolMenuOption( "Options", "Gredwitch's Base", "GredwitchSettings", "Settings", "", "", gredsettings )
 end );
+
+function PlayerSpawn(ply)
+	ply:ChatPrint("[Gredwitch's Base] Thank you for using Gredwitch's addons!")
+	ply:ChatPrint("[Gredwitch's Base] Current version is : 08072018")
+end
+hook.Add( "PlayerInitialSpawn", "gred_cl_chatprint_version",PlayerSpawn)

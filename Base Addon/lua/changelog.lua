@@ -217,9 +217,19 @@
 - Fixed the particles not showing
 - Fixed a typo in autorun/server/gred_add.lua
 
-??/06/2018 (06/??/2018)
+30/06/2018 (06/30/2018)
 
 - Added a new option to customize the explosion sounds muffle
+- Fixed the Hydra 70 spawning without WAC being enabled
+- Fixed a bunch of bugs related to WAC not being installed
 - Fixed a bunch of serverside related things (including particles)
 - Fixed some stuff related to the SWEPs
+- Updated the particles
+
+??/07/2018 (07/??/2018)
+
+- Added working JDAMs
+- Fixed dropping bombs making the aircraft fuck up
+- Fixed a missing texture on the Mk 82
+- Most of the convars are now server side to prevent client lags and bugs
 --]]

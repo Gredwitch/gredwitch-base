@@ -85,27 +85,9 @@ function ENT:fireBullet(pos)
 	end
 	tracer = tracer + 1
 	
-	if SERVER and not game.SinglePlayer() then
-		LtWPOS = self:LocalToWorld(pos)
-		for k, ply in pairs(player.GetAll()) do
-			if not ply:IsPlayer() then return end
-			if tonumber(ply:GetInfo("gred_cl_altmuzzleeffect")) == 1 then
-			ParticleEffect("muzzleflash_sparks_variant_6",LtWPOS,ang,nil)
-			ParticleEffect("muzzleflash_1p_glow",LtWPOS,ang,nil)
-			ParticleEffect("muzzleflash_m590_1p_core",LtWPOS,ang,nil)
-			ParticleEffect("muzzleflash_smoke_small_variant_1",LtWPOS,ang,nil)
-			else
-				local effectdata=EffectData()
-				effectdata:SetOrigin(LtWPOS)
-				effectdata:SetAngles(ang)
-				effectdata:SetEntity(self)
-				effectdata:SetScale(1)
-				util.Effect("MuzzleEffect", effectdata)
-			end
-		end
-	elseif game.SinglePlayer() then
-		LtWPOS = self:LocalToWorld(pos)
-		if GetConVar("gred_cl_altmuzzleeffect"):GetInt() == 1 then
+	LtWPOS = self:LocalToWorld(pos)
+	if SERVER then
+		if GetConVar("gred_sv_altmuzzleeffect"):GetInt() == 1 then
 			ParticleEffect("muzzleflash_sparks_variant_6",LtWPOS,ang,nil)
 			ParticleEffect("muzzleflash_1p_glow",LtWPOS,ang,nil)
 			ParticleEffect("muzzleflash_m590_1p_core",LtWPOS,ang,nil)
@@ -119,7 +101,6 @@ function ENT:fireBullet(pos)
 			util.Effect("MuzzleEffect", effectdata)
 		end
 	end
-	
 	for _,e in pairs(self.aircraft.wheels) do
 		if IsValid(e) then
 			constraint.NoCollide(e,b,0,0)

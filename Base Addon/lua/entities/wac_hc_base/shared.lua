@@ -25,11 +25,11 @@ ENT.Sounds = {
 	Start = "HelicopterVehicle/HeliStart.mp3",
 	Blades = "vehicles/Airboat/fan_blade_idle_loop1.wav",
 	Engine = "WAC/Heli/heli_loop_int.wav",
-	Radio = "",
 	MissileAlert = "HelicopterVehicle/MissileNearby.mp3",
 	MinorAlarm = "HelicopterVehicle/MinorAlarm.mp3",
 	LowHealth = "HelicopterVehicle/LowHealth.mp3",
 	CrashAlarm = "HelicopterVehicle/CrashAlarm.mp3",
+	Radio = "",
 }
 
 ENT.Wheels = {}
@@ -50,8 +50,8 @@ function ENT:addSounds()
 				self.sounds[name]:SetSoundLevel(120)
 			elseif name == "Engine" then
 				self.sounds[name]:SetSoundLevel(110)
-			elseif name == "Radio" and value != "" then
-				self.sounds[name]:SetSoundLevel(40)
+			elseif name == "Radio" and value != "" then --ADDED BY THE GREDWITCH
+				self.sounds[name]:SetSoundLevel(80) --ADDED BY THE GREDWITCH
 			end
 		end
 	end

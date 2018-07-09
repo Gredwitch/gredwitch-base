@@ -118,103 +118,99 @@ local materials={
 		computer				=	24,
 }
 
-if SERVER then
 	function ENT:CreateEffect()
-		for k, ply in pairs(player.GetAll()) do
-			if not ply:IsPlayer() then return end
-			if self.Caliber == "wac_base_7mm" then
-				if tonumber(ply:GetInfo("gred_cl_noparticles_7mm")) == 1 then return end
-				if tonumber(ply:GetInfo("gred_cl_insparticles")) == 1 then pcfD = "" else pcfD = "doi_" end
-				if materials[HitMat] == 1 then
-					ParticleEffect(""..pcfD.."impact_concrete",hitpos,hitang,nil)
-				elseif materials[HitMat] == 2 then
-					ParticleEffect(""..pcfD.."impact_dirt",hitpos,hitang,nil)
+		if self.Caliber == "wac_base_7mm" then
+			if GetConVar("gred_sv_noparticles_7mm"):GetInt() == 1 then return end
+			if GetConVar("gred_sv_insparticles"):GetInt() == 1 then pcfD = "" else pcfD = "doi_" end
+			
+			if materials[HitMat] == 1 then
+				ParticleEffect(""..pcfD.."impact_concrete",hitpos,hitang,nil)
+			elseif materials[HitMat] == 2 then
+				ParticleEffect(""..pcfD.."impact_dirt",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 3 then
+			elseif materials[HitMat] == 3 then
 					--ParticleEffect(""..pcfD.."impact_glass",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 4 then
-					ParticleEffect(""..pcfD.."impact_glass",hitpos,hitang,nil)
+			elseif materials[HitMat] == 4 then
+				ParticleEffect(""..pcfD.."impact_glass",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 5 then
-					ParticleEffect(""..pcfD.."impact_metal",hitpos,hitang,nil)
+			elseif materials[HitMat] == 5 then
+				ParticleEffect(""..pcfD.."impact_metal",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 6 then
-					ParticleEffect(""..pcfD.."impact_sand",hitpos,hitang,nil)
+			elseif materials[HitMat] == 6 then
+				ParticleEffect(""..pcfD.."impact_sand",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 7 then
-					ParticleEffect(""..pcfD.."impact_snow",hitpos,hitang,nil)
+			elseif materials[HitMat] == 7 then
+				ParticleEffect(""..pcfD.."impact_snow",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 8 then
-					ParticleEffect(""..pcfD.."impact_leaves",hitpos,hitang,nil)
+			elseif materials[HitMat] == 8 then
+				ParticleEffect(""..pcfD.."impact_leaves",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 9 then
-					ParticleEffect(""..pcfD.."impact_wood",hitpos,hitang,nil)
+			elseif materials[HitMat] == 9 then
+				ParticleEffect(""..pcfD.."impact_wood",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 10 then
-					ParticleEffect(""..pcfD.."impact_grass",hitpos,hitang,nil)
+			elseif materials[HitMat] == 10 then
+				ParticleEffect(""..pcfD.."impact_grass",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 11 then
-					ParticleEffect(""..pcfD.."impact_tile",hitpos,hitang,nil)
+			elseif materials[HitMat] == 11 then
+				ParticleEffect(""..pcfD.."impact_tile",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 12 then
-					ParticleEffect(""..pcfD.."impact_plastic",hitpos,hitang,nil)
+			elseif materials[HitMat] == 12 then
+				ParticleEffect(""..pcfD.."impact_plastic",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 13 then
-					ParticleEffect(""..pcfD.."impact_rock",hitpos,hitang,nil)
+			elseif materials[HitMat] == 13 then
+				ParticleEffect(""..pcfD.."impact_rock",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 14 then
-					ParticleEffect(""..pcfD.."impact_gravel",hitpos,hitang,nil)
+			elseif materials[HitMat] == 14 then
+				ParticleEffect(""..pcfD.."impact_gravel",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 15 then
-					ParticleEffect(""..pcfD.."impact_mud",hitpos,hitang,nil)
+			elseif materials[HitMat] == 15 then
+				ParticleEffect(""..pcfD.."impact_mud",hitpos,hitang,nil)
 				
-				elseif materials[HitMat] == 16 then
-					ParticleEffect(""..pcfD.."impact_fruit",hitpos,hitang,nil)
+			elseif materials[HitMat] == 16 then
+				ParticleEffect(""..pcfD.."impact_fruit",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 17 then
-					ParticleEffect(""..pcfD.."impact_asphalt",hitpos,hitang,nil)
+			elseif materials[HitMat] == 17 then
+				ParticleEffect(""..pcfD.."impact_asphalt",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 18 then
-					ParticleEffect(""..pcfD.."impact_cardboard",hitpos,hitang,nil)
+			elseif materials[HitMat] == 18 then
+				ParticleEffect(""..pcfD.."impact_cardboard",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 19 then
-					ParticleEffect(""..pcfD.."impact_rubber",hitpos,hitang,nil)
+			elseif materials[HitMat] == 19 then
+				ParticleEffect(""..pcfD.."impact_rubber",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 20 then
-					ParticleEffect(""..pcfD.."impact_carpet",hitpos,hitang,nil)
+			elseif materials[HitMat] == 20 then
+				ParticleEffect(""..pcfD.."impact_carpet",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 21 then
-					ParticleEffect(""..pcfD.."impact_brick",hitpos,hitang,nil)
+			elseif materials[HitMat] == 21 then
+				ParticleEffect(""..pcfD.."impact_brick",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 22 then
-					ParticleEffect(""..pcfD.."impact_leaves",hitpos,hitang,nil)
+			elseif materials[HitMat] == 22 then
+				ParticleEffect(""..pcfD.."impact_leaves",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 23 then
-					ParticleEffect(""..pcfD.."impact_paper",hitpos,hitang,nil)
+			elseif materials[HitMat] == 23 then
+				ParticleEffect(""..pcfD.."impact_paper",hitpos,hitang,nil)
 					
-				elseif materials[HitMat] == 24 then
-					ParticleEffect(""..pcfD.."impact_computer",hitpos,hitang,nil)
-				end
-				
-			elseif self.Caliber == "wac_base_12mm" then
-				if tonumber(ply:GetInfo("gred_cl_noparticles_12mm")) == 1 then return end
-				ParticleEffect("doi_gunrun_impact",hitpos,hitang,nil)
-			elseif self.Caliber == "wac_base_20mm" then
-				if tonumber(ply:GetInfo("gred_cl_noparticles_20mm",1)) == 1 then return end
-				if !hitsky then
-					ParticleEffect("gred_20mm",hitpos,hitang,nil)
-				else
-					ParticleEffect("gred_20mm_airburst",hitpos,hitang,nil)
-				end
-			elseif self.Caliber == "wac_base_30mm" then
-				if tonumber(ply:GetInfo("gred_cl_noparticles_30mm",1)) == 1 then return end
-				ParticleEffect("30cal_impact",hitpos,hitang,nil)
+			elseif materials[HitMat] == 24 then
+				ParticleEffect(""..pcfD.."impact_computer",hitpos,hitang,nil)
 			end
+				
+		elseif self.Caliber == "wac_base_12mm" then
+			if GetConVar("gred_sv_noparticles_12mm"):GetInt() == 1 then return end
+			ParticleEffect("doi_gunrun_impact",hitpos,hitang,nil)
+		elseif self.Caliber == "wac_base_20mm" then
+			if GetConVar("gred_sv_noparticles_20mm"):GetInt() == 1 then return end
+			
+			if !hitsky then
+				ParticleEffect("gred_20mm",hitpos,hitang,nil)
+			else
+				ParticleEffect("gred_20mm_airburst",hitpos,hitang,nil)
+			end
+		elseif self.Caliber == "wac_base_30mm" then
+			if GetConVar("gred_sv_noparticles_30mm"):GetInt() == 1 then return end
+			ParticleEffect("30cal_impact",hitpos,hitang,nil)
 		end
 	end
-
-
 
 	ENT.Explode=function(self,tr,ply)
 		if self.Exploded then return end
@@ -305,4 +301,3 @@ if SERVER then
 		end
 		self:Remove()
 	end
-end
