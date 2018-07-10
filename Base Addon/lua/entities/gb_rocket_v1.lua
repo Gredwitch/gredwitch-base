@@ -1,5 +1,13 @@
 AddCSLuaFile()
 
+sound.Add( {
+	name = "V1_Startup",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 90,
+	pitch = {100},
+	sound = "gunsounds/v1_launch.wav"
+} )
 DEFINE_BASECLASS( "base_rocket" )
 
 ENT.Spawnable		            	 =  true
@@ -17,7 +25,7 @@ ENT.Effect                           =  "500lb_ground"
 ENT.EffectAir                        =  "500lb_ground"
 ENT.EffectWater                      =  "water_torpedo"
 ENT.ExplosionSound                   =  "explosions/gbomb_4.mp3" 
-ENT.StartSound                       =  "gunsounds/v1_launch.wav"
+ENT.StartSound                       =  "V1_Startup"
 ENT.ArmSound                         =  "npc/roller/mine/rmine_blip3.wav"
 ENT.ActivationSound                  =  "buttons/button14.wav"
 ENT.EngineSound                      =  "V1_Engine"
@@ -78,4 +86,55 @@ function ENT:Arm()
 		self:EmitSound(self.ArmSound)
 		self:Launch()
 	 end)
-end	 
+end	
+
+function ENT:Launch()
+     if(self.Exploded) then return end
+	 if(self.Burned) then return end
+	 --if(self.Armed) then return end
+	 if(self.Fired) then return end
+	 
+	 local phys = self:GetPhysicsObject()
+	 if !phys:IsValid() then return end
+	 
+	 self.Fired = true
+	 if(self.SmartLaunch) then
+		 constraint.RemoveAll(self)
+	 end
+	 timer.Simple(0.05,function()
+	     if not self:IsValid() then return end
+	     if(phys:IsValid()) then
+             phys:Wake()
+		     phys:EnableMotion(true)
+	     end
+	 end)
+	 timer.Simple(self.IgnitionDelay,function()
+	     if not self:IsValid() then return end  -- Make a short ignition delay!
+		 self:SetNetworkedBool("Exploded",true)
+		 self:SetNetworkedInt("LightRed", self.LightRed)
+		 self:SetNetworkedInt("LightBlue", self.LightBlue)
+		 self:SetNetworkedInt("LightGreen", self.LightGreen)	
+		 self:SetNetworkedBool("EmitLight",true)
+		 self:SetNetworkedInt("LightEmitTime", self.LightEmitTime)
+		 self:SetNetworkedInt("LightBrightness", self.LightBrightness)
+		 self:SetNetworkedInt("LightSize", self.LightSize)
+		 local phys = self:GetPhysicsObject()
+		 self.Ignition = true
+		 self:Arm()
+		 local pos = self:GetPos()
+		 self:EmitSound(self.StartSound)
+	     self:EmitSound(self.EngineSound)
+		 self:SetNetworkedBool("EmitLight",true)
+		 self:SetNetworkedBool("self.Ignition",true)
+		if self.RocketTrail != "" then ParticleEffectAttach(self.RocketTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
+		 if(self.FuelBurnoutTime != 0) then 
+	         timer.Simple(self.FuelBurnoutTime,function()
+		         if not self:IsValid() then return end 
+		         self.Burnt = true
+		         self:StopParticles()
+		         self:StopSound(self.EngineSound)
+	            if self.RocketBurnoutTrail != "" then ParticleEffectAttach(self.RocketBurnoutTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
+             end)	 
+		 end
+     end)		 
+end
