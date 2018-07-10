@@ -73,7 +73,7 @@ function ENT:fire()
 		if SERVER and not game.SinglePlayer() then
 		for k, ply in pairs(player.GetAll()) do
 			if not ply:IsPlayer() then return end
-			if tonumber(ply:GetInfo("gred_cl_altmuzzleeffect")) == 1 then
+			if tonumber(ply:GetInfo("gred_sv_altmuzzleeffect")) == 1 then
 			ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
 			ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
 			ParticleEffect("muzzleflash_m590_1p_core",pos,ang,nil)
@@ -88,7 +88,7 @@ function ENT:fire()
 			end
 		end
 	elseif game.SinglePlayer() then
-		if GetConVar("gred_cl_altmuzzleeffect"):GetInt() == 1 then
+		if GetConVar("gred_sv_altmuzzleeffect"):GetInt() == 1 then
 			ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
 			ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
 			ParticleEffect("muzzleflash_m590_1p_core",pos,ang,nil)

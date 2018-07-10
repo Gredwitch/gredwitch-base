@@ -267,11 +267,11 @@ local materials={
 				bullet.Tracer = zero
 				bullet.AmmoType = null
 				bullet.TracerName = nil
-				bullet.Dir = self.Entity:GetForward()
+				bullet.Dir = self:GetForward()
 				bullet.Spread = Vector(threeZ)
 				bullet.Src = self:GetPos()
 				self:FireBullets(bullet,false)
-				self:CreateEffect()
+				if not self.NoParticle then self:CreateEffect() end
 			end
 		else
 			if self.FuzeTime > 0 then
@@ -292,7 +292,7 @@ local materials={
 			bullet.Tracer = zero
 			bullet.AmmoType = null
 			bullet.TracerName = null
-			bullet.Dir = self.Entity:GetForward()
+			bullet.Dir = self:GetForward()
 			bullet.Spread = Vector(threeZ)
 			bullet.Src = pos
 			self:FireBullets( bullet, false )

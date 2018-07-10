@@ -13,8 +13,8 @@ function ENT:Initialize()
 	if self.phys:IsValid() then
 		self.phys:SetMass(5)
 		self.phys:EnableCollisions(true)
-		self.phys:Wake()
 		self.phys:EnableGravity(true)
+		self.phys:Wake()
 	end
 	
 	if self.Speed == nil then self.Speed = 1000 end
@@ -22,21 +22,18 @@ function ENT:Initialize()
 	if self.Radius == nil then self.Radius = 70 end
 	if self.Owner == nil then self.Owner = ply end
 	if self.npod == nil then self.npod = 1 end
+	
 	self.oldpos=self:GetPos()-self:GetAngles():Forward()*self.Speed
 	self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetInt()
 	self.Radius = self.Radius * GetConVar("gred_sv_bullet_radius"):GetInt()
 	self:SetRenderMode(RENDERMODE_GLOW)
 	self:SetNotSolid(true)
-	self.cbt={}
-	self.cbt.health=5000
-	self.cbt.armor=500
-	self.cbt.maxhealth=5000
+	self.NoParticle = false
 	
+	self.Mask = MASK_ALL
 	self:SetNWInt("gunRPM", self.gunRPM)
 	self:SetNWBool("sequential", self.sequential)
 	self:SetNWInt("npod", self.npod)
-	self.startTime=CurTime()
-	self.canThink=true
 	self.IsBullet=true
 	if self.Caliber == "wac_base_20mm" and self.FuzeTime > 0 then 
 		self.GetExplTime = CurTime() + self.FuzeTime 
@@ -56,12 +53,13 @@ function ENT:PhysicsUpdate(ph)
 	trace.start = pos
 	trace.endpos = dif
 	trace.filter = self.Entity
-	trace.mask=CONTENTS_SOLID + CONTENTS_MOVEABLE + CONTENTS_OPAQUE + CONTENTS_DEBRIS + CONTENTS_HITBOX + CONTENTS_MONSTER + CONTENTS_WINDOW
+	trace.mask=self.Mask
 	local tr = util.TraceLine(trace)
-	
-	if tr.Hit then
+	local hit = tr.Hit
+	local nohitwater = tr.MatType != 83
+	if hit and nohitwater then
 		self.Explode(self,tr)
-	elseif self.canThink and !self.NoTele then
+	else
 		self.Entity:SetPos(dif)
 	end
 	if self.Caliber == "wac_base_20mm" and self.FuzeTime > 0 then
@@ -69,22 +67,17 @@ function ENT:PhysicsUpdate(ph)
 			self:Explode()
 		end
 	end
-	local trdat2   = {}
-	trdat2.start   = pos
-	trdat2.endpos  = dif
-	trdat2.filter  = self.Entity
-	trdat2.mask    = MASK_WATER
-	local tr2 = util.TraceLine(trdat2)
-	if tr2.Hit and !self.Exploded then
+	if !self.Exploded and hit and !nohitwater then
 		if GetConVar("gred_sv_nowaterimpacts"):GetInt() == 1 then return end
+		self.NoParticle = true
 		if self.Caliber == "wac_base_7mm" then
-			ParticleEffect("doi_impact_water",tr2.HitPos,Angle(-90,zero,zero),nil)
+			ParticleEffect("doi_impact_water",tr.HitPos,Angle(-90,zero,zero),nil)
 		elseif self.Caliber == "wac_base_12mm" then
-			ParticleEffect("impact_water",tr2.HitPos,Angle(-90,zero,zero),nil)
+			ParticleEffect("impact_water",tr.HitPos,Angle(-90,zero,zero),nil)
 		elseif self.Caliber == "wac_base_20mm" then
-			ParticleEffect("water_small",tr2.HitPos,Angle(threeZ),nil)
+			ParticleEffect("water_small",tr.HitPos,Angle(threeZ),nil)
 		elseif self.Caliber == "wac_base_30mm" then
-			ParticleEffect("water_medium",tr2.HitPos,Angle(threeZ),nil)
+			ParticleEffect("water_medium",tr.HitPos,Angle(threeZ),nil)
 		end
 		self:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",audioSpecs )
 	end

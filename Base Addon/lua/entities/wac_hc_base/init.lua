@@ -32,7 +32,7 @@ ENT.BackRotor = {
 	model = "models/props_borealis/borealis_door001a.mdl",
 	health = 40
 }
-ENT.Engines = 1
+ENT.Engines = 1 -- ADDED BY THE GREDWITCH
 ENT.EngineHealth = 100
 ENT.engineHealth = 100
 
@@ -139,9 +139,11 @@ function ENT:Initialize()
 	self:addNpcTargets()
 
 	self.phys:EnableDrag(false)
-	local HealthsliderVAR = GetConVarNumber("gred_sv_healthslider")
-	local HealthEnable = GetConVarNumber("gred_sv_enablehealth")
-	local EngineHealthEnable = GetConVarNumber("gred_sv_enableenginehealth")
+	
+	 -- ADDED BY THE GREDWITCH (start)
+	local HealthsliderVAR = GetConVar("gred_sv_healthslider"):GetInt()
+	local HealthEnable = GetConVar("gred_sv_enablehealth"):GetInt()
+	local EngineHealthEnable = GetConVar("gred_sv_enableenginehealth"):GetInt()
 	local Healthslider = 100
 	if HealthEnable == 1 and EngineHealthEnable == 1 then
 		
@@ -165,17 +167,11 @@ function ENT:Initialize()
 		self.Engines = 1
 		self.engineHealth = Healthslider
 		self.EngineHealth = Healthslider
-	end --[[
-	print("---------------------------------------------------------------")
-	print("Engines	  				",self.Engines)
-	print("Healthslider				",Healthslider)
-	print("HealthsliderVAR				",HealthsliderVAR)
-	print("self.Engines*Healthslider		",self.Engines*Healthslider)
-	print("engineHealth				",self.engineHealth)
-	print("EngineHealth				",self.EngineHealth)
-	print("---------------------------------------------------------------")--]]
+	end -- ADDED BY THE GREDWITCH (end)
 	
 end
+
+
 
 function ENT:addEntity(name)
 	local e = ents.Create(name)
@@ -1108,62 +1104,41 @@ function ENT:DamageEngine(amt)
 			end
 			
 			if self.engineHealth < 20 and !self.EngineFire then
-				if (GetConVar("gred_sv_fire_effect"):GetInt() >= 1) then
-					local fire = ents.Create("env_fire")
-					fire:SetPos(self:LocalToWorld(self.FirePos))
-					fire:Spawn()
-					fire:SetParent(self.Entity)
+				local fire = ents.Create("env_fire")
+				fire:SetPos(self:LocalToWorld(self.FirePos))
+				fire:Spawn()
+				fire:SetParent(self.Entity)
+				if GetConVar("gred_sv_fire_effect"):GetInt() >= 1 then
 					ParticleEffectAttach("fire_large_01", 1, fire, 0)
 					if (GetConVar("gred_sv_multiple_fire_effects"):GetInt() >= 1) then
-						if	  self.OtherRotors then ParticleEffectAttach("fire_large_01", 1, self.OtherRotors[1], 0)
-							if self.OtherRotors[2] then ParticleEffectAttach("fire_large_01", 1, self.OtherRotors[2], 0) end
-							if self.OtherRotors[3] then ParticleEffectAttach("fire_large_01", 1, self.OtherRotors[3], 0) end
+						if self.OtherRotors then 
+							for i = 1,3 do
+								if not self.OtherRotors[i] then return end
+								ParticleEffectAttach("fire_large_01", 1, self.OtherRotors[i], 0)
+							end
 						end
 						if self.OtherRotor then ParticleEffectAttach("fire_large_01", 1, self.OtherRotor, 0) end
 						if self.rotor2 then ParticleEffectAttach("fire_large_01", 1, self.rotor2, 0) end
 						if self.topRotor2 then ParticleEffectAttach("fire_large_01", 1, self.topRotor2, 0) end
 					end
-				elseif (GetConVar("gred_sv_fire_effect"):GetInt() <= 0) then
-					local fire = ents.Create("env_fire_trail")
-					fire:SetPos(self:LocalToWorld(self.FirePos))
-					fire:Spawn()
-					fire:SetParent(self.Entity)
-					if (GetConVar("gred_sv_multiple_fire_effects"):GetInt() >= 1) then
+				elseif GetConVar("gred_sv_fire_effect"):GetInt() <= 0 then
+					if GetConVar("gred_sv_multiple_fire_effects"):GetInt() >= 1 then
 						if self.OtherRotors then
-							local fire1 = ents.Create("env_fire_trail")
-							fire1:SetPos(self:LocalToWorld(self.OtherRotorPos[1]))
-							fire1:Spawn()
-							fire1:SetParent(self.Entity)
-							if self.OtherRotors[2] then
-								local fire2 = ents.Create("env_fire_trail")
-								fire2:SetPos(self:LocalToWorld(self.OtherRotorPos[2]))
-								fire2:Spawn()
-								fire2:SetParent(self.Entity)
+							for i = 1,3 do
+								if not self.OtherRotors[i] then return end
+								local fire = ents.Create("env_fire_trail")
+								fire:SetPos(self:LocalToWorld(self.OtherRotorPos[i]))
+								fire:Spawn()
+								fire:SetParent(self.Entity)
 							end
-							if self.OtherRotors[3] then
-								local fire3 = ents.Create("env_fire_trail")
-								fire3:SetPos(self:LocalToWorld(self.OtherRotorPos[3]))
-								fire3:Spawn()
-								fire3:SetParent(self.Entity)
-							end
-						end
-						if self.OtherRotor then
-							local fire4 = ents.Create("env_fire_trail")
-							fire4:SetPos(self:LocalToWorld(self.OtherRotorPos))
-							fire4:Spawn()
-							fire4:SetParent(self.Entity)
-						end
-						if self.rotor2 then
-							local fire5 = ents.Create("env_fire_trail")
-							fire5:SetPos(self:LocalToWorld(self.rotorPos2))
-							fire5:Spawn()
-							fire5:SetParent(self.Entity)
-						end
-						if self.topRotor2 then
-							local fire6 = ents.Create("env_fire_trail")
-							fire6:SetPos(self:LocalToWorld(self.TopRotor2.pos))
-							fire6:Spawn()
-							fire6:SetParent(self.Entity)
+						else
+							local fire = ents.Create("env_fire_trail")
+							if self.OtherRotor then local pos = self:LocalToWorld(self.OtherRotorPos) end
+							if self.rotor2 then local pos = self:LocalToWorld(self.rotorPos2) end
+							if self.topRotor2 then local pos = self:LocalToWorld(self.TopRotor2.pos) end
+							fire:SetPos(pos)
+							fire:Spawn()
+							fire:SetParent(self.Entity)
 						end
 					end
 				end

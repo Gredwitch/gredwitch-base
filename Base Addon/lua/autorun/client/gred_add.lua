@@ -32,10 +32,12 @@ game.AddParticles( "particles/weapon_fx_tracers.pcf" )
 game.AddParticles( "particles/weapon_fx_ins.pcf" )
 
 game.AddParticles( "particles/gred_particles.pcf" )
+game.AddParticles( "particles/fire_01.pcf" )
 
 -- Precaching main particles
 PrecacheParticleSystem("gred_20mm")
 PrecacheParticleSystem("gred_20mm_airburst")
+PrecacheParticleSystem("fire_large_01")
 PrecacheParticleSystem("30cal_impact")
 PrecacheParticleSystem("doi_gunrun_impact")
 PrecacheParticleSystem("doi_artillery_explosion")
@@ -65,6 +67,7 @@ CreateConVar("gred_sv_multiple_fire_effects"	,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_bullet_dmg"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_bullet_radius"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_soundspeed_divider"		,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_decals"					,  "1"  , GRED_SVAR)
 
 CreateConVar("gred_sv_nowaterimpacts"			,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_insparticles"				,  "0"  , GRED_SVAR)
@@ -75,7 +78,6 @@ CreateConVar("gred_sv_noparticles_20mm"			,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_noparticles_30mm"			,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_altmuzzleeffect"			,  "0"  , GRED_SVAR)
 
-CreateClientConVar("gred_cl_decals"			 	, "1" , true,true)
 CreateClientConVar("gred_cl_sound_shake"		, "1" , true,true)
 
 -----------------------------------------------------------
@@ -102,71 +104,70 @@ local function gredsettings(CPanel)
 	end
 	CPanel:AddPanel( logo );
 	
-	if ply:IsListenServerHost() then
-	CPanel:AddControl( "CheckBox", { Label = "Should all bombs unweld and unfreeze?", Command = "gred_sv_shockwave_unfreeze" } );
-	
-	CPanel:NumSlider( "Forcefield Max Range", "gred_sv_maxforcefield_range", 10, 10000, 0 );
-	
-	CPanel:NumSlider( "Sound muffling divider", "gred_sv_soundspeed_divider", 1, 3, 0 );
-	end
-	CPanel:AddControl( "CheckBox", { Label = "Should bombs leave decals behind?", Command = "gred_cl_decals" } );
-	if ply:IsListenServerHost() then
-	CPanel:AddControl( "CheckBox", { Label = "Should bombs be easily armed?", Command = "gred_sv_easyuse" } );
-	
-	CPanel:AddControl( "CheckBox", { Label = "Should bombs arm when hit or dropped?", Command = "gred_sv_fragility" } );
-	end
 	CPanel:AddControl( "CheckBox", { Label = "Should there be sound shake?", Command = "gred_cl_sound_shake" } );
+	
+	if not game.IsDedicated() then
+		CPanel:AddControl( "CheckBox", { Label = "Should all bombs unweld and unfreeze?", Command = "gred_sv_shockwave_unfreeze" } );
+		
+		CPanel:NumSlider( "Forcefield Max Range", "gred_sv_maxforcefield_range", 10, 10000, 0 );
+		
+		CPanel:NumSlider( "Sound muffling divider", "gred_sv_soundspeed_divider", 1, 3, 0 );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Should bombs leave decals behind?", Command = "gred_sv_decals" } );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Should bombs be easily armed?", Command = "gred_sv_easyuse" } );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Should bombs arm when hit or dropped?", Command = "gred_sv_fragility" } );
 
 	------------------------------PLANES SETTINGS-------------------------------
-	local plane = vgui.Create( "DImageButton" );
-	plane:SetImage( "hud/planes_settings.png" );
-	plane:SetSize( 200, 80 );
-	plane.DoClick = function()
-		local psnd = Sound( table.Random(psounds) );
-		surface.PlaySound( psnd );
-	end
-	CPanel:AddPanel( plane );
+		local plane = vgui.Create( "DImageButton" );
+		plane:SetImage( "hud/planes_settings.png" );
+		plane:SetSize( 200, 80 );
+		plane.DoClick = function()
+			local psnd = Sound( table.Random(psounds) );
+			surface.PlaySound( psnd );
+		end
+		CPanel:AddPanel( plane );
 	
-	if ply:IsListenServerHost() then
-	CPanel:AddControl( "CheckBox", { Label = "Use old rockets?", Command = "gred_sv_oldrockets" } );
-	
-	CPanel:AddControl( "CheckBox", { Label = "Should jets be very fast?", Command = "gred_jets_speed" } );
+		CPanel:AddControl( "CheckBox", { Label = "Use old rockets?", Command = "gred_sv_oldrockets" } );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Should jets be very fast?", Command = "gred_jets_speed" } );
 
-	CPanel:AddControl( "CheckBox", { Label = "Use alternative fire particles?", Command = "gred_sv_fire_effect" } );
-	
-	CPanel:AddControl( "CheckBox", { Label = "Use multiple fire particles?", Command = "gred_sv_multiple_fire_effects" } );
-	
-	CPanel:AddControl( "CheckBox", { Label = "Use custom health system?", Command = "gred_sv_enablehealth" } );
-	
-	CPanel:AddControl( "CheckBox", { Label = "Use health per engine sysetm?", Command = "gred_sv_enableenginehealth" } );
-	
-	CPanel:NumSlider( "Default engine health", "gred_sv_healthslider", 1, 1000, 0 );
-	
-	------------------------------BULLETS SETTINGS-------------------------------
-	
-	CPanel:AddControl( "CheckBox", { Label = "Use an alternative muzzleflash?", Command = "gred_sv_altmuzzleeffect" } );
+		CPanel:AddControl( "CheckBox", { Label = "Use alternative fire particles?", Command = "gred_sv_fire_effect" } );
 		
-	CPanel:AddControl( "CheckBox", { Label = "Should 12mm MGs have a blast radius? (Kills tanks!)", Command = "gred_sv_12mm_he_impact" } );
+		CPanel:AddControl( "CheckBox", { Label = "Use multiple fire particles?", Command = "gred_sv_multiple_fire_effects" } );
 		
-	CPanel:AddControl( "CheckBox", { Label = "Should 7mm MGs have a blast radius? (Kills tanks!)", Command = "gred_sv_7mm_he_impact" } );
-	
-	CPanel:NumSlider( "Bullet damage multiplier","gred_sv_bullet_dmg",-10,10,2 );
-	
-	CPanel:NumSlider( "Bullet radius multiplier","gred_sv_bullet_radius",-10,10,2 );
-	
-	CPanel:NumSlider( "Tracer ammo apparition", "gred_sv_tracers", 0, 20, 0 );
-	
-	CPanel:AddControl( "CheckBox", { Label = "Use Insurgency impact effects for 7mm MGs?", Command = "gred_sv_insparticles" } );
+		CPanel:AddControl( "CheckBox", { Label = "Use custom health system?", Command = "gred_sv_enablehealth" } );
 		
-	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 7mm MGs?", Command = "gred_sv_noparticles_7mm" } );
+		CPanel:AddControl( "CheckBox", { Label = "Use health per engine sysetm?", Command = "gred_sv_enableenginehealth" } );
 		
-	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 12mm MGs?", Command = "gred_sv_noparticles_12mm" } );
+		CPanel:NumSlider( "Default engine health", "gred_sv_healthslider", 1, 1000, 0 );
 		
-	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 20mm cannons?", Command = "gred_sv_noparticles_20mm" } );
+		------------------------------BULLETS SETTINGS-------------------------------
 		
-	CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 30mm cannons?", Command = "gred_sv_noparticles_30mm" } );
+		CPanel:AddControl( "CheckBox", { Label = "Use an alternative muzzleflash?", Command = "gred_sv_altmuzzleeffect" } );
+			
+		CPanel:AddControl( "CheckBox", { Label = "Should 12mm MGs have a blast radius? (Kills tanks!)", Command = "gred_sv_12mm_he_impact" } );
+			
+		CPanel:AddControl( "CheckBox", { Label = "Should 7mm MGs have a blast radius? (Kills tanks!)", Command = "gred_sv_7mm_he_impact" } );
 		
-	CPanel:AddControl( "CheckBox", { Label = "Disable water impact effects?", Command = "gred_sv_nowaterimpacts" } );
+		CPanel:NumSlider( "Bullet damage multiplier","gred_sv_bullet_dmg",0,10,2 );
+		
+		CPanel:NumSlider( "Bullet radius multiplier","gred_sv_bullet_radius",0,10,2 );
+		
+		CPanel:NumSlider( "Tracer ammo apparition", "gred_sv_tracers", 0, 20, 0 );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Use Insurgency impact effects for 7mm MGs?", Command = "gred_sv_insparticles" } );
+			
+		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 7mm MGs?", Command = "gred_sv_noparticles_7mm" } );
+			
+		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 12mm MGs?", Command = "gred_sv_noparticles_12mm" } );
+			
+		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 20mm cannons?", Command = "gred_sv_noparticles_20mm" } );
+			
+		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 30mm cannons?", Command = "gred_sv_noparticles_30mm" } );
+			
+		CPanel:AddControl( "CheckBox", { Label = "Disable water impact effects?", Command = "gred_sv_nowaterimpacts" } );
 	end
 end
 

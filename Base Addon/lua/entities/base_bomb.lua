@@ -311,7 +311,8 @@ function ENT:Arm()
 	    self.Armed = true
 		self.Arming = false
 		self:EmitSound(self.ArmSound)
-		if(self.Timed) then
+		if(self.Timed) or self.JDAM then
+			if self.JDAM then self.Timer = 20 end
 	        timer.Simple(self.Timer, function()
 	            if !self:IsValid() then return end 
 				timer.Simple(math.Rand(0,self.MaxDelay),function()
