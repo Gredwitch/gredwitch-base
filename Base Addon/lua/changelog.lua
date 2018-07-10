@@ -232,5 +232,6 @@
 - Fixed dropping bombs making the aircraft fuck up
 - Fixed a missing texture on the Mk 82
 - Fixed the bullets being laggy
+- Fixed the V1 start sound not following the rocket
 - Most of the convars are now server side to prevent client lags and bugs
 --]]
