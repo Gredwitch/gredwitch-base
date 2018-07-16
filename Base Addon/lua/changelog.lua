@@ -235,7 +235,7 @@
 - Fixed the V1 start sound not following the rocket
 - Most of the convars are now server side to prevent client lags and bugs
 
-13/07/2018 (07/13/2018)
+16/07/2018 (07/16/2018)
 
 - Added a mortar white phosphorus artillery SWEP
 - Added an artillery strike base to optimize the code
