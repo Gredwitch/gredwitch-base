@@ -226,7 +226,7 @@
 - Fixed some stuff related to the SWEPs
 - Updated the particles
 
-??/07/2018 (07/??/2018)
+10/07/2018 (07/10/2018)
 
 - Added working JDAMs
 - Fixed dropping bombs making the aircraft fuck up
@@ -234,4 +234,14 @@
 - Fixed the bullets being laggy
 - Fixed the V1 start sound not following the rocket
 - Most of the convars are now server side to prevent client lags and bugs
+
+13/07/2018 (07/13/2018)
+
+- Added a mortar white phosphorus artillery SWEP
+- Added an artillery strike base to optimize the code
+- Fixed dropped bombs flying away due to other bombs's explosions
+- Fixed dropped bombs disappearing after the aircraft's destruction
+- Fixed the artillery SWEPs
+- Fixed explosion sounds not playing when switching to a camera
+- Fixed the JDAMs not working on servers
 --]]

@@ -84,12 +84,6 @@ ENT.RotationalForce                  =  500
 ENT.ForceOrientation                 =  "NORMAL"       
 ENT.Timer                            =  0
 
-
-ENT.DEFAULT_PHYSFORCE                = 155
-ENT.DEFAULT_PHYSFORCE_PLYAIR         = 20
-ENT.DEFAULT_PHYSFORCE_PLYGROUND      = 1000     
-ENT.Shocktime                        = 2
-
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
 function ENT:SpawnFunction( ply, tr )

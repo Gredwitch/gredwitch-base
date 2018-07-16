@@ -176,7 +176,7 @@ function ENT:Explode()
 	local pos = self:LocalToWorld(self:OBBCenter())
 	self:AddOnExplode()
 	if not self.Smoke then
-	local ent = ents.Create("shockwave_ent")
+		local ent = ents.Create("shockwave_ent")
 		ent:SetPos( pos ) 
 		ent:Spawn()
 		ent:Activate()
@@ -190,27 +190,26 @@ function ENT:Explode()
 		ent:SetVar("DELAY",0.01)
 		ent.trace=self.TraceLength
 		ent.decal=self.Decal
-	end
-	for k, v in pairs(ents.FindInSphere(pos,self.SpecialRadius)) do
-	    if v:IsValid() then
-			local i = 0
-		    while i < v:GetPhysicsObjectCount() do
-			phys = v:GetPhysicsObjectNum(i)	  
-            if (phys:IsValid()) then		
-		 	    local mass = phys:GetMass()
-				local F_ang = self.PhysForce
-				local dist = (pos - v:GetPos()):Length()
-				local relation = math.Clamp((self.SpecialRadius - dist) / self.SpecialRadius, 0, 1)
-				local F_dir = (v:GetPos() - pos):GetNormal() * self.PhysForce
-				   
-				phys:AddAngleVelocity(Vector(F_ang, F_ang, F_ang) * relation)
-				phys:AddVelocity(F_dir)
-		    end
-			i = i + 1
+		for k, v in pairs(ents.FindInSphere(pos,self.SpecialRadius)) do
+			if v:IsValid() then
+				local i = 0
+				while i < v:GetPhysicsObjectCount() do
+				phys = v:GetPhysicsObjectNum(i)	  
+				if (phys:IsValid()) then		
+					local mass = phys:GetMass()
+					local F_ang = self.PhysForce
+					local dist = (pos - v:GetPos()):Length()
+					local relation = math.Clamp((self.SpecialRadius - dist) / self.SpecialRadius, 0, 1)
+					local F_dir = (v:GetPos() - pos):GetNormal() * self.PhysForce
+					   
+					phys:AddAngleVelocity(Vector(F_ang, F_ang, F_ang) * relation)
+					phys:AddVelocity(F_dir)
+				end
+				i = i + 1
+				end
 			end
 		end
 	end
-	 
 	if(self:WaterLevel() >= 1) then
 		local trdata   = {}
 		local trlength = Vector(0,0,9000)

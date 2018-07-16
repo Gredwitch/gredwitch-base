@@ -53,14 +53,8 @@ ENT.FuelBurnoutTime                  =  0.7
 ENT.IgnitionDelay                    =  0       
 ENT.ArmDelay                         =  0
 ENT.RotationalForce                  =  1000
-ENT.ForceOrientation                 =  "NORMAL"       
+ENT.ForceOrientation                 =  "NORMAL"
 ENT.Timer                            =  0
-
-
-ENT.DEFAULT_PHYSFORCE                = 155
-ENT.DEFAULT_PHYSFORCE_PLYAIR         = 20
-ENT.DEFAULT_PHYSFORCE_PLYGROUND      = 1000     
-ENT.Shocktime                        = 2
 
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 

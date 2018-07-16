@@ -87,6 +87,7 @@ function ENT:Think()
 					if (v:IsValid()) then
 						phys = v:GetPhysicsObjectNum(i)
 						if (v:GetPhysicsObject(i):IsValid()) then
+							if v.IsOnPlane then return end
 							local mass = phys:GetMass()
 							local F_ang = self.DEFAULT_PHYSFORCE
 							local dist = (pos - v:GetPos()):Length()

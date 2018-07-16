@@ -76,10 +76,10 @@ function ENT:PhysicsUpdate(ph)
 	local v = self:WorldToLocal(target + Vector(
 		0, 0, math.Clamp((self:GetPos()*Vector(1,1,0)):Distance(target*Vector(1,1,0))/5 - 50, 0, 1000)
 	)):GetNormal()
-	v.y = math.Clamp(v.y*10,-1,1)*1000
-	v.z = math.Clamp(v.z*10,-1,1)*1000
+	v.y = math.Clamp(v.y*10,-1,1)*100
+	v.z = math.Clamp(v.z*10,-1,1)*100
 	ph:AddAngleVelocity(Vector(0,-v.z,v.y))
-	ph:AddVelocity(self:GetForward() * 1 - self:LocalToWorld(vel*Vector(0.1, 1, 1))+pos)
+	ph:AddVelocity(self:GetForward() - self:LocalToWorld(vel*Vector(0.1, 1, 1))+pos)
 end
 
 function ENT:Initialize()

@@ -20,6 +20,7 @@ if SERVER then
 		    bomb:Spawn()
 		    bomb:Activate()
 		    bomb.weld=constraint.Weld(bomb,self.aircraft,0,0,0,true)
+			bomb.IsOnPlane = true
 			bomb.phys=bomb:GetPhysicsObject()
 			if !IsValid(bomb.phys) then return end
 			bomb.phys:SetMass(1)
@@ -36,8 +37,10 @@ function ENT:OnRemove()
 		if self.bombs then
 			for k,v in pairs(self.allbombs) do
 				if IsValid(v) then
-					v:Remove()
-					v=nil
+					if not v.dropping then
+						v:Remove()
+						v=nil
+					end
 				end
 			end
 		end

@@ -22,6 +22,7 @@ if SERVER then
 		    bomb:Spawn()
 		    bomb:Activate()
 		    bomb.weld=constraint.Weld(bomb,self.aircraft,0,0,0,true)
+			bomb.IsOnPlane = true
 			bomb.phys=bomb:GetPhysicsObject()
 			if !IsValid(bomb.phys) then return end
 			bomb.phys:SetMass(1)

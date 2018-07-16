@@ -45,7 +45,7 @@ end
 
 net.Receive( "gred_net_sound_lowsh", function( len, pl )
 	local sound = net.ReadString()
-	LocalPlayer():EmitSound(sound)
+	LocalPlayer():GetViewEntity():EmitSound(sound)
 end );
 
 function ENT:Think()		

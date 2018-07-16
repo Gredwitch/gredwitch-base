@@ -6,7 +6,7 @@ sound.Add( {
 	volume = 1.0,
 	level = 90,
 	pitch = {100},
-	sound = "gunsounds/v1_launch.wav"
+	sound = "gunsounds/v1"
 } )
 DEFINE_BASECLASS( "base_rocket" )
 
@@ -28,7 +28,7 @@ ENT.ExplosionSound                   =  "explosions/gbomb_4.mp3"
 ENT.StartSound                       =  "V1_Startup"
 ENT.ArmSound                         =  "npc/roller/mine/rmine_blip3.wav"
 ENT.ActivationSound                  =  "buttons/button14.wav"
-ENT.EngineSound                      =  "V1_Engine"
+ENT.EngineSound                      =  ""
 
 ENT.ShouldUnweld                     =  true          
 ENT.ShouldIgnite                     =  false         
@@ -53,12 +53,6 @@ ENT.ArmDelay                         =  0
 ENT.RotationalForce                  =  0
 ENT.ForceOrientation                 =  "NORMAL"       
 ENT.Timer                            =  0
-
-
-ENT.DEFAULT_PHYSFORCE                = 155
-ENT.DEFAULT_PHYSFORCE_PLYAIR         = 20
-ENT.DEFAULT_PHYSFORCE_PLYGROUND         = 1000
-ENT.Shocktime                        = 2
 
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
