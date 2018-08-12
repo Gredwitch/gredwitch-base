@@ -64,12 +64,16 @@ function ENT:Think()
 		 if (v:IsValid() or v:IsPlayer()) and (v.forcefielded==false or v.forcefielded==nil) then
 			local i = 0
 			 while i < v:GetPhysicsObjectCount() do
-				 if self.GBOWNER == nil then
+				if self.GBOWNER == nil then
 					self.GBOWNER = self
-				 end
-				 if !self.GBOWNER:IsValid() then
-					self.GBOWNER = self
-				 end
+				end
+				if !IsValid(self.GBOWNER) then
+					if IsValid(self) then
+						self.GBOWNER = self
+					else
+						self.GBOWNER = nil
+					end
+				end
 				self.Owner = self.GBOWNER
 				local dmg = DamageInfo()
 					dmg:SetDamage(1)

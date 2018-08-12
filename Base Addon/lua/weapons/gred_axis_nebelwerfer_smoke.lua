@@ -29,3 +29,6 @@ SWEP.Smoke						= true
 SWEP.SoundName					= "/radio/axis/artillerybeginsmoke"
 SWEP.SndPossibilities			= 5
 SWEP.SndFormat					= ".ogg"
+
+SWEP.SndLang					= "German"
+SWEP.SndAccent                  = 0

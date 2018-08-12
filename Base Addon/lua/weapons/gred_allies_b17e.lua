@@ -23,3 +23,6 @@ SWEP.Bomber						= true
 SWEP.SoundName					= "/radio/allied/carpetbombbegin"
 SWEP.SndPossibilities			= 5
 SWEP.SndFormat					= ".ogg"
+
+SWEP.SndLang					= "English"
+SWEP.SndAccent                  = 0

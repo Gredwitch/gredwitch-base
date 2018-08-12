@@ -28,3 +28,6 @@ SWEP.ShellCount					= 20
 SWEP.SoundName					= "/radio/allied/artillerybegin"
 SWEP.SndPossibilities			= 6
 SWEP.SndFormat					= ".ogg"
+
+SWEP.SndLang					= "English"
+SWEP.SndAccent                  = 0

@@ -23,3 +23,6 @@ SWEP.Bomber						= true
 SWEP.SoundName					= "/radio/axis/carpetbombbegin"
 SWEP.SndPossibilities			= 5
 SWEP.SndFormat					= ".ogg"
+
+SWEP.SndLang					= "German"
+SWEP.SndAccent                  = 0

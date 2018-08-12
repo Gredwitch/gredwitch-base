@@ -28,3 +28,6 @@ SWEP.ShellCount					= 24
 SWEP.SoundName					= "/radio/axis/artillerybegin"
 SWEP.SndPossibilities			= 5
 SWEP.SndFormat					= ".ogg"
+
+SWEP.SndLang					= "German"
+SWEP.SndAccent                  = 0

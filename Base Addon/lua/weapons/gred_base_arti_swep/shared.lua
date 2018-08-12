@@ -16,9 +16,8 @@ SWEP.LoopTimerTime1				= 0
 SWEP.LoopTimerTime2				= 0
 SWEP.FireRate					= 0
 
-SWEP.SoundName					= ""
-SWEP.SndPossibilities			= ""
-SWEP.SndFormat					= ""
+SWEP.SndLang					= ""
+SWEP.SndAccent                  = 0
 
 SWEP.Category					= "Gredwitch's SWEPs"
 SWEP.Author						= "Gredwitch"
@@ -99,7 +98,26 @@ SWEP.VElements = {
 	["binos"] = { type = "Model", model = "models/weapons/binos.mdl", bone = "r-thumb-low", rel = "", pos = Vector(3.907, -0.109, -1.125), angle = Angle(-2.829, 27.281, 105.791), size = Vector(0.5, 0.5, 0.5), color = Color(255, 255, 255, 255), surpresslightning = false, material = "", skin = 0, bodygroup = {} }
 }
 
-
+local AxisRadioSndArti = {}
+local AxisRadioSndSmoke = {}
+local AxisRadioSndBomb = {}
+local AxisRadioSndStuka = {}
+local AlliedRadioSndArti = {}
+local AlliedRadioSndSmoke = {}
+local AlliedRadioSndBomb = {}
+local AlliedRadioSndWP = {}
+for i = 1,5 do
+    AxisRadioSndArti[i] = "radio/axis/artillerybegin".. i..".ogg"
+    AxisRadioSndSmoke[i] = "radio/axis/artillerybeginsmoke".. i..".ogg"
+    AxisRadioSndBomb[i] = "radio/axis/carpetbombbegin".. i..".ogg"
+    AxisRadioSndStuka[i] = "radio/axis/stukadivebegin".. i..".ogg"
+    
+    AlliedRadioSndArti[i] = "radio/allied/artillerybegin".. i..".ogg"
+    AlliedRadioSndSmoke[i] = "radio/allied/artillerybeginsmoke".. i..".ogg"
+    AlliedRadioSndBomb[i] = "radio/allied/carpetbombbegin".. i..".ogg"
+    AlliedRadioSndWP[i] = "radio/allied/incendiaryartillerybegin".. i..".ogg"
+end
+AlliedRadioSndArti[6] = "radio/allied/artillerybegin6.ogg"
 
 function SWEP:PrimaryAttack()
 	if !self:CanPrimaryAttack() then return end
@@ -107,7 +125,25 @@ function SWEP:PrimaryAttack()
 		self.Owner:ChatPrint("[GREDWITCH'S SWEPS]"..self.StrikeString.." strike begins in "..(self.strikedalay).." seconds")
 	end
 	self.Shooting = true
-	self.Weapon:EmitSound(self.SoundName..(math.random(1,self.SndPossibilities))..self.SndFormat)
+	
+	local radsnd = ""
+	local i = ""
+	local k = ""
+	if self.SndLang == "German" then 
+		i = "Axis"
+	elseif self.SndLang == "English" then
+		i = "Allied"
+	end
+	if self.Bomber then 
+		k = "Bomb"
+	elseif self.Smoke then 
+		k = "Smoke"
+	else 
+		if self.Accent == 1 then k = "WP" else k = "Arti" end
+	end
+	local snd = string.ToTable(i.."RadioSnd"..k)
+	radsnd = table.Random(snd)
+	self.Weapon:EmitSound(radsnd)
 	self.Weapon:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 	self:TakePrimaryAmmo(1)
 	

@@ -5,10 +5,11 @@ include("shared.lua")
 
 
 function ENT:Initialize()
-	self.Entity:SetModel("models/mm1/box.mdl")
+	self.Entity:SetModel("models/gredwitch/bullet.mdl")
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
 	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
 	self.Entity:SetSolid(SOLID_VPHYSICS)
+	
 	self.phys = self.Entity:GetPhysicsObject()
 	if self.phys:IsValid() then
 		self.phys:SetMass(5)
@@ -26,7 +27,7 @@ function ENT:Initialize()
 	self.oldpos=self:GetPos()-self:GetAngles():Forward()*self.Speed
 	self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetInt()
 	self.Radius = self.Radius * GetConVar("gred_sv_bullet_radius"):GetInt()
-	self:SetRenderMode(RENDERMODE_GLOW)
+	if self.noTracer then self:SetRenderMode(RENDERMODE_TRANSALPHA) end
 	self:SetNotSolid(true)
 	self.NoParticle = false
 	

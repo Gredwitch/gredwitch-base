@@ -53,6 +53,5 @@ function ENT:SpawnFunction( ply, tr )
      ent:SetPos( tr.HitPos + tr.HitNormal * 16 ) 
      ent:Spawn()
      ent:Activate()
-	print(ent.ExplosionSound)
      return ent
 end

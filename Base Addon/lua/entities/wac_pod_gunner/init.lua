@@ -14,20 +14,6 @@ function ENT:Initialize()
 	if tracer == nil then tracer = 0 end
 	tracerConvar=GetConVar("gred_sv_tracers"):GetInt()
 	
-	bcolor = Color(255,255,0)
-	num1   = 5
-	num2   = 0.05
-	num3   = 1 / (15 + 1)
-	num4   = 13 / 2
-	num5   = 13 / 8
-	num6   = 13 / 350
-	num7   = 1 / 13 / 2 * 0.5
-	
-	if	   self.TracerColor == "Red" then tracercolor=Color(255,0,0) 
-	elseif self.TracerColor == "Green" then tracercolor=Color(0,255,0) 
-	elseif self.TracerColor == "Yellow" then tracercolor=Color(0,255,0) 
-	end
-	
 	self.basePodThink = self:base("wac_pod_base").Think
 end
 
@@ -63,31 +49,19 @@ function ENT:fire()
 	b:Activate()
 	b.Owner=self:getAttacker()
 	
-	if tracer >= tracerConvar then
-		util.SpriteTrail(b, 0, bcolor, false, num1, num1, num2, num3, "trails/laser.vmt")
-		util.SpriteTrail(b, 0, b.col, false, num4, num5, num6, num7, "trails/smoke.vmt")
+	if tracer >= GetConVarNumber("gred_sv_tracers") then
+		if self.Color == "Red" then
+			b:SetSkin(1)
+		elseif self.Color == "Green" then
+		elseif self.Color == "Yellow" then
+			b:SetSkin(0)
+		end
+		b:SetModelScale(20)
 		tracer = 0
-	end
+	else b.noTracer = true end
 	tracer = tracer + 1
 	
-		if SERVER and not game.SinglePlayer() then
-		for k, ply in pairs(player.GetAll()) do
-			if not ply:IsPlayer() then return end
-			if tonumber(ply:GetInfo("gred_sv_altmuzzleeffect")) == 1 then
-			ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
-			ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
-			ParticleEffect("muzzleflash_m590_1p_core",pos,ang,nil)
-			ParticleEffect("muzzleflash_smoke_small_variant_1",pos,ang,nil)
-			else
-				local effectdata=EffectData()
-				effectdata:SetOrigin(pos)
-				effectdata:SetAngles(ang)
-				effectdata:SetEntity(self)
-				effectdata:SetScale(1)
-				util.Effect("MuzzleEffect", effectdata)
-			end
-		end
-	elseif game.SinglePlayer() then
+	if SERVER then
 		if GetConVar("gred_sv_altmuzzleeffect"):GetInt() == 1 then
 			ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
 			ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
