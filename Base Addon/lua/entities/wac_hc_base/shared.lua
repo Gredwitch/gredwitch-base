@@ -51,7 +51,7 @@ function ENT:addSounds()
 			elseif name == "Engine" then
 				self.sounds[name]:SetSoundLevel(110)
 			elseif name == "Radio" and value != "" then --ADDED BY THE GREDWITCH
-				self.sounds[name]:SetSoundLevel(80) --ADDED BY THE GREDWITCH
+				self.sounds[name]:SetSoundLevel(60) --ADDED BY THE GREDWITCH
 			end
 		end
 	end

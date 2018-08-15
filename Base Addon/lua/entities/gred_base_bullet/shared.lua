@@ -223,7 +223,7 @@ local materials={
 			hitang = tr.HitNormal:Angle()
 			hitpos = tr.HitPos
 		end
-		if self.Caliber != "wac_base_20mm" then
+		if self.Caliber != "wac_base_20mm" and self.Caliber != "wac_base_30mm" then
 			if !tr.HitSky then
 				local bullet = {}
 				bullet.Attacker = self.Owner
@@ -256,12 +256,8 @@ local materials={
 					end
 					hitang = hitang+Angle(90,0,0)
 					HitMat = util.GetSurfacePropName(tr.SurfaceProps)
-				elseif self.Caliber == "wac_base_30mm" then
-					bullet.Damage = zero
-					util.BlastDamage(self, self.Owner, hitpos, self.Radius*4, 280)
-					self.Entity:EmitSound("impactsounds/30mm_1.wav",140, math.random(90,120),1, CHAN_AUTO)
 				end
-				bullet.Force = 700
+				bullet.Force = 100
 				bullet.HullSize = zero
 				bullet.Num = 1
 				bullet.Tracer = zero
@@ -281,12 +277,19 @@ local materials={
 			else
 				hitsky = tr.HitSky
 			end
-			util.BlastDamage(self,self.Owner,hitpos,self.Radius*2, 120)
+			if self.Caliber == "wac_base_30mm" then
+				util.BlastDamage(self, self.Owner, hitpos, self.Radius*4, 280)
+				self.Entity:EmitSound("impactsounds/30mm_1.wav",140, math.random(90,120),1, CHAN_AUTO)
+			else
+				self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
+				util.BlastDamage(self,self.Owner,hitpos,self.Radius*2, 120)
+			end
 			local bullet = {}
+			bullet.Damage = zero
 			bullet.Attacker = self.Owner
 			bullet.Callback = nil
 			bullet.Damage = zero
-			bullet.Force = 700
+			bullet.Force = 100
 			bullet.HullSize = zero
 			bullet.Num = 1
 			bullet.Tracer = zero
@@ -297,7 +300,6 @@ local materials={
 			bullet.Src = pos
 			self:FireBullets( bullet, false )
 			self:CreateEffect()
-			self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
 		end
 		self:Remove()
 	end

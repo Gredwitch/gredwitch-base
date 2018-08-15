@@ -36,7 +36,7 @@ function ENT:Initialize()
 	self:SetNWBool("sequential", self.sequential)
 	self:SetNWInt("npod", self.npod)
 	self.IsBullet=true
-	if self.Caliber == "wac_base_20mm" and self.FuzeTime > 0 then 
+	if self.FuzeTime > 0 then
 		self.GetExplTime = CurTime() + self.FuzeTime 
 	end
 	self:NextThink(CurTime())
@@ -60,12 +60,14 @@ function ENT:PhysicsUpdate(ph)
 	local nohitwater = tr.MatType != 83
 	if hit and nohitwater then
 		self.Explode(self,tr)
+		return
 	else
 		self.Entity:SetPos(dif)
 	end
-	if self.Caliber == "wac_base_20mm" and self.FuzeTime > 0 then
+	if self.FuzeTime > 0 then
 		if CurTime() >= self.GetExplTime then
 			self:Explode()
+			return
 		end
 	end
 	if !self.Exploded and hit and !nohitwater then

@@ -598,6 +598,17 @@ end
 
 function ENT:Think()
 	local crt = CurTime()
+	if self.sounds.Radio then
+		if self.active then
+			if !self.sounds.Radio:IsPlaying() then
+				self.sounds.Radio:Play()
+			end
+		else
+			if self.sounds.Radio:IsPlaying() then
+				self.sounds.Radio:Stop()
+			end
+		end
+	end
 	if !self.disabled then
 		if self.nextUpdate<crt then
 			if self.phys and self.phys:IsValid() then
