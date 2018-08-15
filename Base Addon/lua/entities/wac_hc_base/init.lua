@@ -598,6 +598,7 @@ end
 
 function ENT:Think()
 	local crt = CurTime()
+	-- START ADDED BY THE GREDWITCH
 	if self.sounds.Radio then
 		if self.active then
 			if !self.sounds.Radio:IsPlaying() then
@@ -609,6 +610,7 @@ function ENT:Think()
 			end
 		end
 	end
+	-- END ADDED BY THE GREDWITCH
 	if !self.disabled then
 		if self.nextUpdate<crt then
 			if self.phys and self.phys:IsValid() then

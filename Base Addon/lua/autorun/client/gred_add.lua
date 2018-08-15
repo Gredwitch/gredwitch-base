@@ -68,6 +68,7 @@ CreateConVar("gred_sv_bullet_radius"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_soundspeed_divider"		,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_decals"					,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_arti_spawnaltitude"		, "1000", GRED_SVAR)
+CreateConVar("gred_sv_wac_radio"				,  "1"  , GRED_SVAR)
 
 CreateConVar("gred_sv_nowaterimpacts"			,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_insparticles"				,  "0"  , GRED_SVAR)
@@ -130,6 +131,8 @@ local function gredsettings(CPanel)
 		CPanel:AddPanel( plane );
 	
 		CPanel:AddControl( "CheckBox", { Label = "Use old rockets?", Command = "gred_sv_oldrockets" } );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Enable radio sounds ?", Command = "gred_sv_wac_radio" } );
 		
 		CPanel:AddControl( "CheckBox", { Label = "Should jets be very fast?", Command = "gred_jets_speed" } );
 

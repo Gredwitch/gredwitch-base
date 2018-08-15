@@ -244,4 +244,13 @@
 - Fixed the artillery SWEPs
 - Fixed explosion sounds not playing when switching to a camera
 - Fixed the JDAMs not working on servers
+
+17/08/2018 (08/17/2018)
+
+- Updated BASE_BULLET : added a new optimized tracer system / added a 30mm time-fuze shell
+- Updated POD_MG : added compatibility for the new tracer system
+- Updated POD_GUNNER : added compatibility for the new tracer system / removed outdated code
+- Updated BOMB_2000GP : removed the debug message
+- Updated gred_add : added an option to disable the radio sounds
+- Fixed a bug in shockwave_ent 
 --]]
