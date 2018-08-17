@@ -21,13 +21,10 @@ ENT.Sounds = {
 	shoot3p = "WAC/cannon/viper_cannon_3p.wav",
 	spin = "WAC/cannon/viper_cannon_rotate.wav"
 }
-
+if SERVER then util.AddNetworkString("gred_net_wac_gunner_muzzle_fx")  end
 function ENT:SetupDataTables()
 	self:base("wac_pod_base").SetupDataTables(self)
 	self:NetworkVar("Float", 2, "SpinSpeed");
-	self:NetworkVar( "String", 0, "TracerColor" );
-	self:NetworkVar( "String", 0, "BulletType" );
-	self:NetworkVar( "Int", 0, "TkAmmo" );
 end
 
 

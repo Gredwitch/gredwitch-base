@@ -23,6 +23,12 @@ ENT.Sounds = {
 	shoot = "",
 	stop = "",
 }
+if SERVER then util.AddNetworkString("gred_net_wac_mg_muzzle_fx")  end
+function ENT:SetupDataTables()
+	self:base("wac_pod_base").SetupDataTables(self)
+	self:NetworkVar( "Vector", 0, "ShootPos" );
+	self:NetworkVar( "Angle", 1, "ShootAng" );
+end
 function ENT:Initialize()
 	self:base("wac_pod_base").Initialize(self)
 	
@@ -64,10 +70,16 @@ function ENT:fireBullet(pos)
 	b:Activate()
 	b.Owner=self:getAttacker()
 	
+	net.Start("gred_net_wac_mg_muzzle_fx")
+		net.WriteVector(self:LocalToWorld(pos))
+		net.WriteAngle(ang)
+	net.Broadcast()
+	
 	if tracer >= GetConVarNumber("gred_sv_tracers") then
 		if self.Color == "Red" then
 			b:SetSkin(1)
 		elseif self.Color == "Green" then
+			b:SetSkin(3)
 		elseif self.Color == "Yellow" then
 			b:SetSkin(0)
 		end
@@ -76,22 +88,6 @@ function ENT:fireBullet(pos)
 	else b.noTracer = true end
 	tracer = tracer + 1
 	
-	LtWPOS = self:LocalToWorld(pos)
-	if SERVER then
-		if GetConVar("gred_sv_altmuzzleeffect"):GetInt() == 1 then
-			ParticleEffect("muzzleflash_sparks_variant_6",LtWPOS,ang,nil)
-			ParticleEffect("muzzleflash_1p_glow",LtWPOS,ang,nil)
-			ParticleEffect("muzzleflash_m590_1p_core",LtWPOS,ang,nil)
-			ParticleEffect("muzzleflash_smoke_small_variant_1",LtWPOS,ang,nil)
-		else
-			local effectdata=EffectData()
-			effectdata:SetOrigin(LtWPOS)
-			effectdata:SetAngles(ang)
-			effectdata:SetEntity(self)
-			effectdata:SetScale(1)
-			util.Effect("MuzzleEffect", effectdata)
-		end
-	end
 	for _,e in pairs(self.aircraft.wheels) do
 		if IsValid(e) then
 			constraint.NoCollide(e,b,0,0)

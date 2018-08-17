@@ -9,7 +9,7 @@ function ENT:Initialize()
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
 	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
 	self.Entity:SetSolid(SOLID_VPHYSICS)
-	
+	self.Initialized = true
 	self.phys = self.Entity:GetPhysicsObject()
 	if self.phys:IsValid() then
 		self.phys:SetMass(5)
@@ -39,6 +39,8 @@ function ENT:Initialize()
 	if self.FuzeTime > 0 then
 		self.GetExplTime = CurTime() + self.FuzeTime 
 	end
+	if CLIENT then self:SetCaliber(self.Caliber) end
+	self.Initialized =true
 	self:NextThink(CurTime())
 end
 
@@ -71,21 +73,17 @@ function ENT:PhysicsUpdate(ph)
 		end
 	end
 	if !self.Exploded and hit and !nohitwater then
-		if GetConVar("gred_sv_nowaterimpacts"):GetInt() == 1 then return end
+		net.Start("gred_net_impact_fx")
+			net.WriteBool(true)
+			net.WriteString(self.Caliber)
+			net.WriteVector(tr.HitPos)
+		net.Broadcast()
 		self.NoParticle = true
-		if self.Caliber == "wac_base_7mm" then
-			ParticleEffect("doi_impact_water",tr.HitPos,Angle(-90,zero,zero),nil)
-		elseif self.Caliber == "wac_base_12mm" then
-			ParticleEffect("impact_water",tr.HitPos,Angle(-90,zero,zero),nil)
-		elseif self.Caliber == "wac_base_20mm" then
-			ParticleEffect("water_small",tr.HitPos,Angle(threeZ),nil)
-		elseif self.Caliber == "wac_base_30mm" then
-			ParticleEffect("water_medium",tr.HitPos,Angle(threeZ),nil)
-		end
 		self:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",audioSpecs )
 	end
 end
 
 function ENT:Think()
+	if not self.Initialized then self:Initialize() end
 	self.phys:Wake()
 end

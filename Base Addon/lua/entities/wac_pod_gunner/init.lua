@@ -1,8 +1,8 @@
-AddCSLuaFile("shared.lua")
-include("shared.lua")
-
 if not wac then return end
 
+AddCSLuaFile("shared.lua")
+AddCSLuaFile("cl_init.lua")
+include("shared.lua")
 
 function ENT:Initialize()
 	self:base("wac_pod_base").Initialize(self)
@@ -53,6 +53,7 @@ function ENT:fire()
 		if self.Color == "Red" then
 			b:SetSkin(1)
 		elseif self.Color == "Green" then
+			b:SetSkin(3)
 		elseif self.Color == "Yellow" then
 			b:SetSkin(0)
 		end
@@ -61,21 +62,10 @@ function ENT:fire()
 	else b.noTracer = true end
 	tracer = tracer + 1
 	
-	if SERVER then
-		if GetConVar("gred_sv_altmuzzleeffect"):GetInt() == 1 then
-			ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
-			ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
-			ParticleEffect("muzzleflash_m590_1p_core",pos,ang,nil)
-			ParticleEffect("muzzleflash_smoke_small_variant_1",pos,ang,nil)
-		else
-			local effectdata=EffectData()
-			effectdata:SetOrigin(pos)
-			effectdata:SetAngles(ang)
-			effectdata:SetEntity(self)
-			effectdata:SetScale(1)
-			util.Effect("MuzzleEffect", effectdata)
-		end
-	end
+	net.Start("gred_net_wac_gunner_muzzle_fx")
+		net.WriteVector(pos)
+		net.WriteAngle(ang)
+	net.Broadcast()
 	
 	for _,e in pairs(self.aircraft.wheels) do
 		if IsValid(e) then
