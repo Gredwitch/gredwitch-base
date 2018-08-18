@@ -13,16 +13,19 @@ if SERVER then
 	
 	function ENT:ReloadBombs()
 		if self.aircraft.engineHealth <= 0 then return end
+		if (GetConVar("gred_sv_spawnable_bombs"):GetInt() == 0 and not self.IsOnPlane) then
+			self:Remove()
+		end
 		self:SetAmmo(#self.Pods)
 		self.bombs={}
 		for k,v in pairs(self.Pods) do
 			local bomb = ents.Create( self.Kind )
+			bomb.IsOnPlane = true
 			bomb:SetPos(self.aircraft:LocalToWorld(v))
 		    bomb:SetAngles(self.aircraft:GetAngles())
 		    bomb:Spawn()
 		    bomb:Activate()
 		    bomb.weld=constraint.Weld(bomb,self.aircraft,0,0,0,true)
-			bomb.IsOnPlane = true
 			bomb.phys=bomb:GetPhysicsObject()
 			if !IsValid(bomb.phys) then return end
 			bomb.phys:SetMass(1)

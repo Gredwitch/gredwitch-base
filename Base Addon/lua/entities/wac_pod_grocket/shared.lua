@@ -70,6 +70,7 @@ function ENT:fireRocket(pos, ang)
 		rocket:SetPos(self:LocalToWorld(pos))
 		rocket:SetAngles(ang)
 		rocket.Owner = self:getAttacker()
+		rocket.IsOnPlane = true
 		rocket:Spawn()
 		rocket:Activate()
 		rocket:Launch()

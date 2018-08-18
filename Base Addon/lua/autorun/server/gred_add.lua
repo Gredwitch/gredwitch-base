@@ -22,6 +22,8 @@ CreateConVar("gred_sv_soundspeed_divider"		,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_decals"					,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_arti_spawnaltitude"		, "1000", GRED_SVAR)
 CreateConVar("gred_sv_wac_radio"				,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_spawnable_bombs"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_wac_bombs"				,  "1"  , GRED_SVAR)
 --[[
 CreateConVar("gred_sv_nowaterimpacts"			,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_insparticles"				,  "0"  , GRED_SVAR)
@@ -41,6 +43,8 @@ game.AddDecal( "scorch_big_3",					"decals/scorch_big_3" );
 -- Precaching main particles
 PrecacheParticleSystem("gred_20mm")
 PrecacheParticleSystem("gred_20mm_airburst")
+PrecacheParticleSystem("gred_40mm")
+PrecacheParticleSystem("gred_40mm_airburst")
 PrecacheParticleSystem("30cal_impact")
 PrecacheParticleSystem("fire_large_01")
 PrecacheParticleSystem("30cal_impact")
@@ -86,3 +90,4 @@ for i = 0,1 do
 	PrecacheParticleSystem(""..pcfD.."impact_paper")
 	PrecacheParticleSystem(""..pcfD.."impact_computer")
 end
+util.PrecacheModel("models/gredwitch/bullet.mdl") 

@@ -60,6 +60,34 @@ ENT.DEFAULT_PHYSFORCE_PLYAIR         = 500
 ENT.DEFAULT_PHYSFORCE_PLYGROUND      = 5000
 ENT.GBOWNER                          = nil
 
+function ENT:Initialize()
+	if (SERVER) then
+		if (GetConVar("gred_sv_spawnable_bombs"):GetInt() == 0 and not self.IsOnPlane) then
+			self:Remove()
+		end
+		self:LoadModel()
+		self:PhysicsInit( SOLID_VPHYSICS )
+		self:SetSolid( SOLID_VPHYSICS )
+		self:SetMoveType( MOVETYPE_VPHYSICS )
+		self:SetUseType( ONOFF_USE )
+		local phys = self:GetPhysicsObject()
+		local skincount = self:SkinCount()
+		if (phys:IsValid()) then
+			phys:SetMass(self.Mass)
+			phys:Wake()
+		end
+		if (skincount > 0) then
+			self:SetSkin(math.random(0,skincount))
+		end
+		self.Armed    = false
+		self.Exploded = false
+		self.Used     = false
+		self.Arming   = false
+		if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
+		if !(WireAddon == nil) then self.Inputs   = Wire_CreateInputs(self, { "Arm", "Detonate" }) end
+	end
+end
+
 function ENT:PhysicsUpdate(ph)
 	if not self.JDAM or not self.Armed then return end
 	local pos = self:GetPos()
@@ -82,31 +110,6 @@ function ENT:PhysicsUpdate(ph)
 	ph:AddVelocity(self:GetForward() - self:LocalToWorld(vel*Vector(0.1, 1, 1))+pos)
 end
 
-function ENT:Initialize()
-	if (SERVER) then
-		self:LoadModel()
-		self:PhysicsInit( SOLID_VPHYSICS )
-		self:SetSolid( SOLID_VPHYSICS )
-		self:SetMoveType( MOVETYPE_VPHYSICS )
-		self:SetUseType( ONOFF_USE )
-		local phys = self:GetPhysicsObject()
-		local skincount = self:SkinCount()
-		if (phys:IsValid()) then
-			phys:SetMass(self.Mass)
-			phys:Wake()
-		end
-		if (skincount > 0) then
-			self:SetSkin(math.random(0,skincount))
-		end
-		self.Armed    = false
-		self.Exploded = false
-		self.Used     = false
-		self.Arming   = false
-		
-		if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
-		if !(WireAddon == nil) then self.Inputs   = Wire_CreateInputs(self, { "Arm", "Detonate" }) end
-	end
-end
 
 function ENT:TriggerInput(iname, value)
      if (!self:IsValid()) then return end

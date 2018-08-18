@@ -108,6 +108,9 @@ ENT.GBOWNER                          =  nil             -- don't you fucking tou
 
 function ENT:Initialize()
  if (SERVER) then
+	if (GetConVar("gred_sv_spawnable_bombs"):GetInt() == 0 and !self.IsOnPlane) then
+		self:Remove()
+	end
      self:SetModel(self.Model)  
 	 self:PhysicsInit( SOLID_VPHYSICS )
 	 self:SetSolid( SOLID_VPHYSICS )

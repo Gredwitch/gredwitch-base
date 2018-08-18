@@ -37,6 +37,8 @@ game.AddParticles( "particles/fire_01.pcf" )
 -- Precaching main particles
 PrecacheParticleSystem("gred_20mm")
 PrecacheParticleSystem("gred_20mm_airburst")
+PrecacheParticleSystem("gred_40mm")
+PrecacheParticleSystem("gred_40mm_airburst")
 PrecacheParticleSystem("30cal_impact")
 PrecacheParticleSystem("fire_large_01")
 PrecacheParticleSystem("30cal_impact")
@@ -107,6 +109,8 @@ CreateConVar("gred_sv_soundspeed_divider"		,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_decals"					,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_arti_spawnaltitude"		, "1000", GRED_SVAR)
 CreateConVar("gred_sv_wac_radio"				,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_spawnable_bombs"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_wac_bombs"				,  "1"  , GRED_SVAR)
 --[[
 CreateConVar("gred_sv_nowaterimpacts"			,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_insparticles"				,  "0"  , GRED_SVAR)
@@ -125,8 +129,9 @@ CreateClientConVar("gred_cl_noparticles_12mm"	, "0" , true,false)
 CreateClientConVar("gred_cl_noparticles_20mm"	, "0" , true,false)
 CreateClientConVar("gred_cl_noparticles_20mm"	, "0" , true,false)
 CreateClientConVar("gred_cl_noparticles_30mm"	, "0" , true,false)
+CreateClientConVar("gred_cl_noparticles_40mm"	, "0" , true,false)
 CreateClientConVar("gred_cl_altmuzzleeffect"	, "0" , true,false)
-
+util.PrecacheModel("models/gredwitch/bullet.mdl") 
 -----------------------------------------------------------
 -- Adding the spawnmenu options
 local function gredsettings(CPanel)
@@ -164,6 +169,8 @@ local function gredsettings(CPanel)
 		
 		CPanel:AddControl( "CheckBox", { Label = "Should bombs be easily armed?", Command = "gred_sv_easyuse" } );
 		
+		CPanel:AddControl( "CheckBox", { Label = "Should explosives be spawnable?", Command = "gred_sv_spawnable_bombs" } );
+		
 		CPanel:AddControl( "CheckBox", { Label = "Should bombs arm when hit or dropped?", Command = "gred_sv_fragility" } );
 
 	------------------------------PLANES SETTINGS-------------------------------
@@ -177,6 +184,8 @@ local function gredsettings(CPanel)
 		CPanel:AddPanel( plane );
 	
 		CPanel:AddControl( "CheckBox", { Label = "Use old rockets?", Command = "gred_sv_oldrockets" } );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Enable bombs in aircrafts?", Command = "gred_sv_wac_bombs" } );
 		
 		CPanel:AddControl( "CheckBox", { Label = "Enable radio sounds ?", Command = "gred_sv_wac_radio" } );
 		
@@ -215,6 +224,8 @@ local function gredsettings(CPanel)
 		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 20mm cannons?", Command = "gred_cl_noparticles_20mm" } );
 			
 		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 30mm cannons?", Command = "gred_cl_noparticles_30mm" } );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 40mm cannons?", Command = "gred_cl_noparticles_40mm" } );
 			
 		CPanel:AddControl( "CheckBox", { Label = "Disable water impact effects?", Command = "gred_cl_nowaterimpacts" } );
 	end

@@ -94,7 +94,8 @@ ENT.Weapons = {}
 
 
 function ENT:Initialize()
-	self.Initialized = true
+	if SERVER then self.m_initialized = true end
+	if CLIENT then self.m_initialized = true end
 	wac.aircraft.initialize()
 	self.Entity:SetModel(self.Model)
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
@@ -598,8 +599,9 @@ end
 
 
 function ENT:Think()
-	local crt = CurTime()
 	-- START ADDED BY THE GREDWITCH
+	if CLIENT then if not self.m_initialized then self:Initialize() end end
+	if SERVER then if not self.m_initialized then self:Initialize() end end
 	if self.sounds.Radio then
 		if self.active then
 			if !self.sounds.Radio:IsPlaying() and GetConVar("gred_sv_wac_radio"):GetInt() == 1 then
@@ -611,8 +613,8 @@ function ENT:Think()
 			end
 		end
 	end
-	if not self.Initialized then self:Initialize() end
 	-- END ADDED BY THE GREDWITCH
+	local crt = CurTime()
 	if !self.disabled then
 		if self.nextUpdate<crt then
 			if self.phys and self.phys:IsValid() then

@@ -247,10 +247,15 @@
 
 17/08/2018 (08/17/2018)
 
-- Updated BASE_BULLET : added a new optimized tracer system / added a 30mm time-fuze shell
-- Updated POD_MG : added compatibility for the new tracer system
-- Updated POD_GUNNER : added compatibility for the new tracer system / removed outdated code
+- Updated BASE_BULLET : added a new optimized tracer system / added a 30mm time-fuze shell / made impact effects client only
+  / added a new 40mm bullet
+- Updated POD_MG : added compatibility for the new tracer system / made the muzzleflashes client only
+- Updated POD_GUNNER : added compatibility for the new tracer system / removed outdated code / made the muzzleflashes client only
 - Updated BOMB_2000GP : removed the debug message
-- Updated gred_add : added an option to disable the radio sounds
-- Fixed a bug in shockwave_ent 
+- Updated BASE_BOMB : added an option to prevent bombs from being spawned
+- Updated gred_particles : added two new 40mm effects
+- Updated POD_JDAM / POD_GBOMB : added an option to prevent WAC aircrafts from carrying bombs
+- Updated gred_add : added an option to disable the radio sounds / precached more particles / precached the bullet model
+- Fixed a bug in shockwave_ent
+- Fixed wac_hc_base : fixed an issue that was preventing the players from getting in an aircraft in multiplayer
 --]]

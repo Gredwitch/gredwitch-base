@@ -99,6 +99,13 @@ net.Receive("gred_net_impact_fx",function()
 			if GetConVar("gred_cl_noparticles_30mm"):GetInt() == 1 then return end
 			net.ReadBool()
 			ParticleEffect("30cal_impact",net.ReadVector(),net.ReadAngle(),nil)
+		elseif cal == "wac_base_40mm" then
+			if GetConVar("gred_cl_noparticles_40mm"):GetInt() == 1 then return end
+			if !net.ReadBool() then
+				ParticleEffect("gred_40mm",net.ReadVector(),net.ReadAngle(),nil)
+			else
+				ParticleEffect("gred_40mm_airburst",net.ReadVector(),Angle(-90,0,0),nil)
+			end
 		end
 	else
 		if GetConVar("gred_cl_nowaterimpacts"):GetInt() == 1 then return end
@@ -109,7 +116,7 @@ net.Receive("gred_net_impact_fx",function()
 			ParticleEffect("impact_water",net.ReadVector(),Angle(-90,zero,zero),nil)
 		elseif cal == "wac_base_20mm" then
 			ParticleEffect("water_small",net.ReadVector(),Angle(threeZ),nil)
-		elseif cal == "wac_base_30mm" then
+		elseif cal == "wac_base_30mm" or cal == "wac_base_40mm" then
 			ParticleEffect("water_medium",net.ReadVector(),Angle(threeZ),nil)
 		end
 	end
