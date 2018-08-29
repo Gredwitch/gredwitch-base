@@ -121,6 +121,7 @@ PrecacheParticleSystem("gred_ap_impact")
 PrecacheParticleSystem("doi_mortar_explosion")
 PrecacheParticleSystem("doi_wparty_explosion")
 PrecacheParticleSystem("doi_smoke_artillery")
+PrecacheParticleSystem("doi_ceilingDust_large")
 PrecacheParticleSystem("m203_smokegrenade")
 
 
