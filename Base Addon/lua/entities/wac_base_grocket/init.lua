@@ -32,7 +32,7 @@ CloseWaterExploSnds[1]                         =  "explosions/doi_ty_01_closewat
 CloseWaterExploSnds[2]                         =  "explosions/doi_ty_02_closewater.wav"
 CloseWaterExploSnds[3]                         =  "explosions/doi_ty_03_closewater.wav"
 CloseWaterExploSnds[4]                         =  "explosions/doi_ty_04_closewater.wav"
-
+if SERVER then util.AddNetworkString("gred_net_wacrocket_explosion_fx") end
 function ENT:Initialize()
 	math.randomseed(CurTime())
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
@@ -59,17 +59,23 @@ function ENT:Explode(tr)
 	if self.Exploded then return end
 	self.Exploded = true
 	
+	net.Start("gred_net_wacrocket_explosion_fx")
     if(self:WaterLevel() >= 1) then
-		ParticleEffect("ins_water_explosion", WaterHitPos, Angle(-90,0,0), nil)
+		net.WriteString("ins_water_explosion")
+		net.WriteVector(WaterHitPos)
+		net.WriteAngle(Angle(-90,0,0))
 		self.ExplosionSound =  self.WaterExplosionSound
 		self.FarExplosionSound = self.WaterFarExplosionSound
 	else
 		if self.hellfire then
-			ParticleEffect("high_explosive_main_2",pos,Angle(0,0,0),nil)
+			net.WriteString("high_explosive_main_2")
 		else
-			ParticleEffect("100lb_air",pos,Angle(0,0,0),nil)
+			net.WriteString("100lb_air")
 		end
+		net.WriteVector(pos)
+		net.WriteAngle(Angle(0,0,0))
 	end
+	net.Broadcast()
 	local ent = ents.Create("shockwave_sound_lowsh")
 	ent:SetPos(pos)
 	ent:SetVar("GBOWNER",self.Owner)

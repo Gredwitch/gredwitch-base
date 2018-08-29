@@ -1,6 +1,6 @@
 AddCSLuaFile()
 
-DEFINE_BASECLASS( "base_rocket" )
+DEFINE_BASECLASS( "base_shell" )
 
 local ExploSnds = {}
 ExploSnds[1]                         =  "explosions/doi_generic_01.wav"
@@ -32,59 +32,38 @@ CloseWaterExploSnds[2]                         =  "explosions/doi_generic_02_clo
 CloseWaterExploSnds[3]                         =  "explosions/doi_generic_03_closewater.wav"
 CloseWaterExploSnds[4]                         =  "explosions/doi_generic_04_closewater.wav"
 
-ENT.Spawnable		            	 =  true         
-ENT.AdminSpawnable		             =  true 
+ENT.Spawnable		            	 =  false         
+ENT.AdminSpawnable		             =  false 
 
-ENT.PrintName		                 =  "[ROCKETS]81mm Mortar Shell"
-ENT.Author			                 =  ""
-ENT.Contact			                 =  ""
+ENT.PrintName		                 =  "[SHELLS]105mm Shell"
+ENT.Author			                 =  "Gredwitch"
+ENT.Contact			                 =  "qhamitouche@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
+ENT.Model                            =  "models/gredwitch/bombs/75mm_shell.mdl"
+ENT.Mass                             =  10
 
-ENT.Model                            =  "models/gredwitch/bombs/artillery_shell.mdl"
-ENT.RocketTrail                      =  ""
-ENT.RocketBurnoutTrail               =  ""
-ENT.Effect                           =  "gred_mortar_explosion"
-ENT.EffectAir                        =  "gred_mortar_explosion"
+ENT.Effect                           =  "doi_artillery_explosion"
+ENT.EffectAir                        =  "doi_artillery_explosion"
 ENT.EffectWater                      =  "ins_water_explosion"
-
+ENT.SmokeEffect						 =  "doi_smoke_artillery"
+ENT.AngEffect						 =	true
+     
 ENT.ExplosionSound                   =  table.Random(CloseExploSnds)
 ENT.FarExplosionSound				 =  table.Random(ExploSnds)
 ENT.DistExplosionSound				 =  table.Random(DistExploSnds)
-ENT.WaterExplosionSound				 =  table.Random(CloseWaterExploSnds)
+ENT.WaterExplosionSound				 =	table.Random(CloseExploSnds)
 ENT.WaterFarExplosionSound			 =  table.Random(WaterExploSnds)
-ENT.RSound							 =	0
-ENT.AngEffect						 =	true
 
-ENT.StartSound                       =  ""
-ENT.ArmSound                         =  ""
-ENT.ActivationSound                  =  ""
-ENT.EngineSound                      =  ""
+ENT.RSound   						 =  0
 
-ENT.ShouldUnweld                     =  true          
-ENT.ShouldIgnite                     =  false         
-ENT.UseRandomSounds                  =  true                  
-ENT.SmartLaunch                      =  true  
-ENT.Timed                            =  false 
+ENT.ShouldUnweld                     =  false
+ENT.ShouldIgnite                     =  false
+ENT.SmartLaunch                      =  true
+ENT.Timed                            =  false
 
-ENT.ExplosionDamage                  =  350
-ENT.ExplosionRadius                  =  350
-ENT.PhysForce                        =  350
-ENT.SpecialRadius                    =  350
-ENT.MaxIgnitionTime                  =  0
-ENT.Life                             =  1
-ENT.MaxDelay                         =  0
-ENT.TraceLength                      =  1000
-ENT.ImpactSpeed                      =  100
-ENT.Mass                             =  30
-ENT.EnginePower                      =  800
-ENT.FuelBurnoutTime                  =  0.7
-ENT.IgnitionDelay                    =  0       
-ENT.ArmDelay                         =  0
-ENT.RotationalForce                  =  1000
-ENT.ForceOrientation                 =  "NORMAL"
-ENT.Timer                            =  0
-
-ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
+ENT.APDamage						 =  1005
+ENT.ExplosionDamage                  =  200
+ENT.ExplosionRadius                  =  500
 
 function ENT:SpawnFunction( ply, tr )
     if ( !tr.Hit ) then return end
@@ -100,6 +79,5 @@ function ENT:SpawnFunction( ply, tr )
 	ent.DistExplosionSound	= table.Random(DistExploSnds)
 	ent.WaterExplosionSound	= table.Random(CloseWaterExploSnds)
 	ent.WaterFarExplosionSound	= table.Random(WaterExploSnds)
-
     return ent
 end

@@ -1,69 +1,91 @@
 AddCSLuaFile()
-if SERVER then util.AddNetworkString("gred_net_gredrocket_explosion_fx") end
-if CLIENT then
-	net.Receive("gred_net_gredrocket_explosion_fx",function()
-		ParticleEffect(net.ReadString(),net.ReadVector(),net.ReadAngle(),nil)
-		if net.ReadBool() then
-			ParticleEffect("doi_ceilingDust_large",net.ReadVector(),Angle(0,0,0),nil)
-		end
-	end)
-end
 DEFINE_BASECLASS( "base_anim" )
-sound.Add( {
-	name = "RP3_Engine",
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 90,
-	pitch = {100},
-	sound = "gunsounds/rpg_rocket_loop.wav"
-} )
 
-sound.Add( {
-	name = "Hydra_Engine",
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 90,
-	pitch = {100},
-	sound = "wac/rocket_idle.wav"
-} )
+local materials = {
+	canister				=	1,
+	chain					=	1,
+	chainlink				=	1,
+	combine_metal			=	1,
+	crowbar					=	1,
+	floating_metal_barrel	=	1,
+	grenade					=	1,
+	metal					=	1,
+	metal_barrel			=	1,
+	metal_bouncy			=	1,
+	Metal_Box				=	1,
+	metal_seafloorcar		=	1,
+	metalgrate				=	1,
+	metalpanel				=	1,
+	metalvent				=	1,
+	metalvehicle			=	1,
+	paintcan				=	1,
+	roller					=	1,
+	slipperymetal			=	1,
+	solidmetal				=	1,
+	strider					=	1,
+	weapon					=	1,
+	
+	wood					=	2,
+	wood_Box				=	2,
+	wood_Crate 				=	2,
+	wood_Furniture			=	2,
+	wood_LowDensity 		=	2,
+	wood_Plank				=	2,
+	wood_Panel				=	2,
+	wood_Solid				=	2,
+}
 
-sound.Add( {
-	name = "V1_Engine",
+sound.Add({
+	name = "shellSound",
 	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 90,
-	pitch = {100},
-	sound = "gunsounds/v1_loop.wav"
-} )
-
-sound.Add( {
-	name = "Nebelwerfer_Fire",
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 90,
-	pitch = {80,140},
-	sound = "gunsounds/nebelwerfer_rocket.wav"
-} )
-local ExploSnds = {}
-ExploSnds[1]                      =  "chappi/imp0.wav"
-
+	soundlevel = 90,
+	sound = "gred_emp/common/shellwhiz.wav"
+})
 local damagesound                    =  "weapons/rpg/shotdown.wav"
 
+local SmokeSnds = {}
+SmokeSnds[1]                         =  "gred_emp/nebelwerfer/artillery_strike_smoke_close_01.wav"
+SmokeSnds[2]                         =  "gred_emp/nebelwerfer/artillery_strike_smoke_close_02.wav"
+SmokeSnds[3]                         =  "gred_emp/nebelwerfer/artillery_strike_smoke_close_03.wav"
+SmokeSnds[4]                         =  "gred_emp/nebelwerfer/artillery_strike_smoke_close_04.wav"
+
+local APSounds = {}
+APSounds[1]							 =  "impactsounds/ap_impact_01.wav"
+APSounds[2]							 =  "impactsounds/ap_impact_02.wav"
+APSounds[3]							 =  "impactsounds/ap_impact_03.wav"
+APSounds[4]							 =  "impactsounds/ap_impact_04.wav"
+
+local APWoodSounds = {}
+APWoodSounds[1]							 =  "impactsounds/ap_impact_wood_01.wav"
+APWoodSounds[2]							 =  "impactsounds/ap_impact_wood_02.wav"
+APWoodSounds[3]							 =  "impactsounds/ap_impact_wood_03.wav"
+APWoodSounds[4]							 =  "impactsounds/ap_impact_wood_04.wav"
+
+local APSoundsDist = {}
+APSoundsDist[1]							 =  "impactsounds/ap_impact_dist_01.wav"
+APSoundsDist[2]							 =  "impactsounds/ap_impact_dist_02.wav"
+APSoundsDist[3]							 =  "impactsounds/ap_impact_dist_03.wav"
+
+local APMetalSounds = {}
+APMetalSounds[1]							 =  "impactsounds/ap_impact_metal_01.wav"
+APMetalSounds[2]							 =  "impactsounds/ap_impact_metal_02.wav"
+APMetalSounds[3]							 =  "impactsounds/ap_impact_metal_03.wav"
 
 ENT.Spawnable		            	 =  false
 ENT.AdminSpawnable		             =  false
 
-ENT.PrintName		                 =  "Gredwitch's Rocket base"
+ENT.PrintName		                 =  "Gredwitch's Shell base"
 ENT.Author			                 =  "Gredwitch"
 ENT.Contact			                 =  "qhamitouche@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 
+ENT.TOBEPRINTED						 =	0
+
 ENT.Model                            =  ""
-ENT.RocketTrail                      =  ""
-ENT.RocketBurnoutTrail               =  ""
 ENT.Effect                           =  ""
 ENT.EffectAir                        =  ""
 ENT.EffectWater                      =  ""
+ENT.RocketTrail						 =	"grenadetrail"
      
 ENT.ExplosionSound                   =  ENT.ExplosionSound
 ENT.FarExplosionSound				 =  ENT.ExplosionSound
@@ -76,7 +98,7 @@ ENT.WaterFarExplosionSound			 =  nil
 ENT.StartSound                       =  ""
 ENT.ArmSound                         =  ""
 ENT.ActivationSound                  =  ""
-ENT.EngineSound                      =  "Missile.Ignite"
+ENT.EngineSound                      =  ""--"Missile.Ignite"
 ENT.NBCEntity                        =  ""
 
 ENT.ShouldUnweld                     =  false
@@ -86,63 +108,58 @@ ENT.SmartLaunch                      =  true
 ENT.Timed                            =  false
 ENT.IsNBC                            =  false
 
+ENT.AP								 =  false
 ENT.ExplosionDamage                  =  0
 ENT.ExplosionRadius                  =  0
-ENT.PhysForce                        =  0
-ENT.SpecialRadius                    =  0
-ENT.MaxIgnitionTime                  =  5
+ENT.PhysForce                        =  ENT.ExplosionRadius / ENT.ExplosionDamage
+ENT.SpecialRadius                    =  ENT.ExplosionDamage / ENT.ExplosionRadius
 ENT.Life                             =  20
-ENT.MaxDelay                         =  2
-ENT.TraceLength                      =  500
-ENT.ImpactSpeed                      =  500
+ENT.TraceLength                      =  25
+ENT.ImpactSpeed                      =  50
 ENT.Mass                             =  0
-ENT.EnginePower                      =  0
-ENT.FuelBurnoutTime                  =  0
+ENT.EnginePower                      =  200
+ENT.FuelBurnoutTime                  =  0.7
 ENT.IgnitionDelay                    =  0
-ENT.RotationalForce                  =  25
-ENT.ArmDelay                         =  2
+ENT.RotationalForce                  =  0
+ENT.ArmDelay                         =  0
 ENT.ForceOrientation                 =  "NORMAL"
 ENT.Timer                            =  0
 ENT.Smoke							 =  false
 
-ENT.LightEmitTime                    =  0
-ENT.LightRed                         =  0
-ENT.LightBlue						 =  0
-ENT.LightGreen						 =  0
-ENT.LightBrightness					 =  0
-ENT.LightSize   					 =  0
 ENT.RSound   						 =  1
+
 
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
 function ENT:Initialize()
- if (SERVER) then
-	if (GetConVar("gred_sv_spawnable_bombs"):GetInt() == 0 and !self.IsOnPlane) then
-		self:Remove()
-	end
-     self:SetModel(self.Model)  
-	 self:PhysicsInit( SOLID_VPHYSICS )
-	 self:SetSolid( SOLID_VPHYSICS )
-	 self:SetMoveType(MOVETYPE_VPHYSICS)
-	 self:SetUseType( ONOFF_USE ) -- doesen't fucking work
-	 local phys = self:GetPhysicsObject()
-	 local skincount = self:SkinCount()
-	 if (phys:IsValid()) then
-		 phys:SetMass(self.Mass)
-		 phys:Wake()
-     end
-	 if (skincount > 0) then
-	     self:SetSkin(math.random(0,skincount))
-	 end
-	 self.Armed    = false
-	 self.Exploded = false
-	 self.Fired    = false
-	 self.Burnt    = false
-	 self.Ignition = false
-	 self.Arming   = false
-		
-	if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
-	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
+	self.initied = true
+	 if (SERVER) then
+		local m = GetConVar("gred_sv_shellspeed_multiplier"):GetFloat()
+		if m > 0 then
+			self.EnginePower = self.EnginePower * m
+		end
+		 self:SetModel(self.Model)  
+		 self:PhysicsInit( SOLID_VPHYSICS )
+		 self:SetSolid( SOLID_VPHYSICS )
+		 self:SetMoveType(MOVETYPE_VPHYSICS)
+		 self:SetUseType( ONOFF_USE ) -- doesen't fucking work
+		 local phys = self:GetPhysicsObject()
+		 local skincount = self:SkinCount()
+		 if (phys:IsValid()) then
+			 phys:SetMass(self.Mass)
+			 phys:Wake()
+		 end
+		 if (skincount > 0) then
+			 self:SetSkin(math.random(0,skincount))
+		 end
+		 self.Armed    = false
+		 self.Exploded = false
+		 self.Fired    = false
+		 self.Burnt    = false
+		 self.Ignition = false
+		 self.Arming   = false
+		if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
+		if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
 	end
 end
 
@@ -151,12 +168,9 @@ function ENT:TriggerInput(iname, value)
 	 if (iname == "Detonate") then
          if (value >= 1) then
 		     if (!self.Exploded and self.Armed) then
-			     timer.Simple(math.Rand(0,self.MaxDelay),function()
-				     if !self:IsValid() then return end
-	                 self.Exploded = true
-					 
-			         self:Explode()
-				 end)
+				if !self:IsValid() then return end
+	            self.Exploded = true
+			    self:Explode()
 		     end
 		 end
 	 end
@@ -180,13 +194,24 @@ end
 function ENT:AddOnExplode()
 end
 
-function ENT:AddOnThink()
-end
-
 function ENT:Explode()
     if not self.Exploded then return end
 	local pos = self:LocalToWorld(self:OBBCenter())
 	self:AddOnExplode()
+	if self.Smoke then
+		self.ExplosionSound = table.Random(SmokeSnds)
+		self.FarExplosionSound = self.ExplosionSound
+		self.DistExplosionSound = ""
+		self.RSound = 0
+		self.Effect = self.SmokeEffect
+		self.EffectAir = self.SmokeEffect
+	elseif self.AP then
+		self.Effect = "gred_ap_impact"
+		self.EffectAir = "gred_ap_impact"
+		self.ExplosionRadius = 100
+		self.ExplosionDamage = self.APDamage
+		self.PhysForce = 10
+	end
 	if not self.Smoke then
 		local ent = ents.Create("shockwave_ent")
 		ent:SetPos( pos ) 
@@ -222,7 +247,7 @@ function ENT:Explode()
 			end
 		end
 	end
-	net.Start("gred_net_gbombs_explosion_fx")
+	 
 	if(self:WaterLevel() >= 1) then
 		local trdata   = {}
 		local trlength = Vector(0,0,9000)
@@ -241,52 +266,62 @@ function ENT:Explode()
 		local tr2 = util.TraceLine(trdat2)
 		
 		if tr2.Hit then
-			net.WriteString(self.EffectWater)
-			net.WriteVector(tr2.HitPos)
 			if self.EffectWater == "ins_water_explosion" then
-				net.WriteAngle(Angle(-90,0,0))
+				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
 			else
-				net.WriteAngle(Angle(0,0,0))
+				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
 			end
 		end
-		 
-		if self.WaterExplosionSound == nil then else 
-			self.ExplosionSound = self.WaterExplosionSound 
+		if !self.Smoke then
+			if self.WaterExplosionSound == nil then else 
+				self.ExplosionSound = self.WaterExplosionSound 
+			end
+			if self.WaterFarExplosionSound == nil then else  
+				self.FarExplosionSound = self.WaterFarExplosionSound 
+			end
 		end
-		if self.WaterFarExplosionSound == nil then else  
-			self.FarExplosionSound = self.WaterFarExplosionSound 
-		end
-		
      else
-		 local tracedata    = {}
-	     tracedata.start    = pos
-		 tracedata.endpos   = tracedata.start - Vector(0, 0, self.TraceLength)
-		 tracedata.filter   = self.Entity
+		local tracedata    = {}
+	    tracedata.start    = pos
+		tracedata.endpos   = tracedata.start - Vector(0, 0, self.TraceLength)
+		tracedata.filter   = self.Entity
 				
-		 local trace = util.TraceLine(tracedata)
+		local trace = util.TraceLine(tracedata)
 	     
-		if trace.HitWorld then
-			net.WriteString(self.Effect)
-			net.WriteVector(pos)
-			if self.AngEffect then
-				net.WriteAngle(Angle(-90,0,0))
-				net.WriteBool(true)
-				net.WriteVector(pos-Vector(0,0,100))
+		if self.AP then
+			self.EffectAir = "AP_impact_wall"
+			local fwd = self:GetForward()
+			local tr = util.QuickTrace(pos - fwd*2,pos + pos-self:GetAngles():Forward()*1000,self.Entity)
+			local hitmat = util.GetSurfacePropName(tr.SurfaceProps)
+			if materials[hitmat] == 1 then
+				self.Effect = "AP_impact_wall"
+				self.ExplosionSound = table.Random(APMetalSounds)
+				self.FarExplosionSound = table.Random(APMetalSounds)
+				pos = tr.HitPos+(fwd*2)
+			elseif materials[hitmat] == 2 then
+				self.ExplosionSound = table.Random(APWoodSounds)
+				self.FarExplosionSound = table.Random(APWoodSounds)
 			else
-				net.WriteAngle(Angle(0,0,0))
+				self.ExplosionSound = table.Random(APSounds)
+				self.FarExplosionSound = table.Random(APSounds)
+			end
+		end
+		if trace.HitWorld then
+			if self.AngEffect then
+				ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil)
+				ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
+			else
+				ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
 			end
 		else 
-			net.WriteString(self.Effect)
-			net.WriteVector(pos)
 			if self.AngEffect then
-				net.WriteAngle(Angle(-90,0,0))
+				ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
 			else
-				net.WriteAngle(Angle(0,0,0))
+				ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)
 			end
 		end
     end
-	net.Broadcast()
-	 
+	
 	local ent = ents.Create("shockwave_sound_lowsh")
 	ent:SetPos( pos ) 
 	ent:Spawn()
@@ -341,14 +376,11 @@ function ENT:OnTakeDamage(dmginfo)
 	 end
 	 if(!self.Armed) then return end
 	 self.Life = self.Life - dmginfo:GetDamage()
-     if (self.Life <= 0) then 
-		 timer.Simple(math.Rand(0,self.MaxDelay),function()
-	         if !self:IsValid() then return end 
-			 self.Exploded = true
-			 self:Explode()
-			
-	     end)
-	 end
+     if (self.Life <= 0) then
+	    if !self:IsValid() then return end 
+		self.Exploded = true
+		self:Explode()
+	end
 end
 
 function ENT:PhysicsCollide( data, physobj )
@@ -378,80 +410,69 @@ function ENT:PhysicsCollide( data, physobj )
 end
 
 function ENT:Launch()
-     if(self.Exploded) then return end
-	 if(self.Burned) then return end
-	 --if(self.Armed) then return end
-	 if(self.Fired) then return end
+    if(self.Exploded) then return end
+	if(self.Burned) then return end
+	if(self.Fired) then return end
 	 
-	 local phys = self:GetPhysicsObject()
-	 if !phys:IsValid() then return end
+	local phys = self:GetPhysicsObject()
+	if !phys:IsValid() then return end
 	 
-	 self.Fired = true
-	 if(self.SmartLaunch) then
-		 constraint.RemoveAll(self)
-	 end
-	 timer.Simple(0.05,function()
-	     if not self:IsValid() then return end
-	     if(phys:IsValid()) then
-             phys:Wake()
-		     phys:EnableMotion(true)
-	     end
-	 end)
-	 timer.Simple(self.IgnitionDelay,function()
-	     if not self:IsValid() then return end  -- Make a short ignition delay!
-		 self:SetNetworkedBool("Exploded",true)
-		 self:SetNetworkedInt("LightRed", self.LightRed)
-		 self:SetNetworkedInt("LightBlue", self.LightBlue)
-		 self:SetNetworkedInt("LightGreen", self.LightGreen)	
-		 self:SetNetworkedBool("EmitLight",true)
-		 self:SetNetworkedInt("LightEmitTime", self.LightEmitTime)
-		 self:SetNetworkedInt("LightBrightness", self.LightBrightness)
-		 self:SetNetworkedInt("LightSize", self.LightSize)
-		 local phys = self:GetPhysicsObject()
-		 self.Ignition = true
-		 self:Arm()
-		 local pos = self:GetPos()
-		 sound.Play(self.StartSound, pos, 120, 130,1)
-	     self:EmitSound(self.EngineSound)
-		 self:SetNetworkedBool("EmitLight",true)
-		 self:SetNetworkedBool("self.Ignition",true)
-		if self.RocketTrail != "" then ParticleEffectAttach(self.RocketTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
-		 if(self.FuelBurnoutTime != 0) then 
-	         timer.Simple(self.FuelBurnoutTime,function()
-		         if not self:IsValid() then return end 
-		         self.Burnt = true
-		         self:StopParticles()
-		         self:StopSound(self.EngineSound)
-	            if self.RocketBurnoutTrail != "" then ParticleEffectAttach(self.RocketBurnoutTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
-             end)	 
-		 end
-     end)		 
+	self.Fired = true
+	if(self.SmartLaunch) then
+		constraint.RemoveAll(self)
+	end
+	timer.Simple(0,function()
+	    if not self:IsValid() then return end
+	    if(phys:IsValid()) then
+            phys:Wake()
+		    phys:EnableMotion(true)
+	    end
+	end)
+	
+	if not self:IsValid() then return end
+	local phys = self:GetPhysicsObject()
+	self.Ignition = true
+	self:Arm()
+	local pos = self:GetPos()
+	
+	if self.RocketTrail != "" then ParticleEffectAttach(self.RocketTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
+	if(self.FuelBurnoutTime != 0) then 
+		timer.Simple(self.FuelBurnoutTime,function()
+			if not self:IsValid() then return end
+			self.Burnt = true
+		end)
+	end
 end
 
 function ENT:Think()
-     if(self.Burnt) then return end
-     if(!self.Ignition) then return end -- if there wasn't ignition, we won't fly
-	 if(self.Exploded) then return end -- if we exploded then what the fuck are we doing here
-	 if(!self:IsValid()) then return end -- if we aren't good then something fucked up
-	 local phys = self:GetPhysicsObject()
-	 local thrustpos = self:GetPos()
-	 if(self.ForceOrientation == "RIGHT") then
-	     phys:AddVelocity(self:GetRight() * self.EnginePower) -- Continuous engine impulse
-	 elseif(self.ForceOrientation == "LEFT") then
-	     phys:AddVelocity(self:GetRight() * -self.EnginePower) -- Continuous engine impulse
-	 elseif(self.ForceOrientation == "UP") then
-	     phys:AddVelocity(self:GetUp() * self.EnginePower) -- Continuous engine impulse
-	 elseif(self.ForceOrientation == "DOWN") then 
-	     phys:AddVelocity(self:GetUp() * -self.EnginePower) -- Continuous engine impulse
-	 elseif(self.ForceOrientation == "INV") then
-	     phys:AddVelocity(self:GetForward() * -self.EnginePower) -- Continuous engine impulse
-	 else
-		 phys:AddVelocity(self:GetForward() * self.EnginePower) -- Continuous engine impulse
-	 end
-	 if (self.Armed) then
+	if (SERVER and not self.initied) or (CLIENT and not self.initied) then self:Initialize() end
+    if(self.Burnt) then return end
+    if(!self.Ignition) then return end -- if there wasn't ignition, we won't fly
+	if(self.Exploded) then return end -- if we exploded then what the fuck are we doing here
+	if(!self:IsValid()) then return end -- if we aren't good then something fucked up
+	local phys = self:GetPhysicsObject()
+	local thrustpos = self:GetPos()
+	-- phys:AddVelocity(self:GetForward() * -self.EnginePower)
+	phys:AddVelocity(self:GetForward() * self.EnginePower)
+	if (self.Armed) then
         phys:AddAngleVelocity(Vector(self.RotationalForce,0,0)) -- Rotational force
-	 end
-	self:AddOnThink()
+	end
+	if CLIENT then
+		if not self.Fired then return end
+		local ply = LocalPlayer()
+		local e=ply:GetViewEntity()
+		if !IsValid(e) then e=ply end
+		
+		local frt=CurTime()-self.LastThink
+		local pos=e:GetPos()
+		local spos=self:GetPos()
+		local doppler=(pos:Distance(spos+e:GetVelocity())-pos:Distance(spos+self:GetVelocity()))/200*1
+		local engineVal = math.Clamp(1*100+1*1*3+doppler, 0, 200)
+		local val = math.Clamp(1*100 + doppler, 0, 200)
+		self.sounds.Blades = CreateSound(self,"shellSound")
+		self.sounds.Blades:ChangePitch(math.Clamp(val, 50, 150),0.1)
+		self.sounds.Blades:ChangeVolume(1*math.Clamp(val*val/5000, 0, 5),0.1)
+	end
 	self:NextThink(CurTime() + 0.01)
 	return true
 end

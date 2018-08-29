@@ -1,5 +1,13 @@
 AddCSLuaFile()
-
+if SERVER then util.AddNetworkString("gred_net_gbombs_explosion_fx") end
+if CLIENT then
+	net.Receive("gred_net_gbombs_explosion_fx",function()
+		ParticleEffect(net.ReadString(),net.ReadVector(),net.ReadAngle(),nil)
+		if net.ReadBool() then
+			ParticleEffect("doi_ceilingDust_large",net.ReadVector(),Angle(0,0,0),nil)
+		end
+	end)
+end
 DEFINE_BASECLASS( "base_anim" )
 
 local Models = {}
@@ -164,7 +172,7 @@ function ENT:Explode()
 	ent.trace=self.TraceLength
 	ent.decal=self.Decal
 	
-	
+	net.Start("gred_net_gbombs_explosion_fx")
 	if(self:WaterLevel() >= 1) then
 		local trdata   = {}
 		local trlength = Vector(0,0,9000)
@@ -183,10 +191,12 @@ function ENT:Explode()
 		local tr2 = util.TraceLine(trdat2)
 		
 		if tr2.Hit then
+			net.WriteString(self.EffectWater)
+			net.WriteVector(tr2.HitPos)
 			if self.EffectWater == "ins_water_explosion" then
-				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(-90,0,0), nil)
+				net.WriteAngle(Angle(-90,0,0))
 			else
-				ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
+				net.WriteAngle(Angle(0,0,0))
 			end
 		end
 		 
@@ -206,21 +216,27 @@ function ENT:Explode()
 		 local trace = util.TraceLine(tracedata)
 	     
 		if trace.HitWorld then
+			net.WriteString(self.Effect)
+			net.WriteVector(pos)
 			if self.AngEffect then
-				ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil)
-				ParticleEffect("doi_ceilingDust_large",pos-Vector(0,0,100),Angle(0,0,0),nil) 
+				net.WriteAngle(Angle(-90,0,0))
+				net.WriteBool(true)
+				net.WriteVector(pos-Vector(0,0,100))
 			else
-				ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
+				net.WriteAngle(Angle(0,0,0))
 			end
 		else 
+			net.WriteString(self.Effect)
+			net.WriteVector(pos)
 			if self.AngEffect then
-				ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
+				net.WriteAngle(Angle(-90,0,0))
 			else
-				ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)
+				net.WriteAngle(Angle(0,0,0))
 			end
 		end
     end
-	 
+	net.Broadcast()
+	
 	local ent = ents.Create("shockwave_sound_lowsh")
 	ent:SetPos( pos ) 
 	ent:Spawn()

@@ -1,4 +1,13 @@
 AddCSLuaFile()
+if SERVER then util.AddNetworkString("gred_net_gdumb_explosion_fx") end
+if CLIENT then
+	net.Receive("gred_net_gbombs_explosion_fx",function()
+		ParticleEffect(net.ReadString(),net.ReadVector(),net.ReadAngle(),nil)
+		if net.ReadBool() then
+			ParticleEffect("doi_ceilingDust_large",net.ReadVector(),Angle(0,0,0),nil)
+		end
+	end)
+end
 DEFINE_BASECLASS( "base_anim" )
 
 util.PrecacheSound( "BaseExplosionEffect.Sound" ) 
@@ -87,10 +96,13 @@ function ENT:LoadModel()
 	 end
 end
 
+function ENT:AddOnExplode()
+end
+
 function ENT:Explode()
 	if !self.Exploded then return end
 	local pos = self:LocalToWorld(self:OBBCenter())
-
+	self:AddOnExplode()
 	local ent = ents.Create("shockwave_ent")
 	ent:SetPos( pos ) 
 	ent:Spawn()
@@ -106,27 +118,33 @@ function ENT:Explode()
 	ent.trace=self.TraceLength
 	ent.decal=self.Decal
 	
-	
+	net.Start("gred_net_gbombs_explosion_fx")
 	if(self:WaterLevel() >= 1) then
-		 local trdata   = {}
-		 local trlength = Vector(0,0,9000)
+		local trdata   = {}
+		local trlength = Vector(0,0,9000)
 
-		 trdata.start   = pos
-		 trdata.endpos  = trdata.start + trlength
-		 trdata.filter  = self
-		 local tr = util.TraceLine(trdata) 
+		trdata.start   = pos
+		trdata.endpos  = trdata.start + trlength
+		trdata.filter  = self
+		local tr = util.TraceLine(trdata) 
 
-		 local trdat2   = {}
-		 trdat2.start   = tr.HitPos
-		 trdat2.endpos  = trdata.start - trlength
-		 trdat2.filter  = self
-		 trdat2.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
+		local trdat2   = {}
+		trdat2.start   = tr.HitPos
+		trdat2.endpos  = trdata.start - trlength
+		trdat2.filter  = self
+		trdat2.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
 			 
-		 local tr2 = util.TraceLine(trdat2)
-			 
-	     if tr2.Hit then
-		     ParticleEffect(self.EffectWater, tr2.HitPos, Angle(0,0,0), nil)
-		 end
+		local tr2 = util.TraceLine(trdat2)
+		
+		if tr2.Hit then
+			net.WriteString(self.EffectWater)
+			net.WriteVector(tr2.HitPos)
+			if self.EffectWater == "ins_water_explosion" then
+				net.WriteAngle(Angle(-90,0,0))
+			else
+				net.WriteAngle(Angle(0,0,0))
+			end
+		end
 		 
 		if self.WaterExplosionSound == nil then else 
 			self.ExplosionSound = self.WaterExplosionSound 
@@ -143,24 +161,28 @@ function ENT:Explode()
 				
 		 local trace = util.TraceLine(tracedata)
 	     
-		 if trace.HitWorld then
-		    if self.Effect == "doi_artillery_explosion" or self.Effect == "doi_stuka_explosion" or self.Effect == "ins_rpg_explosion" then 
-				ParticleEffect(self.Effect,pos,Angle(-90,0,0),nil) 
-				--[[local Beffect = self:CreateParticleEffect(self.Effect,2, { attachtype = 2  } )--self.Effect,0,nil)--{1,self,pos})
-				Beffect:SetControlPoint(4,Vector(114,114,114))
-				Beffect:StartEmission()--]]
+		if trace.HitWorld then
+			net.WriteString(self.Effect)
+			net.WriteVector(pos)
+			if self.AngEffect then
+				net.WriteAngle(Angle(-90,0,0))
+				net.WriteBool(true)
+				net.WriteVector(pos-Vector(0,0,100))
 			else
-				ParticleEffect(self.Effect,pos,Angle(0,0,0),nil)
+				net.WriteAngle(Angle(0,0,0))
 			end
-		 else 
-		    if self.EffectAir == "doi_artillery_explosion" or self.EffectAir == "doi_stuka_explosion" or self.EffectAir == "ins_rpg_explosion" then 
-				ParticleEffect(self.EffectAir,pos,Angle(-90,0,0),nil) 
+		else 
+			net.WriteString(self.Effect)
+			net.WriteVector(pos)
+			if self.AngEffect then
+				net.WriteAngle(Angle(-90,0,0))
 			else
-				ParticleEffect(self.EffectAir,pos,Angle(0,0,0),nil)
+				net.WriteAngle(Angle(0,0,0))
 			end
-		 end
-     end
-	 
+		end
+    end
+	net.Broadcast()
+	
 	local ent = ents.Create("shockwave_sound_lowsh")
 	ent:SetPos( pos ) 
 	ent:Spawn()
@@ -188,6 +210,7 @@ function ENT:Explode()
      self:Remove()
 end
 
+
 function ENT:OnTakeDamage(dmginfo)
      if self.Exploded then return end
      self:TakePhysicsDamage(dmginfo)
@@ -210,16 +233,18 @@ function ENT:OnTakeDamage(dmginfo)
 end
 
 function ENT:PhysicsCollide( data, physobj )
-     if(self.Exploded) then return end
-     if(!self:IsValid()) then return end
-	 if(self.Life <= 0) then return end
+	timer.Simple(0,function()
+		 if(self.Exploded) then return end
+		 if(!self:IsValid()) then return end
+		 if(self.Life <= 0) then return end
 
-     if self.ShouldExplodeOnImpact then
-	     if (data.Speed > self.ImpactSpeed ) then
-			 self.Exploded = true
-			 self:Explode()
+		 if self.ShouldExplodeOnImpact then
+			 if (data.Speed > self.ImpactSpeed ) then
+				 self.Exploded = true
+				 self:Explode()
+			 end
 		 end
-	 end
+	end)
 end
 
 function ENT:OnRemove()

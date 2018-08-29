@@ -45,8 +45,15 @@ function ENT:fire()
 	b.Damage=40
 	b.Radius=70
 	b.gunRPM=self.FireRate
+	constraint.NoCollide(b,self.aircraft,0,0)
 	b:Spawn()
 	b:Activate()
+	for _,e in pairs(self.aircraft.entities) do
+		if IsValid(e) then
+			constraint.NoCollide(e,b,0,0)
+		end
+	end
+	constraint.NoCollide(self.aircraft,b,0,0)
 	b.Owner=self:getAttacker()
 	
 	if tracer >= GetConVarNumber("gred_sv_tracers") then

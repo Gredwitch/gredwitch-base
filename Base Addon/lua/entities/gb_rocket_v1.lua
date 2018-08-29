@@ -4,9 +4,9 @@ sound.Add( {
 	name = "V1_Startup",
 	channel = CHAN_STATIC,
 	volume = 1.0,
-	level = 90,
+	level = 150,
 	pitch = {100},
-	sound = "gunsounds/v1"
+	sound = "gunsounds/v1.wav"
 } )
 DEFINE_BASECLASS( "base_rocket" )
 
@@ -46,8 +46,8 @@ ENT.MaxDelay                         =  0
 ENT.TraceLength                      =  1000
 ENT.ImpactSpeed                      =  100
 ENT.Mass                             =  700
-ENT.EnginePower                      =  9999
-ENT.FuelBurnoutTime                  =  20
+ENT.EnginePower                      =  50
+ENT.FuelBurnoutTime                  =  3
 ENT.IgnitionDelay                    =  2
 ENT.ArmDelay                         =  0
 ENT.RotationalForce                  =  0

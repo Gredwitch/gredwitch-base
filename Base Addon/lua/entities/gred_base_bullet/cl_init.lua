@@ -82,6 +82,8 @@ net.Receive("gred_net_impact_fx",function()
 					
 			elseif mat == 24 then
 				ParticleEffect(""..pcfD.."impact_computer",net.ReadVector(),net.ReadAngle(),nil)
+			else
+			
 			end
 				
 		elseif cal == "wac_base_12mm" then

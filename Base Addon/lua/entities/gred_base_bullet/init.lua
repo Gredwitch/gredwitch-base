@@ -25,12 +25,11 @@ function ENT:Initialize()
 	if self.npod == nil then self.npod = 1 end
 	
 	self.oldpos=self:GetPos()-self:GetAngles():Forward()*self.Speed
-	self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetInt()
-	self.Radius = self.Radius * GetConVar("gred_sv_bullet_radius"):GetInt()
+	-- self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+	self.Radius = self.Radius * GetConVar("gred_sv_bullet_radius"):GetFloat()
 	if self.noTracer then self:SetRenderMode(RENDERMODE_TRANSALPHA) end
 	self:SetNotSolid(true)
 	self.NoParticle = false
-	
 	self.Mask = MASK_ALL
 	self:SetNWInt("gunRPM", self.gunRPM)
 	self:SetNWBool("sequential", self.sequential)
@@ -41,6 +40,7 @@ function ENT:Initialize()
 	end
 	if CLIENT then self:SetCaliber(self.Caliber) end
 	self.Initialized =true
+	self.explodable = self.Caliber == "wac_base_20mm" or self.Caliber == "wac_base_30mm" or self.Caliber == "wac_base_40mm"
 	self:NextThink(CurTime())
 end
 
@@ -59,12 +59,20 @@ function ENT:PhysicsUpdate(ph)
 	trace.mask=self.Mask
 	local tr = util.TraceLine(trace)
 	local hit = tr.Hit
-	local nohitwater = tr.MatType != 83
+	local nohitwater = tr.MatType != 83 
 	if hit and nohitwater then
 		self.Explode(self,tr)
 		return
 	else
-		self.Entity:SetPos(dif)
+		if !util.IsInWorld(dif) then
+			if self.explodable then 
+				self:Explode(self,tr)
+			else 
+				self:Remove()
+			end
+		else
+			self.Entity:SetPos(dif)
+		end
 	end
 	if self.FuzeTime > 0 then
 		if CurTime() >= self.GetExplTime then

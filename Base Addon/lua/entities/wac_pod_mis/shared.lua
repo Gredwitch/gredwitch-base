@@ -35,8 +35,6 @@ function ENT:SetupDataTables()
 	self:base("wac_pod_base").SetupDataTables(self)
 	self:NetworkVar("Entity", 0, "Target")
 	self:NetworkVar("Vector", 0, "TargetOffset")
-	self:NetworkVar( "Int", 0, "TkAmmo" );
-	self:NetworkVar( "Int", 0, "Kind" );
 end
 
 function ENT:canFire()
@@ -54,7 +52,7 @@ function ENT:fireRocket(pos, ang)
 	rocket.Owner = self:getAttacker()
 	rocket.Damage = 1000
 	rocket.Radius = 400
-	rocket.Speed = 851
+	rocket.Speed = 70
 	rocket.Drag = Vector(0,1,1)
 	rocket.TrailLength = 200
 	rocket.Scale = 15

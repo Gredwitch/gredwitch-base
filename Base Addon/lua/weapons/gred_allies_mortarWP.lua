@@ -13,7 +13,7 @@ SWEP.Instructions				= "Right ckick to look through the binoculars, left click t
 
 SWEP.PrintName					= "[ALLIES]WP Mortar strike"
 SWEP.strikedalay				= 10
-SWEP.strikeentity     	  		= "gb_rocket_81mmWP"
+SWEP.strikeentity     	  		= "gb_shell_81mmWP"
 SWEP.Primary.Ammo				= "Allied radio battery"
 SWEP.Team						= "Allies"
 SWEP.StrikeString				= "WP Mortar"

@@ -21,20 +21,30 @@ if SERVER then
 			else self.Owner = nil end
 		end
 		if self.FuzeTime == 0 then
-			hitang = tr.HitNormal:Angle()
-			hitpos = tr.HitPos
+			if tr.HitNormal == nil then
+				hitang = Angle(threeZ)
+			else
+				hitang = tr.HitNormal:Angle()
+			end
+			if tr.HitPos == nil then
+				hitpos = self.oldpos
+			else
+				hitpos = tr.HitPos
+			end
 		end
 		if self.Caliber != "wac_base_20mm" and self.Caliber != "wac_base_30mm" and self.Caliber != "wac_base_40mm" then
 			if !tr.HitSky then
 				local bullet = {}
 				bullet.Attacker = self.Owner
 				bullet.Callback = nil
+				
 				if self.Caliber == "wac_base_12mm" then
+					self.Damage = 60 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
 					if GetConVarNumber("gred_sv_12mm_he_impact") >= 1 then 
 						bullet.Damage = zero 
-						util.BlastDamage(self, self.Owner,hitpos, self.Radius, 80)
+						util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
 					else
-						bullet.Damage = 80
+						bullet.Damage = self.Damage
 					end
 					local d
 					if self.gunRPM >= 4000 then d = (self.gunRPM / 20000) else d = (self.gunRPM / 5000) end
@@ -49,6 +59,7 @@ if SERVER then
 					end
 					
 				elseif self.Caliber == "wac_base_7mm" then
+					self.Damage = 40 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
 					if GetConVarNumber("gred_sv_7mm_he_impact") >= 1 then
 						bullet.Damage = zero
 						util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
@@ -75,9 +86,14 @@ if SERVER then
 						net.WriteString(self.Caliber)
 						if self.Caliber == "wac_base_7mm" then
 							self.Mats={
+								default_silent			=	-1,
+								floatingstandable		=	-1,
+								no_decal				=	-1,
+								
 								boulder 				=	1,
 								concrete				=	1,
 								default					=	1,
+								item					=	1,
 								concrete_block			=	1,
 								plaster					=	1,
 								pottery					=	1,
@@ -88,7 +104,9 @@ if SERVER then
 								antlion					=	3,
 								armorflesh				=	3,
 								bloodyflesh				=	3,
+								player					=	3,
 								flesh					=	3,
+								player_control_clip		=	3,
 								zombieflesh				=	3,
 
 								glass					=	4,
@@ -117,6 +135,7 @@ if SERVER then
 								slipperymetal			=	5,
 								solidmetal				=	5,
 								strider					=	5,
+								popcan					=	5,
 								weapon					=	5,
 									
 								quicksand				=	6,
@@ -133,6 +152,7 @@ if SERVER then
 								wood_crate 				=	9,
 								wood_furniture			=	9,
 								wood_lowDensity 		=	9,
+								ladder 					=	9,
 								wood_plank				=	9,
 								wood_panel				=	9,
 								wood_polid				=	9,
@@ -198,14 +218,17 @@ if SERVER then
 				end
 			end
 			if self.Caliber == "wac_base_30mm" then
-				util.BlastDamage(self, self.Owner, hitpos, self.Radius*4, 280)
+				self.Damage = 100 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+				util.BlastDamage(self, self.Owner, hitpos, self.Radius*3, self.Damage)
 				self.Entity:EmitSound("impactsounds/30mm_1.wav",140, math.random(90,120),1, CHAN_AUTO)
 			elseif self.Caliber == "wac_base_20mm" then
+				self.Damage = 80 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
 				self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
-				util.BlastDamage(self,self.Owner,hitpos,self.Radius*2, 120)
+				util.BlastDamage(self,self.Owner,hitpos,self.Radius*2, self.Damage)
 			else
+				self.Damage = 120 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
 				self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
-				util.BlastDamage(self,self.Owner,hitpos,self.Radius*5, 120)
+				util.BlastDamage(self,self.Owner,hitpos,self.Radius*4, self.Damage)
 			end
 			local bullet = {}
 			bullet.Damage = zero

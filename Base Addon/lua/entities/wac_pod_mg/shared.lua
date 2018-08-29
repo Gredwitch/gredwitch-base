@@ -64,10 +64,15 @@ function ENT:fireBullet(pos)
 	b.Radius=70
 	b.sequential=self.Sequential
 	b.npod=#self.Pods
-	constraint.NoCollide(b,self.aircraft,0,0)
 	b.gunRPM=self.FireRate
 	b:Spawn()
 	b:Activate()
+	for _,e in pairs(self.aircraft.entities) do
+		if IsValid(e) then
+			constraint.NoCollide(e,b,0,0)
+		end
+	end
+	constraint.NoCollide(self.aircraft,b,0,0)
 	b.Owner=self:getAttacker()
 	
 	net.Start("gred_net_wac_mg_muzzle_fx")
@@ -88,12 +93,6 @@ function ENT:fireBullet(pos)
 	else b.noTracer = true end
 	tracer = tracer + 1
 	
-	for _,e in pairs(self.aircraft.wheels) do
-		if IsValid(e) then
-			constraint.NoCollide(e,b,0,0)
-		end
-	end
-	constraint.NoCollide(self.aircraft,b,0,0)
 end
 
 

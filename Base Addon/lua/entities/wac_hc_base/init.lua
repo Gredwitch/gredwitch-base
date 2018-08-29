@@ -599,9 +599,9 @@ end
 
 
 function ENT:Think()
-	-- START ADDED BY THE GREDWITCH
-	if CLIENT then if not self.m_initialized then self:Initialize() end end
-	if SERVER then if not self.m_initialized then self:Initialize() end end
+	-- START ADDED BY THE GREDWITCH^
+	if CLIENT and not self.m_initialized then self:Initialize() return end
+	if SERVER and not self.m_initialized then self:Initialize() return end
 	if self.sounds.Radio then
 		if self.active then
 			if !self.sounds.Radio:IsPlaying() and GetConVar("gred_sv_wac_radio"):GetInt() == 1 then
@@ -977,6 +977,23 @@ function ENT:PhysicsCollide(cdat, phys)
 			end
 		end
 	end
+	--[[ ADDED BY THE GREDWITCH
+	if cdat.Speed > 500 then
+		print(self:BoundingRadius())
+		local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
+		for k, p in pairs(self.passengers) do
+			if p and p:IsValid() then
+				p:TakeDamage(cdat.Speed,lasta,self.Entity)
+			end
+		end
+		local hitang = Angle(0,self:GetAngles().y+90,0)
+		self:Remove()
+		if self:BoundingRadius() <= 500 then
+			ParticleEffect("gred_plane_explosion_medium",cdat.HitPos,hitang,nil)
+		else
+			ParticleEffect("napalm_fireboom_base",cdat.HitPos,hitang,nil)
+		end
+	end]]
 end
 
 function ENT:DamageSmallRotor(amt)
