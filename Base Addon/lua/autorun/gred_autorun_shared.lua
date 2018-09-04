@@ -106,6 +106,7 @@ end
 
 PrecacheParticleSystem("high_explosive_main_2")
 PrecacheParticleSystem("high_explosive_air_2")
+PrecacheParticleSystem("water_torpedo")
 PrecacheParticleSystem("high_explosive_air")
 PrecacheParticleSystem("napalm_explosion")
 PrecacheParticleSystem("napalm_explosion_midair")

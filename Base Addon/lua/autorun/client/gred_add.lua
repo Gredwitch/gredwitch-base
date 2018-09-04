@@ -26,6 +26,7 @@ CreateConVar("gred_sv_wac_radio"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_spawnable_bombs"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_bombs"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_shellspeed_multiplier"	,  "2"  , GRED_SVAR)
+CreateConVar("gred_sv_wac_explosion_water"		,  "1"  , GRED_SVAR)
 --[[
 CreateConVar("gred_sv_nowaterimpacts"			,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_insparticles"				,  "0"  , GRED_SVAR)
@@ -73,7 +74,7 @@ local function gredsettings(CPanel)
 	
 	CPanel:AddControl( "CheckBox", { Label = "Should there be sound shake?", Command = "gred_cl_sound_shake" } );
 	
-	if not game.IsDedicated() then
+	-- if not game.IsDedicated() then
 		CPanel:AddControl( "CheckBox", { Label = "Should all bombs unweld and unfreeze?", Command = "gred_sv_shockwave_unfreeze" } );
 		
 		CPanel:NumSlider( "Forcefield Max Range", "gred_sv_maxforcefield_range", 10, 10000, 0 );
@@ -102,7 +103,7 @@ local function gredsettings(CPanel)
 		
 		CPanel:AddControl( "CheckBox", { Label = "Enable bombs in aircrafts?", Command = "gred_sv_wac_bombs" } );
 		
-		CPanel:AddControl( "CheckBox", { Label = "Enable radio sounds ?", Command = "gred_sv_wac_radio" } );
+		CPanel:AddControl( "CheckBox", { Label = "Enable radio sounds?", Command = "gred_sv_wac_radio" } );
 		
 		CPanel:AddControl( "CheckBox", { Label = "Should jets be very fast?", Command = "gred_jets_speed" } );
 
@@ -110,9 +111,11 @@ local function gredsettings(CPanel)
 		
 		CPanel:AddControl( "CheckBox", { Label = "Use multiple fire particles?", Command = "gred_sv_multiple_fire_effects" } );
 		
-		CPanel:AddControl( "CheckBox", { Label = "Use custom health system?", Command = "gred_sv_enablehealth" } );
+		CPanel:AddControl( "CheckBox", { Label = "Should aircrafts crash underwater?", Command = "gred_sv_wac_explosion_water" } );
 		
-		CPanel:AddControl( "CheckBox", { Label = "Use health per engine sysetm?", Command = "gred_sv_enableenginehealth" } );
+		CPanel:AddControl( "CheckBox", { Label = "Use a custom health system?", Command = "gred_sv_enablehealth" } );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Use a health per engine system?", Command = "gred_sv_enableenginehealth" } );
 		
 		CPanel:NumSlider( "Default engine health", "gred_sv_healthslider", 1, 1000, 0 );
 		
@@ -143,7 +146,7 @@ local function gredsettings(CPanel)
 		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 40mm cannons?", Command = "gred_cl_noparticles_40mm" } );
 			
 		CPanel:AddControl( "CheckBox", { Label = "Disable water impact effects?", Command = "gred_cl_nowaterimpacts" } );
-	end
+	-- end
 end
 
 hook.Add( "PopulateToolMenu", "gred_menu", function()

@@ -112,6 +112,10 @@ function ENT:Initialize()
 	or (GetConVar("gred_sv_wac_bombs"):GetInt() == 0 and self.IsOnPlane) then
 		self:Remove()
 	end
+	
+		local physEnvironment = physenv.GetPerformanceSettings()
+		physEnvironment.MaxVelocity = 3500
+		physenv.SetPerformanceSettings(physEnvironment)
      self:SetModel(self.Model)  
 	 self:PhysicsInit( SOLID_VPHYSICS )
 	 self:SetSolid( SOLID_VPHYSICS )

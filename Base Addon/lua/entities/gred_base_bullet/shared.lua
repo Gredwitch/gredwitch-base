@@ -200,7 +200,7 @@ if SERVER then
 									
 								computer				=	24,
 							}
-							net.WriteInt(self.Mats[util.GetSurfacePropName(tr.SurfaceProps)],6)
+							net.WriteInt(self.Mats[util.GetSurfacePropName(tr.SurfaceProps)] or 24,6)
 						end
 						net.WriteVector(hitpos)
 						net.WriteAngle(hitang)

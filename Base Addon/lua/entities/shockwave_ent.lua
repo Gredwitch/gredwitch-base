@@ -152,13 +152,14 @@ function ENT:Think()
 			 i = i + 1
 			 end
 		 end
- 	 end
+ 	 end--[[
 	 self.Bursts = self.Bursts + 1
 	 if (self.CURRENTRANGE >= self.MAX_RANGE) then
 	     self:Remove()
 	 end
 	 self:NextThink(CurTime() + (self.DELAY*10))
-	 return true
+	 return true]]
+	 self:Remove()
 	 end
 end
 

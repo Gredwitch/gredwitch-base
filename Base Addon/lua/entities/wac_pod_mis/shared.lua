@@ -45,6 +45,7 @@ end
 
 function ENT:fireRocket(pos, ang)
 	if !self:takeAmmo(self.TkAmmo) then return end
+	
 	local rocket = ents.Create("wac_base_grocket")
 	rocket:SetModel ( self.model )
 	rocket:SetPos(self:LocalToWorld(pos))

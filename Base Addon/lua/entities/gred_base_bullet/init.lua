@@ -51,13 +51,13 @@ function ENT:PhysicsUpdate(ph)
 	local difference = (pos - self.oldpos)
 	self.oldpos = pos
 	local dif = pos + difference
-	
 	local trace = {}
 	trace.start = pos
 	trace.endpos = dif
 	trace.filter = self.Entity
 	trace.mask=self.Mask
 	local tr = util.TraceLine(trace)
+	-- local tr = util.QuickTrace(pos,dif,self.Entity)
 	local hit = tr.Hit
 	local nohitwater = tr.MatType != 83 
 	if hit and nohitwater then

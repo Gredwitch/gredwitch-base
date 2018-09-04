@@ -63,6 +63,7 @@ ENT.Timed                            =  false
 
 ENT.APDamage						 =  750
 ENT.ExplosionDamage                  =  100
+ENT.EnginePower                      =  180
 ENT.ExplosionRadius                  =  450
 
 function ENT:SpawnFunction( ply, tr )

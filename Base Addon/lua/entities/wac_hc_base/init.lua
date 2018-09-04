@@ -603,14 +603,54 @@ function ENT:Think()
 	if CLIENT and not self.m_initialized then self:Initialize() return end
 	if SERVER and not self.m_initialized then self:Initialize() return end
 	if self.sounds.Radio then
-		if self.active then
-			if !self.sounds.Radio:IsPlaying() and GetConVar("gred_sv_wac_radio"):GetInt() == 1 then
-				self.sounds.Radio:Play()
-			end
+		if self.active and GetConVar("gred_sv_wac_radio"):GetInt() == 1 then
+			self.sounds.Radio:Play()
 		else
-			if self.sounds.Radio:IsPlaying() then
-				self.sounds.Radio:Stop()
+			self.sounds.Radio:Stop()
+		end
+	end
+	if self:WaterLevel() >= 2 and GetConVar("gred_sv_wac_explosion_water"):GetInt() >= 1 and !self.hascrashed then
+		local pos = self:GetPos()
+		local trdat   = {}
+		trdat.start   = pos+Vector(0,0,4000)
+		trdat.endpos  = pos
+		trdat.filter  = self
+		trdat.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
+		
+		local tr = util.TraceLine(trdat)
+		
+		if tr.Hit then
+			local ang = Angle(-90,0,0)
+			local radius = self:BoundingRadius()
+			if radius <= 600 then
+				ParticleEffect("ins_water_explosion",tr.HitPos,ang,nil)
+			else
+				ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(500,250),math.random(500,250),0),ang,nil)
+				ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(500,250),math.random(-500,-250),0),ang,nil)
+				ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(-500,-250),math.random(500,250),0),ang,nil)
+				ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(-500,-250),math.random(-500,-250),0),ang,nil)
 			end
+			local ent = ents.Create("shockwave_sound_lowsh")
+			ent:SetPos(tr.HitPos) 
+			ent:Spawn()
+			ent:Activate()
+			ent:SetVar("GBOWNER", self.Owner)
+			ent:SetVar("MAX_RANGE",radius*self.Weight)
+			ent:SetVar("NOFARSOUND",0)
+			ent:SetVar("SHOCKWAVE_INCREMENT",200)
+			ent:SetVar("DELAY",0.01)
+			ent:SetVar("SOUNDCLOSE", "/explosions/aircraft_water_close.wav")
+			ent:SetVar("SOUND", "/explosions/aircraft_water_dist.wav")
+			ent:SetVar("SOUNDFAR", "/explosions/aircraft_water_far.wav")
+			ent:SetVar("Shocktime", 0)
+			local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
+			for k, p in pairs(self.passengers) do
+				if p and p:IsValid() then
+					p:TakeDamage(p:Health() + 20, lasta, self.Entity)
+				end
+			end
+			self.hascrashed = true
+			self:Remove()
 		end
 	end
 	-- END ADDED BY THE GREDWITCH
@@ -1231,6 +1271,30 @@ function ENT:DamageEngine(amt)
 				if self.RotorWash then
 					self.RotorWash:Remove()
 					self.RotorWash=nil
+				end
+				if self:WaterLevel() >= 1 and GetConVar("gred_sv_wac_explosion_water"):GetInt() >= 1 then
+					local pos = self:GetPos()
+					local trdat   = {}
+					trdat.start   = pos+Vector(0,0,4000)
+					trdat.endpos  = pos
+					trdat.filter  = self
+					trdat.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
+						 
+					local tr = util.TraceLine(trdat)
+		
+					if tr.Hit then
+						local ang = Angle(-90,0,0)
+						if self:BoundingRadius() <= 600 then
+							ParticleEffect("ins_water_explosion",tr.HitPos,ang,nil)
+						else
+							ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(500,250),math.random(500,250),0),ang,nil)
+							ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(500,250),math.random(-500,-250),0),ang,nil)
+							ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(-500,-250),math.random(500,250),0),ang,nil)
+							ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(-500,-250),math.random(-500,-250),0),ang,nil)
+						end
+						self.hascrashed = true
+						self:Remove()
+					end
 				end
 				--[[self:SetNWBool("locked", true)
 				ParticleEffectAttach("1000lb_air", 1, self.Entity, 0)

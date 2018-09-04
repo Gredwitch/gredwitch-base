@@ -27,6 +27,7 @@ CreateConVar("gred_sv_wac_radio"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_spawnable_bombs"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_bombs"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_shellspeed_multiplier"	,  "2"  , GRED_SVAR)
+CreateConVar("gred_sv_wac_explosion_water"		,  "1"  , GRED_SVAR)
 --[[
 CreateConVar("gred_sv_nowaterimpacts"			,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_insparticles"				,  "0"  , GRED_SVAR)
@@ -43,11 +44,4 @@ game.AddDecal( "scorch_big",					"decals/scorch_big" );
 game.AddDecal( "scorch_big_2",					"decals/scorch_big_2" );
 game.AddDecal( "scorch_big_3",					"decals/scorch_big_3" );
 
-hook.Add("PlayerSpawnedSENT","gred_phys_superspeed",function(ply,ent)
-	if not customphy then
-		local physEnvironment = physenv.GetPerformanceSettings()
-		physEnvironment.MaxVelocity = 9999999999999
-		physenv.SetPerformanceSettings(physEnvironment)
-		customphy = true
-	end
-end)
+hook.Remove("PlayerSpawnedSENT","gred_phys_superspeed")

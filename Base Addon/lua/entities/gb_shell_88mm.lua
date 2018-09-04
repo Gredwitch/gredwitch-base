@@ -62,6 +62,7 @@ ENT.SmartLaunch                      =  true
 ENT.Timed                            =  false
 
 ENT.APDamage						 =  880
+ENT.EnginePower                      =  150
 ENT.ExplosionDamage                  =  100
 ENT.ExplosionRadius                  =  500
 

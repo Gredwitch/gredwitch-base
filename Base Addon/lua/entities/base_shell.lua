@@ -134,6 +134,10 @@ ENT.GBOWNER                          =  nil             -- don't you fucking tou
 function ENT:Initialize()
 	self.initied = true
 	 if (SERVER) then
+		local physEnvironment = physenv.GetPerformanceSettings()
+		physEnvironment.MaxVelocity = 99999
+		physenv.SetPerformanceSettings(physEnvironment)
+		
 		local m = GetConVar("gred_sv_shellspeed_multiplier"):GetFloat()
 		if m > 0 then
 			self.EnginePower = self.EnginePower * m

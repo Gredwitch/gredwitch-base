@@ -53,6 +53,10 @@ function ENT:Initialize()
 	self.DistExplosionSound				 =  table.Random(DistExploSnds)
 	self.WaterExplosionSound			 =  table.Random(CloseWaterExploSnds)
 	self.WaterFarExplosionSound			 =  table.Random(WaterExploSnds)
+	
+		local physEnvironment = physenv.GetPerformanceSettings()
+		physEnvironment.MaxVelocity = 3500
+		physenv.SetPerformanceSettings(physEnvironment)
 end
 
 function ENT:Explode(tr)

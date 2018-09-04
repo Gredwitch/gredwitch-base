@@ -91,6 +91,11 @@ function ENT:Initialize()
 		self.Exploded = false
 		self.Used     = false
 		self.Arming   = false
+		if self.JDAM then
+			local physEnvironment = physenv.GetPerformanceSettings()
+			physEnvironment.MaxVelocity = 3500
+			physenv.SetPerformanceSettings(physEnvironment)
+		end
 		if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
 		if !(WireAddon == nil) then self.Inputs   = Wire_CreateInputs(self, { "Arm", "Detonate" }) end
 	end
