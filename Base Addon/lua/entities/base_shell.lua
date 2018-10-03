@@ -86,7 +86,8 @@ ENT.Effect                           =  ""
 ENT.EffectAir                        =  ""
 ENT.EffectWater                      =  ""
 ENT.RocketTrail						 =	"grenadetrail"
-     
+    
+ENT.NextUse							 =	0
 ENT.ExplosionSound                   =  ENT.ExplosionSound
 ENT.FarExplosionSound				 =  ENT.ExplosionSound
 ENT.DistExplosionSound				 =  ENT.ExplosionSound
@@ -127,7 +128,8 @@ ENT.Timer                            =  0
 ENT.Smoke							 =  false
 
 ENT.RSound   						 =  1
-
+ENT.ModelSize						 =	1
+ENT.PlyPickup						 =	nil
 
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
@@ -146,7 +148,7 @@ function ENT:Initialize()
 		 self:PhysicsInit( SOLID_VPHYSICS )
 		 self:SetSolid( SOLID_VPHYSICS )
 		 self:SetMoveType(MOVETYPE_VPHYSICS)
-		 self:SetUseType( ONOFF_USE ) -- doesen't fucking work
+		 self:SetUseType(SIMPLE_USE)
 		 local phys = self:GetPhysicsObject()
 		 local skincount = self:SkinCount()
 		 if (phys:IsValid()) then
@@ -162,6 +164,8 @@ function ENT:Initialize()
 		 self.Burnt    = false
 		 self.Ignition = false
 		 self.Arming   = false
+		if !self.AP then self:SetBodygroup(1,1) end
+		self:SetModelScale(self.ModelSize)
 		if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
 		if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
 	end
@@ -392,6 +396,7 @@ function ENT:PhysicsCollide( data, physobj )
      if(self.Exploded) then return end
      if(!self:IsValid()) then return end
 	 if(self.Life <= 0) then return end
+	 if self:IsPlayerHolding() then return end
 		 if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then
 			 if(!self.Fired and !self.Burnt and !self.Arming and !self.Armed ) and (data.Speed > self.ImpactSpeed * 5) then --and !self.Arming and !self.Armed
 				 if(math.random(0,9) == 1) then
@@ -417,28 +422,18 @@ function ENT:Launch()
     if(self.Exploded) then return end
 	if(self.Burned) then return end
 	if(self.Fired) then return end
-	 
+	if not self:IsValid() then return end
 	local phys = self:GetPhysicsObject()
 	if !phys:IsValid() then return end
-	 
 	self.Fired = true
 	if(self.SmartLaunch) then
 		constraint.RemoveAll(self)
 	end
-	timer.Simple(0,function()
-	    if not self:IsValid() then return end
-	    if(phys:IsValid()) then
-            phys:Wake()
-		    phys:EnableMotion(true)
-	    end
-	end)
-	
-	if not self:IsValid() then return end
-	local phys = self:GetPhysicsObject()
+	phys:Wake()
+	phys:EnableMotion(true)
+	phys:AddVelocity(self:GetForward() * self.EnginePower)
 	self.Ignition = true
 	self:Arm()
-	local pos = self:GetPos()
-	
 	if self.RocketTrail != "" then ParticleEffectAttach(self.RocketTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
 	if(self.FuelBurnoutTime != 0) then 
 		timer.Simple(self.FuelBurnoutTime,function()
@@ -454,8 +449,8 @@ function ENT:Think()
     if(!self.Ignition) then return end -- if there wasn't ignition, we won't fly
 	if(self.Exploded) then return end -- if we exploded then what the fuck are we doing here
 	if(!self:IsValid()) then return end -- if we aren't good then something fucked up
+	if !self:IsPlayerHolding() then self.PlyPickup = nil end
 	local phys = self:GetPhysicsObject()
-	local thrustpos = self:GetPos()
 	-- phys:AddVelocity(self:GetForward() * -self.EnginePower)
 	phys:AddVelocity(self:GetForward() * self.EnginePower)
 	if (self.Armed) then
@@ -503,9 +498,15 @@ function ENT:Arm()
 end	 
 
 function ENT:Use( activator, caller )
-     if(self.Exploded) then return end
-	 if(self.Dumb) then return end
-	 if(GetConVar("gred_sv_easyuse"):GetInt() >= 1) then
+	local ct = CurTime()
+	if self.NextUse >= ct then return end
+    if(self.Exploded) then return end
+	if(self.Dumb) then return end
+	if self:IsPlayerHolding() then return end
+	activator:PickupObject(self)
+	self.PlyPickup = activator
+	self.NextUse = ct + 0.1
+	 --[[if(GetConVar("gred_sv_easyuse"):GetInt() >= 1) then
          if(self:IsValid()) then
              if (!self.Exploded) and (!self.Burnt) and (!self.Fired) then
 	             if (activator:IsPlayer()) then
@@ -514,10 +515,13 @@ function ENT:Use( activator, caller )
 		         end
 	         end
          end
-	 end
+	 end]]
 end
 
 function ENT:OnRemove()
+	if self.PlyPickup != nil then
+		self.PlyPickup:DropObject()
+	end
      self:StopSound(self.EngineSound)
 	 self:StopParticles()
 end

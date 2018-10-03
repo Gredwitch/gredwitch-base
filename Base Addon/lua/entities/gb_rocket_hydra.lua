@@ -20,8 +20,8 @@ ENT.Category                         =  "Gredwitch's Stuff"
 ENT.Model                            =  "models/weltensturm/wac/rockets/rocket01.mdl"
 ENT.RocketTrail                      =  "ins_rockettrail"
 ENT.RocketBurnoutTrail               =  "grenadetrail"
-ENT.Effect                           =  "100lb_air"
-ENT.EffectAir                        =  "100lb_air"
+ENT.Effect                           =  "high_explosive_air"
+ENT.EffectAir                        =  "high_explosive_air"
 ENT.EffectWater                      =  "water_torpedo" 
 
 ENT.ExplosionSound				 	 =  table.Random(ExploSnds)
@@ -37,9 +37,9 @@ ENT.SmartLaunch                      =  true
 ENT.Timed                            =  false 
 
 ENT.ExplosionDamage                  =  500
-ENT.ExplosionRadius                  =  350             
+ENT.ExplosionRadius                  =  250             
 ENT.PhysForce                        =  500             
-ENT.SpecialRadius                    =  350           
+ENT.SpecialRadius                    =  250           
 ENT.MaxIgnitionTime                  =  0           
 ENT.Life                             =  1
 ENT.MaxDelay                         =  0

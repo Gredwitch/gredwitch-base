@@ -40,10 +40,10 @@ ENT.Author			                 =  "Gredwitch"
 ENT.Contact			                 =  "qhamitouche@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 ENT.Model                            =  "models/gredwitch/bombs/75mm_shell.mdl"
-ENT.Mass                             =  10
+ENT.Mass                             =  68
 
-ENT.Effect                           =  "ins_rpg_explosion"
-ENT.EffectAir                        =  "ins_rpg_explosion"
+ENT.Effect                           =  "doi_compb_explosion"
+ENT.EffectAir                        =  "doi_compb_explosion"
 ENT.EffectWater                      =  "ins_water_explosion"
 ENT.SmokeEffect						 =  "m203_smokegrenade"
 ENT.AngEffect						 =	true
@@ -65,6 +65,7 @@ ENT.APDamage						 =  750
 ENT.ExplosionDamage                  =  100
 ENT.EnginePower                      =  180
 ENT.ExplosionRadius                  =  450
+ENT.ModelSize						 =	0.9
 
 function ENT:SpawnFunction( ply, tr )
     if ( !tr.Hit ) then return end

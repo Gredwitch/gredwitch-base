@@ -48,7 +48,7 @@ net.Receive( "gred_net_sound_lowsh", function( len, pl )
 	LocalPlayer():GetViewEntity():EmitSound(sound)
 end );
 
-function ENT:Think()		
+function ENT:Think()
     if (SERVER) then
 		if !self:IsValid() then return end
 		local pos = self:GetPos()
@@ -107,6 +107,7 @@ function ENT:Think()
 				end
 			end
 		end
+		self:Remove()
 	end
 end
 

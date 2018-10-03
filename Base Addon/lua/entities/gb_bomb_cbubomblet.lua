@@ -1,6 +1,6 @@
 AddCSLuaFile()
 
-DEFINE_BASECLASS( "base_dumb" )
+DEFINE_BASECLASS( "base_bomb" )
 
 ENT.Spawnable		            	 =  false        
 ENT.AdminSpawnable		             =  false
@@ -32,9 +32,9 @@ ENT.MaxIgnitionTime                  =  0
 ENT.Life                             =  98                                 
 ENT.MaxDelay                         =  2                                 
 ENT.TraceLength                      =  100
-ENT.ImpactSpeed                      =  110
+ENT.ImpactSpeed                      =  1
 ENT.Mass                             =  90
-ENT.ArmDelay                         =  2   
+ENT.ArmDelay                         =  0.5
 ENT.Timer                            =  0
 
 ENT.Shocktime                        = 1

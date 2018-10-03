@@ -18,8 +18,8 @@ ENT.Category                         =  "Gredwitch's Stuff"
 ENT.Model                            =  "models/gredwitch/bombs/artillery_shell.mdl"
 ENT.Mass                             =  10
 
-ENT.Effect                           =  "doi_wparty_explosion"
-ENT.EffectAir                        =  "doi_wparty_explosion"
+ENT.Effect                           =  "doi_wpgrenade_explosion"
+ENT.EffectAir                        =  "doi_wpgrenade_explosion"
 ENT.EffectWater                      =  "ins_water_explosion"
 ENT.AngEffect						 =	true
 
@@ -33,7 +33,7 @@ ENT.Timed                            =  false
 
 ENT.APDamage						 =  150
 ENT.ExplosionDamage                  =  30
-ENT.ExplosionRadius                  =  350
+ENT.ExplosionRadius                  =  150
 
 
 function ENT:SpawnFunction( ply, tr )
@@ -54,7 +54,7 @@ function ENT:AddOnExplode()
 	local ent = ents.Create("base_napalm")
 	local pos = self:GetPos()
 	ent:SetPos(pos)
-	ent.Radius	 = 500
+	ent.Radius	 = 300
 	ent.Rate  	 = 1
 	ent.Lifetime = 15
 	ent:Spawn()

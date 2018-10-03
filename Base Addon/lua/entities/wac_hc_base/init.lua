@@ -94,8 +94,7 @@ ENT.Weapons = {}
 
 
 function ENT:Initialize()
-	if SERVER then self.m_initialized = true end
-	if CLIENT then self.m_initialized = true end
+	self.m_initialized = true
 	wac.aircraft.initialize()
 	self.Entity:SetModel(self.Model)
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
@@ -599,9 +598,8 @@ end
 
 
 function ENT:Think()
-	-- START ADDED BY THE GREDWITCH^
-	if CLIENT and not self.m_initialized then self:Initialize() return end
-	if SERVER and not self.m_initialized then self:Initialize() return end
+	-- START ADDED BY THE GREDWITCH
+	if !self.m_initialized then self:Initialize() end
 	if self.sounds.Radio then
 		if self.active and GetConVar("gred_sv_wac_radio"):GetInt() == 1 then
 			self.sounds.Radio:Play()
@@ -996,6 +994,7 @@ end
 
 
 function ENT:PhysicsCollide(cdat, phys)
+timer.Simple(0,function()
 	if wac.aircraft.cvars.nodamage:GetInt() == 1 then
 		return
 	end
@@ -1017,23 +1016,57 @@ function ENT:PhysicsCollide(cdat, phys)
 			end
 		end
 	end
-	--[[ ADDED BY THE GREDWITCH
-	if cdat.Speed > 500 then
-		print(self:BoundingRadius())
+	-- ADDED BY THE GREDWITCH
+	if cdat.Speed > 1000 then
+		if GetConVar("gred_sv_wac_explosion"):GetInt() <= 0 then return end
 		local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
 		for k, p in pairs(self.passengers) do
 			if p and p:IsValid() then
 				p:TakeDamage(cdat.Speed,lasta,self.Entity)
 			end
 		end
+		if self.blewup then return end
 		local hitang = Angle(0,self:GetAngles().y+90,0)
+		local pos = cdat.HitPos--self:GetPos()
+		local ent = ents.Create("shockwave_sound_lowsh")
+		ent:SetPos( pos ) 
+		ent:Spawn()
+		ent:Activate()
+		ent:SetVar("GBOWNER", self)
+		ent:SetVar("MAX_RANGE",50000)
+		ent:SetVar("NOFARSOUND",0)
+		ent:SetVar("SHOCKWAVE_INCREMENT",200)
+		
+		ent:SetVar("DELAY",0.01)
+		ent:SetVar("SOUNDCLOSE","explosions/fuel_depot_explode_close.wav")
+		ent:SetVar("SOUND","explosions/fuel_depot_explode_dist.wav")
+		ent:SetVar("SOUNDFAR","explosions/fuel_depot_explode_far.wav")
+		ent:SetVar("Shocktime", 0)
+		self.blewup = true
 		self:Remove()
-		if self:BoundingRadius() <= 500 then
-			ParticleEffect("gred_plane_explosion_medium",cdat.HitPos,hitang,nil)
-		else
-			ParticleEffect("napalm_fireboom_base",cdat.HitPos,hitang,nil)
+		if self:BoundingRadius() <= 300 then
+			ParticleEffect("doi_petrol_explosion",pos,hitang,nil)
+		elseif self:BoundingRadius() <= 500 then
+			ParticleEffect("doi_petrol_explosion",pos,hitang,nil)
+			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(0,45,45),nil)
+			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(0,-45,-45),nil)
+			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(45,0,0),nil)
+			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(-45,0,0),nil)
+		elseif self:BoundingRadius() <= 2000 then
+			ParticleEffect("doi_petrol_explosion",pos,hitang,nil)
+			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(0,45,45),nil)
+			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(0,-45,-45),nil)
+			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(45,0,0),nil)
+			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(-45,0,0),nil)
+			
+			ParticleEffect("doi_petrol_explosion",pos,hitang,nil)
+			ParticleEffect("doi_petrol_explosion",pos+Vector(math.random(-400,-250),math.random(-400,-250),0),hitang+Angle(0,45,45),nil)
+			ParticleEffect("doi_petrol_explosion",pos+Vector(math.random(-400,250),math.random(-400,250),0),hitang+Angle(0,-45,-45),nil)
+			ParticleEffect("doi_petrol_explosion",pos+Vector(math.random(400,-250),math.random(400,-250),0),hitang+Angle(45,0,0),nil)
+			ParticleEffect("doi_petrol_explosion",pos+Vector(math.random(400,250),math.random(400,250),0),hitang+Angle(-45,0,0),nil)
 		end
-	end]]
+	end
+end)
 end
 
 function ENT:DamageSmallRotor(amt)

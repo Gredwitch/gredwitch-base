@@ -172,7 +172,7 @@ function ENT:Explode()
 	ent:SetVar("GBOWNER", self.GBOWNER)
 	ent:SetVar("SHOCKWAVEDAMAGE",self.ExplosionDamage)
 	ent:SetVar("MAX_RANGE",self.ExplosionRadius)
-	ent:SetVar("SHOCKWAVE_INCREMENT",100)
+	ent:SetVar("SHOCKWAVE_INCREMENT",50)
 	ent:SetVar("DELAY",0.01)
 	ent.trace=self.TraceLength
 	ent.decal=self.Decal
@@ -323,7 +323,14 @@ function ENT:PhysicsCollide( data, physobj )
 		 end
 	end)
 end
-
+sound.Add( {
+	name = "bombSND",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 100,
+	pitch = {100},
+	sound = "bomb/bomb_whistle.wav"
+} )
 function ENT:Arm()
     if(!self:IsValid()) then return end
 	if(self.Exploded) then return end
@@ -331,7 +338,7 @@ function ENT:Arm()
 	self.Arming = true
 	self.Used = true
 	timer.Simple(self.ArmDelay, function()
-	    if !self:IsValid() then return end 
+	    if !self:IsValid() then return end
 	    self.Armed = true
 		self.Arming = false
 		self:EmitSound(self.ArmSound)
@@ -367,7 +374,7 @@ end
 
 function ENT:OnRemove()
 	 self:StopParticles()
-	 --bombAir:Stop()
+	 self:StopSound("bombSND")
 	-- Wire_Remove(self)
 end
 

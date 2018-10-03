@@ -17,14 +17,11 @@ function ENT:Initialize()
 		self.phys:EnableGravity(true)
 		self.phys:Wake()
 	end
-	
-	if self.Speed == nil then self.Speed = 1000 end
 	if self.Damage == nil then self.Damage = 40 end
 	if self.Radius == nil then self.Radius = 70 end
 	if self.Owner == nil then self.Owner = ply end
 	if self.npod == nil then self.npod = 1 end
 	
-	self.oldpos=self:GetPos()-self:GetAngles():Forward()*self.Speed
 	-- self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
 	self.Radius = self.Radius * GetConVar("gred_sv_bullet_radius"):GetFloat()
 	if self.noTracer then self:SetRenderMode(RENDERMODE_TRANSALPHA) end
@@ -38,6 +35,18 @@ function ENT:Initialize()
 	if self.FuzeTime > 0 then
 		self.GetExplTime = CurTime() + self.FuzeTime 
 	end
+	if self.Caliber == "wac_base_7mm" then
+		self.Speed = 1000
+	elseif self.Caliber == "wac_base_12mm" then
+		self.Speed = 700
+	elseif self.Caliber == "wac_base_20mm" then
+		self.Speed = 600
+	elseif self.Caliber == "wac_base_30mm" then
+		self.Speed = 500
+	elseif self.Caliber == "wac_base_40mm" then
+		self.Speed = 400
+	end
+	self.oldpos=self:GetPos()-self:GetAngles():Forward()*self.Speed
 	if CLIENT then self:SetCaliber(self.Caliber) end
 	self.Initialized =true
 	self.explodable = self.Caliber == "wac_base_20mm" or self.Caliber == "wac_base_30mm" or self.Caliber == "wac_base_40mm"
@@ -49,15 +58,26 @@ function ENT:PhysicsUpdate(ph)
 	if !util.IsInWorld(pos) then self:Remove() end
 	if !self.oldpos then self:Remove() return end
 	local difference = (pos - self.oldpos)
-	self.oldpos = pos
 	local dif = pos + difference
-	local trace = {}
-	trace.start = pos
-	trace.endpos = dif
-	trace.filter = self.Entity
-	trace.mask=self.Mask
-	local tr = util.TraceLine(trace)
-	-- local tr = util.QuickTrace(pos,dif,self.Entity)
+	if self:WaterLevel() >= 1 then
+		-- if !self.Exploded and hit and !nohitwater then
+		local trace = {}
+		trace.start = self.oldpos
+		trace.endpos = dif
+		trace.filter = self.Entity
+		trace.mask=self.Mask
+		local tr2 = util.TraceLine(trace)
+		net.Start("gred_net_impact_fx")
+			net.WriteBool(true)
+			net.WriteString(self.Caliber)
+			net.WriteVector(tr2.HitPos)
+		net.Broadcast()
+		self.NoParticle = true
+		self:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",audioSpecs )
+		-- end
+	end
+	self.oldpos = pos
+	local tr = util.QuickTrace(pos,dif-pos,self)
 	local hit = tr.Hit
 	local nohitwater = tr.MatType != 83 
 	if hit and nohitwater then
@@ -79,15 +99,6 @@ function ENT:PhysicsUpdate(ph)
 			self:Explode()
 			return
 		end
-	end
-	if !self.Exploded and hit and !nohitwater then
-		net.Start("gred_net_impact_fx")
-			net.WriteBool(true)
-			net.WriteString(self.Caliber)
-			net.WriteVector(tr.HitPos)
-		net.Broadcast()
-		self.NoParticle = true
-		self:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",audioSpecs )
 	end
 end
 

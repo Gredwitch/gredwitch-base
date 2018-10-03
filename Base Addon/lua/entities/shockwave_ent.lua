@@ -51,35 +51,36 @@ function ENT:Trace()
 	
 	util.Decal( self.decal, tracedata.start, tracedata.endpos )
 end
-function ENT:Think()		
+function ENT:Think()
     if (SERVER) then
-    if !self:IsValid() then return end
-	local pos = self:GetPos()
-	self.CURRENTRANGE = self.CURRENTRANGE+(self.SHOCKWAVE_INCREMENT*4)
-	if self.allowtrace then
-		self:Trace()
-		self.allowtrace=false
-	end
-	 for k, v in pairs(ents.FindInSphere(pos,self.CURRENTRANGE)) do
-		 if (v:IsValid() or v:IsPlayer()) and (v.forcefielded==false or v.forcefielded==nil) then
-			local i = 0
-			 while i < v:GetPhysicsObjectCount() do
-				if self.GBOWNER == nil then
-					self.GBOWNER = self
-				end
-				if !IsValid(self.GBOWNER) then
-					if IsValid(self) then
+		if !self:IsValid() then return end
+		local pos = self:GetPos()
+		self.CURRENTRANGE = self.CURRENTRANGE+(self.SHOCKWAVE_INCREMENT*4)
+		if self.allowtrace then
+			self:Trace()
+			self.allowtrace=false
+		end
+		for k, v in pairs(ents.FindInSphere(pos,self.CURRENTRANGE)) do
+			if (v:IsValid() or v:IsPlayer()) and (v.forcefielded==false or v.forcefielded==nil) then
+				local i = 0
+				while i < v:GetPhysicsObjectCount() do
+					if self.GBOWNER == nil then
 						self.GBOWNER = self
-					else
-						self.GBOWNER = nil
 					end
-				end
-				self.Owner = self.GBOWNER
-				local dmg = DamageInfo()
-					dmg:SetDamage(1)
-					dmg:SetDamageType(DMG_BLAST)
-					dmg:SetAttacker(self.Owner)
+					if !IsValid(self.GBOWNER) then
+						if IsValid(self) then
+							self.GBOWNER = self
+						else
+							self.GBOWNER = nil
+						end
+					end
+					self.Owner = self.GBOWNER
+					-- local dmg = DamageInfo()
+					-- dmg:SetDamage(1)
+					-- dmg:SetDamageType(DMG_BLAST)
+					-- dmg:SetAttacker(self.Owner)
 					util.BlastDamage(self, self.Owner, pos, self.MAX_RANGE, self.SHOCKWAVEDAMAGE)
+					
 					local ent = ents.Create("env_physexplosion")
 					ent:SetPos( pos ) 
 					ent:Spawn()
@@ -118,7 +119,7 @@ function ENT:Think()
 						if (v:IsPlayer()) then
 							
 							 v:SetMoveType( MOVETYPE_WALK )
-							 v:TakeDamageInfo(dmg)
+							 -- v:TakeDamageInfo(dmg)
 							 local mass = phys:GetMass()
 							 local F_ang = self.DEFAULT_PHYSFORCE_PLYAIR
 							 local dist = (pos - v:GetPos()):Length()
@@ -129,11 +130,10 @@ function ENT:Think()
 								F_dir = (v:GetPos() - pos) * 1
 							 end
 							 v:SetVelocity( F_dir )		
-						 end
-
-						 if (v:IsPlayer()) and v:IsOnGround() then
+						end
+						if (v:IsPlayer()) and v:IsOnGround() then
 							 v:SetMoveType( MOVETYPE_WALK )
-							 v:TakeDamageInfo(dmg)
+							 -- v:TakeDamageInfo(dmg)
 							 local mass = phys:GetMass()
 							 local F_ang = self.DEFAULT_PHYSFORCE_PLYGROUND
 							 local dist = (pos - v:GetPos()):Length()
@@ -145,22 +145,21 @@ function ENT:Think()
 							 end	 
 							 v:SetVelocity( F_dir )		
 						 end
-						 if (v:IsNPC()) then
-							 v:TakeDamageInfo(dmg)
-						 end
+						if (v:IsNPC()) then
+							-- v:TakeDamageInfo(dmg)
+						end
 					end
-			 i = i + 1
-			 end
-		 end
- 	 end--[[
-	 self.Bursts = self.Bursts + 1
-	 if (self.CURRENTRANGE >= self.MAX_RANGE) then
-	     self:Remove()
-	 end
-	 self:NextThink(CurTime() + (self.DELAY*10))
-	 return true]]
-	 self:Remove()
-	 end
+					i = i + 1
+				end
+			end
+		end
+		self.Bursts = self.Bursts + 1
+		if (self.CURRENTRANGE >= self.MAX_RANGE) then
+			self:Remove()
+		end
+		self:NextThink(CurTime() + (self.DELAY*10))
+		return true
+	end
 end
 
 function ENT:Draw()

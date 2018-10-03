@@ -105,6 +105,7 @@ function ENT:dropBomb(bomb)
 	bomb.JDAM = true
 	bomb.target = self:GetTarget()
 	bomb.targetOffset = self:GetTargetOffset()
+	-- bomb:EmitSound("bombSND")
 	
 	timer.Simple(1, function()
 		if IsValid(bomb) and IsValid(bomb.phys) then

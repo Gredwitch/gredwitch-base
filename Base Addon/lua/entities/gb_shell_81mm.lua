@@ -33,20 +33,20 @@ CloseWaterExploSnds[3]                         =  "explosions/doi_generic_03_clo
 CloseWaterExploSnds[4]                         =  "explosions/doi_generic_04_closewater.wav"
 
 ENT.Spawnable		            	 =  false         
-ENT.AdminSpawnable		             =  false 
+ENT.AdminSpawnable		             =  false
 
-ENT.PrintName		                 =  "[SHELLS]88mm Shell"
+ENT.PrintName		                 =  "[SHELLS]81mm Mortar Shell"
 ENT.Author			                 =  "Gredwitch"
 ENT.Contact			                 =  "qhamitouche@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
-ENT.Model                            =  "models/gredwitch/bombs/75mm_shell.mdl"
-ENT.Mass                             =  137
 
-ENT.Effect                           =  "doi_artillery_explosion"
-ENT.EffectAir                        =  "doi_artillery_explosion"
+ENT.Model                            =  "models/gredwitch/bombs/artillery_shell.mdl"
+ENT.Effect                           =  "gred_mortar_explosion"
+ENT.EffectAir                        =  "gred_mortar_explosion"
 ENT.EffectWater                      =  "ins_water_explosion"
-ENT.SmokeEffect						 =  "doi_smoke_artillery"
+ENT.SmokeEffect						 =  "m203_smokegrenade"
 ENT.AngEffect						 =	true
+ENT.Mass                             =  10
      
 ENT.ExplosionSound                   =  table.Random(CloseExploSnds)
 ENT.FarExplosionSound				 =  table.Random(ExploSnds)
@@ -61,10 +61,11 @@ ENT.ShouldIgnite                     =  false
 ENT.SmartLaunch                      =  true
 ENT.Timed                            =  false
 
-ENT.APDamage						 =  880
-ENT.EnginePower                      =  150
-ENT.ExplosionDamage                  =  100
-ENT.ExplosionRadius                  =  500
+ENT.APDamage						 =  1005
+ENT.ExplosionDamage                  =  350
+ENT.EnginePower                      =  100
+ENT.ExplosionRadius                  =  350
+ENT.ModelSize						 =	1
 
 function ENT:SpawnFunction( ply, tr )
     if ( !tr.Hit ) then return end

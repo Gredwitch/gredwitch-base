@@ -15,8 +15,8 @@ ENT.PrintName		                 =  "[SHELLS]105mm WP Shell"
 ENT.Author			                 =  "Gredwitch"
 ENT.Contact			                 =  "qhamitouche@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
-ENT.Model                            =  "models/gredwitch/bombs/artillery_shell.mdl"
-ENT.Mass                             =  10
+ENT.Model                            =  "models/gredwitch/bombs/75mm_shell.mdl"
+ENT.Mass                             =  105
 
 ENT.Effect                           =  "doi_wparty_explosion"
 ENT.EffectAir                        =  "doi_wparty_explosion"
@@ -24,7 +24,7 @@ ENT.EffectWater                      =  "ins_water_explosion"
 ENT.AngEffect						 =	true
 
 ENT.ExplosionSound                   =  table.Random(ExploSnds)
-ENT.RSound   						 =  1
+ENT.RSound   						 =  150
 
 ENT.ShouldUnweld                     =  false
 ENT.ShouldIgnite                     =  false
@@ -35,6 +35,7 @@ ENT.APDamage						 =  150
 ENT.ExplosionDamage                  =  30
 ENT.EnginePower                      =  100
 ENT.ExplosionRadius                  =  350
+ENT.ModelSize						 =	1.2
 
 
 function ENT:SpawnFunction( ply, tr )

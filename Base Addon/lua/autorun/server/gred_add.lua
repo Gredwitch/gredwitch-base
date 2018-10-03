@@ -28,16 +28,9 @@ CreateConVar("gred_sv_spawnable_bombs"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_bombs"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_shellspeed_multiplier"	,  "2"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_explosion_water"		,  "1"  , GRED_SVAR)
---[[
-CreateConVar("gred_sv_nowaterimpacts"			,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_insparticles"				,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_noparticles_7mm"			,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_noparticles_12mm"			,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_noparticles_20mm"			,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_noparticles_20mm"			,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_noparticles_30mm"			,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_altmuzzleeffect"			,  "0"  , GRED_SVAR)
---]]
+CreateConVar("gred_sv_default_wac_munitions"	,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_wac_explosion"			,  "1"  , GRED_SVAR)
+
 game.AddDecal( "scorch_small",					"decals/scorch_small" );
 game.AddDecal( "scorch_medium",					"decals/scorch_medium" );
 game.AddDecal( "scorch_big",					"decals/scorch_big" );

@@ -28,7 +28,7 @@ function ENT:Initialize()
 	end
 end
 
-
+hook.Remove("OnEntityCreated", "vFireRemoveDefaultFires")
 function ENT:Think()
     if (SERVER) then
 		if !self:IsValid() then return end

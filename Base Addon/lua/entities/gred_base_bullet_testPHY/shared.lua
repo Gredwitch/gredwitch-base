@@ -1,36 +1,44 @@
 ENT.Type 			= "anim"
-ENT.Base 			= "base_gmodentity"
+-- ENT.Base 			= "base_gmodentity"
 ENT.Author 			= "Gredwich"
 ENT.Category 		= ""
 ENT.Spawnable		= false
 ENT.AdminSpawnable  = false
 ENT.FuzeTime		= 0
 -- ENT.Caliber			= ""
+ENT.tr				= nil
 local zero = 0
 local threeZ = zero,zero,zero
 local audioSpecs = 100, 100,1, CHAN_AUTO
 local null = ""
+
 if SERVER then
 	util.AddNetworkString("gred_net_impact_fx") 
 
-	function ENT.Explode(self,tr,ply)
+	function ENT.Explode(self,tra,ply)
 		if self.Exploded then return end
 		self.Exploded = true
 		if not IsValid(self.Owner) then 
 			if IsValid(self.Entity) then self.Owner = self.Entity
 			else self.Owner = nil end
 		end
-		-- print(tr.HitPos)
-		if self.FuzeTime == 0 then
-			if tr.HitNormal == nil then
-				hitang = Angle(threeZ)
-			else
-				hitang = tr.HitNormal:Angle()
-			end
-			if tr.HitPos == nil then
-				hitpos = self.oldpos
-			else
-				hitpos = tr.HitPos
+		local tr = self.tr
+		local pos = self:GetPos()
+		if self.HitWater then
+			hitang = Angle(threeZ)
+			hitpos = pos
+		else
+			if self.FuzeTime == 0 then
+				if tr.HitNormal == nil then
+					hitang = Angle(threeZ)
+				else
+					hitang = tr.HitNormal:Angle()
+				end
+				if tr.HitPos == nil then
+					hitpos = pos
+				else
+					hitpos = tr.HitPos
+				end
 			end
 		end
 		if self.Caliber != "wac_base_20mm" and self.Caliber != "wac_base_30mm" and self.Caliber != "wac_base_40mm" then
@@ -76,9 +84,9 @@ if SERVER then
 				bullet.Tracer = zero
 				bullet.AmmoType = null
 				bullet.TracerName = nil
-				bullet.Dir = self:GetForward()
+				bullet.Dir = tr.HitNormal
 				bullet.Spread = Vector(threeZ)
-				bullet.Src = self:GetPos()
+				bullet.Src = pos
 				self:FireBullets(bullet,false)
 				
 				if !self.NoParticle then
@@ -209,9 +217,9 @@ if SERVER then
 				end
 			end
 		else
-			if SERVER then
+			if !self.HitWater then
 				if self.FuzeTime > 0 then
-					hitpos = self:GetPos()
+					hitpos = pos
 					hitang = Angle(threeZ)
 					hitsky = true
 				else
@@ -221,7 +229,7 @@ if SERVER then
 			if self.Caliber == "wac_base_30mm" then
 				self.Damage = 100 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
 				util.BlastDamage(self, self.Owner, hitpos, self.Radius*3, self.Damage)
-				self.Entity:EmitSound("impactsounds/30mm_1.wav",100, math.random(90,120),1, CHAN_AUTO)
+				self.Entity:EmitSound("impactsounds/30mm_1.wav",140, math.random(90,120),1, CHAN_AUTO)
 			elseif self.Caliber == "wac_base_20mm" then
 				self.Damage = 80 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
 				self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
@@ -244,7 +252,7 @@ if SERVER then
 			bullet.TracerName = null
 			bullet.Dir = self:GetForward()
 			bullet.Spread = Vector(threeZ)
-			bullet.Src = self:GetPos()
+			bullet.Src = pos
 			if !hitsky then self:FireBullets( bullet, false ) end
 			if !self.NoParticle then
 				net.Start("gred_net_impact_fx")

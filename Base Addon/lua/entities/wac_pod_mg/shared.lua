@@ -34,65 +34,75 @@ function ENT:Initialize()
 	
 	if tracer == nil then tracer = 0 end
 	tracerConvar=GetConVar("gred_sv_tracers"):GetInt()
+	ammovar=GetConVar("gred_sv_default_wac_munitions"):GetInt()
 end
 
 function ENT:fireBullet(pos)
 	if !self:takeAmmo(self.TkAmmo) then return end
-	if not self.seat then return end
-	local pos2=self.aircraft:LocalToWorld(pos+Vector(self.aircraft:GetVelocity():Length()*0.6,0,0))
-	
-	if self.BulletType == "wac_base_7mm" then
-		spread = Angle(math.Rand(-0.5,0.5), math.Rand(-0.5,0.5), math.Rand(-0.5,0.5))
-	elseif self.BulletType == "wac_base_12mm" then
-		spread = Angle(math.Rand(-1,1), math.Rand(-1,1), math.Rand(-1,1))
-	elseif self.BulletType == "wac_base_20mm" then
-		spread = Angle(math.Rand(-1.4,1.4), math.Rand(-1.4,1.4), math.Rand(-1.4,1.4))
-	elseif self.BulletType == "wac_base_30mm" then
-		spread = Angle(math.Rand(-3,3), math.Rand(-3,3), math.Rand(-3,3))
-	end
-	
-	local ang = self.aircraft:GetAngles()+Angle(axis,axis,0) + spread
-	local b=ents.Create("gred_base_bullet")
-	b:SetPos(pos2)
-	b:SetAngles(ang)
-	b.col = tracercolor
-	b.Speed=1000
-	b.Caliber = self.BulletType
-	b.Size=0
-	b.Width=0
-	b.Damage=40
-	b.Radius=70
-	b.sequential=self.Sequential
-	b.npod=#self.Pods
-	b.gunRPM=self.FireRate
-	b:Spawn()
-	b:Activate()
-	for _,e in pairs(self.aircraft.entities) do
-		if IsValid(e) then
-			constraint.NoCollide(e,b,0,0)
+	local ang = self.aircraft:GetAngles()
+	if ammovar >= 1 then
+		local bullet = {}
+		bullet.Num = 1
+		bullet.Src = self.aircraft:LocalToWorld(pos)
+		bullet.Dir = self:GetForward()
+		bullet.Spread = Vector(0.015,0.015,0)
+		bullet.Tracer = 0
+		bullet.Force = 5
+		bullet.Damage = 20
+		bullet.Attacker = self:getAttacker()
+		self.aircraft:FireBullets(bullet)
+	else
+		local pos2=self.aircraft:LocalToWorld(pos+Vector(self.aircraft:GetVelocity():Length()*0.6,0,0))
+		if self.BulletType == "wac_base_7mm" then
+			spread = Angle(math.Rand(-0.5,0.5), math.Rand(-0.5,0.5), math.Rand(-0.5,0.5))
+		elseif self.BulletType == "wac_base_12mm" then
+			spread = Angle(math.Rand(-1,1), math.Rand(-1,1), math.Rand(-1,1))
+		elseif self.BulletType == "wac_base_20mm" then
+			spread = Angle(math.Rand(-1.4,1.4), math.Rand(-1.4,1.4), math.Rand(-1.4,1.4))
+		elseif self.BulletType == "wac_base_30mm" then
+			spread = Angle(math.Rand(-3,3), math.Rand(-3,3), math.Rand(-3,3))
 		end
+		ang = ang + Angle(axis,axis,0) + spread
+		local b=ents.Create("gred_base_bullet")
+		b:SetPos(pos2)
+		b:SetAngles(ang)
+		b.col = tracercolor
+		b.Speed=1000
+		b.Caliber = self.BulletType
+		b.Size=0
+		b.Width=0
+		b.Damage=40
+		b.Radius=70
+		b.sequential=self.Sequential
+		b.npod=#self.Pods
+		b.gunRPM=self.FireRate
+		b:Spawn()
+		b:Activate()
+		for _,e in pairs(self.aircraft.entities) do
+			if IsValid(e) then
+				constraint.NoCollide(e,b,0,0)
+			end
+		end
+		constraint.NoCollide(self.aircraft,b,0,0)
+		b.Owner=self:getAttacker()
+		
+		if tracer >= GetConVarNumber("gred_sv_tracers") then
+			if self.Color == "Red" then
+				b:SetSkin(1)
+			elseif self.Color == "Green" then
+				b:SetSkin(3)
+			elseif self.Color == "Yellow" then
+				b:SetSkin(0)
+			end
+			b:SetModelScale(20)
+			tracer = 0
+		else b.noTracer = true end
+		tracer = tracer + 1
 	end
-	constraint.NoCollide(self.aircraft,b,0,0)
-	b.Owner=self:getAttacker()
-	
 	net.Start("gred_net_wac_mg_muzzle_fx")
-		net.WriteVector(self:LocalToWorld(pos))
+		net.WriteVector(self.aircraft:LocalToWorld(pos))
 		net.WriteAngle(ang)
 	net.Broadcast()
-	
-	if tracer >= GetConVarNumber("gred_sv_tracers") then
-		if self.Color == "Red" then
-			b:SetSkin(1)
-		elseif self.Color == "Green" then
-			b:SetSkin(3)
-		elseif self.Color == "Yellow" then
-			b:SetSkin(0)
-		end
-		b:SetModelScale(20)
-		tracer = 0
-	else b.noTracer = true end
-	tracer = tracer + 1
-	
 end
 
 

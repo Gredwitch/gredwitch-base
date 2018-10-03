@@ -201,7 +201,7 @@ function ENT:Explode()
 		ent:SetVar("GBOWNER", self.GBOWNER)
 		ent:SetVar("MAX_RANGE",self.ExplosionRadius)
 		ent:SetVar("SHOCKWAVEDAMAGE",self.ExplosionDamage)
-		ent:SetVar("SHOCKWAVE_INCREMENT",100)
+		ent:SetVar("SHOCKWAVE_INCREMENT",50)
 		ent:SetVar("DELAY",0.01)
 		ent.trace=self.TraceLength
 		ent.decal=self.Decal
@@ -414,7 +414,7 @@ function ENT:Launch()
 		 self.Ignition = true
 		 self:Arm()
 		 local pos = self:GetPos()
-		 sound.Play(self.StartSound, pos, 120, 130,1)
+		 sound.Play(self.StartSound, pos, 120, 100,1)
 	     self:EmitSound(self.EngineSound)
 		 self:SetNetworkedBool("EmitLight",true)
 		 self:SetNetworkedBool("self.Ignition",true)

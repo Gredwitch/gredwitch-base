@@ -27,16 +27,9 @@ CreateConVar("gred_sv_spawnable_bombs"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_bombs"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_shellspeed_multiplier"	,  "2"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_explosion_water"		,  "1"  , GRED_SVAR)
---[[
-CreateConVar("gred_sv_nowaterimpacts"			,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_insparticles"				,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_noparticles_7mm"			,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_noparticles_12mm"			,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_noparticles_20mm"			,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_noparticles_20mm"			,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_noparticles_30mm"			,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_altmuzzleeffect"			,  "0"  , GRED_SVAR)
---]]
+CreateConVar("gred_sv_default_wac_munitions"	,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_wac_explosion"			,  "1"  , GRED_SVAR)
+
 CreateClientConVar("gred_cl_sound_shake"		, "1" , true,false)
 CreateClientConVar("gred_cl_nowaterimpacts"		, "0" , true,false)
 CreateClientConVar("gred_cl_insparticles"		, "0" , true,false)
@@ -112,6 +105,10 @@ local function gredsettings(CPanel)
 		CPanel:AddControl( "CheckBox", { Label = "Use multiple fire particles?", Command = "gred_sv_multiple_fire_effects" } );
 		
 		CPanel:AddControl( "CheckBox", { Label = "Should aircrafts crash underwater?", Command = "gred_sv_wac_explosion_water" } );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Should aircrafts crash?", Command = "gred_sv_wac_explosion" } );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Use the default WAC munitions?", Command = "gred_sv_default_wac_munitions" } );
 		
 		CPanel:AddControl( "CheckBox", { Label = "Use a custom health system?", Command = "gred_sv_enablehealth" } );
 		

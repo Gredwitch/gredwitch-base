@@ -34,7 +34,6 @@ ENT.Sounds = {
 
 ENT.Wheels = {}
 
-
 function ENT:addSounds()
 	self.sounds = {}
 	for name, value in pairs(self.Sounds) do

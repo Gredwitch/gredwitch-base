@@ -23,6 +23,14 @@ sound.Add( {
 	pitch = { 100 },
 	sound = "gunsounds/fh2_rocket_3p.wav"
 } )
+sound.Add( {
+	name = "firehydra",
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = 90,
+	pitch = { 100 },
+	sound = "helicoptervehicle/missileshoot.mp3"
+} )
 
 function ENT:Initialize()
 	self:base("wac_pod_base").Initialize(self)
@@ -40,55 +48,101 @@ end
 function ENT:canFire()
 	if self.FaF then return self.FaF
 	else return IsValid(self:GetTarget()) end
+	ammovar=GetConVar("gred_sv_default_wac_munitions"):GetInt()
 end
 
 
 function ENT:fireRocket(pos, ang)
 	if !self:takeAmmo(self.TkAmmo) then return end
-	
-	local rocket = ents.Create("wac_base_grocket")
-	rocket:SetModel ( self.model )
-	rocket:SetPos(self:LocalToWorld(pos))
-	rocket:SetAngles(ang)
-	rocket.Owner = self:getAttacker()
-	rocket.Damage = 1000
-	rocket.Radius = 400
-	rocket.Speed = 70
-	rocket.Drag = Vector(0,1,1)
-	rocket.TrailLength = 200
-	rocket.Scale = 15
-	rocket.SmokeDens = 1
-	rocket.Launcher = self.aircraft
-	rocket.target = self:GetTarget()
-	rocket.targetOffset = self:GetTargetOffset()
-	rocket.calcTarget = function(r)
-		if !self.FaF then
+	if ammovar >= 1 then
+		local rocket = ents.Create("wac_hc_rocket")
+		rocket:SetPos(self:LocalToWorld(pos))
+		rocket:SetAngles(ang)
+		rocket.Owner = self:getAttacker()
+		rocket.Damage = 150
+		rocket.Radius = 200
+		rocket.Speed = 500
+		rocket.Drag = Vector(0,1,1)
+		rocket.TrailLength = 200
+		rocket.Scale = 15
+		rocket.SmokeDens = 1
+		rocket.Launcher = self.aircraft
+		rocket.target = self:GetTarget()
+		rocket.targetOffset = self:GetTargetOffset()
+		rocket.calcTarget = function(r)
+			--[[
 			if !IsValid(r.target) then
 				return r:GetPos() + r:GetForward()*100
 			else
 				return r.target:LocalToWorld(r.targetOffset)
+			end]]
+			if !self.FaF then
+				if !IsValid(r.target) then
+					return r:GetPos() + r:GetForward()*100
+				else
+					return r.target:LocalToWorld(r.targetOffset)
+				end
+			else
+				r.hellfire = true
+				return r.target:LocalToWorld(r.targetOffset)
 			end
-		else
-			r.hellfire = true
-			return r.target:LocalToWorld(r.targetOffset)
 		end
-	end
-	rocket:Spawn()
-	rocket:Activate()
-	rocket:StartRocket()
-	local ph = rocket:GetPhysicsObject()
-	if ph:IsValid() then
-		ph:SetVelocity(self:GetVelocity())
-		ph:AddAngleVelocity(Vector(30,0,0))
-	end
-	self:StopSound("fire")
-	self:EmitSound("fire")
-	for _,e in pairs(self.aircraft.wheels) do
-		if IsValid(e) then
-			constraint.NoCollide(e,rocket,0,0)
+		rocket:Spawn()
+		rocket:Activate()
+		rocket:StartRocket()
+		local ph = rocket:GetPhysicsObject()
+		if ph:IsValid() then
+			ph:SetVelocity(self:GetVelocity())
+			ph:AddAngleVelocity(Vector(30,0,0))
 		end
+		constraint.NoCollide(self.aircraft, rocket, 0, 0)
+		-- self:StopSound("firehydra")
+		self:EmitSound("firehydra")
+	else
+		local rocket = ents.Create("wac_base_grocket")
+		rocket:SetModel ( self.model )
+		rocket:SetPos(self:LocalToWorld(pos))
+		rocket:SetAngles(ang)
+		rocket.Owner = self:getAttacker()
+		rocket.Damage = 1000
+		rocket.Radius = 400
+		rocket.Speed = 70
+		rocket.Drag = Vector(0,1,1)
+		rocket.TrailLength = 200
+		rocket.Scale = 15
+		rocket.SmokeDens = 1
+		rocket.Launcher = self.aircraft
+		rocket.target = self:GetTarget()
+		rocket.targetOffset = self:GetTargetOffset()
+		rocket.calcTarget = function(r)
+			if !self.FaF then
+				if !IsValid(r.target) then
+					return r:GetPos() + r:GetForward()*100
+				else
+					return r.target:LocalToWorld(r.targetOffset)
+				end
+			else
+				r.hellfire = true
+				return r.target:LocalToWorld(r.targetOffset)
+			end
+		end
+		rocket:Spawn()
+		rocket:Activate()
+		rocket:StartRocket()
+		local ph = rocket:GetPhysicsObject()
+		if ph:IsValid() then
+			ph:SetVelocity(self:GetVelocity())
+			ph:AddAngleVelocity(Vector(30,0,0))
+		end
+		for _,e in pairs(self.aircraft.wheels) do
+			if IsValid(e) then
+				constraint.NoCollide(e,rocket,0,0)
+			end
+		end
+		constraint.NoCollide(self.aircraft,rocket,0,0)
+		-- self:StopSound("fire")
+		self:EmitSound("fire")
 	end
-	constraint.NoCollide(self.aircraft,rocket,0,0)
 end
 
 
@@ -112,7 +166,7 @@ if SERVER then
 		if ang then
 			local pos = self.aircraft:LocalToWorld(self.aircraft.Camera.pos)
 			local dir = ang:Forward()
-			local tr = util.QuickTrace(pos+dir*20, dir*self.MaxRange, self)
+			local tr = util.QuickTrace(pos+dir*20, dir*self.MaxRange, {self,self.aircraft})
 			if self.FaF then
 				if tr.HitSky then return
 				elseif tr.Hit then

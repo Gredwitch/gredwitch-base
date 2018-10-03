@@ -23,18 +23,28 @@ sound.Add( {
 	volume = 1.0,
 	level = 120,
 	pitch = { 100 },
-	sound = "gunsounds/rocket.wav"
+	sound = "HelicopterVehicle/MissileShoot.mp3"--"gunsounds/rocket.wav"
+} )
+sound.Add( {
+	name = "firehydra",
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = 90,
+	pitch = { 100 },
+	sound = "helicoptervehicle/missileshoot.mp3"
 } )
 
 
 function ENT:Initialize()
 	self:base("wac_pod_base").Initialize(self)
+	ammovar=GetConVar("gred_sv_default_wac_munitions"):GetInt()
+	oldrockets = GetConVar("gred_sv_oldrockets"):GetInt()
 end
 
 
 function ENT:fireRocket(pos, ang)
 	if !self:takeAmmo(self.TkAmmo) then return end
-	if GetConVar("gred_sv_oldrockets"):GetInt() >= 1 then
+	if oldrockets >= 1 then
 		local rocket = ents.Create("wac_base_grocket")
 		rocket:SetPos(self:LocalToWorld(pos))
 		rocket:SetAngles(ang)
@@ -57,14 +67,37 @@ function ENT:fireRocket(pos, ang)
 			ph:SetVelocity(self:GetVelocity())
 			ph:AddAngleVelocity(Vector(30,0,0))
 		end
-		self:StopSound( "fire" )
-		self:EmitSound( "fire" )
 		for _,e in pairs(self.aircraft.wheels) do
 			if IsValid(e) then
 				constraint.NoCollide(e,rocket,0,0)
 			end
 		end
 		constraint.NoCollide(self.aircraft,rocket,0,0)
+		self:EmitSound( "fire" )
+	elseif ammovar >= 1 then
+		local rocket = ents.Create("wac_hc_rocket")
+		rocket:SetPos(self:LocalToWorld(pos))
+		rocket:SetAngles(ang)
+		rocket.Owner = self.seat:GetDriver() or self.aircraft
+		rocket.Damage = 150
+		rocket.Radius = 200
+		rocket.Speed = 750
+		rocket.Drag = Vector(0,1,1)
+		rocket.TrailLength = 200
+		rocket.Scale = 15
+		rocket.SmokeDens = 1
+		rocket.Launcher = self.aircraft
+		rocket:Spawn()
+		rocket:Activate()
+		rocket:StartRocket()
+		local ph = rocket:GetPhysicsObject()
+		if ph:IsValid() then
+			ph:SetVelocity(self:GetVelocity())
+			ph:AddAngleVelocity(Vector(30,0,0))
+		end
+		constraint.NoCollide(self.aircraft, rocket, 0, 0)
+		self:EmitSound("firehydra")
+	
 	else
 		local rocket = ents.Create( self.Kind )
 		rocket:SetPos(self:LocalToWorld(pos))

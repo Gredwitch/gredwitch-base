@@ -84,11 +84,13 @@ function ENT:dropBomb(bomb)
 	bomb.Owner = self:getAttacker()
 	
 	bomb.phys:AddVelocity(self.aircraft.phys:GetVelocity())
+	-- bomb:EmitSound("bombSND")
 	timer.Simple(0.01,function() if IsValid(bomb.phys) then bomb.phys:SetMass(bomb.Mass)  end end)
 	timer.Simple(1, function()
 		if IsValid(bomb) and IsValid(bomb.phys) then
 			bomb.dropping=true
-			bomb.Armed = true
+			bomb.Armed=true
+			-- bomb:Arm()
 			if self.Rocket == 1 then bomb:Launch() end
 			bomb:SetCollisionGroup(0)
 		end

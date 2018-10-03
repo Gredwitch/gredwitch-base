@@ -1,18 +1,4 @@
 if SERVER then AddCSLuaFile() end
-if CLIENT then
-	language.Add("allied_radiobattery", "Allied radio battery")
-	language.Add("axis_radiobattery", "Axis radio battery")
-end
-
-game.AddAmmoType( {
-	name = "Axis radio battery",
-	dmgtype = DMG_BULLET
-} )
-game.AddAmmoType( {
-	name = "Allied radio battery",
-	dmgtype = DMG_BULLET
-} )
-
 
 -- Adding particles
 game.AddParticles( "particles/doi_explosion_fx.pcf")
@@ -33,9 +19,11 @@ game.AddParticles( "particles/gb5_napalm.pcf")
 game.AddParticles( "particles/gb5_light_bomb.pcf")
 game.AddParticles( "particles/gb5_high_explosive_2.pcf")
 game.AddParticles( "particles/gb5_high_explosive.pcf")
+game.AddParticles( "particles/gb5_fireboom.pcf")
 game.AddParticles( "particles/neuro_tank_ap.pcf")
 
 game.AddParticles( "particles/ins_rockettrail.pcf")
+game.AddParticles( "particles/ammo_cache_ins.pcf")
 game.AddParticles( "particles/doi_rockettrail.pcf")
 game.AddParticles( "particles/mnb_flamethrower.pcf")
 game.AddParticles( "particles/impact_fx_ins.pcf" )
@@ -66,6 +54,8 @@ PrecacheParticleSystem("gred_mortar_explosion")
 PrecacheParticleSystem("gred_50mm")
 PrecacheParticleSystem("ins_rpg_explosion")
 PrecacheParticleSystem("ins_water_explosion")
+PrecacheParticleSystem("fireboom_explosion_midair")
+PrecacheParticleSystem("doi_petrol_explosion")
 
 PrecacheParticleSystem("doi_impact_water")
 PrecacheParticleSystem("impact_water")
