@@ -245,10 +245,10 @@
 - Fixed explosion sounds not playing when switching to a camera
 - Fixed the JDAMs not working on servers
 
-17/08/2018 (08/17/2018)
+18/08/2018 (08/18/2018)
 
 - Updated BASE_BULLET : added a new optimized tracer system / added a 30mm time-fuze shell / made impact effects client only
-  / added a new 40mm bullet
+/ added a new 40mm bullet
 - Updated POD_MG : added compatibility for the new tracer system / made the muzzleflashes client only
 - Updated POD_GUNNER : added compatibility for the new tracer system / removed outdated code / made the muzzleflashes client only
 - Updated BOMB_2000GP : removed the debug message
@@ -258,4 +258,57 @@
 - Updated gred_add : added an option to disable the radio sounds / precached more particles / precached the bullet model
 - Fixed a bug in shockwave_ent
 - Fixed wac_hc_base : fixed an issue that was preventing the players from getting in an aircraft in multiplayer
+
+29/08/2018 (08/28/2018)
+
+- Added gred_sv_shellspeed_multiplier
+- Added physics.lua / Updated gred_add : Made the addon override gmod's default max physics object velocities
+- Added missing particle materials
+- Fixed ROCKET_V1 : Fixed the engine sound not working
+- Fixed BASE_DUMB : Fixed "Changing collision rules within a callback is likely to cause crashes!"
+- Fixed the addon not overridding WAC
+- Updated WAC_BASE_ROCKET : Made the particle effects client side only
+- Updated BASE_BOMB : Made the particle effects client side only
+- Updated BASE_ROCKET : Made the particle effects client side only
+- Updated BASE_BULLET : Fixed some missing impact effects types / Fixed the bullets having a "crazy origin" / Fixed the bullets not dealing any damage and not having a radius when the dividers are below 1 / Removed useless if CLIENT in cl_init.lua
+- Updated all the rockets to improve the neurotec compatibility
+- Moved the shells from the Emplacement pack here
+
+04/09/2018 (09/04/2018)
+- Updated BASE_BULLET : Fixed writeInt error
+- Updated GRED_ADD : Removed a hook and applied the physenv manually to the shells / Fixed a missing particle precache
+- Updated shockwave_ent Fixed explosions making everything fly away forever
+- Updated WAC_HC_BASE : Improved the radio sounds activation / Added a new water explosion effect when WAC aircrafts are crashing
+- Updated BASE_SHELL : Physenv should now apply localy to prevent problems with other stuff
+
+03/10/2018 (10/03/2018)
+- Added some materials
+- Added wac_hc_rocket : fixed the default wac rockets
+- Fixed shockwave_ent's explosions making everything fucking up
+- Fixed shockwave_sound_lowsh causing performance issues due to not 
+- Fixed napalm and WP shells not being compatible with vFire
+- Fixed the rockets and the shells pointing toward the ground a little bitremoving itself after playing the sound
+- Updated gb_bomb_cbu
+- Updated gb_bomb_cbubomblet
+- Updated gb_shell_81mm : made it not spawnable
+- Updated wac_hc_base : fixed WAC not working in peer to peer (again) / added a crash effect / added a zoom feature for cameras (press the freeview key)
+- Updated gred_add / POD_MG / POD_GUNNER / POD_MIS / POD_GROCKET : added a button to use the default WAC stuff
+- Updated POD_MIS : fixed missiles locking on the aircraft
+- Updated BASE_BULLET : optimized the bullets / the bullets' speed is now affected by their weight (higher caliber = higher weight)
+- Removed the artillery sweps as they are going to be uploaded in a different addon
+- Removed unused base_dumb
+
+23/10/2018 (10/23/2018)
+- Added base_gas
+- Added gb_shell_gas
+- Updated shockwave_ent : decals should now be client-side / fixed the rockets making everything fly away
+- Updated base_bomb / base_rocket / base_shell / base_napalm : re-organized the bases to make them more optimized
+- Updated all the shells / gb_bomb_sc100 / gb_bomb_fab250 : fixed non-working water explosion sounds
+- Updated base_bullet : optimized the bullet
+- Updated POD_GUNNER / POD_MG : optimized the fire functions
+- Updated POD_GROCKET / POD_MIS : the rockets shouldn't collide with the aircrafts anymore
+- Updated HC_ROCKET : fixed the rocket's speed
+- Updated HC_BASE : Helicopters should now spin when their health is low / Made the explosion effects client-side
+- Updated the spawnmenu options : server-side options are not showing anymore since you can only modify the convars with RCon
+- Removed unused base_fire
 --]]
