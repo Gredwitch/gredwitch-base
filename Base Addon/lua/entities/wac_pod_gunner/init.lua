@@ -21,21 +21,32 @@ function ENT:Initialize()
 	if tracer == nil then tracer = 0 end
 	tracerConvar=GetConVar("gred_sv_tracers"):GetInt()
 	ammovar=GetConVar("gred_sv_default_wac_munitions"):GetInt()
+	if ammovar >= 1 then
+		num = 1
+	else
+		if self.BulletType == "wac_base_7mm" then
+			num = 0.5
+		elseif self.BulletType == "wac_base_12mm" then
+			num = 1
+		elseif self.BulletType == "wac_base_20mm" then
+			num = 1.4
+		elseif self.BulletType == "wac_base_30mm" then
+			num = 2
+		end
+	end
 	
 	self.basePodThink = self:base("wac_pod_base").Think
 end
 
 function ENT:fire()
 	if !self:takeAmmo(self.TkAmmo) then return end
-	local dir = self.aircraft:getCameraAngles():Forward()
+	local camAng = self.aircraft:getCameraAngles()
+	local dir = camAng:Forward()
 	local pos = self.aircraft:LocalToWorld(self.ShootPos) + dir*self.ShootOffset.x
-	local tr = util.QuickTrace(self:LocalToWorld(self.aircraft.Camera.pos) + dir*20, dir*999999999, {self, self.aircraft})
-	
 	if ammovar >= 1 then
-		local ang = (tr.HitPos - pos):Angle()
-	
+		local tr = util.QuickTrace(self:LocalToWorld(self.aircraft.Camera.pos) + dir*20, dir*999999999, {self, self.aircraft})
 		local b = ents.Create("wac_hc_hebullet")
-		ang = ang + Angle(math.Rand(-1,1), math.Rand(-1,1), math.Rand(-1,1))*self.Spray
+		local ang = (tr.HitPos - pos):Angle() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num))*self.Spray
 		b:SetPos(pos)
 		b:SetAngles(ang)
 		b.col = Color(255,200,100)
@@ -74,18 +85,8 @@ function ENT:fire()
 			self.Entity:Remove()
 		end
 	else
-		if self.BulletType == "wac_base_7mm" then
-			spread = Angle(math.Rand(-0.5,0.5), math.Rand(-0.5,0.5), math.Rand(-0.5,0.5))
-		elseif self.BulletType == "wac_base_12mm" then
-			spread = Angle(math.Rand(-1,1), math.Rand(-1,1), math.Rand(-1,1))
-		elseif self.BulletType == "wac_base_20mm" then
-			spread = Angle(math.Rand(-1.4,1.4), math.Rand(-1.4,1.4), math.Rand(-1.4,1.4))
-		elseif self.BulletType == "wac_base_30mm" then
-			spread = Angle(math.Rand(-2,2), math.Rand(-2,2), math.Rand(-2,2))
-		end
-		
-		local ang = (tr.HitPos - pos):Angle() + spread
 		local b = ents.Create("gred_base_bullet")
+		local ang = camAng + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num))
 		b:SetPos(pos)
 		b:SetAngles(ang)
 		b.Speed=1000
@@ -99,12 +100,6 @@ function ENT:fire()
 		constraint.NoCollide(b,self.aircraft,0,0)
 		b:Spawn()
 		b:Activate()
-		for _,e in pairs(self.aircraft.entities) do
-			if IsValid(e) then
-				constraint.NoCollide(e,b,0,0)
-			end
-		end
-		constraint.NoCollide(self.aircraft,b,0,0)
 		b.Owner=self:getAttacker()
 		
 		if tracer >= GetConVarNumber("gred_sv_tracers") then
@@ -124,30 +119,33 @@ function ENT:fire()
 			net.WriteVector(pos)
 			net.WriteAngle(ang)
 		net.Broadcast()
-		
-		for _,e in pairs(self.aircraft.wheels) do
-			if IsValid(e) then
-				constraint.NoCollide(e,b,0,0)
-			end
-		end
-		constraint.NoCollide(self.aircraft,b,0,0)
 	end
 	
-	self.sounds.shoot1p:Stop()
-	self.sounds.shoot1p:Play()
-	self.sounds.shoot3p:Stop()
-	self.sounds.shoot3p:Play()
-	self.sounds.shoot3p:SetSoundLevel(110)
+	if self.Loop then
+		if !self:GetIsShooting() then
+			self.sounds.shoot1p:Play()
+			self.sounds.shoot3p:Play()
+			self.sounds.shoot3p:SetSoundLevel(130)
+		end
+	else
+		self.sounds.shoot1p:Stop()
+		self.sounds.shoot1p:Play()
+		self.sounds.shoot3p:Stop()
+		self.sounds.shoot3p:Play()
+		self.sounds.shoot3p:SetSoundLevel(130)
+	end
 	self:SetIsShooting(true)
 end
 function ENT:stop()
 	if self:GetIsShooting() then
+		self.sounds.shoot1p:Stop()
+		self.sounds.shoot3p:Stop()
 		self.sounds.stop1p:Stop()
 		self.sounds.stop1p:Play()
 		self.sounds.stop3p:Stop()
 		self.sounds.stop3p:Play()
 		self:SetIsShooting(false)
-	end				
+	end
 end
 function ENT:canFire()
 	return self:GetSpinSpeed() > 0.8

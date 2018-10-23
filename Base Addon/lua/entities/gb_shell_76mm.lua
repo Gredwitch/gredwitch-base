@@ -47,11 +47,11 @@ ENT.EffectAir                        =  "doi_compb_explosion"
 ENT.EffectWater                      =  "ins_water_explosion"
 ENT.SmokeEffect						 =  "m203_smokegrenade"
 ENT.AngEffect						 =	true
-     
+
 ENT.ExplosionSound                   =  table.Random(CloseExploSnds)
 ENT.FarExplosionSound				 =  table.Random(ExploSnds)
 ENT.DistExplosionSound				 =  table.Random(DistExploSnds)
-ENT.WaterExplosionSound				 =	table.Random(CloseExploSnds)
+ENT.WaterExplosionSound				 =	table.Random(CloseWaterExploSnds)
 ENT.WaterFarExplosionSound			 =  table.Random(WaterExploSnds)
 
 ENT.RSound   						 =  0

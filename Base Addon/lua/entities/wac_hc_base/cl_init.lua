@@ -21,7 +21,7 @@ function ENT:receiveInput(name, value, seat)
 		local player = LocalPlayer()
 		if value > 0.5 then
 			-- ADDED BY GREDWITCH
-			if self.Camera and seat == self.Camera.seat and self.seat != 1 then
+			if self.Camera and seat == self.Camera.seat and seat != 1 then
 				if !player:GetVehicle().useCamerazoom then player:GetVehicle().useCamerazoom = 0 end
 				player:GetVehicle().useCamerazoom = player:GetVehicle().useCamerazoom + 1
 				if player:GetVehicle().useCamerazoom > 3 then player:GetVehicle().useCamerazoom = 0 end
@@ -29,7 +29,7 @@ function ENT:receiveInput(name, value, seat)
 				player.wac.viewFree = true
 			end -- ADDED BY GREDWITCH
 		else
-			if self.Camera and seat == self.Camera.seat then
+			if self.Camera and seat == self.Camera.seat and seat != 1 then
 			else
 				player.wac.viewFree = false
 				player.wac_air_resetview = true
@@ -54,7 +54,6 @@ function ENT:Initialize()
 	self.IsOn = false
 	self.LastThink = CurTime()
 
-	self.m_initialized = true
 	self.weapons = {}
 	self.weaponAttachments = {}
 	if self.WeaponAttachments then
@@ -84,8 +83,8 @@ end
 
 
 function ENT:Think()
-	if !self.m_initialized then self:Initialize() end
-	if not self.valid then return end
+	if !self.valid then self:Initialize() return end
+	-- if not self.valid then return end
 
 	if self.skin ~= self:GetSkin() then
 		self.skin = self:GetSkin()

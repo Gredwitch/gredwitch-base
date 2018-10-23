@@ -598,7 +598,7 @@ end
 
 
 function ENT:Think()
-	-- START ADDED BY THE GREDWITCH
+	-- START ADDED BY THE GREDWITCH^
 	if !self.m_initialized then self:Initialize() end
 	if self.sounds.Radio then
 		if self.active and GetConVar("gred_sv_wac_radio"):GetInt() == 1 then
@@ -620,13 +620,34 @@ function ENT:Think()
 		if tr.Hit then
 			local ang = Angle(-90,0,0)
 			local radius = self:BoundingRadius()
+			local water = "ins_water_explosion"
 			if radius <= 600 then
-				ParticleEffect("ins_water_explosion",tr.HitPos,ang,nil)
+				net.Start("gred_net_wac_explosion")
+					net.WriteString(water)
+					net.WriteVector(tr.HitPos)
+					net.WriteAngle(ang)
+				net.Broadcast()
 			else
-				ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(500,250),math.random(500,250),0),ang,nil)
-				ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(500,250),math.random(-500,-250),0),ang,nil)
-				ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(-500,-250),math.random(500,250),0),ang,nil)
-				ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(-500,-250),math.random(-500,-250),0),ang,nil)
+				net.Start("gred_net_wac_explosion")
+					net.WriteString(water)
+					net.WriteVector(tr.HitPos+Vector(math.random(500,250),math.random(500,250),0))
+					net.WriteAngle(ang)
+				net.Broadcast()
+				net.Start("gred_net_wac_explosion")
+					net.WriteString(water)
+					net.WriteVector(tr.HitPos+Vector(math.random(500,250),math.random(-500,-250),0))
+					net.WriteAngle(ang)
+				net.Broadcast()
+				net.Start("gred_net_wac_explosion")
+					net.WriteString(water)
+					net.WriteVector(tr.HitPos+Vector(math.random(-500,-250),math.random(500,250),0))
+					net.WriteAngle(ang)
+				net.Broadcast()
+				net.Start("gred_net_wac_explosion")
+					net.WriteString(water)
+					net.WriteVector(tr.HitPos+Vector(math.random(-500,-250),math.random(-500,-250),0))
+					net.WriteAngle(ang)
+				net.Broadcast()
 			end
 			local ent = ents.Create("shockwave_sound_lowsh")
 			ent:SetPos(tr.HitPos) 
@@ -649,6 +670,44 @@ function ENT:Think()
 			end
 			self.hascrashed = true
 			self:Remove()
+		end
+	end
+	if self.ShouldRotate and self.topRotor and self.Base != "wac_pl_base" and !self.disabled
+	and self.rotorRpm > 0.2 and GetConVar("gred_sv_wac_heli_spin"):GetInt() >= 1 then
+		local p = self:GetPhysicsObject()
+		if p and IsValid(p) then
+			if !self.sounds.crashsnd:IsPlaying() then
+				self.sounds.crashsnd:Play()
+			end
+			self.sounds.bipsnd:Play()
+			
+			local v = p:GetAngleVelocity()
+			if v.z < 150 then
+				p:AddAngleVelocity(Vector(0,0,10))
+			end
+			if p:GetVelocity().z > -300 then
+				p:AddVelocity(Vector(0,0,7*-(10*self.rotorRpm)))
+			end
+			if v.y > -50 then
+				p:AddAngleVelocity(Vector(0,-10,0))
+			end
+			self:SetHover(true)
+			self.controls.throttle = 0
+			for k,v in pairs (self.wheels) do
+				if !v.ph then
+					v.ph = function(ent,data) 
+						v.GredHitGround = true	
+					end
+					v:AddCallback("PhysicsCollide",v.ph)
+				end
+				if v.GredHitGround then
+					self:GredExplode(500,self:GetPos())
+				end
+			end
+		end
+	else
+		if !self.topRotor and self.sounds.crashsnd then
+			self.sounds.crashsnd:Stop()
 		end
 	end
 	-- END ADDED BY THE GREDWITCH
@@ -992,81 +1051,170 @@ function ENT:maintenance()
     end
 end
 
+function ENT:GredExplode(speed,pos)-- ADDED BY THE GREDWITCH (start)
+	if self.blewup then return end
+	self.blewup = true
+	local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
+	for k, p in pairs(self.passengers) do
+		if p and p:IsValid() then
+			p:TakeDamage(speed,lasta,self.Entity)
+		end
+	end
+	self:TakeDamage(self.engineHealth)
+	if GetConVar("gred_sv_wac_explosion"):GetInt() <= 0 then return end
+	local radius = self:BoundingRadius()
+	local hitang = Angle(0,self:GetAngles().y+90,0)
+	local ent = ents.Create("shockwave_sound_lowsh")
+	ent:SetPos(pos) 
+	ent:Spawn()
+	ent:Activate()
+	ent:SetVar("GBOWNER", self)
+	ent:SetVar("MAX_RANGE",50000)
+	ent:SetVar("NOFARSOUND",0)
+	ent:SetVar("SHOCKWAVE_INCREMENT",200)
+	
+	ent:SetVar("DELAY",0.01)
+	ent:SetVar("SOUNDCLOSE","explosions/fuel_depot_explode_close.wav")
+	ent:SetVar("SOUND","explosions/fuel_depot_explode_dist.wav")
+	ent:SetVar("SOUNDFAR","explosions/fuel_depot_explode_far.wav")
+	ent:SetVar("Shocktime", 0)
+	
+	local ent = ents.Create("shockwave_ent")
+	ent:SetPos( pos ) 
+	ent:Spawn()
+	ent:Activate()
+	ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
+	ent:SetVar("DEFAULT_PHYSFORCE_PLYAIR", self.DEFAULT_PHYSFORCE_PLYAIR)
+	ent:SetVar("DEFAULT_PHYSFORCE_PLYGROUND", self.DEFAULT_PHYSFORCE_PLYGROUND)
+	ent:SetVar("GBOWNER", self.GBOWNER)
+	ent:SetVar("SHOCKWAVEDAMAGE",1000)
+	ent:SetVar("SHOCKWAVE_INCREMENT",50)
+	ent:SetVar("DELAY",0.01)
+	ent.trace=self.TraceLength
+	ent.decal=self.Decal
+	self:Remove()
+	local effect = "doi_petrol_explosion"
+	if radius <= 300 then
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos)
+			net.WriteAngle(hitang)
+		net.Broadcast()
+		ent:SetVar("MAX_RANGE",600)
+	elseif radius <= 500 then
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos)
+			net.WriteAngle(hitang)
+		net.Broadcast()
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos)
+			net.WriteAngle(hitang+Angle(0,45,45))
+		net.Broadcast()
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos)
+			net.WriteAngle(hitang+Angle(0,-45,-45))
+		net.Broadcast()
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos)
+			net.WriteAngle(hitang+Angle(45,0,0))
+		net.Broadcast()
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos)
+			net.WriteAngle(hitang+Angle(-45,0,0))
+		net.Broadcast()
+		ent:SetVar("MAX_RANGE",800)
+	elseif radius <= 2000 then
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos)
+			net.WriteAngle(hitang)
+		net.Broadcast()
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos)
+			net.WriteAngle(hitang+Angle(0,45,45))
+		net.Broadcast()
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos)
+			net.WriteAngle(hitang+Angle(0,-45,-45))
+		net.Broadcast()
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos)
+			net.WriteAngle(hitang+Angle(45,0,0))
+		net.Broadcast()
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos)
+			net.WriteAngle(hitang+Angle(-45,0,0))
+		net.Broadcast()
+				
+				
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos+Vector(math.random(-400,-250),math.random(-400,-250),0))
+			net.WriteAngle(hitang)
+		net.Broadcast()
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos+Vector(math.random(-400,250),math.random(-400,250),0))
+			net.WriteAngle(hitang+Angle(0,45,45))
+		net.Broadcast()
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos+Vector(math.random(400,-250),math.random(400,-250),0))
+			net.WriteAngle(hitang+Angle(0,-45,-45))
+		net.Broadcast()
+		net.Start("gred_net_wac_explosion")
+			net.WriteString(effect)
+			net.WriteVector(pos+Vector(math.random(400,250),math.random(400,250),0))
+			net.WriteAngle(hitang+Angle(45,0,0))
+		net.Broadcast()
+		ent:SetVar("MAX_RANGE",1000)
+	end
+end
+
+function ENT:GredIsOnGround(v)
+	local p = v:GetPos()
+	return util.QuickTrace(p,p-Vector(0,0,1)).Hit
+end
 
 function ENT:PhysicsCollide(cdat, phys)
-timer.Simple(0,function()
-	if wac.aircraft.cvars.nodamage:GetInt() == 1 then
-		return
-	end
-	if cdat.DeltaTime > 0.5 then
-		local mass = cdat.HitObject:GetMass()
-		if cdat.HitEntity:GetClass() == "worldspawn" then
-			mass = 5000
+	timer.Simple(0,function()
+		if wac.aircraft.cvars.nodamage:GetInt() == 1 then
+			return
 		end
-		local dmg = (cdat.Speed*cdat.Speed*math.Clamp(mass, 0, 5000))/10000000
-		if !dmg or dmg < 1 then return end
-		self:TakeDamage(dmg*15)
-		if dmg > 2 then
-			self.Entity:EmitSound("vehicles/v8/vehicle_impact_heavy"..math.random(1,4)..".wav")
-			local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
-			for k, p in pairs(self.passengers) do
-				if p and p:IsValid() then
-					p:TakeDamage(dmg/5, lasta, self.Entity)
+		if cdat.DeltaTime > 0.5 then
+			local mass = cdat.HitObject:GetMass()
+			if cdat.HitEntity:GetClass() == "worldspawn" then
+				mass = 5000
+			end
+			local dmg = (cdat.Speed*cdat.Speed*math.Clamp(mass, 0, 5000))/10000000
+			if !dmg or dmg < 1 then return end
+			self:TakeDamage(dmg*15)
+			if dmg > 2 then
+				self.Entity:EmitSound("vehicles/v8/vehicle_impact_heavy"..math.random(1,4)..".wav")
+				local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
+				for k, p in pairs(self.passengers) do
+					if p and p:IsValid() then
+						p:TakeDamage(dmg/5, lasta, self.Entity)
+					end
 				end
 			end
 		end
-	end
-	-- ADDED BY THE GREDWITCH
-	if cdat.Speed > 1000 then
-		if GetConVar("gred_sv_wac_explosion"):GetInt() <= 0 then return end
-		local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
-		for k, p in pairs(self.passengers) do
-			if p and p:IsValid() then
-				p:TakeDamage(cdat.Speed,lasta,self.Entity)
-			end
+		-- ADDED BY THE GREDWITCH
+		if (cdat.Speed > 1000 and !self.ShouldRotate) 
+		or (cdat.Speed > 100 and self.ShouldRotate and !cdat.HitEntity.isWacRotor) 
+		and (!cdat.HitEntity:IsPlayer() and!cdat.HitEntity:IsNPC() and !string.StartWith(cdat.HitEntity:GetClass(),"vfire")) then
+			self:GredExplode(cdat.speed,cdat.HitPos)
 		end
-		if self.blewup then return end
-		local hitang = Angle(0,self:GetAngles().y+90,0)
-		local pos = cdat.HitPos--self:GetPos()
-		local ent = ents.Create("shockwave_sound_lowsh")
-		ent:SetPos( pos ) 
-		ent:Spawn()
-		ent:Activate()
-		ent:SetVar("GBOWNER", self)
-		ent:SetVar("MAX_RANGE",50000)
-		ent:SetVar("NOFARSOUND",0)
-		ent:SetVar("SHOCKWAVE_INCREMENT",200)
-		
-		ent:SetVar("DELAY",0.01)
-		ent:SetVar("SOUNDCLOSE","explosions/fuel_depot_explode_close.wav")
-		ent:SetVar("SOUND","explosions/fuel_depot_explode_dist.wav")
-		ent:SetVar("SOUNDFAR","explosions/fuel_depot_explode_far.wav")
-		ent:SetVar("Shocktime", 0)
-		self.blewup = true
-		self:Remove()
-		if self:BoundingRadius() <= 300 then
-			ParticleEffect("doi_petrol_explosion",pos,hitang,nil)
-		elseif self:BoundingRadius() <= 500 then
-			ParticleEffect("doi_petrol_explosion",pos,hitang,nil)
-			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(0,45,45),nil)
-			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(0,-45,-45),nil)
-			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(45,0,0),nil)
-			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(-45,0,0),nil)
-		elseif self:BoundingRadius() <= 2000 then
-			ParticleEffect("doi_petrol_explosion",pos,hitang,nil)
-			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(0,45,45),nil)
-			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(0,-45,-45),nil)
-			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(45,0,0),nil)
-			ParticleEffect("doi_petrol_explosion",pos,hitang+Angle(-45,0,0),nil)
-			
-			ParticleEffect("doi_petrol_explosion",pos,hitang,nil)
-			ParticleEffect("doi_petrol_explosion",pos+Vector(math.random(-400,-250),math.random(-400,-250),0),hitang+Angle(0,45,45),nil)
-			ParticleEffect("doi_petrol_explosion",pos+Vector(math.random(-400,250),math.random(-400,250),0),hitang+Angle(0,-45,-45),nil)
-			ParticleEffect("doi_petrol_explosion",pos+Vector(math.random(400,-250),math.random(400,-250),0),hitang+Angle(45,0,0),nil)
-			ParticleEffect("doi_petrol_explosion",pos+Vector(math.random(400,250),math.random(400,250),0),hitang+Angle(-45,0,0),nil)
-		end
-	end
-end)
+	end)
 end
 
 function ENT:DamageSmallRotor(amt)
@@ -1104,8 +1252,13 @@ function ENT:KillBackRotor()
 	e:SetVelocity(self.backRotor:GetVelocity())
 	e:GetPhysicsObject():AddAngleVelocity(self.backRotor.Phys:GetAngleVelocity())
 	e:GetPhysicsObject():SetMass(self.backRotor.Phys:GetMass())
+	e.isWacRotor = true
 	self.backRotor:Remove()
 	self.backRotor = nil
+	-- if self.engineHealth < 60 and math.random(0,GetConVar("gred_sv_wac_heli_spin_chance"):GetInt()) == 0 then
+		-- self.ShouldRotate = true
+		-- self.OldGredUP = self:GetUp()
+	-- end
 	timer.Simple(10, function()
 		if e and e:IsValid() then
 			e:Remove()
@@ -1209,6 +1362,12 @@ function ENT:DamageEngine(amt)
 			if !self.sounds.LowHealth:IsPlaying() then
 				self.sounds.LowHealth:Play()
 			end
+			f = math.random(0,GetConVar("gred_sv_wac_heli_spin_chance"):GetInt())
+			if !self.ShouldRotate and f == 0 then
+				self.OldGredUP = self:GetUp()
+				self.ShouldRotate = true
+			end
+			
 			
 			if self.engineHealth < 20 and !self.EngineFire then
 				local fire = ents.Create("env_fire")
@@ -1317,20 +1476,40 @@ function ENT:DamageEngine(amt)
 		
 					if tr.Hit then
 						local ang = Angle(-90,0,0)
-						if self:BoundingRadius() <= 600 then
-							ParticleEffect("ins_water_explosion",tr.HitPos,ang,nil)
+						local water = "ins_water_explosion"
+						if radius <= 600 then
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(water)
+								net.WriteVector(tr.HitPos)
+								net.WriteAngle(ang)
+							net.Broadcast()
 						else
-							ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(500,250),math.random(500,250),0),ang,nil)
-							ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(500,250),math.random(-500,-250),0),ang,nil)
-							ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(-500,-250),math.random(500,250),0),ang,nil)
-							ParticleEffect("ins_water_explosion",tr.HitPos+Vector(math.random(-500,-250),math.random(-500,-250),0),ang,nil)
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(water)
+								net.WriteVector(tr.HitPos+Vector(math.random(500,250),math.random(500,250),0))
+								net.WriteAngle(ang)
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(water)
+								net.WriteVector(tr.HitPos+Vector(math.random(500,250),math.random(-500,-250),0))
+								net.WriteAngle(ang)
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(water)
+								net.WriteVector(tr.HitPos+Vector(math.random(-500,-250),math.random(500,250),0))
+								net.WriteAngle(ang)
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(water)
+								net.WriteVector(tr.HitPos+Vector(math.random(-500,-250),math.random(-500,-250),0))
+								net.WriteAngle(ang)
+							net.Broadcast()
 						end
 						self.hascrashed = true
 						self:Remove()
 					end
 				end
 				--[[self:SetNWBool("locked", true)
-				ParticleEffectAttach("1000lb_air", 1, self.Entity, 0)
 				timer.Simple( 0.1, function() self:Remove() end)--]]
 			end
 		end

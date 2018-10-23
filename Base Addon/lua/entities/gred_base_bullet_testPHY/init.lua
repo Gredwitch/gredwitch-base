@@ -13,9 +13,9 @@ function ENT:Initialize()
 	self:SetColor(Color(255,255,255,0))
 	
 	
-	local physEnvironment = physenv.GetPerformanceSettings()
-	physEnvironment.MaxVelocity = 9999999999
-	physenv.SetPerformanceSettings(physEnvironment)
+	-- local physEnvironment = physenv.GetPerformanceSettings()
+	-- physEnvironment.MaxVelocity = 9999999999
+	-- physenv.SetPerformanceSettings(physEnvironment)
 	
 	self.phys = self.Entity:GetPhysicsObject()
 	if self.Caliber == "wac_base_7mm" then
@@ -32,7 +32,6 @@ function ENT:Initialize()
 	if IsValid(self.phys) then
 		self.phys:SetMass(mass)
 		self.phys:EnableCollisions(true)
-		-- self.phys:EnableGravity(true)
 		self.phys:Wake()
 		self.phys:ApplyForceCenter(self:GetForward()*1000000) 
 	end
@@ -62,36 +61,7 @@ function ENT:Initialize()
 end
 
 function ENT:PhysicsUpdate(ph)
-	if self.Collided then self:Remove() end
 	if !self.explodable then return end
-	-- if !util.IsInWorld(pos) then self:Remove() end
-	-- if !self.oldpos then self:Remove() return end
-	-- local difference = (pos - self.oldpos)
-	-- self.oldpos = pos
-	-- local dif = pos + difference
-	-- local trace = {}
-	-- trace.start = pos
-	-- trace.endpos = dif
-	-- trace.filter = self.Entity
-	-- trace.mask=self.Mask
-	-- local tr = util.TraceLine(trace)
-	-- local tr = util.QuickTrace(pos,dif,self.Entity)
-	-- local hit = tr.Hit
-	-- local nohitwater = tr.MatType != 83 
-	-- if hit and nohitwater then
-		-- self.Explode(self,tr)
-		-- return
-	-- else
-		-- if !util.IsInWorld(dif) then
-			-- if self.explodable then 
-				-- self:Explode(self,tr)
-			-- else 
-				-- self:Remove()
-			-- end
-		-- else
-			-- self.Entity:SetPos(dif)
-		-- end
-	-- end
 	if self.FuzeTime > 0 then
 		if CurTime() >= self.GetExplTime then
 			self:Explode()
@@ -112,16 +82,127 @@ function ENT:PhysicsUpdate(ph)
 end
 function ENT:PhysicsCollide(data,phys)
 	timer.Simple(0,function()
-		local tr = util.QuickTrace(data.HitPos,data.HitPos,self)
-		self.tr = tr
-		data.HitEntity:SetVelocity(data.TheirOldVelocity)
-		data.HitEntity:SetPos(data.HitEntity:GetPos())
-		self:Explode(self,tr)
-		self.Collided = true
-		self:Remove()
+		self:Explode(data)
+		self.tr = data
 	end)
 end
 function ENT:Think()
-	if self.Collided then self:Remove() end
 	self.phys:Wake()
+end
+
+function ENT:Explode(tr)
+	if self.Exploded then return end
+	self.Exploded = true
+	-- if not IsValid(self.Owner) then 
+		-- if IsValid(self.Entity) then self.Owner = self.Entity
+		-- else self.Owner = nil end
+	-- end
+	-- local tr = self.tr
+	local pos = self:GetPos()
+	local hitpos = tr.HitPos
+	local hitang = tr.HitNormal:Angle()
+	
+	if !self.explodable then
+		local bullet = {}
+		bullet.Attacker = self.Owner
+		bullet.Callback = nil
+		if self.Caliber == "wac_base_12mm" then
+			self.Damage = 60 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			if GetConVarNumber("gred_sv_12mm_he_impact") >= 1 then 
+				bullet.Damage = zero 
+				util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
+			else
+				bullet.Damage = self.Damage
+			end
+			local d
+			if self.gunRPM >= 4000 then d = (self.gunRPM / 20000) else d = (self.gunRPM / 5000) end
+			if self.gunRPM >= 1000 then
+				self.Entity:EmitSound("impactsounds/gun_impact_"..math.random(1,14)..".wav",100, 100,d, CHAN_AUTO)
+				
+			elseif !self.sequential then
+				d = 1 / self.npod
+				self.Entity:EmitSound("impactsounds/gun_impact_"..math.random(1,14)..".wav",100, 100,d, CHAN_AUTO)
+			else
+				self.Entity:EmitSound("impactsounds/gun_impact_"..math.random(1,14)..".wav",audioSpecs)
+			end
+			hitang:Add(Angle(180,0,0))
+		elseif self.Caliber == "wac_base_7mm" then
+			self.Damage = 40 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			if GetConVarNumber("gred_sv_7mm_he_impact") >= 1 then
+				bullet.Damage = zero
+				util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
+			else
+				bullet.Damage = self.Damage 
+			end
+		end
+		bullet.Force = 5
+		bullet.HullSize = zero
+		bullet.Num = 1
+		bullet.Tracer = zero
+		bullet.AmmoType = null
+		bullet.TracerName = nil
+		bullet.Dir = tr.HitNormal
+		bullet.Spread = Vector(threeZ)
+		bullet.Src = pos
+		self:FireBullets(bullet,false)
+		if !self.NoParticle then
+			net.Start("gred_net_impact_fx")
+				net.WriteBool(false)
+				net.WriteString(self.Caliber)
+				-- if self.Caliber == "wac_base_7mm" then
+					-- net.WriteInt(self.Mats[util.GetSurfacePropName(tr.SurfaceProps)] or 24,6)
+				-- end
+				net.WriteVector(hitpos)
+				net.WriteAngle(hitang)
+			net.Broadcast()
+		end
+	else
+		if !self.HitWater then
+			if self.FuzeTime > 0 then
+				hitpos = pos
+				hitang = Angle(threeZ)
+				hitsky = true
+			else
+				hitsky = tr.HitSky
+			end
+		end
+		if self.Caliber == "wac_base_30mm" then
+			self.Damage = 100 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			util.BlastDamage(self, self.Owner, hitpos, self.Radius*3, self.Damage)
+			self.Entity:EmitSound("impactsounds/30mm_1.wav",140, math.random(90,120),1, CHAN_AUTO)
+		elseif self.Caliber == "wac_base_20mm" then
+			self.Damage = 80 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
+			util.BlastDamage(self,self.Owner,hitpos,self.Radius*2, self.Damage)
+		else
+			self.Damage = 120 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
+			util.BlastDamage(self,self.Owner,hitpos,self.Radius*4, self.Damage)
+		end
+		local bullet = {}
+		bullet.Damage = zero
+		bullet.Attacker = self.Owner
+		bullet.Callback = nil
+		bullet.Damage = zero
+		bullet.Force = 100
+		bullet.HullSize = zero
+		bullet.Num = 1
+		bullet.Tracer = zero
+		bullet.AmmoType = null
+		bullet.TracerName = null
+		bullet.Dir = self:GetForward()
+		bullet.Spread = Vector(threeZ)
+		bullet.Src = pos
+		if !hitsky then self:FireBullets( bullet, false ) end
+		if !self.NoParticle then
+			net.Start("gred_net_impact_fx")
+				net.WriteBool(false)
+				net.WriteString(self.Caliber)
+				net.WriteBool(hitsky)
+				net.WriteVector(hitpos)
+				if !hitsky then net.WriteAngle(hitang) end
+			net.Broadcast()
+		end
+	end
+	self:Remove()
 end

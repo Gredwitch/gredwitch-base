@@ -23,7 +23,7 @@ function ENT:Initialize()
 	if self.calcTarget then
 		self.Speed = 70
 	else
-		self.Speed = 300
+		self.Speed = 100
 	end
 end
 

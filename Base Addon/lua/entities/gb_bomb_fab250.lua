@@ -20,6 +20,18 @@ DistExploSnds[2]                         =  "explosions/doi_generic_02_dist.wav"
 DistExploSnds[3]                         =  "explosions/doi_generic_03_dist.wav"
 DistExploSnds[4]                         =  "explosions/doi_generic_04_dist.wav"
 
+local WaterExploSnds = {}
+WaterExploSnds[1]                         =  "explosions/doi_generic_01_water.wav"
+WaterExploSnds[2]                         =  "explosions/doi_generic_02_water.wav"
+WaterExploSnds[3]                         =  "explosions/doi_generic_03_water.wav"
+WaterExploSnds[4]                         =  "explosions/doi_generic_04_water.wav"
+
+local CloseWaterExploSnds = {}
+CloseWaterExploSnds[1]                         =  "explosions/doi_generic_02_closewater.wav"
+CloseWaterExploSnds[2]                         =  "explosions/doi_generic_02_closewater.wav"
+CloseWaterExploSnds[3]                         =  "explosions/doi_generic_03_closewater.wav"
+CloseWaterExploSnds[4]                         =  "explosions/doi_generic_04_closewater.wav"
+
 ENT.Spawnable		            	 =  true         
 ENT.AdminSpawnable		             =  true 
 
@@ -37,6 +49,8 @@ ENT.AngEffect						 =	true
 ENT.ExplosionSound                   =  table.Random(CloseExploSnds)
 ENT.FarExplosionSound				 =  table.Random(ExploSnds)
 ENT.DistExplosionSound				 =  table.Random(DistExploSnds)
+ENT.WaterExplosionSound				 =  table.Random(CloseWaterExploSnds)
+ENT.WaterFarExplosionSound			 =  table.Random(WaterExploSnds)
 ENT.RSound							 =	0
 
 ENT.ArmSound                         =  "npc/roller/mine/rmine_blip3.wav"
@@ -81,6 +95,8 @@ function ENT:SpawnFunction( ply, tr )
 	ent.ExplosionSound	= table.Random(CloseExploSnds)
 	ent.FarExplosionSound	= table.Random(ExploSnds)
 	ent.DistExplosionSound	= table.Random(DistExploSnds)
+	ent.WaterExplosionSound	= table.Random(CloseWaterExploSnds)
+	ent.WaterFarExplosionSound	= table.Random(WaterExploSnds)
 	
     return ent
 end

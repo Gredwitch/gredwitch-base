@@ -1,13 +1,4 @@
 AddCSLuaFile()
-if SERVER then util.AddNetworkString("gred_net_gbombs_explosion_fx") end
-if CLIENT then
-	net.Receive("gred_net_gbombs_explosion_fx",function()
-		ParticleEffect(net.ReadString(),net.ReadVector(),net.ReadAngle(),nil)
-		if net.ReadBool() then
-			ParticleEffect("doi_ceilingDust_large",net.ReadVector(),Angle(0,0,0),nil)
-		end
-	end)
-end
 DEFINE_BASECLASS( "base_anim" )
 
 local Models = {}
@@ -62,6 +53,7 @@ ENT.ArmDelay                         =  0.5
 ENT.Timer                            =  0
 ENT.RSound   						 =  1
 ENT.JDAM							 =  false
+ENT.Smoke							 =	false
 
 ENT.DEFAULT_PHYSFORCE                = 500
 ENT.DEFAULT_PHYSFORCE_PLYAIR         = 500
@@ -91,14 +83,15 @@ function ENT:Initialize()
 		self.Exploded = false
 		self.Used     = false
 		self.Arming   = false
-		if self.JDAM then
-			local physEnvironment = physenv.GetPerformanceSettings()
-			physEnvironment.MaxVelocity = 3500
-			physenv.SetPerformanceSettings(physEnvironment)
-		end
+		self:AddOnInit()
 		if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
-		if !(WireAddon == nil) then self.Inputs   = Wire_CreateInputs(self, { "Arm", "Detonate" }) end
 	end
+end
+
+
+
+function ENT:AddOnInit() 
+	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate" }) end
 end
 
 function ENT:PhysicsUpdate(ph)
@@ -155,29 +148,35 @@ function ENT:LoadModel()
 	 end
 end
 
-function ENT:AddOnExplode()
+function ENT:AddOnExplode() end
+
+function ENT:AddOnThink() end
+
+function ENT:Think()
+	self:AddOnThink()
 end
 
 function ENT:Explode()
 	if !self.Exploded then return end
 	local pos = self:LocalToWorld(self:OBBCenter())
-	self:AddOnExplode()
-	local ent = ents.Create("shockwave_ent")
-	ent:SetPos( pos ) 
-	ent:Spawn()
-	ent:Activate()
-	ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
-	ent:SetVar("DEFAULT_PHYSFORCE_PLYAIR", self.DEFAULT_PHYSFORCE_PLYAIR)
-	ent:SetVar("DEFAULT_PHYSFORCE_PLYGROUND", self.DEFAULT_PHYSFORCE_PLYGROUND)
-	ent:SetVar("GBOWNER", self.GBOWNER)
-	ent:SetVar("SHOCKWAVEDAMAGE",self.ExplosionDamage)
-	ent:SetVar("MAX_RANGE",self.ExplosionRadius)
-	ent:SetVar("SHOCKWAVE_INCREMENT",50)
-	ent:SetVar("DELAY",0.01)
-	ent.trace=self.TraceLength
-	ent.decal=self.Decal
-	
-	net.Start("gred_net_gbombs_explosion_fx")
+	self:AddOnExplode(pos)
+	if not self.Smoke then
+		local ent = ents.Create("shockwave_ent")
+		ent:SetPos( pos ) 
+		ent:Spawn()
+		ent:Activate()
+		ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
+		ent:SetVar("DEFAULT_PHYSFORCE_PLYAIR", self.DEFAULT_PHYSFORCE_PLYAIR)
+		ent:SetVar("DEFAULT_PHYSFORCE_PLYGROUND", self.DEFAULT_PHYSFORCE_PLYGROUND)
+		ent:SetVar("GBOWNER", self.GBOWNER)
+		ent:SetVar("SHOCKWAVEDAMAGE",self.ExplosionDamage)
+		ent:SetVar("MAX_RANGE",self.ExplosionRadius)
+		ent:SetVar("SHOCKWAVE_INCREMENT",50)
+		ent:SetVar("DELAY",0.01)
+		ent.trace=self.TraceLength
+		ent.decal=self.Decal
+	end
+	net.Start("gred_net_explosion_fx")
 	if(self:WaterLevel() >= 1) then
 		local trdata   = {}
 		local trlength = Vector(0,0,9000)
@@ -204,14 +203,14 @@ function ENT:Explode()
 				net.WriteAngle(Angle(0,0,0))
 			end
 		end
-		 
-		if self.WaterExplosionSound == nil then else 
-			self.ExplosionSound = self.WaterExplosionSound 
+		if !self.Smoke then
+			if self.WaterExplosionSound == nil then else 
+				self.ExplosionSound = self.WaterExplosionSound 
+			end
+			if self.WaterFarExplosionSound == nil then else  
+				self.FarExplosionSound = self.WaterFarExplosionSound 
+			end
 		end
-		if self.WaterFarExplosionSound == nil then else  
-			self.FarExplosionSound = self.WaterFarExplosionSound 
-		end
-		
      else
 		 local tracedata    = {}
 	     tracedata.start    = pos

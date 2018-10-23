@@ -35,6 +35,15 @@ function ENT:Initialize()
 	if tracer == nil then tracer = 0 end
 	tracerConvar=GetConVar("gred_sv_tracers"):GetInt()
 	ammovar=GetConVar("gred_sv_default_wac_munitions"):GetInt()
+	if self.BulletType == "wac_base_7mm" then
+		num = 0.5
+	elseif self.BulletType == "wac_base_12mm" then
+		num = 1
+	elseif self.BulletType == "wac_base_20mm" then
+		num = 1.4
+	elseif self.BulletType == "wac_base_30mm" then
+		num = 3
+	end
 end
 
 function ENT:fireBullet(pos)
@@ -53,16 +62,7 @@ function ENT:fireBullet(pos)
 		self.aircraft:FireBullets(bullet)
 	else
 		local pos2=self.aircraft:LocalToWorld(pos+Vector(self.aircraft:GetVelocity():Length()*0.6,0,0))
-		if self.BulletType == "wac_base_7mm" then
-			spread = Angle(math.Rand(-0.5,0.5), math.Rand(-0.5,0.5), math.Rand(-0.5,0.5))
-		elseif self.BulletType == "wac_base_12mm" then
-			spread = Angle(math.Rand(-1,1), math.Rand(-1,1), math.Rand(-1,1))
-		elseif self.BulletType == "wac_base_20mm" then
-			spread = Angle(math.Rand(-1.4,1.4), math.Rand(-1.4,1.4), math.Rand(-1.4,1.4))
-		elseif self.BulletType == "wac_base_30mm" then
-			spread = Angle(math.Rand(-3,3), math.Rand(-3,3), math.Rand(-3,3))
-		end
-		ang = ang + Angle(axis,axis,0) + spread
+		ang:Add(Angle(axis,axis,0) + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
 		local b=ents.Create("gred_base_bullet")
 		b:SetPos(pos2)
 		b:SetAngles(ang)
@@ -78,12 +78,14 @@ function ENT:fireBullet(pos)
 		b.gunRPM=self.FireRate
 		b:Spawn()
 		b:Activate()
-		for _,e in pairs(self.aircraft.entities) do
-			if IsValid(e) then
-				constraint.NoCollide(e,b,0,0)
-			end
-		end
-		constraint.NoCollide(self.aircraft,b,0,0)
+		-- b.nocol = {}
+		-- for _,e in pairs(self.aircraft.entities) do
+			-- if IsValid(e) then
+				-- table.insert(b.nocol,e)
+			-- end
+		-- end
+		-- table.insert(b.nocol,self.aircraft)
+		-- table.insert(b.nocol,b)
 		b.Owner=self:getAttacker()
 		
 		if tracer >= GetConVarNumber("gred_sv_tracers") then

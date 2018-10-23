@@ -67,12 +67,6 @@ function ENT:fireRocket(pos, ang)
 			ph:SetVelocity(self:GetVelocity())
 			ph:AddAngleVelocity(Vector(30,0,0))
 		end
-		for _,e in pairs(self.aircraft.wheels) do
-			if IsValid(e) then
-				constraint.NoCollide(e,rocket,0,0)
-			end
-		end
-		constraint.NoCollide(self.aircraft,rocket,0,0)
 		self:EmitSound( "fire" )
 	elseif ammovar >= 1 then
 		local rocket = ents.Create("wac_hc_rocket")
@@ -95,7 +89,6 @@ function ENT:fireRocket(pos, ang)
 			ph:SetVelocity(self:GetVelocity())
 			ph:AddAngleVelocity(Vector(30,0,0))
 		end
-		constraint.NoCollide(self.aircraft, rocket, 0, 0)
 		self:EmitSound("firehydra")
 	
 	else
@@ -104,7 +97,14 @@ function ENT:fireRocket(pos, ang)
 		rocket:SetAngles(ang)
 		rocket.Owner = self:getAttacker()
 		rocket.IsOnPlane = true
+		rocket.SmartLaunch = false
 		rocket:Spawn()
+		for _,e in pairs(self.aircraft.entities) do
+			if IsValid(e) then
+				constraint.NoCollide(e,rocket,0,0)
+			end
+		end
+		constraint.NoCollide(self.aircraft,rocket,0,0)
 		rocket:Activate()
 		rocket:Launch()
 		local ph = rocket:GetPhysicsObject()
@@ -112,13 +112,8 @@ function ENT:fireRocket(pos, ang)
 			ph:AddVelocity(self:GetVelocity())
 			ph:AddAngleVelocity(Vector(30,0,0))
 		end
-		for _,e in pairs(self.aircraft.wheels) do
-			if IsValid(e) then
-				constraint.NoCollide(e,rocket,0,0)
-			end
-		end
-		constraint.NoCollide(self.aircraft,rocket,0,0)
 	end
+	-- print(self.aircraft:GetClass())
 end
 
 

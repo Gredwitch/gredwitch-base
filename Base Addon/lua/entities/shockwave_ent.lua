@@ -38,7 +38,7 @@ if SERVER then
 end
 function ENT:Trace()
 	if !self:IsValid() then return end
-	if GetConVar("gred_sv_decals"):GetInt() == 0 then return end
+	if GetConVar("gred_cl_decals"):GetInt() == 0 then return end
 	local pos = self:GetPos()
 	local tracedata    = {}
 	tracedata.start    = pos
@@ -55,7 +55,7 @@ function ENT:Think()
     if (SERVER) then
 		if !self:IsValid() then return end
 		local pos = self:GetPos()
-		self.CURRENTRANGE = self.CURRENTRANGE+(self.SHOCKWAVE_INCREMENT*4)
+		self.CURRENTRANGE = self.CURRENTRANGE+(self.SHOCKWAVE_INCREMENT*7)
 		if self.allowtrace then
 			self:Trace()
 			self.allowtrace=false
@@ -63,6 +63,7 @@ function ENT:Think()
 		for k, v in pairs(ents.FindInSphere(pos,self.CURRENTRANGE)) do
 			if (v:IsValid() or v:IsPlayer()) and (v.forcefielded==false or v.forcefielded==nil) then
 				local i = 0
+				-- local vdmg = self.SHOCKWAVEDAMAGE/((v:GetPos():Distance(pos))*0.01)
 				while i < v:GetPhysicsObjectCount() do
 					if self.GBOWNER == nil then
 						self.GBOWNER = self
@@ -76,10 +77,14 @@ function ENT:Think()
 					end
 					self.Owner = self.GBOWNER
 					-- local dmg = DamageInfo()
-					-- dmg:SetDamage(1)
+					-- dmg:SetDamage(vdmg)
+					-- print("v to pos = ",v:GetPos():Distance(pos))
+					-- print("pos to v = ",pos:Distance(v:GetPos()))
+					-- print("dmg = ",self.SHOCKWAVEDAMAGE/((v:GetPos():Distance(pos))*0.01))
 					-- dmg:SetDamageType(DMG_BLAST)
-					-- dmg:SetAttacker(self.Owner)
+					-- dmg:SetAttacker(self.GBOWNER)
 					util.BlastDamage(self, self.Owner, pos, self.MAX_RANGE, self.SHOCKWAVEDAMAGE)
+					-- util.BlastDamageInfo(dmg,pos,self.MAX_RANGE)
 					
 					local ent = ents.Create("env_physexplosion")
 					ent:SetPos( pos ) 
@@ -89,14 +94,13 @@ function ENT:Think()
 					ent:SetKeyValue("spawnflags","19")
 					ent:Fire("Explode", 0, 0)
 					ent:Remove()
-					if (v:IsValid()) then
-						phys = v:GetPhysicsObjectNum(i)
-						if (v:GetPhysicsObject(i):IsValid()) then
+					if self.CURRENTRANGE < self.MAX_RANGE then
+						local phys = v:GetPhysicsObjectNum(i)
+						if IsValid(phys) then
 							if v.IsOnPlane then return end
 							local mass = phys:GetMass()
 							local F_ang = self.DEFAULT_PHYSFORCE
 							local dist = (pos - v:GetPos()):Length()
-					
 							local relation = math.Clamp((self.CURRENTRANGE - dist) / self.CURRENTRANGE, 0, 1)
 							if not self.DEFAULT_PHYSFORCE == nil then
 								F_dir = (v:GetPos() - pos) * self.DEFAULT_PHYSFORCE
@@ -115,41 +119,38 @@ function ENT:Think()
 							if (v:GetClass()=="func_breakable" or class=="func_breakable_surf" or class=="func_physbox") then
 								v:Fire("Break", 0)
 							end
+							-- v:TakeDamageInfo(dmg)
 						end
-						if (v:IsPlayer()) then
+						if v:IsPlayer() and !v:IsOnGround() then
 							
-							 v:SetMoveType( MOVETYPE_WALK )
-							 -- v:TakeDamageInfo(dmg)
-							 local mass = phys:GetMass()
-							 local F_ang = self.DEFAULT_PHYSFORCE_PLYAIR
-							 local dist = (pos - v:GetPos()):Length()
-							 local relation = math.Clamp((self.CURRENTRANGE - dist) / self.CURRENTRANGE, 0, 1)
-							 if not self.DEFAULT_PHYSFORCE_PLYAIR == nil then
+							v:SetMoveType( MOVETYPE_WALK )
+							local mass = phys:GetMass()
+							local F_ang = self.DEFAULT_PHYSFORCE_PLYAIR
+							local dist = (pos - v:GetPos()):Length()
+							local relation = math.Clamp((self.CURRENTRANGE - dist) / self.CURRENTRANGE, 0, 1)
+							if not self.DEFAULT_PHYSFORCE_PLYAIR == nil then
 								F_dir = (v:GetPos() - pos) * self.DEFAULT_PHYSFORCE_PLYAIR
-							 else
+							else
 								F_dir = (v:GetPos() - pos) * 1
-							 end
-							 v:SetVelocity( F_dir )		
-						end
-						if (v:IsPlayer()) and v:IsOnGround() then
-							 v:SetMoveType( MOVETYPE_WALK )
-							 -- v:TakeDamageInfo(dmg)
-							 local mass = phys:GetMass()
-							 local F_ang = self.DEFAULT_PHYSFORCE_PLYGROUND
-							 local dist = (pos - v:GetPos()):Length()
-							 local relation = math.Clamp((self.CURRENTRANGE - dist) / self.CURRENTRANGE, 0, 1)
-							 if not self.DEFAULT_PHYSFORCE_PLYGROUND == nil then
+							end
+							v:SetVelocity( F_dir )
+							-- v:TakeDamageInfo(dmg)
+						elseif v:IsPlayer() and v:IsOnGround() then
+							v:SetMoveType( MOVETYPE_WALK )
+							local mass = phys:GetMass()
+							local F_ang = self.DEFAULT_PHYSFORCE_PLYGROUND
+							local dist = (pos - v:GetPos()):Length()
+							local relation = math.Clamp((self.CURRENTRANGE - dist) / self.CURRENTRANGE, 0, 1)
+							if not self.DEFAULT_PHYSFORCE_PLYGROUND == nil then
 								F_dir = (v:GetPos() - pos) * self.DEFAULT_PHYSFORCE_PLYGROUND
-							 else
+							else
 								F_dir = (v:GetPos() - pos) * 1
-							 end	 
-							 v:SetVelocity( F_dir )		
-						 end
-						if (v:IsNPC()) then
+							end
+							v:SetVelocity( F_dir )
 							-- v:TakeDamageInfo(dmg)
 						end
 					end
-					i = i + 1
+				i = i + 1
 				end
 			end
 		end

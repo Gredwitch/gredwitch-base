@@ -8,6 +8,7 @@ ENT.Purpose 		= ""
 ENT.Instructions 	= "end my life"
 ENT.Spawnable		= false
 ENT.AdminSpawnable	= false
+ENT.Loop			= false
 ENT.Name 			= "Red Gunner Pod"
 ENT.Ammo 			= 750
 ENT.FireRate 		= 730
@@ -33,8 +34,7 @@ function ENT:SetupDataTables()
 end
 
 
-
-function ENT:drawCrosshair()
+ENT.drawCrosshair=function()
 	surface.SetDrawColor(255,255,255,150)
 	local center = {x=ScrW()/2, y=ScrH()/2}
 	surface.DrawLine(center.x+5, center.y, center.x+30, center.y)

@@ -36,6 +36,7 @@ function ENT:Initialize()
 	self:base("wac_pod_base").Initialize(self)
 	self.baseThink = self:base("wac_pod_base").Think
 	if !self.FaF then self.MaxRange = 10000 end
+	ammovar=GetConVar("gred_sv_default_wac_munitions"):GetInt()
 end
 
 
@@ -48,7 +49,6 @@ end
 function ENT:canFire()
 	if self.FaF then return self.FaF
 	else return IsValid(self:GetTarget()) end
-	ammovar=GetConVar("gred_sv_default_wac_munitions"):GetInt()
 end
 
 
@@ -95,7 +95,6 @@ function ENT:fireRocket(pos, ang)
 			ph:SetVelocity(self:GetVelocity())
 			ph:AddAngleVelocity(Vector(30,0,0))
 		end
-		constraint.NoCollide(self.aircraft, rocket, 0, 0)
 		-- self:StopSound("firehydra")
 		self:EmitSound("firehydra")
 	else
@@ -134,15 +133,15 @@ function ENT:fireRocket(pos, ang)
 			ph:SetVelocity(self:GetVelocity())
 			ph:AddAngleVelocity(Vector(30,0,0))
 		end
-		for _,e in pairs(self.aircraft.wheels) do
-			if IsValid(e) then
-				constraint.NoCollide(e,rocket,0,0)
-			end
-		end
-		constraint.NoCollide(self.aircraft,rocket,0,0)
 		-- self:StopSound("fire")
 		self:EmitSound("fire")
 	end
+	for _,e in pairs(self.aircraft.entities) do
+		if IsValid(e) then
+			constraint.NoCollide(e,b,0,0)
+		end
+	end
+	constraint.NoCollide(self.aircraft,b,0,0)
 end
 
 

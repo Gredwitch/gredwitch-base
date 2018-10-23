@@ -19,8 +19,6 @@ ENT.Seats = {
 		exit = Vector(72,70,0),
 	},
 }
-
-
 ENT.Sounds = {
 	Start = "HelicopterVehicle/HeliStart.mp3",
 	Blades = "vehicles/Airboat/fan_blade_idle_loop1.wav",
@@ -30,12 +28,15 @@ ENT.Sounds = {
 	LowHealth = "HelicopterVehicle/LowHealth.mp3",
 	CrashAlarm = "HelicopterVehicle/CrashAlarm.mp3",
 	Radio = "",
+	crashsnd = "",
+	bipsnd = "crash/bip_loop.wav",
 }
 
 ENT.Wheels = {}
 
 function ENT:addSounds()
 	self.sounds = {}
+	self.Sounds.crashsnd = "crash/crash_"..math.random(1,10)..".ogg" --ADDED BY THE GREDWITCH
 	for name, value in pairs(self.Sounds) do
 		if name != "BaseClass" then
 			sound.Add({
@@ -49,8 +50,12 @@ function ENT:addSounds()
 				self.sounds[name]:SetSoundLevel(120)
 			elseif name == "Engine" then
 				self.sounds[name]:SetSoundLevel(110)
-			elseif name == "Radio" and value != "" then --ADDED BY THE GREDWITCH
-				self.sounds[name]:SetSoundLevel(60) --ADDED BY THE GREDWITCH
+			elseif name == "Radio" and value != "" then --ADDED BY THE GREDWITCH (start)
+				self.sounds[name]:SetSoundLevel(60)
+			elseif name == "crashsnd" then
+				self.sounds[name]:SetSoundLevel(120)
+			elseif name == "bipsnd" then
+				self.sounds[name]:SetSoundLevel(80) --ADDED BY THE GREDWITCH (end)
 			end
 		end
 	end

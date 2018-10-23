@@ -51,7 +51,7 @@ ENT.Mass                             =  10
 ENT.ExplosionSound                   =  table.Random(CloseExploSnds)
 ENT.FarExplosionSound				 =  table.Random(ExploSnds)
 ENT.DistExplosionSound				 =  table.Random(DistExploSnds)
-ENT.WaterExplosionSound				 =	table.Random(CloseExploSnds)
+ENT.WaterExplosionSound				 =	table.Random(CloseWaterExploSnds)
 ENT.WaterFarExplosionSound			 =  table.Random(WaterExploSnds)
 
 ENT.RSound   						 =  0

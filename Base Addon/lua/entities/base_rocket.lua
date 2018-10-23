@@ -1,14 +1,5 @@
 AddCSLuaFile()
-if SERVER then util.AddNetworkString("gred_net_gredrocket_explosion_fx") end
-if CLIENT then
-	net.Receive("gred_net_gredrocket_explosion_fx",function()
-		ParticleEffect(net.ReadString(),net.ReadVector(),net.ReadAngle(),nil)
-		if net.ReadBool() then
-			ParticleEffect("doi_ceilingDust_large",net.ReadVector(),Angle(0,0,0),nil)
-		end
-	end)
-end
-DEFINE_BASECLASS( "base_anim" )
+DEFINE_BASECLASS( "base_bomb" )
 sound.Add( {
 	name = "RP3_Engine",
 	channel = CHAN_STATIC,
@@ -115,38 +106,8 @@ ENT.RSound   						 =  1
 
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
-function ENT:Initialize()
- if (SERVER) then
-	if (GetConVar("gred_sv_spawnable_bombs"):GetInt() == 0 and !self.IsOnPlane) then
-		self:Remove()
-	end
-		local physEnvironment = physenv.GetPerformanceSettings()
-		physEnvironment.MaxVelocity = 3500
-		physenv.SetPerformanceSettings(physEnvironment)
-     self:SetModel(self.Model)  
-	 self:PhysicsInit( SOLID_VPHYSICS )
-	 self:SetSolid( SOLID_VPHYSICS )
-	 self:SetMoveType(MOVETYPE_VPHYSICS)
-	 self:SetUseType( ONOFF_USE ) -- doesen't fucking work
-	 local phys = self:GetPhysicsObject()
-	 local skincount = self:SkinCount()
-	 if (phys:IsValid()) then
-		 phys:SetMass(self.Mass)
-		 phys:Wake()
-     end
-	 if (skincount > 0) then
-	     self:SetSkin(math.random(0,skincount))
-	 end
-	 self.Armed    = false
-	 self.Exploded = false
-	 self.Fired    = false
-	 self.Burnt    = false
-	 self.Ignition = false
-	 self.Arming   = false
-		
-	if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
+function ENT:AddOnInit() 
 	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
-	end
 end
 
 function ENT:TriggerInput(iname, value)
@@ -178,145 +139,6 @@ function ENT:TriggerInput(iname, value)
 		     end
 	     end
      end
-end          
-
-function ENT:AddOnExplode()
-end
-
-function ENT:AddOnThink()
-end
-
-function ENT:Explode()
-    if not self.Exploded then return end
-	local pos = self:LocalToWorld(self:OBBCenter())
-	self:AddOnExplode()
-	if not self.Smoke then
-		local ent = ents.Create("shockwave_ent")
-		ent:SetPos( pos ) 
-		ent:Spawn()
-		ent:Activate()
-		ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
-		ent:SetVar("DEFAULT_PHYSFORCE_PLYAIR", self.DEFAULT_PHYSFORCE_PLYAIR)
-		ent:SetVar("DEFAULT_PHYSFORCE_PLYGROUND", self.DEFAULT_PHYSFORCE_PLYGROUND)
-		ent:SetVar("GBOWNER", self.GBOWNER)
-		ent:SetVar("MAX_RANGE",self.ExplosionRadius)
-		ent:SetVar("SHOCKWAVEDAMAGE",self.ExplosionDamage)
-		ent:SetVar("SHOCKWAVE_INCREMENT",50)
-		ent:SetVar("DELAY",0.01)
-		ent.trace=self.TraceLength
-		ent.decal=self.Decal
-		for k, v in pairs(ents.FindInSphere(pos,self.SpecialRadius)) do
-			if v:IsValid() then
-				local i = 0
-				while i < v:GetPhysicsObjectCount() do
-				phys = v:GetPhysicsObjectNum(i)	  
-				if (phys:IsValid()) then		
-					local mass = phys:GetMass()
-					local F_ang = self.PhysForce
-					local dist = (pos - v:GetPos()):Length()
-					local relation = math.Clamp((self.SpecialRadius - dist) / self.SpecialRadius, 0, 1)
-					local F_dir = (v:GetPos() - pos):GetNormal() * self.PhysForce
-					   
-					phys:AddAngleVelocity(Vector(F_ang, F_ang, F_ang) * relation)
-					phys:AddVelocity(F_dir)
-				end
-				i = i + 1
-				end
-			end
-		end
-	end
-	net.Start("gred_net_gbombs_explosion_fx")
-	if(self:WaterLevel() >= 1) then
-		local trdata   = {}
-		local trlength = Vector(0,0,9000)
-
-		trdata.start   = pos
-		trdata.endpos  = trdata.start + trlength
-		trdata.filter  = self
-		local tr = util.TraceLine(trdata) 
-
-		local trdat2   = {}
-		trdat2.start   = tr.HitPos
-		trdat2.endpos  = trdata.start - trlength
-		trdat2.filter  = self
-		trdat2.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
-			 
-		local tr2 = util.TraceLine(trdat2)
-		
-		if tr2.Hit then
-			net.WriteString(self.EffectWater)
-			net.WriteVector(tr2.HitPos)
-			if self.EffectWater == "ins_water_explosion" then
-				net.WriteAngle(Angle(-90,0,0))
-			else
-				net.WriteAngle(Angle(0,0,0))
-			end
-		end
-		 
-		if self.WaterExplosionSound == nil then else 
-			self.ExplosionSound = self.WaterExplosionSound 
-		end
-		if self.WaterFarExplosionSound == nil then else  
-			self.FarExplosionSound = self.WaterFarExplosionSound 
-		end
-		
-     else
-		 local tracedata    = {}
-	     tracedata.start    = pos
-		 tracedata.endpos   = tracedata.start - Vector(0, 0, self.TraceLength)
-		 tracedata.filter   = self.Entity
-				
-		 local trace = util.TraceLine(tracedata)
-	     
-		if trace.HitWorld then
-			net.WriteString(self.Effect)
-			net.WriteVector(pos)
-			if self.AngEffect then
-				net.WriteAngle(Angle(-90,0,0))
-				net.WriteBool(true)
-				net.WriteVector(pos-Vector(0,0,100))
-			else
-				net.WriteAngle(Angle(0,0,0))
-			end
-		else 
-			net.WriteString(self.Effect)
-			net.WriteVector(pos)
-			if self.AngEffect then
-				net.WriteAngle(Angle(-90,0,0))
-			else
-				net.WriteAngle(Angle(0,0,0))
-			end
-		end
-    end
-	net.Broadcast()
-	 
-	local ent = ents.Create("shockwave_sound_lowsh")
-	ent:SetPos( pos ) 
-	ent:Spawn()
-	ent:Activate()
-	ent:SetVar("GBOWNER", self.GBOWNER)
-	ent:SetVar("MAX_RANGE",self.ExplosionDamage*self.ExplosionRadius)
-	if self.RSound == nil then ent:SetVar("NOFARSOUND",1) else
-		ent:SetVar("NOFARSOUND",self.RSound) 
-	end
-	ent:SetVar("SHOCKWAVE_INCREMENT",200)
-	
-	ent:SetVar("DELAY",0.01)
-	ent:SetVar("SOUNDCLOSE", self.ExplosionSound)
-	ent:SetVar("SOUND", self.FarExplosionSound)
-	ent:SetVar("SOUNDFAR", self.DistExplosionSound)
-	ent:SetVar("Shocktime", 0)
-	
-	 if self.IsNBC then
-	     local nbc = ents.Create(self.NBCEntity)
-		 nbc:SetVar("GBOWNER",self.GBOWNER)
-		 nbc:SetPos(self:GetPos())
-		 nbc:Spawn()
-		 nbc:Activate()
-	 end
-	self:StopSound(self.EngineSound)
-	self:StopSound(self.StartSound)
-	self:Remove()
 end
 
 function ENT:OnTakeDamage(dmginfo)
@@ -356,6 +178,7 @@ end
 
 function ENT:PhysicsCollide( data, physobj )
 	 timer.Simple(0,function()
+	 -- print(data.HitEntity:GetClass())
      if(self.Exploded) then return end
      if(!self:IsValid()) then return end
 	 if(self.Life <= 0) then return end
@@ -498,36 +321,4 @@ end
 function ENT:OnRemove()
      self:StopSound(self.EngineSound)
 	 self:StopParticles()
-end
-
-if ( CLIENT ) then
-     function ENT:Draw()
-         self:DrawModel()
-		 if !(WireAddon == nil) then Wire_Render(self.Entity) end
-     end
-end
-
-function ENT:OnRestore()
-     Wire_Restored(self.Entity)
-end
-
-function ENT:BuildDupeInfo()
-     return WireLib.BuildDupeInfo(self.Entity)
-end
-
-function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
-     WireLib.ApplyDupeInfo( ply, ent, info, GetEntByID )
-end
-
-function ENT:PrentityCopy()
-     local DupeInfo = self:BuildDupeInfo()
-     if(DupeInfo) then
-         duplicator.StorentityModifier(self.Entity,"WireDupeInfo",DupeInfo)
-     end
-end
-
-function ENT:PostEntityPaste(Player,Ent,CreatedEntities)
-     if(Ent.EntityMods and Ent.EntityMods.WireDupeInfo) then
-         Ent:ApplyDupeInfo(Player, Ent, Ent.EntityMods.WireDupeInfo, function(id) return CreatedEntities[id] end)
-     end
 end

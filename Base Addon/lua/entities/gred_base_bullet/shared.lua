@@ -11,16 +11,14 @@ local threeZ = zero,zero,zero
 local audioSpecs = 100, 100,1, CHAN_AUTO
 local null = ""
 if SERVER then
-	util.AddNetworkString("gred_net_impact_fx") 
-
-	function ENT.Explode(self,tr,ply)
+	function ENT:Explode(tr,ply)
 		if self.Exploded then return end
 		self.Exploded = true
 		if not IsValid(self.Owner) then 
 			if IsValid(self.Entity) then self.Owner = self.Entity
 			else self.Owner = nil end
 		end
-		-- print(tr.HitPos)
+		local pos = self:GetPos()
 		if self.FuzeTime == 0 then
 			if tr.HitNormal == nil then
 				hitang = Angle(threeZ)
@@ -33,7 +31,8 @@ if SERVER then
 				hitpos = tr.HitPos
 			end
 		end
-		if self.Caliber != "wac_base_20mm" and self.Caliber != "wac_base_30mm" and self.Caliber != "wac_base_40mm" then
+		-- print(self.exp
+		if !self.explodable then
 			if !tr.HitSky then
 				local bullet = {}
 				bullet.Attacker = self.Owner
@@ -67,7 +66,7 @@ if SERVER then
 					else
 						bullet.Damage = self.Damage 
 					end
-					hitang = hitang+Angle(90,0,0)
+					hitang:Add(Angle(90,0,0))
 					
 				end
 				bullet.Force = 5
@@ -78,7 +77,7 @@ if SERVER then
 				bullet.TracerName = nil
 				bullet.Dir = self:GetForward()
 				bullet.Spread = Vector(threeZ)
-				bullet.Src = self:GetPos()
+				bullet.Src = pos
 				self:FireBullets(bullet,false)
 				
 				if !self.NoParticle then
@@ -209,14 +208,12 @@ if SERVER then
 				end
 			end
 		else
-			if SERVER then
-				if self.FuzeTime > 0 then
-					hitpos = self:GetPos()
-					hitang = Angle(threeZ)
-					hitsky = true
-				else
-					hitsky = tr.HitSky
-				end
+			if self.FuzeTime > 0 then
+				hitpos = pos
+				hitang = Angle(threeZ)
+				hitsky = true
+			else
+				hitsky = tr.HitSky
 			end
 			if self.Caliber == "wac_base_30mm" then
 				self.Damage = 100 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
@@ -244,7 +241,7 @@ if SERVER then
 			bullet.TracerName = null
 			bullet.Dir = self:GetForward()
 			bullet.Spread = Vector(threeZ)
-			bullet.Src = self:GetPos()
+			bullet.Src = pos
 			if !hitsky then self:FireBullets( bullet, false ) end
 			if !self.NoParticle then
 				net.Start("gred_net_impact_fx")
