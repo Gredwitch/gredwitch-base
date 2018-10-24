@@ -277,6 +277,9 @@ function ENT:Think()
 	 if (self.Armed) then
         phys:AddAngleVelocity(Vector(self.RotationalForce,0,0)) -- Rotational force
 	 end
+	if self.Fired then
+		if self:WaterLevel() >= 1 then self:Explode() end
+	end
 	self:AddOnThink()
 	self:NextThink(CurTime() + 0.01)
 	return true

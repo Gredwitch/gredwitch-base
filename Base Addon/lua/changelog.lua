@@ -311,4 +311,8 @@
 - Updated HC_BASE : Helicopters should now spin when their health is low / Made the explosion effects client-side
 - Updated the spawnmenu options : server-side options are not showing anymore since you can only modify the convars with RCon
 - Removed unused base_fire
+
+24/10/2018 (10/24/2018)
+- Updated base_rocket: shells and rockets will now explode when they hit water
+- Updated gred_base_bullet : fixed the water impact effects not working
 --]]

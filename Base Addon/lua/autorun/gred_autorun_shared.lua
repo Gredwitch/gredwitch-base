@@ -127,6 +127,7 @@ if SERVER then
 	util.AddNetworkString("gred_net_impact_fx")
 	util.AddNetworkString("gred_net_wac_explosion")
 	util.AddNetworkString("gred_net_wac_fire")
+	util.AddNetworkString("gred_net_message_ply")
 end
 if CLIENT then
 	net.Receive("gred_net_explosion_fx",function()
@@ -259,5 +260,12 @@ if CLIENT then
 	net.Receive("gred_net_wac_explosion", function()
 		if GetConVar("gred_cl_wac_explosions"):GetInt() <= 0 then return end
 		ParticleEffect(net.ReadString(),net.ReadVector(),net.ReadAngle(),nil)
+	end)
+
+	net.Receive ("gred_net_message_ply",function()
+		local ply = net.ReadEntity()
+		local msg = net.ReadString()
+		ply:PrintMessage(HUD_PRINTTALK,msg)
+		-- ply:ChatPrint(msg)
 	end)
 end
