@@ -45,7 +45,7 @@ function ENT:Initialize()
 	self.orpos = self:GetPos()
 	self.oldpos=self.orpos-(self:GetAngles():Forward()*self.Speed)
 	trace = {}
-	self.Mask = MASK_WATER
+	self.Mask = MASK_ALL
 	self.explodable = self.Caliber == "wac_base_20mm" or self.Caliber == "wac_base_30mm" or self.Caliber == "wac_base_40mm"
 end
 
@@ -62,7 +62,7 @@ function ENT:PhysicsUpdate(ph)
 	trace.filter = self.Entity
 	trace.mask=self.Mask
 	local tr2 = util.TraceLine(trace)
-	if tr2.Hit then
+	if tr2.MatType == 83 then
 		net.Start("gred_net_impact_fx")
 			net.WriteBool(true)
 			net.WriteString(self.Caliber)

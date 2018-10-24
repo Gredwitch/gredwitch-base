@@ -314,5 +314,5 @@
 
 24/10/2018 (10/24/2018)
 - Updated base_rocket: shells and rockets will now explode when they hit water
-- Updated gred_base_bullet : fixed the water impact effects not working
+- Updated gred_base_bullet : fixed the water impact effects not working / Removed useless variables
 --]]
