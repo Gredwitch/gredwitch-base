@@ -43,7 +43,7 @@ ENT.Timer                            =  0
 ENT.Shocktime                        = 0
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
-ENT.Decal                            = "scorch_big"
+ENT.Decal                            = "scorch_huge"
 
 function ENT:SpawnFunction( ply, tr )
      if ( !tr.Hit ) then return end

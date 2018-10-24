@@ -2,7 +2,7 @@
 {
 	"$basetexture" "decals/nuke"
 	"$decal" 1
-	"$decalscale" 0.50
+	"$decalscale" 10
 	"$translucent" 1
 
 

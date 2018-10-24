@@ -1411,12 +1411,12 @@ function ENT:DamageEngine(amt)
 				self.sounds.LowHealth:Play()
 				self.EngineFire = fire
 			end
-			if self.engineHealth < 10 then 
+			if self.engineHealth < 10 and (!self.ShouldRotate or self.blewup) then 
 				self.engineDead = true 
 				self:setEngine(false) 
 			end
 
-			if self.engineHealth < 0 and !self.disabled then
+			if self.engineHealth < 0 and !self.disabled and (!self.ShouldRotate or self.blewup) then
 				self.disabled = true
 				self.engineRpm = 0
 				self.rotorRpm = 0

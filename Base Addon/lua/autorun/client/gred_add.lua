@@ -45,13 +45,6 @@ CreateClientConVar("gred_cl_decals"				, "1" , true,false)
 CreateClientConVar("gred_cl_altmuzzleeffect"	, "0" , true,false)
 CreateClientConVar("gred_cl_wac_explosions" 	, "1" , true,false)
 
-
-game.AddDecal( "scorch_small",					"decals/scorch_small" );
-game.AddDecal( "scorch_medium",					"decals/scorch_medium" );
-game.AddDecal( "scorch_big",					"decals/scorch_big" );
-game.AddDecal( "scorch_big_2",					"decals/scorch_big_2" );
-game.AddDecal( "scorch_big_3",					"decals/scorch_big_3" );
-
 -----------------------------------------------------------
 -- Adding the spawnmenu options
 local function gredsettings(CPanel)

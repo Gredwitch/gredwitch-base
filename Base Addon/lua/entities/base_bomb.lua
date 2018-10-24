@@ -39,6 +39,7 @@ ENT.UseRandomModels                  =  false
 ENT.Timed                            =  false
 ENT.IsNBC                            =  false
 
+ENT.Decal							 =	"scorch_medium"
 ENT.ExplosionDamage                  =  0
 ENT.PhysForce                        =  0
 ENT.ExplosionRadius                  =  0

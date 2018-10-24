@@ -46,8 +46,9 @@ ENT.ImpactSpeed                      =  200
 ENT.Mass                             =  500
 ENT.ArmDelay                         =  0.1   
 ENT.Timer                            =  0
-ENT.RSound							 = 0
-ENT.Shocktime                        = 0
+ENT.RSound							 =  0
+ENT.Shocktime                        =  0
+ENT.Decal							 =	"scorch_big"
 ENT.GBOWNER                          =  nil    
 
 

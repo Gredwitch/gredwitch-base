@@ -31,7 +31,6 @@ if SERVER then
 				hitpos = tr.HitPos
 			end
 		end
-		-- print(self.exp
 		if !self.explodable then
 			if !tr.HitSky then
 				local bullet = {}

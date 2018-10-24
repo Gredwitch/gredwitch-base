@@ -40,11 +40,10 @@ ENT.ImpactSpeed                      =  200
 ENT.Mass                             =  500
 ENT.ArmDelay                         =  0.1   
 ENT.Timer                            =  0
+ENT.Decal							 =	"scorch_gigantic"
 
 ENT.Shocktime                        = 0
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
-
-ENT.Decal                            = "scorch_big"
 
 function ENT:SpawnFunction( ply, tr )
      if ( !tr.Hit ) then return end

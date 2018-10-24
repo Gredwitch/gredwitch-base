@@ -36,28 +36,20 @@ if SERVER then
 		self.allowtrace=true
 	end
 end
-function ENT:Trace()
-	if !self:IsValid() then return end
-	if GetConVar("gred_cl_decals"):GetInt() == 0 then return end
-	local pos = self:GetPos()
-	local tracedata    = {}
-	tracedata.start    = pos
-	tracedata.endpos   = tracedata.start - Vector(0, 0, self.trace)
-	tracedata.filter   = self.Entity
-	local trace = util.TraceLine(tracedata)
-	if self.decal==nil then 
-		self.decal="scorch_medium"
-	end
-	
-	util.Decal( self.decal, tracedata.start, tracedata.endpos )
-end
 function ENT:Think()
     if (SERVER) then
 		if !self:IsValid() then return end
 		local pos = self:GetPos()
 		self.CURRENTRANGE = self.CURRENTRANGE+(self.SHOCKWAVE_INCREMENT*7)
 		if self.allowtrace then
-			self:Trace()
+			if self.decal==nil then
+				self.decal="scorch_medium"
+			end
+			net.Start("gred_net_bombs_decals")
+				net.WriteString(self.decal)
+				net.WriteVector(pos)
+				net.WriteVector(pos-Vector(0,0,self.trace))
+			net.Broadcast()
 			self.allowtrace=false
 		end
 		for k, v in pairs(ents.FindInSphere(pos,self.CURRENTRANGE)) do

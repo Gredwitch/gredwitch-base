@@ -46,6 +46,7 @@ ENT.Mass                             =  340
 ENT.ArmDelay                         =  0
 ENT.Timer                            =  0
 
+ENT.Decal							 =	"scorch_huge"
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
 

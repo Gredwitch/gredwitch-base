@@ -77,6 +77,7 @@ ENT.RotationalForce                  =  500
 ENT.ForceOrientation                 =  "NORMAL"
 ENT.Timer                            =  0
 
+ENT.Decal                            = "scorch_big"
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
 function ENT:SpawnFunction( ply, tr )

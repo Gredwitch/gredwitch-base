@@ -161,6 +161,7 @@ function ENT:AddOnExplode(pos)
 		self.ExplosionRadius = 100
 		self.ExplosionDamage = self.APDamage
 		self.PhysForce = 10
+		self.Decal = "scorch_small"
 	end
 	if self:WaterLevel() < 1 then
 		if self.AP then

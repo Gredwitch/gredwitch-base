@@ -122,13 +122,23 @@ PrecacheParticleSystem("doi_wpgrenade_explosion")
 
 util.PrecacheModel("models/gredwitch/bullet.mdl")
 
+
+game.AddDecal( "scorch_small",					"decals/scorch_small" );
+game.AddDecal( "scorch_medium",					"decals/scorch_medium" );
+game.AddDecal( "scorch_big",					"decals/scorch_big" );
+game.AddDecal( "scorch_huge",					"decals/scorch_huge" );
+game.AddDecal( "scorch_gigantic",				"decals/scorch_gigantic" );
+game.AddDecal( "scorch_x10",					"decals/scorch_x10" );
+
 if SERVER then 
 	util.AddNetworkString("gred_net_explosion_fx")
 	util.AddNetworkString("gred_net_impact_fx")
 	util.AddNetworkString("gred_net_wac_explosion")
 	util.AddNetworkString("gred_net_wac_fire")
 	util.AddNetworkString("gred_net_message_ply")
+	util.AddNetworkString("gred_net_bombs_decals")
 end
+
 if CLIENT then
 	net.Receive("gred_net_explosion_fx",function()
 		ParticleEffect(net.ReadString(),net.ReadVector(),net.ReadAngle(),nil)
@@ -267,5 +277,13 @@ if CLIENT then
 		local msg = net.ReadString()
 		ply:PrintMessage(HUD_PRINTTALK,msg)
 		-- ply:ChatPrint(msg)
+	end)
+
+	net.Receive("gred_net_bombs_decals",function()
+		if GetConVar("gred_cl_decals"):GetInt() <= 0 then return end
+		local decal = net.ReadString()
+		local start = net.ReadVector()
+		local hitpos = net.ReadVector()
+		util.Decal(decal,start,hitpos)
 	end)
 end

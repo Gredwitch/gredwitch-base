@@ -313,6 +313,8 @@
 - Removed unused base_fire
 
 24/10/2018 (10/24/2018)
-- Updated base_rocket: shells and rockets will now explode when they hit water
-- Updated gred_base_bullet : fixed the water impact effects not working / Removed useless variables
+- Updated base_rocket: Shells and rockets will now explode when they hit water
+- Updated gred_base_bullet : Fixed the water impact effects not working / Removed useless variables
+- Updated wac_hc_base : Fixed helicopters blowing up in mid air while going down
+- Tweaked the explosives' decals so they can fit with their effect
 --]]
