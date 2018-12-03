@@ -134,7 +134,7 @@ function ENT:stop()
 		self.sounds.stop:Play()
 		self.shooting = false
 		if self.Brrt == 1 then
-			timer.Create("gred_brrt",2.5, 1,function() self.aircraft:EmitSound("wac/a10/brrt.wav",0, math.random(80,120), 1, CHAN_AUTO) end)
+			timer.Create("gred_brrt",2.5, 1,function() self.aircraft:EmitSound("wac/a10/brrt_0"..math.random(1,4)..".wav",0,100, 1, CHAN_AUTO) end)
 			self:CallOnRemove(("StopBrrt"), function() timer.Remove("gred_brrt") end)
 		end
 	end

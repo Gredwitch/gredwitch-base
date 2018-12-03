@@ -317,4 +317,14 @@
 - Updated gred_base_bullet : Fixed the water impact effects not working / Removed useless variables
 - Updated wac_hc_base : Fixed helicopters blowing up in mid air while going down
 - Tweaked the explosives' decals so they can fit with their effect
+
+03/12/2018 (12/03/2018)
+- Added brand new explosion effects
+- Added gb_shell_152mm and gb_shell_152mm
+- Added a file precache system
+- Added the shell materials
+- Added new brrt SFX
+- Fixed the V1 sound not stopping
+- Updated base_shell : added a shell whistle SFX
+- Updated base_gas : fixed a bug
 --]]
