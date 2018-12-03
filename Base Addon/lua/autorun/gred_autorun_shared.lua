@@ -118,6 +118,9 @@ PrecacheParticleSystem("m203_smokegrenade")
 PrecacheParticleSystem("doi_GASarty_explosion")
 PrecacheParticleSystem("doi_compb_explosion")
 PrecacheParticleSystem("doi_wpgrenade_explosion")
+PrecacheParticleSystem("ins_c4_explosion")
+PrecacheParticleSystem("doi_artillery_explosion_OLD")
+PrecacheParticleSystem("gred_highcal_rocket_explosion")
 
 
 util.PrecacheModel("models/gredwitch/bullet.mdl")
@@ -131,12 +134,14 @@ game.AddDecal( "scorch_gigantic",				"decals/scorch_gigantic" );
 game.AddDecal( "scorch_x10",					"decals/scorch_x10" );
 
 if SERVER then 
+	util.AddNetworkString("gred_net_sound_lowsh")
 	util.AddNetworkString("gred_net_explosion_fx")
 	util.AddNetworkString("gred_net_impact_fx")
 	util.AddNetworkString("gred_net_wac_explosion")
 	util.AddNetworkString("gred_net_wac_fire")
 	util.AddNetworkString("gred_net_message_ply")
 	util.AddNetworkString("gred_net_bombs_decals")
+	util.AddNetworkString("gred_net_nw_var")
 end
 
 if CLIENT then
@@ -286,4 +291,79 @@ if CLIENT then
 		local hitpos = net.ReadVector()
 		util.Decal(decal,start,hitpos)
 	end)
+	
+	net.Receive("gred_net_sound_lowsh",function(len,pl)
+		local sound = net.ReadString()
+		LocalPlayer():GetViewEntity():EmitSound(sound)
+	end)
+	
+	net.Receive("gred_net_nw_var",function()
+		local self = net.ReadEntity()
+		local str = net.ReadString()
+		local t = net.ReadInt(4)
+		if t == 1 then
+			local val = net.ReadString()
+			self:SetNWString(str,val)
+		elseif t == 2 then
+			local ent = net.ReadEntity()
+			self:SetNWEntity(str,ent)
+		elseif t == 3 then
+			local table = net.ReadTable()
+			self:SetNWTable(str,table)
+		end
+	end)
+	
+	net.Receive("gred_net_wac_mg_muzzle_fx",function()
+		if GetConVar("gred_cl_altmuzzleeffect"):GetInt() == 1 then
+			local pos = net.ReadVector()
+			local ang = net.ReadAngle()
+			ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
+			ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
+			ParticleEffect("muzzleflash_m590_1p_core",pos,ang,nil)
+			ParticleEffect("muzzleflash_smoke_small_variant_1",pos,ang,nil)
+		else
+			local effectdata=EffectData()
+			effectdata:SetOrigin(net.ReadVector())
+			effectdata:SetAngles(net.ReadAngle())
+			effectdata:SetEntity(self)
+			effectdata:SetScale(1)
+			util.Effect("MuzzleEffect", effectdata)
+		end
+	end)
 end
+
+local filecount = 0
+local foldercount = 0
+
+local precache = function( dir, flst ) -- .mdl file list precahcer
+	for _, _f in ipairs( flst ) do
+		util.PrecacheModel( dir.."/".._f )
+		filecount = filecount + 1
+	end
+end
+
+findDir = function( parent, direcotry, foot ) -- internal shit
+	local flst, a = file.Find( parent.."/"..direcotry.."/"..foot, "GAME" )
+	local b, dirs = file.Find( parent.."/"..direcotry.."/*", "GAME" )
+	for k,v in ipairs(dirs) do
+		findDir(parent.."/"..direcotry,v,foot)
+		foldercount = foldercount + 1
+	end
+	precache( parent.."/"..direcotry, flst )
+end
+
+findDir( "models", "gredwitch", "*.mdl" )
+
+print("[GREDWITCH'S BASE] Precached "..filecount.." files in "..foldercount.." folders.")
+
+-- local stuff, folders = file.Find("models/gredwitch/*", "GAME")
+
+-- for k,v in pairs(folders) do
+	-- files, dir = file.Find("models/gredwitch/"..v.."/*.mdl", "GAME")
+	-- for a,b in pairs(files) do
+		-- util.PrecacheModel(b)
+		-- print("models/gredwitch/"...."/"..
+		-- filecount = filecount + 1
+	-- end
+	-- foldercount = foldercount + 1
+-- end

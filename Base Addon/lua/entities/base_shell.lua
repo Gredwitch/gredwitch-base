@@ -34,13 +34,6 @@ local materials = {
 	wood_Panel				=	2,
 	wood_Solid				=	2,
 }
-
-sound.Add({
-	name = "shellSound",
-	channel = CHAN_STATIC,
-	soundlevel = 90,
-	sound = "gred_emp/common/shellwhiz.wav"
-})
 local damagesound                    =  "weapons/rpg/shotdown.wav"
 
 local SmokeSnds = {}
@@ -142,10 +135,25 @@ function ENT:AddOnInit()
 	if m > 0 then
 		self.EnginePower = self.EnginePower * m
 	end
-	if !self.AP then self:SetBodygroup(1,1) end
+	if !self.AP then 
+		self:SetBodygroup(1,1)
+		net.Start("gred_net_nw_var")
+			net.WriteEntity(self)
+			net.WriteString("ap")
+			net.WriteInt(1,4)
+			net.WriteString("false")
+		net.Broadcast()
+	else
+		net.Start("gred_net_nw_var")
+			net.WriteEntity(self)
+			net.WriteString("ap")
+			net.WriteInt(1,4)
+			net.WriteString("true")
+		net.Broadcast()
+	end
 	self:SetModelScale(self.ModelSize)
 	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
-end        
+end
 
 function ENT:AddOnExplode(pos) 
 	if self.Smoke then
@@ -205,4 +213,50 @@ function ENT:OnRemove()
 	local physEnvironment = physenv.GetPerformanceSettings()
 	physEnvironment.MaxVelocity = 3500
 	physenv.SetPerformanceSettings(physEnvironment)
+end
+
+if CLIENT then
+	function ENT:Initialize()
+		self.shouldOwnerNotHearSnd = false
+		self.snd = {}
+		self.snd["wiz"] = CreateSound(self,"bomb/tank_shellwhiz.wav")
+		self.snd["trail"] = CreateSound(self,"bomb/shell_trail.wav")
+		timer.Simple(0,function()
+			local a = tobool(self:GetNWString("ap"))
+			if a == false then
+				self.snd["wiz_mortar"] = CreateSound(self,"bomb/shellwhiz_mortar_"..math.random(1,2)..".wav")
+			end
+		end)
+	end
+	function ENT:Think()
+		if !self.snd then return end
+		local e=LocalPlayer():GetViewEntity()
+		
+		if (e != self.GBOWNER and e != self.Owner) or self.shouldOwnerHearSnd then
+			local pos=e:GetPos()
+			local spos=self:GetPos()
+			local val1=(pos:Distance(spos+e:GetVelocity())-pos:Distance(spos+self:GetVelocity()))/300
+			local pitch = math.Clamp(1*100+1*1*3+val1, 0, 200)
+			local volume = 1*math.Clamp(pitch*pitch/4000, 0, false and 1 or 5)
+			for k,v in pairs (self.snd) do
+				v:Play()
+				v:ChangePitch(pitch,0.1)
+				v:ChangeVolume(volume,0.1)
+				v:SetSoundLevel(0)
+			end
+		else
+			for k,v in pairs (self.snd) do
+				v:Stop()
+			end
+		end
+	end
+	
+	function ENT:OnRemove()
+		if self.snd then 
+			for k,v in pairs (self.snd) do
+				v:Stop()
+				v = nil
+			end
+		end
+	end
 end

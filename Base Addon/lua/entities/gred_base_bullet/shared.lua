@@ -77,6 +77,7 @@ if SERVER then
 				bullet.Dir = self:GetForward()
 				bullet.Spread = Vector(threeZ)
 				bullet.Src = pos
+				bullet.IgnoreEntity = self.Filter
 				self:FireBullets(bullet,false)
 				
 				if !self.NoParticle then
@@ -217,7 +218,10 @@ if SERVER then
 			if self.Caliber == "wac_base_30mm" then
 				self.Damage = 100 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
 				util.BlastDamage(self, self.Owner, hitpos, self.Radius*3, self.Damage)
-				self.Entity:EmitSound("impactsounds/30mm_1.wav",100, math.random(90,120),1, CHAN_AUTO)
+				self.Entity:EmitSound("impactsounds/30mm_old.wav",100, math.random(90,110),1, CHAN_AUTO)
+				-- local a = math.random(01,10)
+				-- if a < 10 then a = "0"..a end
+				-- self.Entity:EmitSound("impactsounds/30mm_"..a..".wav",100, math.random(90,120),1, CHAN_AUTO)
 			elseif self.Caliber == "wac_base_20mm" then
 				self.Damage = 80 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
 				self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
@@ -241,6 +245,7 @@ if SERVER then
 			bullet.Dir = self:GetForward()
 			bullet.Spread = Vector(threeZ)
 			bullet.Src = pos
+			bullet.IgnoreEntity = self.Filter
 			if !hitsky then self:FireBullets( bullet, false ) end
 			if !self.NoParticle then
 				net.Start("gred_net_impact_fx")

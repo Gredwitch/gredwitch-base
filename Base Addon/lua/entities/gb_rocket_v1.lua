@@ -127,6 +127,7 @@ function ENT:Launch()
 		         self.Burnt = true
 		         self:StopParticles()
 		         self:StopSound(self.EngineSound)
+				self:StopSound(self.StartSound)
 	            if self.RocketBurnoutTrail != "" then ParticleEffectAttach(self.RocketBurnoutTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
              end)	 
 		 end

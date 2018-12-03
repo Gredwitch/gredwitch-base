@@ -2,10 +2,6 @@ AddCSLuaFile()
 
 DEFINE_BASECLASS( "base_anim" )
 
-if (SERVER) then
-	util.AddNetworkString( "gred_net_sound_lowsh" )
-end
-
 ENT.Spawnable		            	 =  false
 ENT.AdminSpawnable		             =  false     
 
@@ -42,11 +38,6 @@ function ENT:Initialize()
      end
 end
 
-
-net.Receive( "gred_net_sound_lowsh", function( len, pl )
-	local sound = net.ReadString()
-	LocalPlayer():GetViewEntity():EmitSound(sound)
-end );
 
 function ENT:Think()
     if (SERVER) then

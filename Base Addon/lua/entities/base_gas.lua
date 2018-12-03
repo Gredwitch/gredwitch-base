@@ -38,9 +38,10 @@ function ENT:Think()
 	if !valid and ovalid then self.GBOWNER = self.Owner
 	elseif !valid and !ovalid then self.GBOWNER = self end
 	dmg:SetAttacker(self.GBOWNER)
-	debugoverlay.Sphere(self:GetPos(),self.Radius,self.Lifetime,Color( 255, 255, 255 )) 
+	-- debugoverlay.Sphere(self:GetPos(),self.Radius,self.Lifetime,Color( 255, 255, 255 )) 
 	for k, v in ipairs(ents.FindInSphere(self:GetPos(),self.Radius)) do
-		if v:IsPlayer() or v:IsNPC() and !v:GetNWBool("SH_GasMask") and !v:GetClass()=="npc_helicopter" then
+		if v:IsPlayer() or v:IsNPC() and !v:GetNWBool("SH_GasMask") then
+			if v:GetClass()=="npc_helicopter" then return end
 			v:TakeDamageInfo(dmg)
 		end
 	end

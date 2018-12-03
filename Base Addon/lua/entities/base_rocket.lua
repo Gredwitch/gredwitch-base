@@ -238,16 +238,17 @@ function ENT:Launch()
 		 self:Arm()
 		 local pos = self:GetPos()
 		 sound.Play(self.StartSound, pos, 120, 100,1)
-	     self:EmitSound(self.EngineSound)
+	     -- self:EmitSound(self.EngineSound)
 		 self:SetNetworkedBool("EmitLight",true)
 		 self:SetNetworkedBool("self.Ignition",true)
 		if self.RocketTrail != "" then ParticleEffectAttach(self.RocketTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
 		 if(self.FuelBurnoutTime != 0) then 
 	         timer.Simple(self.FuelBurnoutTime,function()
-		         if not self:IsValid() then return end 
-		         self.Burnt = true
-		         self:StopParticles()
-		         self:StopSound(self.EngineSound)
+		        if not self:IsValid() then return end 
+		        self.Burnt = true
+		        self:StopParticles()
+		        self:StopSound(self.EngineSound)
+				self:StopSound(self.StartSound)
 	            if self.RocketBurnoutTrail != "" then ParticleEffectAttach(self.RocketBurnoutTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
              end)	 
 		 end
@@ -323,5 +324,38 @@ end
 
 function ENT:OnRemove()
      self:StopSound(self.EngineSound)
+     self:StopSound(self.StartSound)
 	 self:StopParticles()
 end
+
+-- if CLIENT then
+	-- function ENT:Initialize()
+		-- if self.EngineSound == "" then return end
+		-- self.snd = {}
+		-- self.snd["rocket"] = CreateSound(self,self.EngineSound)
+	-- end	
+	-- function ENT:Think()
+		-- if !self.snd or !self.Fired then return end
+		-- local e=LocalPlayer():GetViewEntity()
+		-- local pos=e:GetPos()
+		-- local spos=self:GetPos()
+		-- local val1=(pos:Distance(spos+e:GetVelocity())-pos:Distance(spos+self:GetVelocity()))/300
+		-- local pitch = math.Clamp(1*100+1*1*3+val1, 0, 200)
+		-- local volume = 1*math.Clamp(pitch*pitch/4000, 0, false and 1 or 5)
+		-- for k,v in pairs (self.snd) do
+			-- v:Play()
+			-- v:ChangePitch(pitch,0.1)
+			-- v:ChangeVolume(volume,0.1)
+			-- v:SetSoundLevel(120)
+		-- end
+	-- end
+	
+	-- function ENT:OnRemove()
+		-- if self.snd then 
+			-- for k,v in pairs (self.snd) do
+				-- v:Stop()
+				-- v = nil
+			-- end
+		-- end
+	-- end
+-- end

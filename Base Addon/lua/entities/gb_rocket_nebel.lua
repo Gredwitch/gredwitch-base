@@ -43,8 +43,8 @@ ENT.Category                         =  "Gredwitch's Stuff"
 ENT.Model                            =  "models/gbombs/nebelwerfer_rocket.mdl"
 ENT.RocketTrail                      =  "rockettrail"
 ENT.RocketBurnoutTrail               =  "grenadetrail"
-ENT.Effect                           =  "doi_artillery_explosion"
-ENT.EffectAir                        =  "doi_artillery_explosion"
+ENT.Effect                           =  "gred_highcal_rocket_explosion"
+ENT.EffectAir                        =  "gred_highcal_rocket_explosion"
 ENT.EffectWater                      =  "ins_water_explosion"
 ENT.AngEffect						 =	true
 

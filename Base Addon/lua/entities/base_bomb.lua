@@ -84,8 +84,10 @@ function ENT:Initialize()
 		self.Exploded = false
 		self.Used     = false
 		self.Arming   = false
-		self:AddOnInit()
-		if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
+		timer.Simple(0,function()
+			if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
+			self:AddOnInit()
+		end)
 	end
 end
 

@@ -44,7 +44,7 @@ function ENT:Initialize()
 	
 	self.orpos = self:GetPos()
 	self.oldpos=self.orpos-(self:GetAngles():Forward()*self.Speed)
-	trace = {}
+	if !self.Filter then self.Filter = {self.Entity} else table.insert(self.Filter,self.Entity) end
 	self.Mask = MASK_ALL
 	self.explodable = self.Caliber == "wac_base_20mm" or self.Caliber == "wac_base_30mm" or self.Caliber == "wac_base_40mm"
 end
@@ -55,23 +55,22 @@ function ENT:PhysicsUpdate(ph)
 	if !self.oldpos then self:Remove() return end
 	local difference = pos - self.oldpos
 	local dif = pos + difference
-	if CLIENT then print("huh") end
 	self.oldpos = pos
+	local trace = {}
 	trace.start = pos
 	trace.endpos = dif
-	trace.filter = self.Entity
+	trace.filter = self.Filter
 	trace.mask=self.Mask
-	local tr2 = util.TraceLine(trace)
-	if tr2.MatType == 83 then
+	local tr = util.TraceLine(trace)
+	if tr.MatType == 83 then
 		net.Start("gred_net_impact_fx")
 			net.WriteBool(true)
 			net.WriteString(self.Caliber)
-			net.WriteVector(tr2.HitPos)
+			net.WriteVector(tr.HitPos)
 		net.Broadcast()
 		self.NoParticle = true
 		self:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",audioSpecs )
 	end
-	local tr = util.QuickTrace(pos,dif-pos,self)
 	if tr.Hit then
 		self:Explode(tr)
 		return
@@ -93,7 +92,10 @@ function ENT:PhysicsUpdate(ph)
 		end
 	end
 end
-
+function ENT:OnRemove()
+	trace = nil
+	Filter = nil
+end
 function ENT:Think()
 	self.phys:Wake()
 end
