@@ -13,10 +13,10 @@ function ENT:Initialize()
 	if !self.sounds.stop1p then
 		self.sounds.stop1p = CreateSound(self,"extras/null.wav")
 	end
+	self.sounds.stop1p:SetSoundLevel(self.sounds.shoot1p:GetSoundLevel())
 	if !self.sounds.stop3p then
 		self.sounds.stop3p = CreateSound(self,"extras/null1.wav")
 	end
-	self.sounds.stop1p:SetSoundLevel(self.sounds.shoot1p:GetSoundLevel())
 	self.sounds.stop3p:SetSoundLevel(110)
 	if tracer == nil then tracer = 0 end
 	tracerConvar=GetConVar("gred_sv_tracers"):GetInt()
@@ -100,6 +100,7 @@ function ENT:fire()
 		constraint.NoCollide(b,self.aircraft,0,0)
 		b:Spawn()
 		b:Activate()
+		b.Filter = {self,self.aircraft,self.aircraft.entities}
 		b.Owner=self:getAttacker()
 		
 		if tracer >= GetConVarNumber("gred_sv_tracers") then

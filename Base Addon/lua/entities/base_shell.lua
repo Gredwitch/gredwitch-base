@@ -155,6 +155,18 @@ function ENT:AddOnInit()
 	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
 end
 
+function ENT:AddOnThink()
+	if self.Fired and not self.Sent then
+		net.Start("gred_net_nw_var")
+			net.WriteEntity(self)
+			net.WriteString("fired")
+			net.WriteInt(1,4)
+			net.WriteString("false")
+		net.Broadcast()
+		self.Sent = true
+	end
+end
+
 function ENT:AddOnExplode(pos) 
 	if self.Smoke then
 		self.ExplosionSound = table.Random(SmokeSnds)
@@ -229,9 +241,11 @@ if CLIENT then
 		end)
 	end
 	function ENT:Think()
-		if !self.snd then return end
+		if !self.Fired then
+			self.Fired = !tobool(self:GetNWString("fired"))
+		end
+		if !self.snd or !self.Fired then return end
 		local e=LocalPlayer():GetViewEntity()
-		
 		if (e != self.GBOWNER and e != self.Owner) or self.shouldOwnerHearSnd then
 			local pos=e:GetPos()
 			local spos=self:GetPos()

@@ -231,22 +231,24 @@ if SERVER then
 				self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
 				util.BlastDamage(self,self.Owner,hitpos,self.Radius*4, self.Damage)
 			end
-			local bullet = {}
-			bullet.Damage = zero
-			bullet.Attacker = self.Owner
-			bullet.Callback = nil
-			bullet.Damage = zero
-			bullet.Force = 100
-			bullet.HullSize = zero
-			bullet.Num = 1
-			bullet.Tracer = zero
-			bullet.AmmoType = null
-			bullet.TracerName = null
-			bullet.Dir = self:GetForward()
-			bullet.Spread = Vector(threeZ)
-			bullet.Src = pos
-			bullet.IgnoreEntity = self.Filter
-			if !hitsky then self:FireBullets( bullet, false ) end
+			if !hitsky then 
+				local bullet = {}
+				bullet.Damage = zero
+				bullet.Attacker = self.Owner
+				bullet.Callback = nil
+				bullet.Damage = zero
+				bullet.Force = 100
+				bullet.HullSize = zero
+				bullet.Num = 1
+				bullet.Tracer = zero
+				bullet.AmmoType = null
+				bullet.TracerName = null
+				bullet.Dir = self:GetForward()
+				bullet.Spread = Vector(threeZ)
+				bullet.Src = pos
+				bullet.IgnoreEntity = self.Filter
+				self:FireBullets( bullet, false )
+			end
 			if !self.NoParticle then
 				net.Start("gred_net_impact_fx")
 					net.WriteBool(false)

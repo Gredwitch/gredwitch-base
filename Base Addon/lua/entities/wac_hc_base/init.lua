@@ -1398,13 +1398,15 @@ function ENT:DamageEngine(amt)
 								fire:SetParent(self.Entity)
 							end
 						else
-							local fire = ents.Create("env_fire_trail")
 							if self.OtherRotor then local pos = self:LocalToWorld(self.OtherRotorPos) end
 							if self.rotor2 then local pos = self:LocalToWorld(self.rotorPos2) end
 							if self.topRotor2 then local pos = self:LocalToWorld(self.TopRotor2.pos) end
-							fire:SetPos(pos)
-							fire:Spawn()
-							fire:SetParent(self.Entity)
+							if pos then
+								local fire = ents.Create("env_fire_trail")
+								fire:SetPos(pos)
+								fire:Spawn()
+								fire:SetParent(self.Entity)
+							end
 						end
 					end
 				end

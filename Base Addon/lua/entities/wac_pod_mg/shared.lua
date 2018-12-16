@@ -78,14 +78,7 @@ function ENT:fireBullet(pos)
 		b.gunRPM=self.FireRate
 		b:Spawn()
 		b:Activate()
-		-- b.nocol = {}
-		-- for _,e in pairs(self.aircraft.entities) do
-			-- if IsValid(e) then
-				-- table.insert(b.nocol,e)
-			-- end
-		-- end
-		-- table.insert(b.nocol,self.aircraft)
-		-- table.insert(b.nocol,b)
+		b.Filter = {self,self.aircraft,self.aircraft.entities}
 		b.Owner=self:getAttacker()
 		
 		if tracer >= GetConVarNumber("gred_sv_tracers") then
