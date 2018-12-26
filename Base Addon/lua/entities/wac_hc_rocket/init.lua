@@ -1,3 +1,4 @@
+if not wac then return end
 
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")

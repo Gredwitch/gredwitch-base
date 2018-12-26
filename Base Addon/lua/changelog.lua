@@ -327,4 +327,11 @@
 - Fixed the V1 sound not stopping
 - Updated base_shell : added a shell whistle SFX
 - Updated base_gas : fixed a bug
+
+26/12/2018 (12/26/2018)
+- Updated BASE_BULLET : updated the code
+- Updated gred_autorun_shared : precached some more particles
+- Updated BASE_BOMB : fixed explosives creating smoke out of the void
+- Updated ROCKET_HYDRA : the rocket will now work even if WAC isn't installed
+- Updated HC_ROCKET : no errors will be created if WAC isn't installed anymore
 --]]
