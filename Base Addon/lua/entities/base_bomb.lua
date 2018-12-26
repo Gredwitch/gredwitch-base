@@ -205,6 +205,7 @@ function ENT:Explode()
 			else
 				net.WriteAngle(Angle(0,0,0))
 			end
+			net.WriteBool(false)
 		end
 		if !self.Smoke then
 			if self.WaterExplosionSound == nil then else 
@@ -231,14 +232,17 @@ function ENT:Explode()
 				net.WriteVector(pos-Vector(0,0,100))
 			else
 				net.WriteAngle(Angle(0,0,0))
+				net.WriteBool(false)
 			end
 		else 
 			net.WriteString(self.Effect)
 			net.WriteVector(pos)
 			if self.AngEffect then
 				net.WriteAngle(Angle(-90,0,0))
+				net.WriteBool(false)
 			else
 				net.WriteAngle(Angle(0,0,0))
+				net.WriteBool(false)
 			end
 		end
     end

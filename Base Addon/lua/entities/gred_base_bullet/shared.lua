@@ -38,7 +38,11 @@ if SERVER then
 				bullet.Callback = nil
 				
 				if self.Caliber == "wac_base_12mm" then
-					self.Damage = 60 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+					if self.CustomDMG then
+						self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+					else
+						self.Damage = 60 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+					end
 					if GetConVarNumber("gred_sv_12mm_he_impact") >= 1 then 
 						bullet.Damage = zero 
 						util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
@@ -58,7 +62,11 @@ if SERVER then
 					end
 					
 				elseif self.Caliber == "wac_base_7mm" then
-					self.Damage = 40 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+					if self.CustomDMG then
+						self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+					else
+						self.Damage = 40 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+					end
 					if GetConVarNumber("gred_sv_7mm_he_impact") >= 1 then
 						bullet.Damage = zero
 						util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
@@ -79,7 +87,6 @@ if SERVER then
 				bullet.Src = pos
 				bullet.IgnoreEntity = self.Filter
 				self:FireBullets(bullet,false)
-				
 				if !self.NoParticle then
 					net.Start("gred_net_impact_fx")
 						net.WriteBool(false)
@@ -216,18 +223,30 @@ if SERVER then
 				hitsky = tr.HitSky
 			end
 			if self.Caliber == "wac_base_30mm" then
-				self.Damage = 100 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+				if self.CustomDMG then
+					self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+				else
+					self.Damage = 100 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+				end
 				util.BlastDamage(self, self.Owner, hitpos, self.Radius*3, self.Damage)
 				self.Entity:EmitSound("impactsounds/30mm_old.wav",100, math.random(90,110),1, CHAN_AUTO)
 				-- local a = math.random(01,10)
 				-- if a < 10 then a = "0"..a end
 				-- self.Entity:EmitSound("impactsounds/30mm_"..a..".wav",100, math.random(90,120),1, CHAN_AUTO)
 			elseif self.Caliber == "wac_base_20mm" then
-				self.Damage = 80 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+				if self.CustomDMG then
+					self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+				else
+					self.Damage = 80 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+				end
 				self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
 				util.BlastDamage(self,self.Owner,hitpos,self.Radius*2, self.Damage)
 			else
-				self.Damage = 120 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+				if self.CustomDMG then
+					self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+				else
+					self.Damage = 120 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+				end
 				self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
 				util.BlastDamage(self,self.Owner,hitpos,self.Radius*4, self.Damage)
 			end
