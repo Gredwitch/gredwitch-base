@@ -127,10 +127,6 @@ ENT.PlyPickup						 =	nil
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
 function ENT:AddOnInit()
-	local physEnvironment = physenv.GetPerformanceSettings()
-	physEnvironment.MaxVelocity = 99999
-	physenv.SetPerformanceSettings(physEnvironment)
-	
 	local m = GetConVar("gred_sv_shellspeed_multiplier"):GetFloat()
 	if m > 0 then
 		self.EnginePower = self.EnginePower * m
@@ -222,9 +218,6 @@ function ENT:OnRemove()
 	end
     self:StopSound(self.EngineSound)
 	self:StopParticles()
-	local physEnvironment = physenv.GetPerformanceSettings()
-	physEnvironment.MaxVelocity = 3500
-	physenv.SetPerformanceSettings(physEnvironment)
 end
 
 if CLIENT then

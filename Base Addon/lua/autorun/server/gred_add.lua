@@ -32,5 +32,3 @@ CreateConVar("gred_sv_default_wac_munitions"	,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_explosion"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_heli_spin"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_heli_spin_chance"		,  "0"  , GRED_SVAR)
-
-hook.Remove("PlayerSpawnedSENT","gred_phys_superspeed")

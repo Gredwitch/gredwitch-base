@@ -334,4 +334,8 @@
 - Updated BASE_BOMB : fixed explosives creating smoke out of the void
 - Updated ROCKET_HYDRA : the rocket will now work even if WAC isn't installed
 - Updated HC_ROCKET : no errors will be created if WAC isn't installed anymore
+
+27/12/2018 (12/27/2018)
+- Fixed missing Network String
+- Fixed Physics Environnements
 --]]

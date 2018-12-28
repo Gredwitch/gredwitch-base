@@ -23,7 +23,6 @@ ENT.Sounds = {
 	shoot = "",
 	stop = "",
 }
-if SERVER then util.AddNetworkString("gred_net_wac_mg_muzzle_fx")  end
 function ENT:SetupDataTables()
 	self:base("wac_pod_base").SetupDataTables(self)
 	self:NetworkVar( "Vector", 0, "ShootPos" );

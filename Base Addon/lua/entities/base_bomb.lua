@@ -80,6 +80,9 @@ function ENT:Initialize()
 		if (skincount > 0) then
 			self:SetSkin(math.random(0,skincount))
 		end
+		local physEnvironment = physenv.GetPerformanceSettings()
+		physEnvironment.MaxVelocity = 99999
+		physenv.SetPerformanceSettings(physEnvironment)
 		self.Armed    = false
 		self.Exploded = false
 		self.Used     = false

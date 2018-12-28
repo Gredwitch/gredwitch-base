@@ -13,10 +13,6 @@ function ENT:Initialize()
 	self:SetColor(Color(255,255,255,0))
 	
 	
-	-- local physEnvironment = physenv.GetPerformanceSettings()
-	-- physEnvironment.MaxVelocity = 9999999999
-	-- physenv.SetPerformanceSettings(physEnvironment)
-	
 	self.phys = self.Entity:GetPhysicsObject()
 	if self.Caliber == "wac_base_7mm" then
 		mass = 10
