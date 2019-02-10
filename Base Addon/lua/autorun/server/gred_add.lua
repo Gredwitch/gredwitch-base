@@ -2,7 +2,6 @@ AddCSLuaFile()
 resource.AddWorkshop(1131455085) -- Base addon
 
 local GRED_SVAR = { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_SERVER_CAN_EXECUTE, FCVAR_NOTIFY }
--- local GRED_SVAR = { FCVAR_REPLICATED }
 
 CreateConVar("gred_sv_easyuse"					,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_maxforcefield_range"		, "5000", GRED_SVAR)
@@ -21,7 +20,6 @@ CreateConVar("gred_sv_multiple_fire_effects"	,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_bullet_dmg"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_bullet_radius"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_soundspeed_divider"		,  "1"  , GRED_SVAR)
--- CreateConVar("gred_sv_decals"					,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_arti_spawnaltitude"		, "1000", GRED_SVAR)
 CreateConVar("gred_sv_wac_radio"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_spawnable_bombs"			,  "1"  , GRED_SVAR)
@@ -32,3 +30,7 @@ CreateConVar("gred_sv_default_wac_munitions"	,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_explosion"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_heli_spin"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_heli_spin_chance"		,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_lfs_healthmultiplier"		,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_lfs_healthmultiplier_all"	,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_lfs_normal_bullets"		,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_wac_override"				,  "1"  , GRED_SVAR)

@@ -134,8 +134,6 @@ PrecacheParticleSystem("ins_ammo_explosionOLD")
 PrecacheParticleSystem("gred_ap_impact")
 PrecacheParticleSystem("AP_impact_wall")
 
-util.PrecacheModel("models/gredwitch/bullet.mdl")
-
 
 game.AddDecal( "scorch_small",					"decals/scorch_small" );
 game.AddDecal( "scorch_medium",					"decals/scorch_medium" );
@@ -143,6 +141,30 @@ game.AddDecal( "scorch_big",					"decals/scorch_big" );
 game.AddDecal( "scorch_huge",					"decals/scorch_huge" );
 game.AddDecal( "scorch_gigantic",				"decals/scorch_gigantic" );
 game.AddDecal( "scorch_x10",					"decals/scorch_x10" );
+
+local filecount = 0
+local foldercount = 0
+
+local precache = function( dir, flst ) -- .mdl file list precahcer
+	for _, _f in ipairs( flst ) do
+		util.PrecacheModel( dir.."/".._f )
+		filecount = filecount + 1
+	end
+end
+
+findDir = function( parent, direcotry, foot ) -- internal shit
+	local flst, a = file.Find( parent.."/"..direcotry.."/"..foot, "GAME" )
+	local b, dirs = file.Find( parent.."/"..direcotry.."/*", "GAME" )
+	for k,v in ipairs(dirs) do
+		findDir(parent.."/"..direcotry,v,foot)
+		foldercount = foldercount + 1
+	end
+	precache( parent.."/"..direcotry, flst )
+end
+
+findDir( "models", "gredwitch", "*.mdl" )
+
+print("[GREDWITCH'S BASE] Precached "..filecount.." files in "..foldercount.." folders.")
 
 if SERVER then 
 	util.AddNetworkString("gred_net_sound_lowsh")
@@ -364,29 +386,6 @@ if CLIENT then
 	end)
 end
 
-local filecount = 0
-local foldercount = 0
-
-local precache = function( dir, flst ) -- .mdl file list precahcer
-	for _, _f in ipairs( flst ) do
-		util.PrecacheModel( dir.."/".._f )
-		filecount = filecount + 1
-	end
-end
-
-findDir = function( parent, direcotry, foot ) -- internal shit
-	local flst, a = file.Find( parent.."/"..direcotry.."/"..foot, "GAME" )
-	local b, dirs = file.Find( parent.."/"..direcotry.."/*", "GAME" )
-	for k,v in ipairs(dirs) do
-		findDir(parent.."/"..direcotry,v,foot)
-		foldercount = foldercount + 1
-	end
-	precache( parent.."/"..direcotry, flst )
-end
-
-findDir( "models", "gredwitch", "*.mdl" )
-
-print("[GREDWITCH'S BASE] Precached "..filecount.." files in "..foldercount.." folders.")
 if CLIENT then
 	timer.Simple(5,function()
 		GredwitchBase=steamworks.ShouldMountAddon(1582297878) and steamworks.IsSubscribed(1582297878)
@@ -407,14 +406,655 @@ if CLIENT then
 		end
 	end)
 end
--- local stuff, folders = file.Find("models/gredwitch/*", "GAME")
 
--- for k,v in pairs(folders) do
-	-- files, dir = file.Find("models/gredwitch/"..v.."/*.mdl", "GAME")
-	-- for a,b in pairs(files) do
-		-- util.PrecacheModel(b)
-		-- print("models/gredwitch/"...."/"..
-		-- filecount = filecount + 1
+-- hook.Add("Tick","gred_wac_think_override",function()
+	-- for _,ent in pairs(ents.GetAll()) do
+		-- if ent.Base == "wac_hc_base" and SERVER then
+			-- if GetConVar("gred_sv_wac_override"):GetInt() == 1 then
+				-- GredOverrideWacThink(ent)
+			-- end
+		-- end
 	-- end
-	-- foldercount = foldercount + 1
--- end
+-- end)
+
+hook.Add("OnEntityCreated","gred_ent_override",function(ent)
+	timer.Simple(0,function()
+		if ent.LFS then
+			if ent.Author == "Gredwitch" or GetConVar("gred_sv_lfs_healthmultiplier_all"):GetInt() == 1 then
+				ent.MaxHealth = ent.MaxHealth * GetConVar("gred_sv_lfs_healthmultiplier"):GetFloat()
+				ent.OldSetupDataTables = ent.SetupDataTables
+				ent.SetupDataTables = function()
+					ent:OldSetupDataTables()
+					ent:NetworkVar( "Float",6, "HP", { KeyName = "health", Edit = { type = "Float", order = 2,min = 0, max = ent.MaxHealth, category = "Misc"} } )
+				end
+				ent:SetupDataTables()
+				
+				ent:SetHP(ent.MaxHealth)
+			end
+		elseif ent.isWacAircraft then
+			if GetConVar("gred_sv_wac_override"):GetInt() == 1 then
+			-- if ent.Base == "wac_hc_base" then
+				
+				ent.Engines = 1
+				ent.Sounds.Radio = ""
+				ent.Sounds.crashsnd = ""
+				ent.Sounds.bipsnd = "crash/bip_loop.wav"
+				
+				-- SHARED.LUA
+				ent.addSounds = function(self)
+					self.sounds = {}
+					self.Sounds.crashsnd = "crash/crash_"..math.random(1,10)..".ogg" --ADDED BY THE GREDWITCH
+					for name, value in pairs(self.Sounds) do
+						if name != "BaseClass" then
+							sound.Add({
+								name = "wac."..self.ClassName.."."..name,
+								channel = CHAN_STATIC,
+								soundlevel = (name == "Blades" or name == "Engine") and 200 or 100,
+								sound = value
+							})
+							self.sounds[name] = CreateSound(self, "wac."..self.ClassName.."."..name)
+							if name == "Blades" then
+								self.sounds[name]:SetSoundLevel(120)
+							elseif name == "Engine" then
+								self.sounds[name]:SetSoundLevel(110)
+							elseif name == "Radio" and value != "" then --ADDED BY THE GREDWITCH (start)
+								self.sounds[name]:SetSoundLevel(60)
+							elseif name == "crashsnd" then
+								self.sounds[name]:SetSoundLevel(120)
+							elseif name == "bipsnd" then
+								self.sounds[name]:SetSoundLevel(80) --ADDED BY THE GREDWITCH (end)
+							end
+						end
+					end
+				end
+				
+				if SERVER then -- INIT.LUA
+					ent.addStuff = function(self)
+						local HealthsliderVAR = GetConVar("gred_sv_healthslider"):GetInt()
+						local HealthEnable = GetConVar("gred_sv_enablehealth"):GetInt()
+						local EngineHealthEnable = GetConVar("gred_sv_enableenginehealth"):GetInt()
+						local Healthslider = 100
+						if HealthEnable == 1 and EngineHealthEnable == 1 then
+							
+							if HealthsliderVAR == nil or HealthsliderVAR <= 0 then 
+								Healthslider = 100
+							else 
+								Healthslider = HealthsliderVAR
+							end
+							
+							self.engineHealth = self.Engines*Healthslider
+							self.EngineHealth = self.Engines*Healthslider
+							
+						elseif HealthEnable == 1 and EngineHealthEnable == 0 then
+						
+							if HealthsliderVAR == nil or HealthsliderVAR <= 0 then 
+								Healthslider = 100
+							else 
+								Healthslider = HealthsliderVAR
+							end
+							
+							self.Engines = 1
+							self.engineHealth = Healthslider
+							self.EngineHealth = Healthslider
+						end
+					end
+					
+					ent.GredExplode = function(self,speed,pos)
+						if self.blewup then return end
+						self.blewup = true
+						local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
+						for k, p in pairs(self.passengers) do
+							if p and p:IsValid() then
+								p:TakeDamage(speed,lasta,self.Entity)
+							end
+						end
+						self:TakeDamage(self.engineHealth)
+						if GetConVar("gred_sv_wac_explosion"):GetInt() <= 0 then return end
+						local radius = self:BoundingRadius()
+						local hitang = Angle(0,self:GetAngles().y+90,0)
+						local ent = ents.Create("shockwave_sound_lowsh")
+						ent:SetPos(pos) 
+						ent:Spawn()
+						ent:Activate()
+						ent:SetVar("GBOWNER", self)
+						ent:SetVar("MAX_RANGE",50000)
+						ent:SetVar("NOFARSOUND",0)
+						ent:SetVar("SHOCKWAVE_INCREMENT",200)
+						
+						ent:SetVar("DELAY",0.01)
+						ent:SetVar("SOUNDCLOSE","explosions/fuel_depot_explode_close.wav")
+						ent:SetVar("SOUND","explosions/fuel_depot_explode_dist.wav")
+						ent:SetVar("SOUNDFAR","explosions/fuel_depot_explode_far.wav")
+						ent:SetVar("Shocktime", 0)
+						
+						local ent = ents.Create("shockwave_ent")
+						ent:SetPos( pos ) 
+						ent:Spawn()
+						ent:Activate()
+						ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
+						ent:SetVar("DEFAULT_PHYSFORCE_PLYAIR", self.DEFAULT_PHYSFORCE_PLYAIR)
+						ent:SetVar("DEFAULT_PHYSFORCE_PLYGROUND", self.DEFAULT_PHYSFORCE_PLYGROUND)
+						ent:SetVar("GBOWNER", self.GBOWNER)
+						ent:SetVar("SHOCKWAVEDAMAGE",1000)
+						ent:SetVar("SHOCKWAVE_INCREMENT",50)
+						ent:SetVar("DELAY",0.01)
+						ent.trace=self.TraceLength
+						ent.decal=self.Decal
+						self:Remove()
+						local effect = "doi_petrol_explosion"
+						if radius <= 300 then
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos)
+								net.WriteAngle(hitang)
+							net.Broadcast()
+							ent:SetVar("MAX_RANGE",600)
+						elseif radius <= 500 then
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos)
+								net.WriteAngle(hitang)
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos)
+								net.WriteAngle(hitang+Angle(0,45,45))
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos)
+								net.WriteAngle(hitang+Angle(0,-45,-45))
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos)
+								net.WriteAngle(hitang+Angle(45,0,0))
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos)
+								net.WriteAngle(hitang+Angle(-45,0,0))
+							net.Broadcast()
+							ent:SetVar("MAX_RANGE",800)
+						elseif radius <= 2000 then
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos)
+								net.WriteAngle(hitang)
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos)
+								net.WriteAngle(hitang+Angle(0,45,45))
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos)
+								net.WriteAngle(hitang+Angle(0,-45,-45))
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos)
+								net.WriteAngle(hitang+Angle(45,0,0))
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos)
+								net.WriteAngle(hitang+Angle(-45,0,0))
+							net.Broadcast()
+									
+									
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos+Vector(math.random(-400,-250),math.random(-400,-250),0))
+								net.WriteAngle(hitang)
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos+Vector(math.random(-400,250),math.random(-400,250),0))
+								net.WriteAngle(hitang+Angle(0,45,45))
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos+Vector(math.random(400,-250),math.random(400,-250),0))
+								net.WriteAngle(hitang+Angle(0,-45,-45))
+							net.Broadcast()
+							net.Start("gred_net_wac_explosion")
+								net.WriteString(effect)
+								net.WriteVector(pos+Vector(math.random(400,250),math.random(400,250),0))
+								net.WriteAngle(hitang+Angle(45,0,0))
+							net.Broadcast()
+							ent:SetVar("MAX_RANGE",1000)
+						end
+					end
+					
+					ent.PhysicsCollide = function(self,cdat, phys)
+						timer.Simple(0,function()
+							if wac.aircraft.cvars.nodamage:GetInt() == 1 then
+								return
+							end
+							if cdat.DeltaTime > 0.5 then
+								local mass = cdat.HitObject:GetMass()
+								if cdat.HitEntity:GetClass() == "worldspawn" then
+									mass = 5000
+								end
+								local dmg = (cdat.Speed*cdat.Speed*math.Clamp(mass, 0, 5000))/10000000
+								if !dmg or dmg < 1 then return end
+								self:TakeDamage(dmg*15)
+								if dmg > 2 then
+									self.Entity:EmitSound("vehicles/v8/vehicle_impact_heavy"..math.random(1,4)..".wav")
+									local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
+									for k, p in pairs(self.passengers) do
+										if p and p:IsValid() then
+											p:TakeDamage(dmg/5, lasta, self.Entity)
+										end
+									end
+								end
+							end
+							-- ADDED BY THE GREDWITCH
+							if (cdat.Speed > 1000 and !self.ShouldRotate) 
+							or (cdat.Speed > 100 and self.ShouldRotate and !cdat.HitEntity.isWacRotor) 
+							and (!cdat.HitEntity:IsPlayer() and!cdat.HitEntity:IsNPC() and !string.StartWith(cdat.HitEntity:GetClass(),"vfire")) then
+								self:GredExplode(cdat.speed,cdat.HitPos)
+							end
+						end)
+					end
+				
+					ent.Think = function(self)
+						self:base("wac_hc_base").Think(self)
+						-- START ADDED BY THE GREDWITCH
+						if self.sounds.Radio then
+							if self.active and GetConVar("gred_sv_wac_radio"):GetInt() == 1 then
+								self.sounds.Radio:Play()
+							else
+								self.sounds.Radio:Stop()
+							end
+						end
+						if self:WaterLevel() >= 2 and GetConVar("gred_sv_wac_explosion_water"):GetInt() >= 1 and !self.hascrashed then
+							local pos = self:GetPos()
+							local trdat   = {}
+							trdat.start   = pos+Vector(0,0,4000)
+							trdat.endpos  = pos
+							trdat.filter  = self
+							trdat.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
+							
+							local tr = util.TraceLine(trdat)
+							
+							if tr.Hit then
+								local ang = Angle(-90,0,0)
+								local radius = self:BoundingRadius()
+								local water = "ins_water_explosion"
+								if radius <= 600 then
+									net.Start("gred_net_wac_explosion")
+										net.WriteString(water)
+										net.WriteVector(tr.HitPos)
+										net.WriteAngle(ang)
+									net.Broadcast()
+								else
+									net.Start("gred_net_wac_explosion")
+										net.WriteString(water)
+										net.WriteVector(tr.HitPos+Vector(math.random(500,250),math.random(500,250),0))
+										net.WriteAngle(ang)
+									net.Broadcast()
+									net.Start("gred_net_wac_explosion")
+										net.WriteString(water)
+										net.WriteVector(tr.HitPos+Vector(math.random(500,250),math.random(-500,-250),0))
+										net.WriteAngle(ang)
+									net.Broadcast()
+									net.Start("gred_net_wac_explosion")
+										net.WriteString(water)
+										net.WriteVector(tr.HitPos+Vector(math.random(-500,-250),math.random(500,250),0))
+										net.WriteAngle(ang)
+									net.Broadcast()
+									net.Start("gred_net_wac_explosion")
+										net.WriteString(water)
+										net.WriteVector(tr.HitPos+Vector(math.random(-500,-250),math.random(-500,-250),0))
+										net.WriteAngle(ang)
+									net.Broadcast()
+								end
+								local ent = ents.Create("shockwave_sound_lowsh")
+								ent:SetPos(tr.HitPos) 
+								ent:Spawn()
+								ent:Activate()
+								ent:SetVar("GBOWNER", self.Owner)
+								ent:SetVar("MAX_RANGE",radius*self.Weight)
+								ent:SetVar("NOFARSOUND",0)
+								ent:SetVar("SHOCKWAVE_INCREMENT",200)
+								ent:SetVar("DELAY",0.01)
+								ent:SetVar("SOUNDCLOSE", "/explosions/aircraft_water_close.wav")
+								ent:SetVar("SOUND", "/explosions/aircraft_water_dist.wav")
+								ent:SetVar("SOUNDFAR", "/explosions/aircraft_water_far.wav")
+								ent:SetVar("Shocktime", 0)
+								local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
+								for k, p in pairs(self.passengers) do
+									if p and p:IsValid() then
+										p:TakeDamage(p:Health() + 20, lasta, self.Entity)
+									end
+								end
+								self.hascrashed = true
+								self:Remove()
+							end
+						end
+						
+						if self.ShouldRotate and self.topRotor and self.Base != "wac_pl_base" and !self.disabled
+						and self.rotorRpm > 0.2 and GetConVar("gred_sv_wac_heli_spin"):GetInt() >= 1 then
+							local p = self:GetPhysicsObject()
+							if p and IsValid(p) then
+								if !self.sounds.crashsnd:IsPlaying() then
+									self.sounds.crashsnd:Play()
+								end
+								self.sounds.bipsnd:Play()
+								
+								local v = p:GetAngleVelocity()
+								if v.z < 150 then
+									p:AddAngleVelocity(Vector(0,0,10))
+								end
+								if p:GetVelocity().z > -300 then
+									p:AddVelocity(Vector(0,0,7*-(15*self.rotorRpm)))
+								end
+								if v.y > -50 then
+									p:AddAngleVelocity(Vector(0,-13,0))
+								end
+								self:SetHover(true)
+								self.controls.throttle = 0
+								for k,v in pairs (self.wheels) do
+									if !v.ph then
+										v.ph = function(ent,data) 
+											v.GredHitGround = true	
+										end
+										v:AddCallback("PhysicsCollide",v.ph)
+									end
+									if v.GredHitGround then
+										self:GredExplode(500,self:GetPos())
+									end
+								end
+							end
+						else
+							if !self.topRotor and self.sounds.crashsnd then
+								self.sounds.crashsnd:Stop()
+							end
+						end
+						
+						-- END ADDED BY THE GREDWITCH
+					end
+					
+					ent.GredIsOnGround = function(self,v)
+						local p = v:GetPos()
+						return util.QuickTrace(p,p-Vector(0,0,1)).Hit
+					end
+					
+					ent.DamageEngine = function(self,amt)
+						if wac.aircraft.cvars.nodamage:GetInt() == 1 then
+							return
+						end
+						if self.disabled then return end
+						self.engineHealth = self.engineHealth - amt
+
+						if self.engineHealth < 80  then
+							if !self.sounds.MinorAlarm:IsPlaying() then
+								self.sounds.MinorAlarm:Play()
+							end
+							if !self.Smoke and self.engineHealth>0 then
+								self.Smoke = self:CreateSmoke()
+							end
+							if self.engineHealth < 50 then
+								if !self.sounds.LowHealth:IsPlaying() then
+									self.sounds.LowHealth:Play()
+								end
+								f = math.random(0,GetConVar("gred_sv_wac_heli_spin_chance"):GetInt())
+								if !self.ShouldRotate and f == 0 then
+									self.OldGredUP = self:GetUp()
+									self.ShouldRotate = true
+								end
+								
+								
+								if self.engineHealth < 20 and !self.EngineFire then
+									local fire = ents.Create("env_fire")
+									fire:SetPos(self:LocalToWorld(self.FirePos))
+									fire:Spawn()
+									fire:SetParent(self.Entity)
+									if GetConVar("gred_sv_fire_effect"):GetInt() >= 1 then
+										ParticleEffectAttach("fire_large_01", 1, fire, 0)
+										if (GetConVar("gred_sv_multiple_fire_effects"):GetInt() >= 1) then
+											if self.OtherRotors then 
+												for i = 1,3 do
+													if not self.OtherRotors[i] then return end
+													ParticleEffectAttach("fire_large_01", 1, self.OtherRotors[i], 0)
+												end
+											end
+											if self.OtherRotor then ParticleEffectAttach("fire_large_01", 1, self.OtherRotor, 0) end
+											if self.rotor2 then ParticleEffectAttach("fire_large_01", 1, self.rotor2, 0) end
+											if self.topRotor2 then ParticleEffectAttach("fire_large_01", 1, self.topRotor2, 0) end
+										end
+									elseif GetConVar("gred_sv_fire_effect"):GetInt() <= 0 then
+										if GetConVar("gred_sv_multiple_fire_effects"):GetInt() >= 1 then
+											if self.OtherRotors then
+												for i = 1,3 do
+													if not self.OtherRotors[i] then return end
+													local fire = ents.Create("env_fire_trail")
+													fire:SetPos(self:LocalToWorld(self.OtherRotorPos[i]))
+													fire:Spawn()
+													fire:SetParent(self.Entity)
+												end
+											else
+												if self.OtherRotor then local pos = self:LocalToWorld(self.OtherRotorPos) end
+												if self.rotor2 then local pos = self:LocalToWorld(self.rotorPos2) end
+												if self.topRotor2 then local pos = self:LocalToWorld(self.TopRotor2.pos) end
+												if pos then
+													local fire = ents.Create("env_fire_trail")
+													fire:SetPos(pos)
+													fire:Spawn()
+													fire:SetParent(self.Entity)
+												end
+											end
+										end
+									end
+									self.sounds.LowHealth:Play()
+									self.EngineFire = fire
+								end
+								if self.engineHealth < 10 and (!self.ShouldRotate or !self.blewup) then 
+									self.engineDead = true 
+									self:setEngine(false) 
+								end
+
+								if self.engineHealth < 0 and !self.disabled and (!self.ShouldRotate or !self.blewup) then
+									self.disabled = true
+									self.engineRpm = 0
+									self.rotorRpm = 0
+									local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
+									for k, p in pairs(self.passengers) do
+										if p and p:IsValid() then
+											p:TakeDamage(p:Health() + 20, lasta, self.Entity)
+										end
+									end
+
+									for k,v in pairs(self.seats) do
+										v:Remove()
+									end
+									self.passengers={}
+									self:StopAllSounds()
+
+									self:setVar("rotorRpm", 0)
+									self:setVar("engineRpm", 0)
+									self:setVar("up", 0)
+
+									self.IgnoreDamage = false
+									--[[ this affects the base class
+										for name, vec in pairs(self.Aerodynamics.Rotation) do
+											vec = VectorRand()*100
+										end
+										for name, vec in pairs(self.Aerodynamics.Lift) do
+											vec = VectorRand()
+										end
+										self.Aerodynamics.Rail = Vector(0.5, 0.5, 0.5)
+									]]
+									local effectdata = EffectData()
+									effectdata:SetStart(self.Entity:GetPos())
+									effectdata:SetOrigin(self.Entity:GetPos())
+									effectdata:SetScale(1)
+									util.Effect("Explosion", effectdata)
+									util.Effect("HelicopterMegaBomb", effectdata)
+									util.Effect("cball_explode", effectdata)
+									util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), 300, 300)
+									self:setEngine(false)
+									if self.Smoke then
+										self.Smoke:Remove()
+										self.Smoke=nil
+									end
+									if self.RotorWash then
+										self.RotorWash:Remove()
+										self.RotorWash=nil
+									end
+									if self:WaterLevel() >= 1 and GetConVar("gred_sv_wac_explosion_water"):GetInt() >= 1 then
+										local pos = self:GetPos()
+										local trdat   = {}
+										trdat.start   = pos+Vector(0,0,4000)
+										trdat.endpos  = pos
+										trdat.filter  = self
+										trdat.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
+											 
+										local tr = util.TraceLine(trdat)
+							
+										if tr.Hit then
+											local ang = Angle(-90,0,0)
+											local water = "ins_water_explosion"
+											if radius <= 600 then
+												net.Start("gred_net_wac_explosion")
+													net.WriteString(water)
+													net.WriteVector(tr.HitPos)
+													net.WriteAngle(ang)
+												net.Broadcast()
+											else
+												net.Start("gred_net_wac_explosion")
+													net.WriteString(water)
+													net.WriteVector(tr.HitPos+Vector(math.random(500,250),math.random(500,250),0))
+													net.WriteAngle(ang)
+												net.Broadcast()
+												net.Start("gred_net_wac_explosion")
+													net.WriteString(water)
+													net.WriteVector(tr.HitPos+Vector(math.random(500,250),math.random(-500,-250),0))
+													net.WriteAngle(ang)
+												net.Broadcast()
+												net.Start("gred_net_wac_explosion")
+													net.WriteString(water)
+													net.WriteVector(tr.HitPos+Vector(math.random(-500,-250),math.random(500,250),0))
+													net.WriteAngle(ang)
+												net.Broadcast()
+												net.Start("gred_net_wac_explosion")
+													net.WriteString(water)
+													net.WriteVector(tr.HitPos+Vector(math.random(-500,-250),math.random(-500,-250),0))
+													net.WriteAngle(ang)
+												net.Broadcast()
+											end
+											self.hascrashed = true
+											self:Remove()
+										end
+									end
+									--[[self:SetNWBool("locked", true)
+									timer.Simple( 0.1, function() self:Remove() end)--]]
+								end
+							end
+						end
+						if self.Smoke then
+							local rcol = math.Clamp(self.engineHealth*3.4, 0, 170)
+							self.Smoke:SetKeyValue("rendercolor", rcol.." "..rcol.." "..rcol)
+						end
+						self:SetNWFloat("health", self.engineHealth)
+					end
+				end
+				
+				if CLIENT then -- CL_INIT.LUA
+					ent.receiveInput = function(self,name, value, seat)
+						if name == "FreeView" then
+							local player = LocalPlayer()
+							if value > 0.5 then
+								-- ADDED BY GREDWITCH
+								if self.Camera and seat == self.Camera.seat and seat != 1 then
+									if !player:GetVehicle().useCamerazoom then player:GetVehicle().useCamerazoom = 0 end
+									player:GetVehicle().useCamerazoom = player:GetVehicle().useCamerazoom + 1
+									if player:GetVehicle().useCamerazoom > 3 then player:GetVehicle().useCamerazoom = 0 end
+								else -- END
+									player.wac.viewFree = true
+								end -- ADDED BY GREDWITCH
+							else
+								if self.Camera and seat == self.Camera.seat and seat != 1 then
+								else
+									player.wac.viewFree = false
+									player.wac_air_resetview = true
+								end
+							end
+						elseif name == "Camera" then
+							local player = LocalPlayer()
+							if value > 0.5 then
+								player:GetVehicle().useCamera = !player:GetVehicle().useCamera
+								if self.Camera and seat == self.Camera.seat then player:GetVehicle().useCamerazoom = 0 end -- ADDED BY GREDWITCH
+							end
+						end
+					end
+					
+					ent.viewCalcCamera = function(self,k, p, view)
+						view.origin = self.camera:LocalToWorld(self.Camera.viewPos)
+						view.angles = self.camera:GetAngles()
+						
+						-- ADDED BY GREDWITCH
+						local zoom = p:GetVehicle().useCamerazoom
+						if zoom then
+							if zoom >= 1 then
+								view.fov = view.fov - zoom*20
+							end
+						end	
+						for k, t in pairs(self.Seats) do
+							if k != "BaseClass" and self:getWeapon(k) then
+								if self:getWeapon(k).HasLastShot then
+									if self:getWeapon(k):GetIsShooting() then
+										local ang = view.angles
+										view.angles = view.angles + Angle(0,0,math.random(-2,2))
+										timer.Simple(0.02,function() if IsValid(self) then
+											view.angles = ang
+											end
+										end)
+									end
+								end
+							end
+						end
+						-- END
+						if self.viewTarget then
+							self.viewTarget.angles = p:GetAimVector():Angle() - self:GetAngles()
+						end
+						self.viewPos = nil
+						p.wac.lagAngles = Angle(0, 0, 0)
+						p.wac.lagAccel = Vector(0, 0, 0)
+						p.wac.lagAccelDelta = Vector(0, 0, 0)
+						return view
+					end
+				end
+				
+				ent:addSounds()
+			end
+		elseif ent.ClassName == "wac_hc_rocket" then
+			ent.Initialize = function(self)
+				math.randomseed(CurTime())
+				self.Entity:SetModel("models/weltensturm/wac/rockets/rocket01.mdl")
+				self.Entity:PhysicsInit(SOLID_VPHYSICS)
+				self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
+				self.Entity:SetSolid(SOLID_VPHYSICS)
+				self.phys = self.Entity:GetPhysicsObject()
+				if (self.phys:IsValid()) then
+					self.phys:SetMass(400)
+					self.phys:EnableGravity(false)
+					self.phys:EnableCollisions(true)
+					self.phys:EnableDrag(false)
+					self.phys:Wake()
+				end
+				self.sound = CreateSound(self.Entity, "WAC/rocket_idle.wav")
+				self.matType = MAT_DIRT
+				self.hitAngle = Angle(270, 0, 0)
+				if self.calcTarget then
+					self.Speed = 70
+				else
+					self.Speed = 100
+				end
+			end
+		end
+	end)
+end)
