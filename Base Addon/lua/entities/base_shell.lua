@@ -257,7 +257,7 @@ if CLIENT then
 			end
 		end
 	end
-	
+		
 	function ENT:OnRemove()
 		if self.snd then 
 			for k,v in pairs (self.snd) do

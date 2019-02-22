@@ -111,173 +111,173 @@ function ENT:AddOnInit()
 end
 
 function ENT:TriggerInput(iname, value)
-     if (!self:IsValid()) then return end
-	 if (iname == "Detonate") then
-         if (value >= 1) then
-		     if (!self.Exploded and self.Armed) then
-			     timer.Simple(math.Rand(0,self.MaxDelay),function()
-				     if !self:IsValid() then return end
-	                 self.Exploded = true
-					 
-			         self:Explode()
-				 end)
-		     end
-		 end
-	 end
-	 if (iname == "Arm") then
-         if (value >= 1) then
-             if (!self.Exploded and !self.Armed and !self.Arming) then
-			     self:EmitSound(self.ActivationSound)
-                 self:Arm()
-             end 
-         end
-     end		 
-	 if (iname == "Launch") then 
-	     if (value >= 1) then
-		     if (!self.Exploded and !self.Burnt and !self.Ignition and !self.Fired) then
-			     self:Launch()
-		     end
-	     end
-     end
+	if (!self:IsValid()) then return end
+	if (iname == "Detonate") then
+	    if (value >= 1) then
+		    if (!self.Exploded and self.Armed) then
+			    timer.Simple(math.Rand(0,self.MaxDelay),function()
+				    if !self:IsValid() then return end
+				 self.Exploded = true
+					
+				   self:Explode()
+				end)
+		    end
+		end
+	end
+	if (iname == "Arm") then
+	    if (value >= 1) then
+		   if (!self.Exploded and !self.Armed and !self.Arming) then
+			    self:EmitSound(self.ActivationSound)
+			  self:Arm()
+		   end 
+	    end
+	end		
+	if (iname == "Launch") then 
+	    if (value >= 1) then
+		    if (!self.Exploded and !self.Burnt and !self.Ignition and !self.Fired) then
+			    self:Launch()
+		    end
+	    end
+	end
 end
 
 function ENT:OnTakeDamage(dmginfo)
-     if !self:IsValid() then return end
-     if self.Exploded then return end
-	 exploDamage = dmginfo:IsDamageType(64)
-	 if exploDamage == true then return end
-	 if (self.Life <= 0) then return end
-	 self:TakePhysicsDamage(dmginfo)
-     if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then  
-	     if(!self.Fired and !self.Burnt and !self.Arming and !self.Armed) then
-	         if(math.random(0,9) == 1) then
-		         self:Launch()
-		     else
-			     self:Arm()
-			 end
-	     end
-	 end
-	 if(self.Fired and !self.Burnt and self.Armed) then
-	     if (dmginfo:GetDamage() >= 2) then
-		     local phys = self:GetPhysicsObject()
-		     self:EmitSound(damagesound)
-	         phys:AddAngleVelocity(dmginfo:GetDamageForce()*0.1)
-	     end
-	 end
-	 if(!self.Armed) then return end
-	 self.Life = self.Life - dmginfo:GetDamage()
-     if (self.Life <= 0) then 
-		 timer.Simple(math.Rand(0,self.MaxDelay),function()
-	         if !self:IsValid() then return end 
-			 self.Exploded = true
-			 self:Explode()
+	if !self:IsValid() then return end
+	if self.Exploded then return end
+	exploDamage = dmginfo:IsDamageType(64)
+	if exploDamage == true then return end
+	if (self.Life <= 0) then return end
+	self:TakePhysicsDamage(dmginfo)
+	if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then  
+	    if(!self.Fired and !self.Burnt and !self.Arming and !self.Armed) then
+		   if(math.random(0,9) == 1) then
+			   self:Launch()
+		    else
+			    self:Arm()
+			end
+	    end
+	end
+	if(self.Fired and !self.Burnt and self.Armed) then
+	    if (dmginfo:GetDamage() >= 2) then
+		    local phys = self:GetPhysicsObject()
+		    self:EmitSound(damagesound)
+		   phys:AddAngleVelocity(dmginfo:GetDamageForce()*0.1)
+	    end
+	end
+	if(!self.Armed) then return end
+	self.Life = self.Life - dmginfo:GetDamage()
+	if (self.Life <= 0) then 
+		timer.Simple(math.Rand(0,self.MaxDelay),function()
+		   if !self:IsValid() then return end 
+			self.Exploded = true
+			self:Explode()
 			
-	     end)
-	 end
+	    end)
+	end
 end
 
 function ENT:PhysicsCollide( data, physobj )
-	 timer.Simple(0,function()
-	 -- print(data.HitEntity:GetClass())
-     if(self.Exploded) then return end
-     if(!self:IsValid()) then return end
-	 if(self.Life <= 0) then return end
-		 if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then
-			 if(!self.Fired and !self.Burnt and !self.Arming and !self.Armed ) and (data.Speed > self.ImpactSpeed * 5) then --and !self.Arming and !self.Armed
-				 if(math.random(0,9) == 1) then
-					 self:Launch()
-					 self:EmitSound(damagesound)
-				 else
-					 self:Arm()
-					 self:EmitSound(damagesound)
-				 end
-			 end
-		 end
+	timer.Simple(0,function()
+	-- print(data.HitEntity:GetClass())
+	if(self.Exploded) then return end
+	if(!self:IsValid()) then return end
+	if(self.Life <= 0) then return end
+		if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then
+			if(!self.Fired and !self.Burnt and !self.Arming and !self.Armed ) and (data.Speed > self.ImpactSpeed * 5) then --and !self.Arming and !self.Armed
+				if(math.random(0,9) == 1) then
+					self:Launch()
+					self:EmitSound(damagesound)
+				else
+					self:Arm()
+					self:EmitSound(damagesound)
+				end
+			end
+		end
 
-		 if(!self.Armed) then return end
+		if(!self.Armed) then return end
 			
-		 if (data.Speed > self.ImpactSpeed )then
-			 self.Exploded = true
-			 self:Explode()
-		 end
+		if (data.Speed > self.ImpactSpeed )then
+			self.Exploded = true
+			self:Explode()
+		end
 	end)
 end
 
 function ENT:Launch()
-     if(self.Exploded) then return end
-	 if(self.Burned) then return end
-	 --if(self.Armed) then return end
-	 if(self.Fired) then return end
-	 
-	 local phys = self:GetPhysicsObject()
-	 if !phys:IsValid() then return end
-	 
-	 self.Fired = true
-	 if(self.SmartLaunch) then
-		 constraint.RemoveAll(self)
-	 end
-	 timer.Simple(0.05,function()
-	     if not self:IsValid() then return end
-	     if(phys:IsValid()) then
-             phys:Wake()
-		     phys:EnableMotion(true)
-	     end
-	 end)
-	 timer.Simple(self.IgnitionDelay,function()
-	     if not self:IsValid() then return end  -- Make a short ignition delay!
-		 self:SetNetworkedBool("Exploded",true)
-		 self:SetNetworkedInt("LightRed", self.LightRed)
-		 self:SetNetworkedInt("LightBlue", self.LightBlue)
-		 self:SetNetworkedInt("LightGreen", self.LightGreen)	
-		 self:SetNetworkedBool("EmitLight",true)
-		 self:SetNetworkedInt("LightEmitTime", self.LightEmitTime)
-		 self:SetNetworkedInt("LightBrightness", self.LightBrightness)
-		 self:SetNetworkedInt("LightSize", self.LightSize)
-		 local phys = self:GetPhysicsObject()
-		 self.Ignition = true
-		 self:Arm()
-		 local pos = self:GetPos()
-		 sound.Play(self.StartSound, pos, 120, 100,1)
-	     -- self:EmitSound(self.EngineSound)
-		 self:SetNetworkedBool("EmitLight",true)
-		 self:SetNetworkedBool("self.Ignition",true)
+	if(self.Exploded) then return end
+	if(self.Burned) then return end
+	--if(self.Armed) then return end
+	if(self.Fired) then return end
+	
+	local phys = self:GetPhysicsObject()
+	if !phys:IsValid() then return end
+	
+	self.Fired = true
+	if(self.SmartLaunch) then
+		constraint.RemoveAll(self)
+	end
+	timer.Simple(0.05,function()
+	    if not self:IsValid() then return end
+	    if(phys:IsValid()) then
+		   phys:Wake()
+		    phys:EnableMotion(true)
+	    end
+	end)
+	timer.Simple(self.IgnitionDelay,function()
+	    if not self:IsValid() then return end  -- Make a short ignition delay!
+		self:SetNetworkedBool("Exploded",true)
+		self:SetNetworkedInt("LightRed", self.LightRed)
+		self:SetNetworkedInt("LightBlue", self.LightBlue)
+		self:SetNetworkedInt("LightGreen", self.LightGreen)	
+		self:SetNetworkedBool("EmitLight",true)
+		self:SetNetworkedInt("LightEmitTime", self.LightEmitTime)
+		self:SetNetworkedInt("LightBrightness", self.LightBrightness)
+		self:SetNetworkedInt("LightSize", self.LightSize)
+		local phys = self:GetPhysicsObject()
+		self.Ignition = true
+		self:Arm()
+		local pos = self:GetPos()
+		sound.Play(self.StartSound, pos, 120, 100,1)
+	    -- self:EmitSound(self.EngineSound)
+		self:SetNetworkedBool("EmitLight",true)
+		self:SetNetworkedBool("self.Ignition",true)
 		if self.RocketTrail != "" then ParticleEffectAttach(self.RocketTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
-		 if(self.FuelBurnoutTime != 0) then 
-	         timer.Simple(self.FuelBurnoutTime,function()
-		        if not self:IsValid() then return end 
-		        self.Burnt = true
-		        self:StopParticles()
-		        self:StopSound(self.EngineSound)
+		if(self.FuelBurnoutTime != 0) then 
+		   timer.Simple(self.FuelBurnoutTime,function()
+			  if not self:IsValid() then return end 
+			  self.Burnt = true
+			  self:StopParticles()
+			  self:StopSound(self.EngineSound)
 				self:StopSound(self.StartSound)
-	            if self.RocketBurnoutTrail != "" then ParticleEffectAttach(self.RocketBurnoutTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
-             end)	 
-		 end
-     end)		 
+			 if self.RocketBurnoutTrail != "" then ParticleEffectAttach(self.RocketBurnoutTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
+		   end)	
+		end
+	end)		
 end
 
 function ENT:Think()
-     if(self.Burnt) then return end
-     if(!self.Ignition) then return end -- if there wasn't ignition, we won't fly
-	 if(self.Exploded) then return end -- if we exploded then what the fuck are we doing here
-	 if(!self:IsValid()) then return end -- if we aren't good then something fucked up
-	 local phys = self:GetPhysicsObject()
-	 local thrustpos = self:GetPos()
-	 if(self.ForceOrientation == "RIGHT") then
-	     phys:AddVelocity(self:GetRight() * self.EnginePower) -- Continuous engine impulse
-	 elseif(self.ForceOrientation == "LEFT") then
-	     phys:AddVelocity(self:GetRight() * -self.EnginePower) -- Continuous engine impulse
-	 elseif(self.ForceOrientation == "UP") then
-	     phys:AddVelocity(self:GetUp() * self.EnginePower) -- Continuous engine impulse
-	 elseif(self.ForceOrientation == "DOWN") then 
-	     phys:AddVelocity(self:GetUp() * -self.EnginePower) -- Continuous engine impulse
-	 elseif(self.ForceOrientation == "INV") then
-	     phys:AddVelocity(self:GetForward() * -self.EnginePower) -- Continuous engine impulse
-	 else
-		 phys:AddVelocity(self:GetForward() * self.EnginePower) -- Continuous engine impulse
-	 end
-	 if (self.Armed) then
-        phys:AddAngleVelocity(Vector(self.RotationalForce,0,0)) -- Rotational force
-	 end
+	if(self.Burnt) then return end
+	if(!self.Ignition) then return end -- if there wasn't ignition, we won't fly
+	if(self.Exploded) then return end -- if we exploded then what the fuck are we doing here
+	if(!self:IsValid()) then return end -- if we aren't good then something fucked up
+	local phys = self:GetPhysicsObject()
+	local thrustpos = self:GetPos()
+	if(self.ForceOrientation == "RIGHT") then
+	    phys:AddVelocity(self:GetRight() * self.EnginePower) -- Continuous engine impulse
+	elseif(self.ForceOrientation == "LEFT") then
+	    phys:AddVelocity(self:GetRight() * -self.EnginePower) -- Continuous engine impulse
+	elseif(self.ForceOrientation == "UP") then
+	    phys:AddVelocity(self:GetUp() * self.EnginePower) -- Continuous engine impulse
+	elseif(self.ForceOrientation == "DOWN") then 
+	    phys:AddVelocity(self:GetUp() * -self.EnginePower) -- Continuous engine impulse
+	elseif(self.ForceOrientation == "INV") then
+	    phys:AddVelocity(self:GetForward() * -self.EnginePower) -- Continuous engine impulse
+	else
+		phys:AddVelocity(self:GetForward() * self.EnginePower) -- Continuous engine impulse
+	end
+	if (self.Armed) then
+	   phys:AddAngleVelocity(Vector(self.RotationalForce,0,0)) -- Rotational force
+	end
 	if self.Fired then
 		if self:WaterLevel() >= 1 then self:Explode() end
 	end
@@ -287,45 +287,45 @@ function ENT:Think()
 end
 
 function ENT:Arm()
-     if(!self:IsValid()) then return end
-	 if(self.Armed) then return end
-	 self.Arming = true
-	 
-	 timer.Simple(self.ArmDelay, function()
-	     if not self:IsValid() then return end 
-	     self.Armed = true
-		 self.Arming = false
-		 self:EmitSound(self.ArmSound)
-		 if(self.Timed) then
-	         timer.Simple(self.Timer, function()
-	             if !self:IsValid() then return end 
-			     self.Exploded = true
-			     self:Explode()
-				 self.EmitLight = true
-	         end)
-		 end
-	 end)
-end	 
+	if(!self:IsValid()) then return end
+	if(self.Armed) then return end
+	self.Arming = true
+	
+	timer.Simple(self.ArmDelay, function()
+	    if not self:IsValid() then return end 
+	    self.Armed = true
+		self.Arming = false
+		self:EmitSound(self.ArmSound)
+		if(self.Timed) then
+		   timer.Simple(self.Timer, function()
+			  if !self:IsValid() then return end 
+			    self.Exploded = true
+			    self:Explode()
+				self.EmitLight = true
+		   end)
+		end
+	end)
+end	
 
 function ENT:Use( activator, caller )
-     if(self.Exploded) then return end
-	 if(self.Dumb) then return end
-	 if(GetConVar("gred_sv_easyuse"):GetInt() >= 1) then
-         if(self:IsValid()) then
-             if (!self.Exploded) and (!self.Burnt) and (!self.Fired) then
-	             if (activator:IsPlayer()) then
-                     self:EmitSound(self.ActivationSound)
-                     self:Launch()
-		         end
-	         end
-         end
-	 end
+	if(self.Exploded) then return end
+	if(self.Dumb) then return end
+	if(GetConVar("gred_sv_easyuse"):GetInt() >= 1) then
+	    if(self:IsValid()) then
+		   if (!self.Exploded) and (!self.Burnt) and (!self.Fired) then
+			  if (activator:IsPlayer()) then
+				 self:EmitSound(self.ActivationSound)
+				 self:Launch()
+			   end
+		   end
+	    end
+	end
 end
 
 function ENT:OnRemove()
-     self:StopSound(self.EngineSound)
-     self:StopSound(self.StartSound)
-	 self:StopParticles()
+	self:StopSound(self.EngineSound)
+	self:StopSound(self.StartSound)
+	self:StopParticles()
 end
 
 -- if CLIENT then

@@ -85,7 +85,7 @@ function ENT:Initialize()
 		physenv.SetPerformanceSettings(physEnvironment)
 		self.Armed    = false
 		self.Exploded = false
-		self.Used     = false
+		self.Used	= false
 		self.Arming   = false
 		timer.Simple(0,function()
 			if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
@@ -93,8 +93,6 @@ function ENT:Initialize()
 		end)
 	end
 end
-
-
 
 function ENT:AddOnInit() 
 	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate" }) end
@@ -122,36 +120,35 @@ function ENT:PhysicsUpdate(ph)
 	ph:AddVelocity(self:GetForward() - self:LocalToWorld(vel*Vector(0.1, 1, 1))+pos)
 end
 
-
 function ENT:TriggerInput(iname, value)
-     if (!self:IsValid()) then return end
-	 if (iname == "Detonate") then
-         if (value >= 1) then
-		     if (!self.Exploded and self.Armed) then
-			     timer.Simple(math.Rand(0,self.MaxDelay),function()
-				     if !self:IsValid() then return end
-	                 self.Exploded = true
-			         self:Explode()
-				 end)
-		     end
-		 end
-	 end
-	 if (iname == "Arm") then
-         if (value >= 1) then
-             if (!self.Exploded and !self.Armed and !self.Arming) then
-			     self:EmitSound(self.ActivationSound)
-                 self:Arm()
-             end 
-         end
-     end		 
+	if (!self:IsValid()) then return end
+	if (iname == "Detonate") then
+	   if (value >= 1) then
+			if (!self.Exploded and self.Armed) then
+				timer.Simple(math.Rand(0,self.MaxDelay),function()
+					if !self:IsValid() then return end
+				 self.Exploded = true
+				   self:Explode()
+				end)
+			end
+		end
+	end
+	if (iname == "Arm") then
+	   if (value >= 1) then
+		  if (!self.Exploded and !self.Armed and !self.Arming) then
+				self:EmitSound(self.ActivationSound)
+			 self:Arm()
+		  end 
+	   end
+	end		
 end 
 
 function ENT:LoadModel()
-     if self.UseRandomModels then
-	     self:SetModel(table.Random(Models))
-	 else
-	     self:SetModel(self.Model)
-	 end
+	if self.UseRandomModels then
+		self:SetModel(table.Random(Models))
+	else
+		self:SetModel(self.Model)
+	end
 end
 
 function ENT:AddOnExplode() end
@@ -182,7 +179,7 @@ function ENT:Explode()
 		ent.trace=self.TraceLength
 		ent.decal=self.Decal
 	end
-	net.Start("gred_net_explosion_fx")
+	local effectdata = EffectData()
 	if(self:WaterLevel() >= 1) then
 		local trdata   = {}
 		local trlength = Vector(0,0,9000)
@@ -201,14 +198,14 @@ function ENT:Explode()
 		local tr2 = util.TraceLine(trdat2)
 		
 		if tr2.Hit then
-			net.WriteString(self.EffectWater)
-			net.WriteVector(tr2.HitPos)
+			effectdata:SetFlags(table.KeyFromValue(gred.Particles,self.EffectWater))
+			effectdata:SetOrigin(tr2.HitPos)
 			if self.EffectWater == "ins_water_explosion" then
-				net.WriteAngle(Angle(-90,0,0))
+				effectdata:SetAngles(Angle(-90,0,0))
 			else
-				net.WriteAngle(Angle(0,0,0))
+				effectdata:SetAngles(Angle(0,0,0))
 			end
-			net.WriteBool(false)
+			effectdata:SetSurfaceProp(0)
 		end
 		if !self.Smoke then
 			if self.WaterExplosionSound == nil then else 
@@ -218,38 +215,37 @@ function ENT:Explode()
 				self.FarExplosionSound = self.WaterFarExplosionSound 
 			end
 		end
-     else
+	else
 		 local tracedata    = {}
-	     tracedata.start    = pos
+		tracedata.start    = pos
 		 tracedata.endpos   = tracedata.start - Vector(0, 0, self.TraceLength)
 		 tracedata.filter   = self.Entity
 				
 		 local trace = util.TraceLine(tracedata)
-	     
+		
 		if trace.HitWorld then
-			net.WriteString(self.Effect)
-			net.WriteVector(pos)
+			effectdata:SetFlags(table.KeyFromValue(gred.Particles,self.Effect))
+			effectdata:SetOrigin(pos)
 			if self.AngEffect then
-				net.WriteAngle(Angle(-90,0,0))
-				net.WriteBool(true)
-				net.WriteVector(pos-Vector(0,0,100))
+				effectdata:SetAngles(Angle(-90,0,0))
+				effectdata:SetSurfaceProp(1)
 			else
-				net.WriteAngle(Angle(0,0,0))
-				net.WriteBool(false)
+				effectdata:SetAngles(Angle(0,0,0))
+				effectdata:SetSurfaceProp(1)
 			end
-		else 
-			net.WriteString(self.Effect)
-			net.WriteVector(pos)
+		else
+			effectdata:SetFlags(table.KeyFromValue(gred.Particles,self.EffectAir))
+			effectdata:SetOrigin(pos)
 			if self.AngEffect then
-				net.WriteAngle(Angle(-90,0,0))
-				net.WriteBool(false)
+				effectdata:SetAngles(Angle(-90,0,0))
+				effectdata:SetSurfaceProp(0)
 			else
-				net.WriteAngle(Angle(0,0,0))
-				net.WriteBool(false)
+				effectdata:SetAngles(Angle(0,0,0))
+				effectdata:SetSurfaceProp(0)
 			end
 		end
     end
-	net.Broadcast()
+	util.Effect("gred_particle_simple",effectdata)
 	
 	local ent = ents.Create("shockwave_sound_lowsh")
 	ent:SetPos( pos ) 
@@ -268,52 +264,52 @@ function ENT:Explode()
 	ent:SetVar("SOUNDFAR", self.DistExplosionSound)
 	ent:SetVar("Shocktime", 0)
 	 
-	 if self.IsNBC then
-	     local nbc = ents.Create(self.NBCEntity)
-		 nbc:SetVar("GBOWNER",self.GBOWNER)
-		 nbc:SetPos(self:GetPos())
-		 nbc:Spawn()
-		 nbc:Activate()
-	 end
-     self:Remove()
+	if self.IsNBC then
+		local nbc = ents.Create(self.NBCEntity)
+		nbc:SetVar("GBOWNER",self.GBOWNER)
+		nbc:SetPos(self:GetPos())
+		nbc:Spawn()
+		nbc:Activate()
+	end
+	self:Remove()
 end
 
 function ENT:OnTakeDamage(dmginfo)
-     if self.Exploded then return end
-	 exploDamage = dmginfo:IsDamageType(64)
-	 if exploDamage == true then return end
-     self:TakePhysicsDamage(dmginfo)
+	if self.Exploded then return end
+	exploDamage = dmginfo:IsDamageType(64)
+	if exploDamage == true then return end
+	self:TakePhysicsDamage(dmginfo)
 	 
-	 local phys = self:GetPhysicsObject()
+	local phys = self:GetPhysicsObject()
 	 
-     if (self.Life <= 0) then return end
-	 if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then
-	     if(!self.Armed and !self.Arming) then
-	         self:Arm()
-	     end
-	 end
+	if (self.Life <= 0) then return end
+	if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then
+		if(!self.Armed and !self.Arming) then
+		    self:Arm()
+		end
+	end
 	 
-     if(!self.Armed) then return end
+	if(!self.Armed) then return end
 
-	 if self:IsValid() then
-	     self.Life = self.Life - dmginfo:GetDamage()
-		 if (self.Life <= self.Life/2) and !self.Exploded and self.Flamable then
-		     self:Ignite(self.MaxDelay,0)
-		 end
-		 if (self.Life <= 0) then 
-		     timer.Simple(math.Rand(0,self.MaxDelay),function()
-			     if !self:IsValid() then return end 
-			     self.Exploded = true
-			     self:Explode()
-			 end)
-	     end
+	if self:IsValid() then
+		self.Life = self.Life - dmginfo:GetDamage()
+		if (self.Life <= self.Life/2) and !self.Exploded and self.Flamable then
+			self:Ignite(self.MaxDelay,0)
+		end
+		if (self.Life <= 0) then 
+			timer.Simple(math.Rand(0,self.MaxDelay),function()
+				if !self:IsValid() then return end 
+				self.Exploded = true
+				self:Explode()
+			end)
+		end
 	end
 end
 
 function ENT:PhysicsCollide( data, physobj )
 	timer.Simple(0,function()
-     if(self.Exploded) then return end
-     if(!self:IsValid()) then return end
+	if(self.Exploded) then return end
+	if(!self:IsValid()) then return end
 	 if(self.Life <= 0) then return end
 		 if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then
 			 if(data.Speed > self.ImpactSpeed) then
@@ -353,31 +349,31 @@ function ENT:Arm()
 		self:EmitSound(self.ArmSound)
 		if(self.Timed) or self.JDAM then
 			if self.JDAM then self.Timer = 20 end
-	        timer.Simple(self.Timer, function()
-	            if !self:IsValid() then return end 
+		   timer.Simple(self.Timer, function()
+			  if !self:IsValid() then return end 
 				timer.Simple(math.Rand(0,self.MaxDelay),function()
-			        if !self:IsValid() then return end 
-			        self.Exploded = true
-			        self:Explode()
+				   if !self:IsValid() then return end 
+				   self.Exploded = true
+				   self:Explode()
 				end)
-	        end)
+		   end)
 	    end
 	end)
 end	 
 
 function ENT:Use( activator, caller )
-     if(self.Exploded) then return end
-     if(self:IsValid()) then
-	     if(GetConVar("gred_sv_easyuse"):GetInt() >= 1) then
-	         if(!self.Armed) then
-		         if(!self.Exploded) and (!self.Used) then
-		             if(activator:IsPlayer()) then
-                         self:EmitSound(self.ActivationSound)
-                         self:Arm()
-		             end
-	             end
-             end
-         end
+	if(self.Exploded) then return end
+	if(self:IsValid()) then
+		if(GetConVar("gred_sv_easyuse"):GetInt() >= 1) then
+		    if(!self.Armed) then
+			    if(!self.Exploded) and (!self.Used) then
+				   if(activator:IsPlayer()) then
+					self:EmitSound(self.ActivationSound)
+					self:Arm()
+				   end
+			   end
+		   end
+	    end
 	 end
 end
 
@@ -388,33 +384,33 @@ function ENT:OnRemove()
 end
 
 if ( CLIENT ) then
-     function ENT:Draw()
-         self:DrawModel()
+	function ENT:Draw()
+	    self:DrawModel()
 		 if !(WireAddon == nil) then Wire_Render(self.Entity) end
-     end
+	end
 end
 
 function ENT:OnRestore()
-     Wire_Restored(self.Entity)
+	Wire_Restored(self.Entity)
 end
 
 function ENT:BuildDupeInfo()
-     return WireLib.BuildDupeInfo(self.Entity)
+	return WireLib.BuildDupeInfo(self.Entity)
 end
 
 function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
-     WireLib.ApplyDupeInfo( ply, ent, info, GetEntByID )
+	WireLib.ApplyDupeInfo( ply, ent, info, GetEntByID )
 end
 
 function ENT:PrentityCopy()
-     local DupeInfo = self:BuildDupeInfo()
-     if(DupeInfo) then
-         duplicator.StorentityModifier(self,"WireDupeInfo",DupeInfo)
-     end
+	local DupeInfo = self:BuildDupeInfo()
+	if(DupeInfo) then
+	    duplicator.StorentityModifier(self,"WireDupeInfo",DupeInfo)
+	end
 end
 
 function ENT:PostEntityPaste(Player,Ent,CreatedEntities)
-     if(Ent.EntityMods and Ent.EntityMods.WireDupeInfo) then
-         Ent:ApplyDupeInfo(Player, Ent, Ent.EntityMods.WireDupeInfo, function(id) return CreatedEntities[id] end)
-     end
+	if(Ent.EntityMods and Ent.EntityMods.WireDupeInfo) then
+	    Ent:ApplyDupeInfo(Player, Ent, Ent.EntityMods.WireDupeInfo, function(id) return CreatedEntities[id] end)
+	end
 end

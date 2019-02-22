@@ -63,11 +63,14 @@ function ENT:PhysicsUpdate(ph)
 	trace.mask=self.Mask
 	local tr = util.TraceLine(trace)
 	if tr.MatType == 83 then
-		net.Start("gred_net_impact_fx")
-			net.WriteBool(true)
-			net.WriteString(self.Caliber)
-			net.WriteVector(tr.HitPos)
-		net.Broadcast()
+		local effectdata = EffectData()
+		effectdata:SetOrigin(tr.HitPos)
+		effectdata:SetAngles(Angle(0,0,0))
+		effectdata:SetSurfaceProp(0)
+		effectdata:SetMaterialIndex(0)
+		effectdata:SetFlags(table.KeyFromValue(gred.Calibre,self.Caliber))
+		util.Effect("gred_particle_impact",effectdata)
+		
 		self.NoParticle = true
 		self:EmitSound( "impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",audioSpecs )
 	end

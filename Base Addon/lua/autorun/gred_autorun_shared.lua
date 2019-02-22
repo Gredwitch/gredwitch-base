@@ -1,150 +1,211 @@
-if SERVER then AddCSLuaFile() end
-
--- Adding particles
-game.AddParticles( "particles/doi_explosion_fx.pcf")
-game.AddParticles( "particles/doi_explosion_fx_b.pcf")
-game.AddParticles( "particles/doi_explosion_fx_c.pcf")
-game.AddParticles( "particles/doi_explosion_fx_grenade.pcf")
-game.AddParticles( "particles/doi_explosion_fx_new.pcf")
-game.AddParticles( "particles/doi_impact_fx.pcf" )
-game.AddParticles( "particles/doi_weapon_fx.pcf" )
-
-game.AddParticles( "particles/gb_water.pcf")
-game.AddParticles( "particles/gb5_100lb.pcf")
-game.AddParticles( "particles/gb5_500lb.pcf")
-game.AddParticles( "particles/gb5_1000lb.pcf")
-game.AddParticles( "particles/gb5_jdam.pcf")
-game.AddParticles( "particles/gb5_large_explosion.pcf")
-game.AddParticles( "particles/gb5_napalm.pcf")
-game.AddParticles( "particles/gb5_light_bomb.pcf")
-game.AddParticles( "particles/gb5_high_explosive_2.pcf")
-game.AddParticles( "particles/gb5_high_explosive.pcf")
-game.AddParticles( "particles/gb5_fireboom.pcf")
-game.AddParticles( "particles/neuro_tank_ap.pcf")
-
-game.AddParticles( "particles/ins_rockettrail.pcf")
-game.AddParticles( "particles/ammo_cache_ins.pcf")
-game.AddParticles( "particles/doi_rockettrail.pcf")
-game.AddParticles( "particles/mnb_flamethrower.pcf")
-game.AddParticles( "particles/impact_fx_ins.pcf" )
-game.AddParticles( "particles/environment_fx.pcf")
-game.AddParticles( "particles/water_impact.pcf")
-game.AddParticles( "particles/explosion_fx_ins.pcf")
-game.AddParticles( "particles/weapon_fx_tracers.pcf" )
-game.AddParticles( "particles/weapon_fx_ins.pcf" )
-
-game.AddParticles( "particles/gred_particles.pcf" )
-game.AddParticles( "particles/fire_01.pcf" )
-game.AddParticles( "particles/doi_explosions_smoke.pcf" )
-game.AddParticles( "particles/explosion_fx_ins_b.pcf" )
-game.AddParticles( "particles/ins_smokegrenade.pcf" )
-game.AddParticles( "particles/ww1_gas.pcf" )
-
--- Precaching main particles
-PrecacheParticleSystem("gred_20mm")
-PrecacheParticleSystem("gred_20mm_airburst")
-PrecacheParticleSystem("gred_40mm")
-PrecacheParticleSystem("gred_40mm_airburst")
-PrecacheParticleSystem("30cal_impact")
-PrecacheParticleSystem("fire_large_01")
-PrecacheParticleSystem("30cal_impact")
-PrecacheParticleSystem("doi_gunrun_impact")
-PrecacheParticleSystem("doi_artillery_explosion")
-PrecacheParticleSystem("doi_stuka_explosion")
-PrecacheParticleSystem("gred_mortar_explosion")
-PrecacheParticleSystem("gred_50mm")
-PrecacheParticleSystem("ins_rpg_explosion")
-PrecacheParticleSystem("ins_water_explosion")
-PrecacheParticleSystem("fireboom_explosion_midair")
-PrecacheParticleSystem("doi_petrol_explosion")
-
-PrecacheParticleSystem("doi_impact_water")
-PrecacheParticleSystem("impact_water")
-PrecacheParticleSystem("water_small")
-PrecacheParticleSystem("water_medium")
-PrecacheParticleSystem("water_huge")
-
-PrecacheParticleSystem("muzzleflash_sparks_variant_6")
-PrecacheParticleSystem("muzzleflash_1p_glow")
-PrecacheParticleSystem("muzzleflash_m590_1p_core")
-PrecacheParticleSystem("muzzleflash_smoke_small_variant_1")
-for i = 0,1 do
-	if i == 1 then pcfD = "" else pcfD = "doi_" end
-	PrecacheParticleSystem(""..pcfD.."impact_concrete")
-	PrecacheParticleSystem(""..pcfD.."impact_dirt")
-	PrecacheParticleSystem(""..pcfD.."impact_glass")
-	PrecacheParticleSystem(""..pcfD.."impact_metal")
-	PrecacheParticleSystem(""..pcfD.."impact_sand")
-	PrecacheParticleSystem(""..pcfD.."impact_snow")
-	PrecacheParticleSystem(""..pcfD.."impact_leaves")
-	PrecacheParticleSystem(""..pcfD.."impact_wood")
-	PrecacheParticleSystem(""..pcfD.."impact_grass")
-	PrecacheParticleSystem(""..pcfD.."impact_tile")
-	PrecacheParticleSystem(""..pcfD.."impact_plastic")
-	PrecacheParticleSystem(""..pcfD.."impact_rock")
-	PrecacheParticleSystem(""..pcfD.."impact_gravel")
-	PrecacheParticleSystem(""..pcfD.."impact_mud")
-	PrecacheParticleSystem(""..pcfD.."impact_fruit")
-	PrecacheParticleSystem(""..pcfD.."impact_asphalt")
-	PrecacheParticleSystem(""..pcfD.."impact_cardboard")
-	PrecacheParticleSystem(""..pcfD.."impact_rubber")
-	PrecacheParticleSystem(""..pcfD.."impact_carpet")
-	PrecacheParticleSystem(""..pcfD.."impact_brick")
-	PrecacheParticleSystem(""..pcfD.."impact_leaves")
-	PrecacheParticleSystem(""..pcfD.."impact_paper")
-	PrecacheParticleSystem(""..pcfD.."impact_computer")
+if SERVER then 
+	AddCSLuaFile() 
+	resource.AddWorkshop(1131455085) -- Base addon
+	local utilAddNetworkString = util.AddNetworkString
+	utilAddNetworkString("gred_net_sound_lowsh")
+	utilAddNetworkString("gred_net_message_ply")
+	utilAddNetworkString("gred_net_bombs_decals")
+	utilAddNetworkString("gred_net_nw_var")
 end
 
-PrecacheParticleSystem("high_explosive_main_2")
-PrecacheParticleSystem("high_explosive_air_2")
-PrecacheParticleSystem("water_torpedo")
-PrecacheParticleSystem("high_explosive_air")
-PrecacheParticleSystem("napalm_explosion")
-PrecacheParticleSystem("napalm_explosion_midair")
-PrecacheParticleSystem("cloudmaker_ground")
-PrecacheParticleSystem("1000lb_explosion")
-PrecacheParticleSystem("500lb_air")
-PrecacheParticleSystem("100lb_air")
-PrecacheParticleSystem("500lb_ground")
-PrecacheParticleSystem("rockettrail")
-PrecacheParticleSystem("grenadetrail")
-PrecacheParticleSystem("weapon_tracers_smoke")
-PrecacheParticleSystem("gred_ap_impact")
-PrecacheParticleSystem("doi_mortar_explosion")
-PrecacheParticleSystem("doi_wparty_explosion")
-PrecacheParticleSystem("doi_smoke_artillery")
-PrecacheParticleSystem("doi_ceilingDust_large")
-PrecacheParticleSystem("m203_smokegrenade")
-PrecacheParticleSystem("doi_GASarty_explosion")
-PrecacheParticleSystem("doi_compb_explosion")
-PrecacheParticleSystem("doi_wpgrenade_explosion")
-PrecacheParticleSystem("ins_c4_explosion")
-PrecacheParticleSystem("doi_artillery_explosion_OLD")
-PrecacheParticleSystem("gred_highcal_rocket_explosion")
+-- Adding particles
+local gameAddParticles = game.AddParticles
+local PrecacheParticleSystem = PrecacheParticleSystem
+local gameAddDecal = game.AddDecal
+local GRED_SVAR = { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_SERVER_CAN_EXECUTE, FCVAR_NOTIFY }
+local CreateConVar = CreateConVar
+local CreateClientConVar = CreateClientConVar
+local tableinsert = table.insert
 
-PrecacheParticleSystem("muzzleflash_bar_3p")
-PrecacheParticleSystem("muzzleflash_garand_3p")
-PrecacheParticleSystem("muzzleflash_mg42_3p")
-PrecacheParticleSystem("ins_weapon_at4_frontblast")
-PrecacheParticleSystem("ins_weapon_rpg_dust")
-PrecacheParticleSystem("gred_arti_muzzle_blast")
-PrecacheParticleSystem("gred_mortar_explosion_smoke_ground")
-PrecacheParticleSystem("weapon_muzzle_smoke")
-PrecacheParticleSystem("ins_ammo_explosionOLD")
-PrecacheParticleSystem("gred_ap_impact")
-PrecacheParticleSystem("AP_impact_wall")
+CreateConVar("gred_sv_easyuse"					,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_maxforcefield_range"		, "5000", GRED_SVAR)
+CreateConVar("gred_sv_12mm_he_impact"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_7mm_he_impact"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_fragility"				,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_shockwave_unfreeze"		,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_tracers"					,  "5"  , GRED_SVAR)
+CreateConVar("gred_sv_oldrockets"				,  "0"  , GRED_SVAR)
+CreateConVar("gred_jets_speed"					,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_healthslider"				, "100" , GRED_SVAR)
+CreateConVar("gred_sv_enablehealth"				,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_enableenginehealth"		,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_fire_effect"				,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_multiple_fire_effects"	,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_bullet_dmg"				,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_bullet_radius"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_soundspeed_divider"		,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_arti_spawnaltitude"		, "1000", GRED_SVAR)
+CreateConVar("gred_sv_wac_radio"				,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_spawnable_bombs"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_wac_bombs"				,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_shellspeed_multiplier"	,  "2"  , GRED_SVAR)
+CreateConVar("gred_sv_wac_explosion_water"		,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_default_wac_munitions"	,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_wac_explosion"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_wac_heli_spin"			,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_wac_heli_spin_chance"		,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_lfs_healthmultiplier"		,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_lfs_healthmultiplier_all"	,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_lfs_normal_bullets"		,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_wac_override"				,  "1"  , GRED_SVAR)
+
+gred = gred or {}
+gred.Calibre = {}
+tableinsert(gred.Calibre,"wac_base_7mm")
+tableinsert(gred.Calibre,"wac_base_12mm")
+tableinsert(gred.Calibre,"wac_base_20mm")
+tableinsert(gred.Calibre,"wac_base_30mm")
+tableinsert(gred.Calibre,"wac_base_40mm")
+
+-- if true then
+gameAddParticles( "particles/doi_explosion_fx.pcf")
+gameAddParticles( "particles/doi_explosion_fx_b.pcf")
+gameAddParticles( "particles/doi_explosion_fx_c.pcf")
+gameAddParticles( "particles/doi_explosion_fx_grenade.pcf")
+gameAddParticles( "particles/doi_explosion_fx_new.pcf")
+gameAddParticles( "particles/doi_impact_fx.pcf" )
+gameAddParticles( "particles/doi_weapon_fx.pcf" )
+
+gameAddParticles( "particles/gb_water.pcf")
+gameAddParticles( "particles/gb5_100lb.pcf")
+gameAddParticles( "particles/gb5_500lb.pcf")
+gameAddParticles( "particles/gb5_1000lb.pcf")
+gameAddParticles( "particles/gb5_jdam.pcf")
+gameAddParticles( "particles/gb5_large_explosion.pcf")
+gameAddParticles( "particles/gb5_napalm.pcf")
+gameAddParticles( "particles/gb5_light_bomb.pcf")
+gameAddParticles( "particles/gb5_high_explosive_2.pcf")
+gameAddParticles( "particles/gb5_high_explosive.pcf")
+gameAddParticles( "particles/gb5_fireboom.pcf")
+gameAddParticles( "particles/neuro_tank_ap.pcf")
+
+gameAddParticles( "particles/ins_rockettrail.pcf")
+gameAddParticles( "particles/ammo_cache_ins.pcf")
+gameAddParticles( "particles/doi_rockettrail.pcf")
+gameAddParticles( "particles/mnb_flamethrower.pcf")
+gameAddParticles( "particles/impact_fx_ins.pcf" )
+gameAddParticles( "particles/environment_fx.pcf")
+gameAddParticles( "particles/water_impact.pcf")
+gameAddParticles( "particles/explosion_fx_ins.pcf")
+gameAddParticles( "particles/weapon_fx_tracers.pcf" )
+gameAddParticles( "particles/weapon_fx_ins.pcf" )
+
+gameAddParticles( "particles/gred_particles.pcf" )
+gameAddParticles( "particles/fire_01.pcf" )
+gameAddParticles( "particles/doi_explosions_smoke.pcf" )
+gameAddParticles( "particles/explosion_fx_ins_b.pcf" )
+gameAddParticles( "particles/ins_smokegrenade.pcf" )
+gameAddParticles( "particles/ww1_gas.pcf" )
+
+-- Precaching main particles
+gred.Particles = {}
+tableinsert(gred.Particles,"gred_20mm")
+tableinsert(gred.Particles,"gred_20mm_airburst")
+tableinsert(gred.Particles,"gred_40mm")
+tableinsert(gred.Particles,"gred_40mm_airburst")
+tableinsert(gred.Particles,"30cal_impact")
+tableinsert(gred.Particles,"fire_large_01")
+tableinsert(gred.Particles,"30cal_impact")
+tableinsert(gred.Particles,"doi_gunrun_impact")
+tableinsert(gred.Particles,"doi_artillery_explosion")
+tableinsert(gred.Particles,"doi_stuka_explosion")
+tableinsert(gred.Particles,"gred_mortar_explosion")
+tableinsert(gred.Particles,"gred_50mm")
+tableinsert(gred.Particles,"ins_rpg_explosion")
+tableinsert(gred.Particles,"ins_water_explosion")
+tableinsert(gred.Particles,"fireboom_explosion_midair")
+tableinsert(gred.Particles,"doi_petrol_explosion")
+
+tableinsert(gred.Particles,"doi_impact_water")
+tableinsert(gred.Particles,"impact_water")
+tableinsert(gred.Particles,"water_small")
+tableinsert(gred.Particles,"water_medium")
+tableinsert(gred.Particles,"water_huge")
+
+tableinsert(gred.Particles,"muzzleflash_sparks_variant_6")
+tableinsert(gred.Particles,"muzzleflash_1p_glow")
+tableinsert(gred.Particles,"muzzleflash_m590_1p_core")
+tableinsert(gred.Particles,"muzzleflash_smoke_small_variant_1")
+for i = 0,1 do
+	if i == 1 then pcfD = "" else pcfD = "doi_" end
+	tableinsert(gred.Particles,""..pcfD.."impact_concrete")
+	tableinsert(gred.Particles,""..pcfD.."impact_dirt")
+	tableinsert(gred.Particles,""..pcfD.."impact_glass")
+	tableinsert(gred.Particles,""..pcfD.."impact_metal")
+	tableinsert(gred.Particles,""..pcfD.."impact_sand")
+	tableinsert(gred.Particles,""..pcfD.."impact_snow")
+	tableinsert(gred.Particles,""..pcfD.."impact_leaves")
+	tableinsert(gred.Particles,""..pcfD.."impact_wood")
+	tableinsert(gred.Particles,""..pcfD.."impact_grass")
+	tableinsert(gred.Particles,""..pcfD.."impact_tile")
+	tableinsert(gred.Particles,""..pcfD.."impact_plastic")
+	tableinsert(gred.Particles,""..pcfD.."impact_rock")
+	tableinsert(gred.Particles,""..pcfD.."impact_gravel")
+	tableinsert(gred.Particles,""..pcfD.."impact_mud")
+	tableinsert(gred.Particles,""..pcfD.."impact_fruit")
+	tableinsert(gred.Particles,""..pcfD.."impact_asphalt")
+	tableinsert(gred.Particles,""..pcfD.."impact_cardboard")
+	tableinsert(gred.Particles,""..pcfD.."impact_rubber")
+	tableinsert(gred.Particles,""..pcfD.."impact_carpet")
+	tableinsert(gred.Particles,""..pcfD.."impact_brick")
+	tableinsert(gred.Particles,""..pcfD.."impact_leaves")
+	tableinsert(gred.Particles,""..pcfD.."impact_paper")
+	tableinsert(gred.Particles,""..pcfD.."impact_computer")
+end
+
+tableinsert(gred.Particles,"high_explosive_main_2")
+tableinsert(gred.Particles,"high_explosive_air_2")
+tableinsert(gred.Particles,"water_torpedo")
+tableinsert(gred.Particles,"high_explosive_air")
+tableinsert(gred.Particles,"napalm_explosion")
+tableinsert(gred.Particles,"napalm_explosion_midair")
+tableinsert(gred.Particles,"cloudmaker_ground")
+tableinsert(gred.Particles,"1000lb_explosion")
+tableinsert(gred.Particles,"500lb_air")
+tableinsert(gred.Particles,"100lb_air")
+tableinsert(gred.Particles,"500lb_ground")
+tableinsert(gred.Particles,"rockettrail")
+tableinsert(gred.Particles,"grenadetrail")
+tableinsert(gred.Particles,"weapon_tracers_smoke")
+tableinsert(gred.Particles,"gred_ap_impact")
+tableinsert(gred.Particles,"doi_mortar_explosion")
+tableinsert(gred.Particles,"doi_wparty_explosion")
+tableinsert(gred.Particles,"doi_smoke_artillery")
+tableinsert(gred.Particles,"doi_ceilingDust_large")
+tableinsert(gred.Particles,"m203_smokegrenade")
+tableinsert(gred.Particles,"doi_GASarty_explosion")
+tableinsert(gred.Particles,"doi_compb_explosion")
+tableinsert(gred.Particles,"doi_wpgrenade_explosion")
+tableinsert(gred.Particles,"ins_c4_explosion")
+tableinsert(gred.Particles,"doi_artillery_explosion_OLD")
+tableinsert(gred.Particles,"gred_highcal_rocket_explosion")
+
+tableinsert(gred.Particles,"muzzleflash_bar_3p")
+tableinsert(gred.Particles,"muzzleflash_garand_3p")
+tableinsert(gred.Particles,"muzzleflash_mg42_3p")
+tableinsert(gred.Particles,"ins_weapon_at4_frontblast")
+tableinsert(gred.Particles,"ins_weapon_rpg_dust")
+tableinsert(gred.Particles,"gred_arti_muzzle_blast")
+tableinsert(gred.Particles,"gred_mortar_explosion_smoke_ground")
+tableinsert(gred.Particles,"weapon_muzzle_smoke")
+tableinsert(gred.Particles,"ins_ammo_explosionOLD")
+tableinsert(gred.Particles,"gred_ap_impact")
+tableinsert(gred.Particles,"AP_impact_wall")
+tableinsert(gred.Particles,"ins_m203_explosion")
+for k,v in pairs(gred.Particles) do PrecacheParticleSystem(v) end
 
 
-game.AddDecal( "scorch_small",					"decals/scorch_small" );
-game.AddDecal( "scorch_medium",					"decals/scorch_medium" );
-game.AddDecal( "scorch_big",					"decals/scorch_big" );
-game.AddDecal( "scorch_huge",					"decals/scorch_huge" );
-game.AddDecal( "scorch_gigantic",				"decals/scorch_gigantic" );
-game.AddDecal( "scorch_x10",					"decals/scorch_x10" );
+gameAddDecal( "scorch_small",		"decals/scorch_small" );
+gameAddDecal( "scorch_medium",		"decals/scorch_medium" );
+gameAddDecal( "scorch_big",			"decals/scorch_big" );
+gameAddDecal( "scorch_huge",		"decals/scorch_huge" );
+gameAddDecal( "scorch_gigantic",	"decals/scorch_gigantic" );
+gameAddDecal( "scorch_x10",			"decals/scorch_x10" );
+
 
 local filecount = 0
 local foldercount = 0
-
+local utilPrecacheModel = util.PrecacheModel
 local precache = function( dir, flst ) -- .mdl file list precahcer
 	for _, _f in ipairs( flst ) do
 		util.PrecacheModel( dir.."/".._f )
@@ -166,152 +227,13 @@ findDir( "models", "gredwitch", "*.mdl" )
 
 print("[GREDWITCH'S BASE] Precached "..filecount.." files in "..foldercount.." folders.")
 
-if SERVER then 
-	util.AddNetworkString("gred_net_sound_lowsh")
-	util.AddNetworkString("gred_net_explosion_fx")
-	util.AddNetworkString("gred_net_impact_fx")
-	util.AddNetworkString("gred_net_wac_explosion")
-	util.AddNetworkString("gred_net_wac_fire")
-	util.AddNetworkString("gred_net_message_ply")
-	util.AddNetworkString("gred_net_bombs_decals")
-	util.AddNetworkString("gred_net_nw_var")
-	util.AddNetworkString("gred_net_wac_gunner_muzzle_fx")
-	util.AddNetworkString("gred_net_wac_mg_muzzle_fx")
-end
+-- end
+
+gred.AddonList = gred.AddonList or {}
+tableinsert(gred.AddonList,1582297878) -- Materials
 
 if CLIENT then
-	net.Receive("gred_net_explosion_fx",function()
-		ParticleEffect(net.ReadString(),net.ReadVector(),net.ReadAngle(),nil)
-		if net.ReadBool() then
-			ParticleEffect("doi_ceilingDust_large",net.ReadVector(),Angle(0,0,0),nil)
-		end
-	end)
 	
-	net.Receive("gred_net_impact_fx",function()
-		if !net.ReadBool() then
-			local cal = net.ReadString()
-			if cal == "wac_base_7mm" then
-				if GetConVar("gred_cl_noparticles_7mm"):GetInt() == 1 then return end
-				if GetConVar("gred_cl_insparticles"):GetInt() == 1 then pcfD = "" else pcfD = "doi_" end
-				local mat = net.ReadInt(6)
-				if mat == 1 then
-					ParticleEffect(""..pcfD.."impact_concrete",net.ReadVector(),net.ReadAngle(),nil)
-				elseif mat == 2 then
-					ParticleEffect(""..pcfD.."impact_dirt",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 4 then
-					ParticleEffect(""..pcfD.."impact_glass",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 5 then
-					ParticleEffect(""..pcfD.."impact_metal",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 6 then
-					ParticleEffect(""..pcfD.."impact_sand",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 7 then
-					ParticleEffect(""..pcfD.."impact_snow",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 8 then
-					ParticleEffect(""..pcfD.."impact_leaves",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 9 then
-					ParticleEffect(""..pcfD.."impact_wood",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 10 then
-					ParticleEffect(""..pcfD.."impact_grass",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 11 then
-					ParticleEffect(""..pcfD.."impact_tile",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 12 then
-					ParticleEffect(""..pcfD.."impact_plastic",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 13 then
-					ParticleEffect(""..pcfD.."impact_rock",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 14 then
-					ParticleEffect(""..pcfD.."impact_gravel",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 15 then
-					ParticleEffect(""..pcfD.."impact_mud",net.ReadVector(),net.ReadAngle(),nil)
-					
-				elseif mat == 16 then
-					ParticleEffect(""..pcfD.."impact_fruit",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 17 then
-					ParticleEffect(""..pcfD.."impact_asphalt",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 18 then
-					ParticleEffect(""..pcfD.."impact_cardboard",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 19 then
-					ParticleEffect(""..pcfD.."impact_rubber",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 20 then
-					ParticleEffect(""..pcfD.."impact_carpet",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 21 then
-					ParticleEffect(""..pcfD.."impact_brick",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 22 then
-					ParticleEffect(""..pcfD.."impact_leaves",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 23 then
-					ParticleEffect(""..pcfD.."impact_paper",net.ReadVector(),net.ReadAngle(),nil)
-						
-				elseif mat == 24 then
-					ParticleEffect(""..pcfD.."impact_computer",net.ReadVector(),net.ReadAngle(),nil)
-				else
-				
-				end
-					
-			elseif cal == "wac_base_12mm" then
-				if GetConVar("gred_cl_noparticles_12mm"):GetInt() == 1 then return end
-				ParticleEffect("doi_gunrun_impact",net.ReadVector(),net.ReadAngle(),nil)
-			elseif cal == "wac_base_20mm" then
-				if GetConVar("gred_cl_noparticles_20mm"):GetInt() == 1 then return end
-				
-				if !net.ReadBool() then
-					ParticleEffect("gred_20mm",net.ReadVector(),net.ReadAngle(),nil)
-				else
-					ParticleEffect("gred_20mm_airburst",net.ReadVector(),net.ReadAngle(),nil)
-				end
-			elseif cal == "wac_base_30mm" then
-				if GetConVar("gred_cl_noparticles_30mm"):GetInt() == 1 then return end
-				net.ReadBool()
-				ParticleEffect("30cal_impact",net.ReadVector(),net.ReadAngle(),nil)
-			elseif cal == "wac_base_40mm" then
-				if GetConVar("gred_cl_noparticles_40mm"):GetInt() == 1 then return end
-				if !net.ReadBool() then
-					ParticleEffect("gred_40mm",net.ReadVector(),net.ReadAngle(),nil)
-				else
-					ParticleEffect("gred_40mm_airburst",net.ReadVector(),Angle(-90,0,0),nil)
-				end
-			end
-		else
-			if GetConVar("gred_cl_nowaterimpacts"):GetInt() == 1 then return end
-			local cal = net.ReadString()
-			if cal == "wac_base_7mm" then
-				ParticleEffect("doi_impact_water",net.ReadVector(),Angle(-90,zero,zero),nil)
-			elseif cal == "wac_base_12mm" then
-				ParticleEffect("impact_water",net.ReadVector(),Angle(-90,zero,zero),nil)
-			elseif cal == "wac_base_20mm" then
-				ParticleEffect("water_small",net.ReadVector(),Angle(threeZ),nil)
-			elseif cal == "wac_base_30mm" or cal == "wac_base_40mm" then
-				ParticleEffect("water_medium",net.ReadVector(),Angle(threeZ),nil)
-			end
-		end
-	end)
-
-	net.Receive("gred_net_wac_fire", function()
-		
-	end)
-	
-	net.Receive("gred_net_wac_explosion", function()
-		if GetConVar("gred_cl_wac_explosions"):GetInt() <= 0 then return end
-		ParticleEffect(net.ReadString(),net.ReadVector(),net.ReadAngle(),nil)
-	end)
-
 	net.Receive ("gred_net_message_ply",function()
 		local ply = net.ReadEntity()
 		local msg = net.ReadString()
@@ -348,74 +270,238 @@ if CLIENT then
 		end
 	end)
 	
-	net.Receive("gred_net_wac_mg_muzzle_fx",function()
-		if GetConVar("gred_cl_altmuzzleeffect"):GetInt() == 1 then
-			local pos = net.ReadVector()
-			local ang = net.ReadAngle()
-			ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
-			ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
-			ParticleEffect("muzzleflash_m590_1p_core",pos,ang,nil)
-			ParticleEffect("muzzleflash_smoke_small_variant_1",pos,ang,nil)
-		else
-			local effectdata=EffectData()
-			effectdata:SetOrigin(net.ReadVector())
-			effectdata:SetAngles(net.ReadAngle())
-			effectdata:SetEntity(self)
-			effectdata:SetScale(1)
-			util.Effect("MuzzleEffect", effectdata)
-		end
-	end)
+	
+	CreateClientConVar("gred_cl_sound_shake"		, "1" , true,false)
+	CreateClientConVar("gred_cl_nowaterimpacts"		, "0" , true,false)
+	CreateClientConVar("gred_cl_insparticles"		, "0" , true,false)
+	CreateClientConVar("gred_cl_noparticles_7mm"	, "0" , true,false)
+	CreateClientConVar("gred_cl_noparticles_12mm"	, "0" , true,false)
+	CreateClientConVar("gred_cl_noparticles_20mm"	, "0" , true,false)
+	CreateClientConVar("gred_cl_noparticles_20mm"	, "0" , true,false)
+	CreateClientConVar("gred_cl_noparticles_30mm"	, "0" , true,false)
+	CreateClientConVar("gred_cl_noparticles_40mm"	, "0" , true,false)
+	CreateClientConVar("gred_cl_decals"				, "1" , true,false)
+	CreateClientConVar("gred_cl_altmuzzleeffect"	, "0" , true,false)
+	CreateClientConVar("gred_cl_wac_explosions" 	, "1" , true,false)
+	CreateClientConVar("gred_cl_enable_popups"	 	, "1" , true,false)
+	CreateClientConVar("gred_cl_firstload"			, "1" , true,false)
 	
 	
-	net.Receive("gred_net_wac_gunner_muzzle_fx",function()
-		if GetConVar("gred_cl_altmuzzleeffect"):GetInt() == 1 then
-			local pos = net.ReadVector()
-			local ang = net.ReadAngle()
-			ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
-			ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
-			ParticleEffect("muzzleflash_m590_1p_core",pos,ang,nil)
-			ParticleEffect("muzzleflash_smoke_small_variant_1",pos,ang,nil)
-		else
-			local effectdata=EffectData()
-			effectdata:SetOrigin(net.ReadVector())
-			effectdata:SetAngles(net.ReadAngle())
-			effectdata:SetEntity(self)
-			effectdata:SetScale(1)
-			util.Effect("MuzzleEffect", effectdata)
-		end
-	end)
-end
+	-- Adding the spawnmenu options
+	
+	local notdedicated = !game.IsDedicated()
 
-if CLIENT then
-	timer.Simple(5,function()
-		GredwitchBase=steamworks.ShouldMountAddon(1582297878) and steamworks.IsSubscribed(1582297878)
-		if !GredwitchBase then
-			GredFrame=vgui.Create('DFrame')
-			GredFrame:SetTitle("Grediwtch's Base (materials) is not installed / enabled")
-			GredFrame:SetSize(ScrW()*0.95, ScrH()*0.95)
-			GredFrame:SetPos((ScrW() - GredFrame:GetWide()) / 2, (ScrH() - GredFrame:GetTall()) / 2)
-			GredFrame:MakePopup()
+	local function gred_settings_bullets(CPanel)
+		CPanel:ClearControls()
+		
+		if notdedicated then
+			CPanel:AddControl( "CheckBox", { Label = "Should 12mm MGs have a blast radius? (Kills tanks!)", Command = "gred_sv_12mm_he_impact" } );
+					
+			CPanel:AddControl( "CheckBox", { Label = "Should 7mm MGs have a blast radius? (Kills tanks!)", Command = "gred_sv_7mm_he_impact" } );
 			
-			local h=vgui.Create('DHTML')
-			h:SetParent(GredFrame)
-			h:SetPos(GredFrame:GetWide()*0.005, GredFrame:GetTall()*0.03)
-			local x,y = GredFrame:GetSize()
-			h:SetSize(x*0.99,y*0.96)
-			h:SetAllowLua(true)
-			h:OpenURL('https://steamcommunity.com/sharedfiles/filedetails/?id=1582297878.html')
+			CPanel:NumSlider( "Bullet damage multiplier","gred_sv_bullet_dmg",0,10,2 );
+			
+			CPanel:NumSlider( "Bullet radius multiplier","gred_sv_bullet_radius",0,10,2 );
+			
+			CPanel:NumSlider( "Tracer ammo apparition", "gred_sv_tracers", 0, 20, 0 );
 		end
-	end)
-end
+		
+		CPanel:AddControl( "CheckBox", { Label = "Use Insurgency impact effects for 7mm MGs?", Command = "gred_cl_insparticles" } );
+				
+		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 7mm MGs?", Command = "gred_cl_noparticles_7mm" } );
+				
+		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 12mm MGs?", Command = "gred_cl_noparticles_12mm" } );
+			
+		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 20mm cannons?", Command = "gred_cl_noparticles_20mm" } );
+				
+		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 30mm cannons?", Command = "gred_cl_noparticles_30mm" } );
+			
+		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 40mm cannons?", Command = "gred_cl_noparticles_40mm" } );
+				
+		CPanel:AddControl( "CheckBox", { Label = "Disable water impact effects?", Command = "gred_cl_nowaterimpacts" } );
+	end
 
--- hook.Add("Tick","gred_wac_think_override",function()
-	-- for _,ent in pairs(ents.GetAll()) do
-		-- if ent.Base == "wac_hc_base" and SERVER then
-			-- if GetConVar("gred_sv_wac_override"):GetInt() == 1 then
-				-- GredOverrideWacThink(ent)
-			-- end
+	local function gred_settings_wac(CPanel)
+		CPanel:ClearControls()
+		
+		local psounds={}
+		psounds[1]="extras/american/outgoingstraferun1.ogg"
+		psounds[2]="extras/american/outgoingstraferun2.ogg"
+		psounds[3]="extras/american/outgoingstraferun3.ogg"
+		psounds[4]="extras/american/outgoingstraferun4.ogg"
+		psounds[5]="extras/american/outgoingstraferun5.ogg"
+		Created = true;
+		
+		local plane = vgui.Create( "DImageButton" );
+		plane:SetImage( "hud/planes_settings.png" );
+		plane:SetSize( 200, 80 );
+		plane.DoClick = function()
+			local psnd = Sound( table.Random(psounds) );
+			surface.PlaySound( psnd );
+		end
+		CPanel:AddPanel( plane );
+		if notdedicated then
+		
+			CPanel:AddControl( "CheckBox", { Label = "Override the WAC base?", Command = "gred_sv_wac_override" } );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Use old rockets?", Command = "gred_sv_oldrockets" } );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Enable bombs in aircrafts?", Command = "gred_sv_wac_bombs" } );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Enable radio sounds?", Command = "gred_sv_wac_radio" } );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Should jets be very fast?", Command = "gred_jets_speed" } );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Should aircrafts crash underwater?", Command = "gred_sv_wac_explosion_water" } );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Should aircrafts crash?", Command = "gred_sv_wac_explosion" } );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Use the default WAC munitions?", Command = "gred_sv_default_wac_munitions" } );
+		
+			CPanel:AddControl( "CheckBox", { Label = "Should helicopters spin when their health is low?", Command = "gred_sv_wac_heli_spin" } );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Use a custom health system?", Command = "gred_sv_enablehealth" } );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Use a health per engine system?", Command = "gred_sv_enableenginehealth" } );
+			
+			CPanel:NumSlider( "Default engine health", "gred_sv_healthslider", 1, 1000, 0 );
+			
+			CPanel:NumSlider( "Helicopter spin chance", "gred_sv_wac_heli_spin_chance", 1, 10, 0 );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Use alternative fire particles?", Command = "gred_sv_fire_effect" } );
+				
+			CPanel:AddControl( "CheckBox", { Label = "Use multiple fire particles?", Command = "gred_sv_multiple_fire_effects" } );
+		end
+		
+		CPanel:AddControl( "CheckBox", { Label = "Enable explosion particles?", Command = "gred_cl_wac_explosions" } );
+		
+	end
+
+	local function gred_settings_misc(CPanel)
+		CPanel:ClearControls()
+		
+		-- local msounds={}
+		-- msounds[1]="extras/american/outgoingstraferun1.ogg"
+		Created = true;
+		
+		-- local plane = vgui.Create( "DImageButton" );
+		-- plane:SetImage( "hud/planes_settings.png" );
+		-- plane:SetSize( 200, 80 );
+		-- plane.DoClick = function()
+			-- local psnd = Sound( table.Random(psounds) );
+			-- surface.PlaySound( psnd );
 		-- end
-	-- end
--- end)
+		-- CPanel:AddPanel( plane );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Use an alternative muzzleflash?", Command = "gred_cl_altmuzzleeffect" } );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Enable pop ups about missing content?", Command = "gred_cl_enable_popups" } );
+	end
+
+	local function gred_settings_lfs(CPanel)
+		CPanel:ClearControls()
+		
+		-- local msounds={}
+		-- msounds[1]="extras/american/outgoingstraferun1.ogg"
+		Created = true;
+		
+		-- local plane = vgui.Create( "DImageButton" );
+		-- plane:SetImage( "hud/planes_settings.png" );
+		-- plane:SetSize( 200, 80 );
+		-- plane.DoClick = function()
+			-- local psnd = Sound( table.Random(psounds) );
+			-- surface.PlaySound( psnd );
+		-- end
+		-- CPanel:AddPanel( plane );
+		if notdedicated then
+		
+			CPanel:NumSlider( "Aircraft health multiplier", "gred_sv_lfs_healthmultiplier", 1, 10, 2 );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Should the health multiplier only apply to Gredwitch's LFS aircrafts?", Command = "gred_sv_lfs_healthmultiplier_all" } );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Should bullets have their default damage? (OP)", Command = "gred_sv_lfs_normal_bullets" } );
+			
+		end
+	end
+
+	local function gred_settings_bombs(CPanel)
+		CPanel:ClearControls()
+		local sound = "extras/terrorist/allahu.mp3"
+		
+		Created = true;
+		
+		local logo = vgui.Create( "DImageButton" );
+		logo:SetImage( "hud/bombs_settings.png" );
+		logo:SetSize( 250, 250 );
+		logo.DoClick = function()
+			local snd = Sound( sound );
+			surface.PlaySound( snd );
+		end
+		CPanel:AddPanel( logo );
+		
+		CPanel:AddControl( "CheckBox", { Label = "Should there be sound shake?", Command = "gred_cl_sound_shake" } );
+		if notdedicated then
+			CPanel:AddControl( "CheckBox", { Label = "Should all bombs unweld and unfreeze?", Command = "gred_sv_shockwave_unfreeze" } );
+			
+			CPanel:NumSlider( "Forcefield Max Range", "gred_sv_maxforcefield_range", 10, 10000, 0 );
+			
+			CPanel:NumSlider( "Sound muffling divider", "gred_sv_soundspeed_divider", 1, 3, 0 );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Should bombs be easily armed?", Command = "gred_sv_easyuse" } );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Should explosives be spawnable?", Command = "gred_sv_spawnable_bombs" } );
+			
+			CPanel:AddControl( "CheckBox", { Label = "Should bombs arm when hit or dropped?", Command = "gred_sv_fragility" } );
+		end
+			
+		CPanel:AddControl( "CheckBox", { Label = "Should bombs leave decals behind?", Command = "gred_cl_decals" } );
+		
+	end
+	
+	hook.Add( "PopulateToolMenu", "gred_menu", function()
+		spawnmenu.AddToolMenuOption("Options",					-- Tab
+									"Gredwitch's Stuff",		-- Sub-tab
+									"gred_settings_bullets",	-- Identifier
+									"Bullets",					-- Name of the sub-sub-tab
+									"",							-- Command
+									"",							-- Config (deprecated)
+									gred_settings_bullets		-- Function
+		)
+		spawnmenu.AddToolMenuOption("Options",
+									"Gredwitch's Stuff",
+									"gred_settings_wac",
+									"WAC",
+									"",
+									"",
+									gred_settings_wac
+		)
+		spawnmenu.AddToolMenuOption("Options",
+									"Gredwitch's Stuff",
+									"gred_settings_lfs",
+									"LFS",
+									"",
+									"",
+									gred_settings_lfs
+		)
+		spawnmenu.AddToolMenuOption("Options",
+									"Gredwitch's Stuff",
+									"gred_settings_bombs",
+									"Bombs",
+									"",
+									"",
+									gred_settings_bombs
+		)
+		spawnmenu.AddToolMenuOption("Options",
+									"Gredwitch's Stuff",
+									"gred_settings_misc",
+									"Misc",
+									"",
+									"",
+									gred_settings_misc
+		)
+	end );
+
+end
 
 hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 	timer.Simple(0,function()
@@ -431,6 +517,10 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 				
 				ent:SetHP(ent.MaxHealth)
 			end
+			
+			
+		-----------------------------------
+		
 		elseif ent.isWacAircraft then
 			if GetConVar("gred_sv_wac_override"):GetInt() == 1 then
 			-- if ent.Base == "wac_hc_base" then
@@ -541,89 +631,31 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 						ent.trace=self.TraceLength
 						ent.decal=self.Decal
 						self:Remove()
-						local effect = "doi_petrol_explosion"
+						-- local effect = "doi_petrol_explosion"
 						if radius <= 300 then
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos)
-								net.WriteAngle(hitang)
-							net.Broadcast()
+							local effectdata = EffectData()
+							effectdata:SetOrigin(pos)
+							effectdata:SetAngles(hitang)
+							effectdata:SetFlags(1)
+							effectdata:SetSurfaceProp(1)
+							util.Effect("gred_particle_wac_explosion",effectdata)
 							ent:SetVar("MAX_RANGE",600)
 						elseif radius <= 500 then
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos)
-								net.WriteAngle(hitang)
-							net.Broadcast()
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos)
-								net.WriteAngle(hitang+Angle(0,45,45))
-							net.Broadcast()
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos)
-								net.WriteAngle(hitang+Angle(0,-45,-45))
-							net.Broadcast()
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos)
-								net.WriteAngle(hitang+Angle(45,0,0))
-							net.Broadcast()
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos)
-								net.WriteAngle(hitang+Angle(-45,0,0))
-							net.Broadcast()
+							local effectdata = EffectData()
+							effectdata:SetOrigin(pos)
+							effectdata:SetAngles(hitang)
+							effectdata:SetFlags(5)
+							effectdata:SetSurfaceProp(1)
+							util.Effect("gred_particle_wac_explosion",effectdata)
+							
 							ent:SetVar("MAX_RANGE",800)
 						elseif radius <= 2000 then
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos)
-								net.WriteAngle(hitang)
-							net.Broadcast()
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos)
-								net.WriteAngle(hitang+Angle(0,45,45))
-							net.Broadcast()
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos)
-								net.WriteAngle(hitang+Angle(0,-45,-45))
-							net.Broadcast()
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos)
-								net.WriteAngle(hitang+Angle(45,0,0))
-							net.Broadcast()
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos)
-								net.WriteAngle(hitang+Angle(-45,0,0))
-							net.Broadcast()
-									
-									
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos+Vector(math.random(-400,-250),math.random(-400,-250),0))
-								net.WriteAngle(hitang)
-							net.Broadcast()
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos+Vector(math.random(-400,250),math.random(-400,250),0))
-								net.WriteAngle(hitang+Angle(0,45,45))
-							net.Broadcast()
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos+Vector(math.random(400,-250),math.random(400,-250),0))
-								net.WriteAngle(hitang+Angle(0,-45,-45))
-							net.Broadcast()
-							net.Start("gred_net_wac_explosion")
-								net.WriteString(effect)
-								net.WriteVector(pos+Vector(math.random(400,250),math.random(400,250),0))
-								net.WriteAngle(hitang+Angle(45,0,0))
-							net.Broadcast()
+							local effectdata = EffectData()
+							effectdata:SetOrigin(pos)
+							effectdata:SetAngles(hitang)
+							effectdata:SetFlags(9)
+							effectdata:SetSurfaceProp(1)
+							util.Effect("gred_particle_wac_explosion",effectdata)
 							ent:SetVar("MAX_RANGE",1000)
 						end
 					end
@@ -685,32 +717,19 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 								local radius = self:BoundingRadius()
 								local water = "ins_water_explosion"
 								if radius <= 600 then
-									net.Start("gred_net_wac_explosion")
-										net.WriteString(water)
-										net.WriteVector(tr.HitPos)
-										net.WriteAngle(ang)
-									net.Broadcast()
+									local effectdata = EffectData()
+									effectdata:SetOrigin(pos)
+									effectdata:SetAngles(ang)
+									effectdata:SetSurfaceProp(2)
+									effectdata:SetFlags(1)
+									util.Effect("gred_particle_wac_explosion",effectdata)
 								else
-									net.Start("gred_net_wac_explosion")
-										net.WriteString(water)
-										net.WriteVector(tr.HitPos+Vector(math.random(500,250),math.random(500,250),0))
-										net.WriteAngle(ang)
-									net.Broadcast()
-									net.Start("gred_net_wac_explosion")
-										net.WriteString(water)
-										net.WriteVector(tr.HitPos+Vector(math.random(500,250),math.random(-500,-250),0))
-										net.WriteAngle(ang)
-									net.Broadcast()
-									net.Start("gred_net_wac_explosion")
-										net.WriteString(water)
-										net.WriteVector(tr.HitPos+Vector(math.random(-500,-250),math.random(500,250),0))
-										net.WriteAngle(ang)
-									net.Broadcast()
-									net.Start("gred_net_wac_explosion")
-										net.WriteString(water)
-										net.WriteVector(tr.HitPos+Vector(math.random(-500,-250),math.random(-500,-250),0))
-										net.WriteAngle(ang)
-									net.Broadcast()
+									local effectdata = EffectData()
+									effectdata:SetOrigin(pos)
+									effectdata:SetAngles(ang)
+									effectdata:SetSurfaceProp(2)
+									effectdata:SetFlags(2)
+									util.Effect("gred_particle_wac_explosion",effectdata)
 								end
 								local ent = ents.Create("shockwave_sound_lowsh")
 								ent:SetPos(tr.HitPos) 
@@ -736,7 +755,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 							end
 						end
 						
-						if self.ShouldRotate and self.topRotor and self.Base != "wac_pl_base" and !self.disabled
+						if self.ShouldRotate and self.backRotor and self.topRotor and self.Base != "wac_pl_base" and !self.disabled
 						and self.rotorRpm > 0.2 and GetConVar("gred_sv_wac_heli_spin"):GetInt() >= 1 then
 							local p = self:GetPhysicsObject()
 							if p and IsValid(p) then
@@ -744,16 +763,19 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 									self.sounds.crashsnd:Play()
 								end
 								self.sounds.bipsnd:Play()
-								
+								local m = p:GetMass()
 								local v = p:GetAngleVelocity()
+								local v1 = p:GetVelocity()
+								-- if p:GetVelocity().z > -300 then
+									-- p:AddVelocity(Vector(0,0,2*(m/1200)*-(15*self.rotorRpm)))
+								-- end
+								p:SetVelocity(Vector(v1.x,v1.y,-300))--2*(m/1200)*-(15*self.rotorRpm)))
+								m = m/200
 								if v.z < 150 then
-									p:AddAngleVelocity(Vector(0,0,10))
-								end
-								if p:GetVelocity().z > -300 then
-									p:AddVelocity(Vector(0,0,7*-(15*self.rotorRpm)))
+									p:AddAngleVelocity(Vector(0,0,3*m))
 								end
 								if v.y > -50 then
-									p:AddAngleVelocity(Vector(0,-13,0))
+									p:AddAngleVelocity(Vector(0,-10-m,0))
 								end
 								self:SetHover(true)
 								self.controls.throttle = 0
@@ -1031,6 +1053,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 				
 				ent:addSounds()
 			end
+		
 		elseif ent.ClassName == "wac_hc_rocket" then
 			ent.Initialize = function(self)
 				math.randomseed(CurTime())

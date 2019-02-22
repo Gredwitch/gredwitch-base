@@ -116,10 +116,11 @@ function ENT:fire()
 		else b.noTracer = true end
 		tracer = tracer + 1
 		
-		net.Start("gred_net_wac_gunner_muzzle_fx")
-			net.WriteVector(pos)
-			net.WriteAngle(ang)
-		net.Broadcast()
+		local effectdata = EffectData()
+		effectdata:SetOrigin(self:LocalToWorld(pos))
+		effectdata:SetAngles(ang)
+		effectdata:SetEntity(self)
+		util.Effect("gred_particle_aircraft_muzzle",effectdata)
 	end
 	
 	if self.Loop then

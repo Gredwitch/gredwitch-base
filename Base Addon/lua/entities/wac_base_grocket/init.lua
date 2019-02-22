@@ -59,23 +59,23 @@ function ENT:Explode(tr)
 	if self.Exploded then return end
 	self.Exploded = true
 	
-	net.Start("gred_net_wacrocket_explosion_fx")
+	local effectdata = EffectData()
     if(self:WaterLevel() >= 1) then
-		net.WriteString("ins_water_explosion")
-		net.WriteVector(WaterHitPos)
-		net.WriteAngle(Angle(-90,0,0))
+		effectdata:SetFlags(table.KeyFromValue(gred.Particles,"ins_water_explosion"))
+		effectdata:SetOrigin(WaterHitPos)
+		effectdata:SetAngles(Angle(-90))
 		self.ExplosionSound =  self.WaterExplosionSound
 		self.FarExplosionSound = self.WaterFarExplosionSound
 	else
 		if self.hellfire then
-			net.WriteString("high_explosive_main_2")
+			effectdata:SetFlags(table.KeyFromValue(gred.Particles,"high_explosive_main_2"))
 		else
-			net.WriteString("100lb_air")
+			effectdata:SetFlags(table.KeyFromValue(gred.Particles,"100lb_air"))
 		end
-		net.WriteVector(pos)
-		net.WriteAngle(Angle(0,0,0))
+		effectdata:SetOrigin(tr.HitPos)
+		effectdata:SetAngles(Angle(0))
 	end
-	net.Broadcast()
+	util.Effect("gred_particle_simple",effectdata)
 	local ent = ents.Create("shockwave_sound_lowsh")
 	ent:SetPos(pos)
 	ent:SetVar("GBOWNER",self.Owner)
@@ -174,7 +174,7 @@ function ENT:PhysicsUpdate(ph)
 		util.Decal("Scorch", tr.HitPos + tr.HitNormal, tr.HitPos - tr.HitNormal)
 		self.matType = tr.MatType
 		self.hitAngle = tr.HitNormal:Angle()
-		self:Explode()
+		self:Explode(tr)
 		return
 	end
 	self.OldPos = trd.endpos

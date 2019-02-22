@@ -93,10 +93,11 @@ function ENT:fireBullet(pos)
 		else b.noTracer = true end
 		tracer = tracer + 1
 	end
-	net.Start("gred_net_wac_mg_muzzle_fx")
-		net.WriteVector(self.aircraft:LocalToWorld(pos))
-		net.WriteAngle(ang)
-	net.Broadcast()
+	local effectdata = EffectData()
+	effectdata:SetOrigin(self:LocalToWorld(pos))
+	effectdata:SetAngles(ang)
+	effectdata:SetEntity(self)
+	util.Effect("gred_particle_aircraft_muzzle",effectdata)
 end
 
 

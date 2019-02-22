@@ -42,8 +42,8 @@ ENT.Category                         =  "Gredwitch's Stuff"
 ENT.Model                            =  "models/gredwitch/bombs/75mm_shell.mdl"
 ENT.Mass                             =  12
 
-ENT.Effect                           =  "doi_compb_explosion"
-ENT.EffectAir                        =  "doi_compb_explosion"
+ENT.Effect                           =  "ins_rpg_explosion"
+ENT.EffectAir                        =  "ins_rpg_explosion"
 ENT.EffectWater                      =  "ins_water_explosion"
 ENT.SmokeEffect						 =  "m203_smokegrenade"
 ENT.AngEffect						 =	true

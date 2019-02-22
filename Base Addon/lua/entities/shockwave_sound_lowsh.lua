@@ -21,21 +21,21 @@ ENT.SOUNDCLOSE                       = ""
 
 
 function ENT:Initialize()
-     if (SERVER) then
-		 self.FILTER                           = {}
-         self:SetModel("models/mm1/box.mdl")
-	     self:SetSolid( SOLID_NONE )
-	     self:SetMoveType( MOVETYPE_NONE )
-	     self:SetUseType( ONOFF_USE ) 
-		 self.Bursts		 = 0
-		 self.CURRENTRANGE	 = 0
-		 self.GBOWNER		 = self:GetVar("GBOWNER")
-		 self.NOFARSOUND	 = self:GetVar("NOFARSOUND")
-		 
-		 self.SOUNDCLOSE 	 = self:GetVar("SOUNDCLOSE")
-		 self.SOUND 		 = self:GetVar("SOUND")
-		 self.SOUNDFAR  	 = self:GetVar("SOUNDFAR")
-     end
+	if (SERVER) then
+		self.FILTER 		= {}
+	    self:SetModel		("models/mm1/box.mdl")
+		self:SetSolid		(SOLID_NONE)
+		self:SetMoveType	(MOVETYPE_NONE)
+		self:SetUseType		(ONOFF_USE) 
+		self.Bursts 		= 0
+		self.CURRENTRANGE 	= 0
+		self.GBOWNER 		= self:GetVar("GBOWNER")
+		self.NOFARSOUND		= self:GetVar("NOFARSOUND")
+		
+		self.SOUNDCLOSE 	= self:GetVar("SOUNDCLOSE")
+		self.SOUND 			= self:GetVar("SOUND")
+		self.SOUNDFAR 		= self:GetVar("SOUNDFAR")
+	end
 end
 
 

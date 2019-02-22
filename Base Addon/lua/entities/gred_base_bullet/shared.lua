@@ -89,130 +89,132 @@ if SERVER then
 				bullet.IgnoreEntity = self.Filter
 				self:FireBullets(bullet,false)
 				if !self.NoParticle then
-					net.Start("gred_net_impact_fx")
-						net.WriteBool(false)
-						net.WriteString(self.Caliber)
-						if self.Caliber == "wac_base_7mm" then
-							self.Mats={
-								default_silent			=	-1,
-								floatingstandable		=	-1,
-								no_decal				=	-1,
-								
-								boulder 				=	1,
-								concrete				=	1,
-								default					=	1,
-								item					=	1,
-								concrete_block			=	1,
-								plaster					=	1,
-								pottery					=	1,
-								
-								dirt					=	2,
-										
-								alienflesh				=	3,
-								antlion					=	3,
-								armorflesh				=	3,
-								bloodyflesh				=	3,
-								player					=	3,
-								flesh					=	3,
-								player_control_clip		=	3,
-								zombieflesh				=	3,
+					local effectdata = EffectData()
+					effectdata:SetOrigin(hitpos)
+					effectdata:SetAngles(hitang)
+					effectdata:SetFlags(table.KeyFromValue(gred.Calibre,self.Caliber))
+					if self.Caliber == "wac_base_7mm" then
+						self.Mats={
+							default_silent			=	-1,
+							floatingstandable		=	-1,
+							no_decal				=	-1,
+							
+							boulder 				=	1,
+							concrete				=	1,
+							default					=	1,
+							item					=	1,
+							concrete_block			=	1,
+							plaster					=	1,
+							pottery					=	1,
+							
+							dirt					=	2,
+									
+							alienflesh				=	3,
+							antlion					=	3,
+							armorflesh				=	3,
+							bloodyflesh				=	3,
+							player					=	3,
+							flesh					=	3,
+							player_control_clip		=	3,
+							zombieflesh				=	3,
 
-								glass					=	4,
-								ice						=	4,
-								glassbottle				=	4,
-								combine_glass			=	4,
-									
-								canister				=	5,
-								chain					=	5,
-								chainlink				=	5,
-								combine_metal			=	5,
-								crowbar					=	5,
-								floating_metal_barrel	=	5,
-								grenade					=	5,
-								metal					=	5,
-								metal_barrel			=	5,
-								metal_bouncy			=	5,
-								metal_Box				=	5,
-								metal_seafloorcar		=	5,
-								metalgrate				=	5,
-								metalpanel				=	5,
-								metalvent				=	5,
-								metalvehicle			=	5,
-								paintcan				=	5,
-								roller					=	5,
-								slipperymetal			=	5,
-								solidmetal				=	5,
-								strider					=	5,
-								popcan					=	5,
-								weapon					=	5,
-									
-								quicksand				=	6,
-								sand					=	6,
-								slipperyslime			=	6,
-								antlionsand				=	6,
+							glass					=	4,
+							ice						=	4,
+							glassbottle				=	4,
+							combine_glass			=	4,
 								
-								snow					=	7,
-									
-								foliage					=	8,
+							canister				=	5,
+							chain					=	5,
+							chainlink				=	5,
+							combine_metal			=	5,
+							crowbar					=	5,
+							floating_metal_barrel	=	5,
+							grenade					=	5,
+							metal					=	5,
+							metal_barrel			=	5,
+							metal_bouncy			=	5,
+							metal_Box				=	5,
+							metal_seafloorcar		=	5,
+							metalgrate				=	5,
+							metalpanel				=	5,
+							metalvent				=	5,
+							metalvehicle			=	5,
+							paintcan				=	5,
+							roller					=	5,
+							slipperymetal			=	5,
+							solidmetal				=	5,
+							strider					=	5,
+							popcan					=	5,
+							weapon					=	5,
 								
-								wood					=	9,
-								wood_box				=	9,
-								wood_crate 				=	9,
-								wood_furniture			=	9,
-								wood_lowDensity 		=	9,
-								ladder 					=	9,
-								wood_plank				=	9,
-								wood_panel				=	9,
-								wood_polid				=	9,
-									
-								grass					=	10,
+							quicksand				=	6,
+							sand					=	6,
+							slipperyslime			=	6,
+							antlionsand				=	6,
+							
+							snow					=	7,
 								
-								tile					=	11,
-								ceiling_tile			=	11,
+							foliage					=	8,
+							
+							wood					=	9,
+							wood_box				=	9,
+							wood_crate 				=	9,
+							wood_furniture			=	9,
+							wood_lowDensity 		=	9,
+							ladder 					=	9,
+							wood_plank				=	9,
+							wood_panel				=	9,
+							wood_polid				=	9,
 								
-								plastic_barrel			=	12,
-								plastic_barrel_buoyant	=	12,
-								Plastic_Box				=	12,
-								plastic					=	12,
+							grass					=	10,
+							
+							tile					=	11,
+							ceiling_tile			=	11,
+							
+							plastic_barrel			=	12,
+							plastic_barrel_buoyant	=	12,
+							Plastic_Box				=	12,
+							plastic					=	12,
+							
+							baserock 				=	13,
+							rock					=	13,
+							
+							gravel					=	14,
+							
+							mud						=	15,
+							
+							watermelon				=	16,
 								
-								baserock 				=	13,
-								rock					=	13,
+							asphalt 				=	17,
+							
+							cardbaord 				=	18,
 								
-								gravel					=	14,
+							rubber 					=	19,
+							rubbertire 				=	19,
+							slidingrubbertire 		=	19,
+							slidingrubbertire_front =	19,
+							slidingrubbertire_rear 	=	19,
+							jeeptire 				=	19,
+							brakingrubbertire 		=	19,
+							
+							carpet 					=	20,
+							brakingrubbertire 		=	20,
+							
+							brick					=	21,
 								
-								mud						=	15,
+							foliage					=	22,
+							
+							paper 					=	23,
+							papercup 				=	23,
 								
-								watermelon				=	16,
-									
-								asphalt 				=	17,
-								
-								cardbaord 				=	18,
-									
-								rubber 					=	19,
-								rubbertire 				=	19,
-								slidingrubbertire 		=	19,
-								slidingrubbertire_front =	19,
-								slidingrubbertire_rear 	=	19,
-								jeeptire 				=	19,
-								brakingrubbertire 		=	19,
-								
-								carpet 					=	20,
-								brakingrubbertire 		=	20,
-								
-								brick					=	21,
-									
-								foliage					=	22,
-								
-								paper 					=	23,
-								papercup 				=	23,
-									
-								computer				=	24,
-							}
-							net.WriteInt(self.Mats[util.GetSurfacePropName(tr.SurfaceProps)] or 24,6)
-						end
-						net.WriteVector(hitpos)
-						net.WriteAngle(hitang)
-					net.Broadcast()
+							computer				=	24,
+						}
+						effectdata:SetSurfaceProp(self.Mats[util.GetSurfacePropName(tr.SurfaceProps)] or 24,6)
+					else
+						effectdata:SetSurfaceProp(0)
+					end
+					effectdata:SetMaterialIndex(1)
+					util.Effect("gred_particle_impact",effectdata)
 				end
 			end
 		else
@@ -270,13 +272,18 @@ if SERVER then
 				self:FireBullets( bullet, false )
 			end
 			if !self.NoParticle then
-				net.Start("gred_net_impact_fx")
-					net.WriteBool(false)
-					net.WriteString(self.Caliber)
-					net.WriteBool(hitsky)
-					net.WriteVector(hitpos)
-					if !hitsky then net.WriteAngle(hitang) end
-				net.Broadcast()
+				local effectdata = EffectData()
+				effectdata:SetOrigin(hitpos)
+				if !hitsky then 
+					effectdata:SetAngles(hitang)
+					effectdata:SetSurfaceProp(0)
+				else 
+					effectdata:SetAngles(Angle(0,0,0)) 
+					effectdata:SetSurfaceProp(1)
+				end
+				effectdata:SetMaterialIndex(1)
+				effectdata:SetFlags(table.KeyFromValue(gred.Calibre,self.Caliber))
+				util.Effect("gred_particle_impact",effectdata)
 			end
 		end
 		self:Remove()
