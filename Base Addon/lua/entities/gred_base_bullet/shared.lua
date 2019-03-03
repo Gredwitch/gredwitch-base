@@ -35,7 +35,7 @@ if SERVER then
 		if !self.explodable then
 			if !tr.HitSky then
 				local bullet = {}
-				bullet.Attacker = self.Owner
+				bullet.Attacker = self:GetOwner()
 				bullet.Callback = nil
 				
 				if self.Caliber == "wac_base_12mm" then
