@@ -48,6 +48,7 @@ CreateConVar("gred_sv_lfs_healthmultiplier"		,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_lfs_healthmultiplier_all"	,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_lfs_normal_bullets"		,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_override"				,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_override_hab"				,  "0"  , GRED_SVAR)
 
 gred = gred or {}
 gred.Calibre = {}
@@ -99,6 +100,122 @@ gameAddParticles( "particles/ww1_gas.pcf" )
 
 -- Precaching main particles
 gred.Particles = {}
+gred.Mats = {
+	default_silent			=	-1,
+	floatingstandable		=	-1,
+	no_decal				=	-1,
+	
+	boulder 				=	1,
+	concrete				=	1,
+	default					=	1,
+	item					=	1,
+	concrete_block			=	1,
+	plaster					=	1,
+	pottery					=	1,
+	
+	dirt					=	2,
+			
+	alienflesh				=	3,
+	antlion					=	3,
+	armorflesh				=	3,
+	bloodyflesh				=	3,
+	player					=	3,
+	flesh					=	3,
+	player_control_clip		=	3,
+	zombieflesh				=	3,
+
+	glass					=	4,
+	ice						=	4,
+	glassbottle				=	4,
+	combine_glass			=	4,
+		
+	canister				=	5,
+	chain					=	5,
+	chainlink				=	5,
+	combine_metal			=	5,
+	crowbar					=	5,
+	floating_metal_barrel	=	5,
+	grenade					=	5,
+	metal					=	5,
+	metal_barrel			=	5,
+	metal_bouncy			=	5,
+	metal_Box				=	5,
+	metal_seafloorcar		=	5,
+	metalgrate				=	5,
+	metalpanel				=	5,
+	metalvent				=	5,
+	metalvehicle			=	5,
+	paintcan				=	5,
+	roller					=	5,
+	slipperymetal			=	5,
+	solidmetal				=	5,
+	strider					=	5,
+	popcan					=	5,
+	weapon					=	5,
+		
+	quicksand				=	6,
+	sand					=	6,
+	slipperyslime			=	6,
+	antlionsand				=	6,
+	
+	snow					=	7,
+		
+	foliage					=	8,
+	
+	wood					=	9,
+	wood_box				=	9,
+	wood_crate 				=	9,
+	wood_furniture			=	9,
+	wood_lowDensity 		=	9,
+	ladder 					=	9,
+	wood_plank				=	9,
+	wood_panel				=	9,
+	wood_polid				=	9,
+		
+	grass					=	10,
+	
+	tile					=	11,
+	ceiling_tile			=	11,
+	
+	plastic_barrel			=	12,
+	plastic_barrel_buoyant	=	12,
+	Plastic_Box				=	12,
+	plastic					=	12,
+	
+	baserock 				=	13,
+	rock					=	13,
+	
+	gravel					=	14,
+	
+	mud						=	15,
+	
+	watermelon				=	16,
+		
+	asphalt 				=	17,
+	
+	cardbaord 				=	18,
+		
+	rubber 					=	19,
+	rubbertire 				=	19,
+	slidingrubbertire 		=	19,
+	slidingrubbertire_front =	19,
+	slidingrubbertire_rear 	=	19,
+	jeeptire 				=	19,
+	brakingrubbertire 		=	19,
+	
+	carpet 					=	20,
+	brakingrubbertire 		=	20,
+	
+	brick					=	21,
+		
+	foliage					=	22,
+	
+	paper 					=	23,
+	papercup 				=	23,
+		
+	computer				=	24,
+}
+						
 tableinsert(gred.Particles,"gred_20mm")
 tableinsert(gred.Particles,"gred_20mm_airburst")
 tableinsert(gred.Particles,"gred_40mm")
@@ -192,6 +309,7 @@ tableinsert(gred.Particles,"ins_ammo_explosionOLD")
 tableinsert(gred.Particles,"gred_ap_impact")
 tableinsert(gred.Particles,"AP_impact_wall")
 tableinsert(gred.Particles,"ins_m203_explosion")
+tableinsert(gred.Particles,"ins_weapon_rpg_frontblast")
 for k,v in pairs(gred.Particles) do PrecacheParticleSystem(v) end
 
 
@@ -304,6 +422,10 @@ if CLIENT then
 			CPanel:NumSlider( "Bullet radius multiplier","gred_sv_bullet_radius",0,10,2 );
 			
 			CPanel:NumSlider( "Tracer ammo apparition", "gred_sv_tracers", 0, 20, 0 );
+			
+			if hab and hab.Module.PhysBullet then
+				CPanel:AddControl( "CheckBox", { Label = "Override Havok's physical bullets?", Command = "gred_sv_override_hab" } );
+			end
 		end
 		
 		CPanel:AddControl( "CheckBox", { Label = "Use Insurgency impact effects for 7mm MGs?", Command = "gred_cl_insparticles" } );
@@ -500,7 +622,80 @@ if CLIENT then
 									gred_settings_misc
 		)
 	end );
+	
+	-- HAB PhysBullet compatibility
+	timer.Simple(0.1,function()
+		if hab then
+			local MODULE = hab.Module.PhysBullet
+			if MODULE then
+				hab.hook("PhysBulletOnBulletCreateEffects_","gred_hab_physbullet_particle",function(ent,index,bullet,mode)
+					local isGred = ent.ClassName == "gred_base_bullet" and not ent.fuckHavok
+					if isGred then
+						local effectdata = EffectData()
+						effectdata:SetOrigin(bullet.Position)
+						effectdata:SetFlags(table.KeyFromValue(gred.Calibre,ent.Caliber))
+						local ang = bullet.tr.HitNormal:Angle()
+						if ent.Caliber == "wac_base_7mm" then
+							effectdata:SetSurfaceProp(gred.Mats[util.GetSurfacePropName(bullet.tr.SurfaceProps)] or 24,6)
+							ang.p = ang.p + 90
+							effectdata:SetAngles(ang)
+						else
+							if ent.Caliber == "wac_base_12mm" then
+								sound.Play("impactsounds/gun_impact_"..math.random(1,14)..".wav",bullet.Position,100,100,0.5)
+							elseif ent.Caliber == "wac_base_20mm" then
+								sound.Play("impactsounds/20mm_0"..math.random(1,5)..".wav",bullet.Position,100,100,0.7)
+							elseif ent.Caliber == "wac_base_30mm" then
+								sound.Play("impactsounds/30mm_old.wav",bullet.Position,100,math.random(90,110),0.7)
+							elseif ent.Caliber == "wac_base_40mm" then
+								sound.Play("impactsounds/20mm_0"..math.random(1,5)..".wav",bullet.Position,100,100,0.7)
+							end
+							effectdata:SetSurfaceProp(0) 
+							effectdata:SetAngles(ang)
+						end
+						effectdata:SetMaterialIndex(1)
+						util.Effect("gred_particle_impact",effectdata)
+					end
+					return isGred and (HAB_BULLET_EF_NOPARTICLES) or (bullet.AmmoType == "GaussEnergy" and HAB_BULLET_EF_DISABLEEFFECT or HAB_BULLET_EF_NONE)
+				end)
+				
+				function MODULE:CreateEffects( Ent, Index, Bullet, Mode )
 
+					local e = Bullet.tr.Entity
+
+					local flags = HAB_BULLET_EF_NONE
+					local override = hook.Call( "PhysBulletOnBulletCreateEffects_", MODULE, Ent, Index, Bullet, Mode )
+					if override then
+					
+						if override == HAB_BULLET_EF_DISABLEEFFECT then
+
+							return
+
+						else
+
+							flags = flags + override
+
+						end
+
+					end
+					
+					local effectdata = EffectData( )
+						effectdata:SetDamageType( Bullet.BulletType )
+						effectdata:SetEntity( e ) -- hit ent
+						effectdata:SetHitBox( Bullet.tr.HitGroup or -1 ) -- hitgroup
+						effectdata:SetMagnitude( Bullet.Caliber ) -- caliber
+						effectdata:SetNormal( Bullet.tr.HitNormal or Bullet.FlightDirection ) -- direction 1
+						effectdata:SetOrigin( Bullet.Position ) -- position
+						effectdata:SetScale( Bullet.Caliber / 64 ) -- size --EffectSize
+						effectdata:SetStart( -( Bullet.tr.Normal or Bullet.FlightDirection ) ) -- direction 2
+						effectdata:SetSurfaceProp( Bullet.Surf or 0 ) -- hit material
+						effectdata:SetAttachment( Mode )
+						effectdata:SetFlags( flags )
+					util.Effect( "hab_physbullet_effects", effectdata )
+
+				end
+			end
+		end
+	end)
 end
 
 hook.Add("OnEntityCreated","gred_ent_override",function(ent)

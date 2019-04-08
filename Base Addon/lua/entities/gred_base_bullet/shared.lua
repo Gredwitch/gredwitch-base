@@ -4,12 +4,204 @@ ENT.Author 			= "Gredwich"
 ENT.Category 		= ""
 ENT.Spawnable		= false
 ENT.AdminSpawnable  = false
-ENT.FuzeTime		= 0
+ENT.FuseTime		= 0
+ENT.Filter			= {}
 -- ENT.Caliber			= ""
+
 local zero = 0
 local threeZ = zero,zero,zero
 local audioSpecs = 100, 100,1, CHAN_AUTO
 local null = ""
+local tableinsert = table.insert
+local pairs = pairs
+local istable = istable
+local IsValid = IsValid
+ENT.fuckHavok = GetConVar("gred_sv_override_hab"):GetInt() == 1
+
+function ENT:SetupDataTables()
+	self:NetworkVar("String",0,"Caliber")
+	self:NetworkVar("String",1,"Filter")
+	
+	self:NetworkVar("Float",0,"FuseTime")
+end
+
+function ENT:CheckFilter()
+	local old = self.Filter
+	self.Filter = {}
+	for k,v in pairs(old) do
+		table.remove(self.Filter,k)
+		if IsValid(v) then
+			if istable(v) then
+				for a,b in pairs(v) do
+					tableinsert(self.Filter,b)
+				end
+			else
+				tableinsert(self.Filter,v)
+			end
+		end
+	end
+	tableinsert(self.Filter,self)
+end
+
+function ENT:Initialize()
+	self.fuckHavok = GetConVar("gred_sv_override_hab"):GetInt() == 1
+	self:SetRenderMode(RENDERMODE_TRANSALPHA)
+	if hab and hab.Module.PhysBullet then
+		if SERVER then self:SetFuseTime(self.FuseTime) end
+		if CLIENT then self.FuseTime = self:GetFuseTime() end
+	end
+	
+	if hab and (hab.Module.PhysBullet and not self.fuckHavok) and self.FuseTime == 0 then
+		if SERVER then
+			self:SetCaliber(self.Caliber)
+			self:CheckFilter()
+			local STR = ""
+			for k,v in pairs(self.Filter) do
+				STR = STR.." "..tostring(v:EntIndex())
+			end
+			self:SetFilter(STR)
+		end
+		if CLIENT then
+			self.Caliber = self:GetCaliber()
+			self.Filter = string.Explode(" ",self:GetFilter())
+			table.remove(self.Filter,1)
+			for k,v in pairs(self.Filter) do
+				self.Filter[k] = Entity(v)
+			end
+		end
+		
+		self.Caliber = self:GetCaliber()
+		local OpBullets = GetConVar("gred_sv_lfs_normal_bullets"):GetInt() == 1
+		local bullet = {}
+		bullet.Attacker = self.Owner
+		bullet.Callback = nil
+		bullet.Tracer = GetConVar("gred_sv_tracers"):GetInt()
+		if self.Caliber == "wac_base_12mm" then
+			if self.CustomDMG and !OpBullets then
+					self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			else
+				self.Damage = 60 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			end
+			if GetConVar("gred_sv_12mm_he_impact"):GetInt() >= 1 then 
+				bullet.Damage = zero 
+				-- util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
+			else
+				bullet.Damage = self.Damage
+			end
+			if self.col == "Green" then
+				bullet.AmmoType = "hvap_127x108_ap"
+			else
+				bullet.AmmoType = "hvap_127x99_ap"
+			end
+		elseif self.Caliber == "wac_base_7mm" then
+			if self.CustomDMG and !OpBullets then
+				self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			else
+				self.Damage = 40 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			end
+			if GetConVar("gred_sv_7mm_he_impact"):GetInt() >= 1 then
+				bullet.Damage = zero
+				-- util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
+			else
+				bullet.Damage = self.Damage 
+			end
+			if self.col == "Green" then
+				bullet.AmmoType = "hab_792x57"
+			elseif self.col == "Yellow" then
+				bullet.AmmoType = "hab_77x56"
+			else
+				bullet.AmmoType = "hab_762x63"
+			end
+		elseif self.Caliber == "wac_base_30mm" then
+			if self.CustomDMG and !OpBullets then
+				self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			else
+				self.Damage = 100 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			end
+			-- self:EmitSound("impactsounds/30mm_old.wav",100, math.random(90,110),1, CHAN_AUTO)
+		elseif self.Caliber == "wac_base_20mm" then
+			if self.CustomDMG and !OpBullets then
+				self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			else
+				self.Damage = 80 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			end
+			-- self:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
+			bullet.AmmoType = "hvap_20x102_hei"
+		else
+			if self.CustomDMG and !OpBullets then
+				self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			else
+				self.Damage = 120 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			end
+			-- self:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
+		end
+		bullet.Force = 5
+		bullet.HullSize = 0
+		bullet.Num = 1
+		bullet.Dir = self:GetForward()
+		bullet.Spread = Vector(0)
+		bullet.Src = self:GetPos()
+		bullet.IgnoreEntity = {}
+		for k,v in pairs(self.Filter) do tableinsert(bullet.IgnoreEntity,v) end
+		
+		self:FireBullets(bullet,false)
+		self:SetModel("models/mm1/box.mdl")
+		DONOTSPAWN = true
+	else
+		if SERVER then
+			self.Entity:SetModel("models/gredwitch/bullet.mdl")
+			self.Entity:PhysicsInit(SOLID_VPHYSICS)
+			self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
+			self.Entity:SetSolid(SOLID_VPHYSICS)
+			self:SetNotSolid(true)
+			if self.noTracer then self:SetRenderMode(RENDERMODE_TRANSALPHA) end
+			self.phys = self.Entity:GetPhysicsObject()
+			if self.phys:IsValid() then
+				self.phys:SetMass(5)
+				self.phys:EnableCollisions(true)
+				self.phys:EnableGravity(true)
+				self.phys:Wake()
+			end
+			
+			if self.Damage == nil then self.Damage = 40 end
+			if self.Radius == nil then self.Radius = 70 end
+			if self.Owner == nil then self.Owner = ply end
+			if self.npod == nil then self.npod = 1 end
+			
+			self.Radius = self.Radius * GetConVar("gred_sv_bullet_radius"):GetFloat()
+			-- self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			
+			if self.FuseTime > 0 then
+				self.GetExplTime = CurTime() + self.FuseTime 
+			end
+			if self.Caliber == "wac_base_7mm" then
+				self.Speed = 1000
+			elseif self.Caliber == "wac_base_12mm" then
+				self.Speed = 700
+			elseif self.Caliber == "wac_base_20mm" then
+				self.Speed = 600
+			elseif self.Caliber == "wac_base_30mm" then
+				self.Speed = 500
+			elseif self.Caliber == "wac_base_40mm" then
+				self.Speed = 400
+			end
+			
+			self.orpos = self:GetPos()
+			self.oldpos = self.orpos - (self:GetAngles():Forward() * self.Speed)
+			for k,v in pairs(self.Filter) do
+				if istable(v) then
+					for a,b in pairs(v) do
+						tableinsert(self.Filter,b)
+					end
+				end
+			end
+			self.Mask = MASK_ALL
+			self.explodable = self.Caliber == "wac_base_20mm" or self.Caliber == "wac_base_30mm" or self.Caliber == "wac_base_40mm"
+		end
+	end
+end
+
+
 if SERVER then
 	function ENT:Explode(tr,ply)
 		if self.Exploded then return end
@@ -19,7 +211,7 @@ if SERVER then
 			else self.Owner = nil end
 		end
 		local pos = self:GetPos()
-		if self.FuzeTime == 0 then
+		if self.FuseTime == 0 then
 			if tr.HitNormal == nil then
 				hitang = Angle(threeZ)
 			else
@@ -94,122 +286,7 @@ if SERVER then
 					effectdata:SetAngles(hitang)
 					effectdata:SetFlags(table.KeyFromValue(gred.Calibre,self.Caliber))
 					if self.Caliber == "wac_base_7mm" then
-						self.Mats={
-							default_silent			=	-1,
-							floatingstandable		=	-1,
-							no_decal				=	-1,
-							
-							boulder 				=	1,
-							concrete				=	1,
-							default					=	1,
-							item					=	1,
-							concrete_block			=	1,
-							plaster					=	1,
-							pottery					=	1,
-							
-							dirt					=	2,
-									
-							alienflesh				=	3,
-							antlion					=	3,
-							armorflesh				=	3,
-							bloodyflesh				=	3,
-							player					=	3,
-							flesh					=	3,
-							player_control_clip		=	3,
-							zombieflesh				=	3,
-
-							glass					=	4,
-							ice						=	4,
-							glassbottle				=	4,
-							combine_glass			=	4,
-								
-							canister				=	5,
-							chain					=	5,
-							chainlink				=	5,
-							combine_metal			=	5,
-							crowbar					=	5,
-							floating_metal_barrel	=	5,
-							grenade					=	5,
-							metal					=	5,
-							metal_barrel			=	5,
-							metal_bouncy			=	5,
-							metal_Box				=	5,
-							metal_seafloorcar		=	5,
-							metalgrate				=	5,
-							metalpanel				=	5,
-							metalvent				=	5,
-							metalvehicle			=	5,
-							paintcan				=	5,
-							roller					=	5,
-							slipperymetal			=	5,
-							solidmetal				=	5,
-							strider					=	5,
-							popcan					=	5,
-							weapon					=	5,
-								
-							quicksand				=	6,
-							sand					=	6,
-							slipperyslime			=	6,
-							antlionsand				=	6,
-							
-							snow					=	7,
-								
-							foliage					=	8,
-							
-							wood					=	9,
-							wood_box				=	9,
-							wood_crate 				=	9,
-							wood_furniture			=	9,
-							wood_lowDensity 		=	9,
-							ladder 					=	9,
-							wood_plank				=	9,
-							wood_panel				=	9,
-							wood_polid				=	9,
-								
-							grass					=	10,
-							
-							tile					=	11,
-							ceiling_tile			=	11,
-							
-							plastic_barrel			=	12,
-							plastic_barrel_buoyant	=	12,
-							Plastic_Box				=	12,
-							plastic					=	12,
-							
-							baserock 				=	13,
-							rock					=	13,
-							
-							gravel					=	14,
-							
-							mud						=	15,
-							
-							watermelon				=	16,
-								
-							asphalt 				=	17,
-							
-							cardbaord 				=	18,
-								
-							rubber 					=	19,
-							rubbertire 				=	19,
-							slidingrubbertire 		=	19,
-							slidingrubbertire_front =	19,
-							slidingrubbertire_rear 	=	19,
-							jeeptire 				=	19,
-							brakingrubbertire 		=	19,
-							
-							carpet 					=	20,
-							brakingrubbertire 		=	20,
-							
-							brick					=	21,
-								
-							foliage					=	22,
-							
-							paper 					=	23,
-							papercup 				=	23,
-								
-							computer				=	24,
-						}
-						effectdata:SetSurfaceProp(self.Mats[util.GetSurfacePropName(tr.SurfaceProps)] or 24,6)
+						effectdata:SetSurfaceProp(gred.Mats[util.GetSurfacePropName(tr.SurfaceProps)] or 24,6)
 					else
 						effectdata:SetSurfaceProp(0)
 					end
@@ -218,7 +295,7 @@ if SERVER then
 				end
 			end
 		else
-			if self.FuzeTime > 0 then
+			if self.FuseTime > 0 then
 				hitpos = pos
 				hitang = Angle(threeZ)
 				hitsky = true
@@ -286,6 +363,12 @@ if SERVER then
 				util.Effect("gred_particle_impact",effectdata)
 			end
 		end
-		self:Remove()
+		if hab and hab.Module.PhysBullet then
+			self.CEASE = true
+			self:SetColor(Color(255,255,255,0))
+			SafeRemoveEntityDelayed(self,3)
+		else
+			self:Remove()
+		end
 	end
 end

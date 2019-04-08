@@ -335,7 +335,27 @@
 - Updated ROCKET_HYDRA : the rocket will now work even if WAC isn't installed
 - Updated HC_ROCKET : no errors will be created if WAC isn't installed anymore
 
-27/12/2018 (12/27/2018)
+28/12/2018 (12/28/2018)
 - Fixed missing Network String
 - Fixed Physics Environnements
+
+10/02/2019 (02/10/2019)
+- Added a new way to override WAC so you don't have to install it in the legacy addons folder
+- Added new convars to block popups, fixed LFS being shit and prevent WAC aircrafts from being overridden
+- Added gb_shell_40mm
+- Cleaned up some code
+- Organized the spawnmenu options
+- Removed unused files
+
+23/02/2019 (02/23/2019)
+- Added a bunch of CEffectDatas : the particle effect spawning system has been updated, the effects don't use the Net Library anymore, which means that the servers will suffer less from the effects
+- Cleaned up A LOT of code
+- Fixed gb_shell_56mm having a 75mm shell explosion effect
+- Updated the autorun files : added a particle table, optimized the loading times, fixed some WAC errors, updated the missing addons popup
+
+08/04/2019 (04/08/2019)
+- Added HAB Physbullet compatibility
+- Added a 128mm shell
+- Fixed a missing particle precache
+- Updated some particles
 --]]

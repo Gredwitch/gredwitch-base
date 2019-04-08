@@ -66,16 +66,18 @@ timer.Simple(5,function()
 		
 		for k,id in pairs(gred.ClientRequiredAddons) do
 			GetWorkshopFileInfo(id,function(r)
-				if x > Wwide - 110 then 
-					x = 110
-					y = y + 70
+				if r then
+					if x > Wwide - 110 then 
+						x = 110
+						y = y + 70
+					end
+					local b = vgui.Create( "DButton", window )
+					b:SetText(r.title)
+					b.DoClick = function() gui.OpenURL("https://steamcommunity.com/sharedfiles/filedetails/?id="..id) end
+					b:SetSize( 100, 40 )
+					b:SetPos(x,y)
+					x = x + 110
 				end
-				local b = vgui.Create( "DButton", window )
-				b:SetText(r.title)
-				b.DoClick = function() gui.OpenURL("https://steamcommunity.com/sharedfiles/filedetails/?id="..id) end
-				b:SetSize( 100, 40 )
-				b:SetPos(x,y)
-				x = x + 110
 			end)
 		end
 	end

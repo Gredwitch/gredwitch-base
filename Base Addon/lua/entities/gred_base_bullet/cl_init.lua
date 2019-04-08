@@ -7,3 +7,4 @@ local null = ""
 function ENT:Draw()
 	self:DrawModel()
 end
+
