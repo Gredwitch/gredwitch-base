@@ -8,6 +8,18 @@ ENT.FuseTime		= 0
 ENT.Filter			= {}
 -- ENT.Caliber			= ""
 
+for i = 1,14 do
+sound.Add( {
+	name = "GRED_IMPACT_12MM_"..i,
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 140,
+	pitch = {100},
+	sound = "impactsounds/gun_impact_"..i
+} )
+end
+
+
 local zero = 0
 local threeZ = zero,zero,zero
 local audioSpecs = 100, 100,1, CHAN_AUTO
@@ -16,7 +28,18 @@ local tableinsert = table.insert
 local pairs = pairs
 local istable = istable
 local IsValid = IsValid
-ENT.fuckHavok = GetConVar("gred_sv_override_hab"):GetInt() == 1
+local RENDERMODE_TRANSALPHA = RENDERMODE_TRANSALPHA
+
+local IsListen 
+local OverrideHAB = GetConVar("gred_sv_override_hab")
+local Tracers = GetConVar("gred_sv_tracers")
+local LFSNormalBullets = GetConVar("gred_sv_lfs_normal_bullets")
+local BulletDMG = GetConVar("gred_sv_bullet_dmg")
+local SERVER = SERVER
+local CLIENT = CLIENT
+local HE12MM = GetConVar("gred_sv_12mm_he_impact")
+local HE7MM = GetConVar("gred_sv_7mm_he_impact")
+local HERADIUS = GetConVar("gred_sv_bullet_radius")
 
 function ENT:SetupDataTables()
 	self:NetworkVar("String",0,"Caliber")
@@ -44,109 +67,16 @@ function ENT:CheckFilter()
 end
 
 function ENT:Initialize()
-	self.fuckHavok = GetConVar("gred_sv_override_hab"):GetInt() == 1
+	self.fuckHavok = OverrideHAB:GetInt() == 1
 	self:SetRenderMode(RENDERMODE_TRANSALPHA)
+	
 	if hab and hab.Module.PhysBullet then
 		if SERVER then self:SetFuseTime(self.FuseTime) end
 		if CLIENT then self.FuseTime = self:GetFuseTime() end
 	end
 	
 	if hab and (hab.Module.PhysBullet and not self.fuckHavok) and self.FuseTime == 0 then
-		if SERVER then
-			self:SetCaliber(self.Caliber)
-			self:CheckFilter()
-			local STR = ""
-			for k,v in pairs(self.Filter) do
-				STR = STR.." "..tostring(v:EntIndex())
-			end
-			self:SetFilter(STR)
-		end
-		if CLIENT then
-			self.Caliber = self:GetCaliber()
-			self.Filter = string.Explode(" ",self:GetFilter())
-			table.remove(self.Filter,1)
-			for k,v in pairs(self.Filter) do
-				self.Filter[k] = Entity(v)
-			end
-		end
-		
-		self.Caliber = self:GetCaliber()
-		local OpBullets = GetConVar("gred_sv_lfs_normal_bullets"):GetInt() == 1
-		local bullet = {}
-		bullet.Attacker = self.Owner
-		bullet.Callback = nil
-		bullet.Tracer = GetConVar("gred_sv_tracers"):GetInt()
-		if self.Caliber == "wac_base_12mm" then
-			if self.CustomDMG and !OpBullets then
-					self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
-			else
-				self.Damage = 60 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
-			end
-			if GetConVar("gred_sv_12mm_he_impact"):GetInt() >= 1 then 
-				bullet.Damage = zero 
-				-- util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
-			else
-				bullet.Damage = self.Damage
-			end
-			if self.col == "Green" then
-				bullet.AmmoType = "hvap_127x108_ap"
-			else
-				bullet.AmmoType = "hvap_127x99_ap"
-			end
-		elseif self.Caliber == "wac_base_7mm" then
-			if self.CustomDMG and !OpBullets then
-				self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
-			else
-				self.Damage = 40 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
-			end
-			if GetConVar("gred_sv_7mm_he_impact"):GetInt() >= 1 then
-				bullet.Damage = zero
-				-- util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
-			else
-				bullet.Damage = self.Damage 
-			end
-			if self.col == "Green" then
-				bullet.AmmoType = "hab_792x57"
-			elseif self.col == "Yellow" then
-				bullet.AmmoType = "hab_77x56"
-			else
-				bullet.AmmoType = "hab_762x63"
-			end
-		elseif self.Caliber == "wac_base_30mm" then
-			if self.CustomDMG and !OpBullets then
-				self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
-			else
-				self.Damage = 100 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
-			end
-			-- self:EmitSound("impactsounds/30mm_old.wav",100, math.random(90,110),1, CHAN_AUTO)
-		elseif self.Caliber == "wac_base_20mm" then
-			if self.CustomDMG and !OpBullets then
-				self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
-			else
-				self.Damage = 80 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
-			end
-			-- self:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
-			bullet.AmmoType = "hvap_20x102_hei"
-		else
-			if self.CustomDMG and !OpBullets then
-				self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
-			else
-				self.Damage = 120 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
-			end
-			-- self:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
-		end
-		bullet.Force = 5
-		bullet.HullSize = 0
-		bullet.Num = 1
-		bullet.Dir = self:GetForward()
-		bullet.Spread = Vector(0)
-		bullet.Src = self:GetPos()
-		bullet.IgnoreEntity = {}
-		for k,v in pairs(self.Filter) do tableinsert(bullet.IgnoreEntity,v) end
-		
-		self:FireBullets(bullet,false)
-		self:SetModel("models/mm1/box.mdl")
-		DONOTSPAWN = true
+		self:Init_Hab()
 	else
 		if SERVER then
 			self.Entity:SetModel("models/gredwitch/bullet.mdl")
@@ -168,8 +98,8 @@ function ENT:Initialize()
 			if self.Owner == nil then self.Owner = ply end
 			if self.npod == nil then self.npod = 1 end
 			
-			self.Radius = self.Radius * GetConVar("gred_sv_bullet_radius"):GetFloat()
-			-- self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+			self.Radius = self.Radius * HERADIUS:GetFloat()
+			-- self.Damage = self.Damage * BulletDMG:GetFloat()
 			
 			if self.FuseTime > 0 then
 				self.GetExplTime = CurTime() + self.FuseTime 
@@ -201,6 +131,103 @@ function ENT:Initialize()
 	end
 end
 
+function ENT:Init_Hab()
+	if SERVER then
+		self:SetCaliber(self.Caliber)
+		self:CheckFilter()
+		local STR = ""
+		for k,v in pairs(self.Filter) do
+			STR = STR.." "..tostring(v:EntIndex())
+		end
+		self:SetFilter(STR)
+	end
+	if CLIENT then
+		self.Caliber = self:GetCaliber()
+		self.Filter = string.Explode(" ",self:GetFilter())
+		table.remove(self.Filter,1)
+		for k,v in pairs(self.Filter) do
+			self.Filter[k] = Entity(v)
+		end
+	end
+	
+	self.Caliber = self:GetCaliber()
+	local OpBullets = LFSNormalBullets:GetInt() == 1
+	local bullet = {}
+	bullet.Attacker = self.Owner
+	bullet.Callback = nil
+	bullet.Tracer = Tracers:GetInt()
+	if self.Caliber == "wac_base_12mm" then
+		if self.CustomDMG and !OpBullets then
+				self.Damage = self.Damage * BulletDMG:GetFloat()
+		else
+			self.Damage = 60 * BulletDMG:GetFloat()
+		end
+		if HE12MM:GetInt() >= 1 then 
+			bullet.Damage = zero 
+			-- util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
+		else
+			bullet.Damage = self.Damage
+		end
+		if self.col == "Green" then
+			bullet.AmmoType = "hvap_127x108_ap"
+		else
+			bullet.AmmoType = "hvap_127x99_ap"
+		end
+	elseif self.Caliber == "wac_base_7mm" then
+		if self.CustomDMG and !OpBullets then
+			self.Damage = self.Damage *BulletDMG:GetFloat()
+		else
+			self.Damage = 40 * BulletDMG:GetFloat()
+		end
+		if HE7MM:GetInt() >= 1 then
+			bullet.Damage = zero
+			-- util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
+		else
+			bullet.Damage = self.Damage 
+		end
+		if self.col == "Green" then
+			bullet.AmmoType = "hab_792x57"
+		elseif self.col == "Yellow" then
+			bullet.AmmoType = "hab_77x56"
+		else
+			bullet.AmmoType = "hab_762x63"
+		end
+	elseif self.Caliber == "wac_base_30mm" then
+		if self.CustomDMG and !OpBullets then
+			self.Damage = self.Damage * BulletDMG:GetFloat()
+		else
+			self.Damage = 100 * BulletDMG:GetFloat()
+		end
+		-- self:EmitSound("impactsounds/30mm_old.wav",100, math.random(90,110),1, CHAN_AUTO)
+	elseif self.Caliber == "wac_base_20mm" then
+		if self.CustomDMG and !OpBullets then
+			self.Damage = self.Damage * BulletDMG:GetFloat()
+		else
+			self.Damage = 80 * BulletDMG:GetFloat()
+		end
+		-- self:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
+		bullet.AmmoType = "hvap_20x102_hei"
+	else
+		if self.CustomDMG and !OpBullets then
+			self.Damage = self.Damage * BulletDMG:GetFloat()
+		else
+			self.Damage = 120 * BulletDMG:GetFloat()
+		end
+		-- self:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
+	end
+	bullet.Force = 5
+	bullet.HullSize = 0
+	bullet.Num = 1
+	bullet.Dir = self:GetForward()
+	bullet.Spread = Vector(0)
+	bullet.Src = self:GetPos()
+	bullet.IgnoreEntity = {}
+	for k,v in pairs(self.Filter) do tableinsert(bullet.IgnoreEntity,v) end
+	
+	self:FireBullets(bullet,false)
+	self:SetModel("models/mm1/box.mdl")
+	DONOTSPAWN = true
+end
 
 if SERVER then
 	function ENT:Explode(tr,ply)
@@ -223,7 +250,7 @@ if SERVER then
 				hitpos = tr.HitPos
 			end
 		end
-		local OpBullets = GetConVar("gred_sv_lfs_normal_bullets"):GetInt() == 1
+		local OpBullets = LFSNormalBullets:GetInt() == 1
 		if !self.explodable then
 			if !tr.HitSky then
 				local bullet = {}
@@ -232,35 +259,26 @@ if SERVER then
 				
 				if self.Caliber == "wac_base_12mm" then
 					if self.CustomDMG and !OpBullets then
-						self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+						self.Damage = self.Damage * BulletDMG:GetFloat()
 					else
-						self.Damage = 60 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+						self.Damage = 60 * BulletDMG:GetFloat()
 					end
-					if GetConVar("gred_sv_12mm_he_impact"):GetInt() >= 1 then 
+					if HE12MM:GetInt() >= 1 then 
 						bullet.Damage = zero 
 						util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
 					else
 						bullet.Damage = self.Damage
 					end
 					local d
-					if self.gunRPM >= 4000 then d = (self.gunRPM / 20000) else d = (self.gunRPM / 5000) end
-					if self.gunRPM >= 1000 then
-						self.Entity:EmitSound("impactsounds/gun_impact_"..math.random(1,14)..".wav",100, 100,d, CHAN_AUTO)
-						
-					elseif !self.sequential then
-						d = 1 / self.npod
-						self.Entity:EmitSound("impactsounds/gun_impact_"..math.random(1,14)..".wav",100, 100,d, CHAN_AUTO)
-					else
-						self.Entity:EmitSound("impactsounds/gun_impact_"..math.random(1,14)..".wav",audioSpecs)
-					end
+					self.Entity:EmitSound("GRED_IMPACT_12MM_"..math.random(1,14))
 					
 				elseif self.Caliber == "wac_base_7mm" then
 					if self.CustomDMG and !OpBullets then
-						self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+						self.Damage = self.Damage * BulletDMG:GetFloat()
 					else
-						self.Damage = 40 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+						self.Damage = 40 * BulletDMG:GetFloat()
 					end
-					if GetConVar("gred_sv_7mm_he_impact"):GetInt() >= 1 then
+					if HE7MM:GetInt() >= 1 then
 						bullet.Damage = zero
 						util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
 					else
@@ -304,9 +322,9 @@ if SERVER then
 			end
 			if self.Caliber == "wac_base_30mm" then
 				if self.CustomDMG and !OpBullets then
-					self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+					self.Damage = self.Damage * BulletDMG:GetFloat()
 				else
-					self.Damage = 100 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+					self.Damage = 100 * BulletDMG:GetFloat()
 				end
 				util.BlastDamage(self, self.Owner, hitpos, self.Radius*3, self.Damage)
 				self.Entity:EmitSound("impactsounds/30mm_old.wav",100, math.random(90,110),1, CHAN_AUTO)
@@ -315,17 +333,17 @@ if SERVER then
 				-- self.Entity:EmitSound("impactsounds/30mm_"..a..".wav",100, math.random(90,120),1, CHAN_AUTO)
 			elseif self.Caliber == "wac_base_20mm" then
 				if self.CustomDMG and !OpBullets then
-					self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+					self.Damage = self.Damage * BulletDMG:GetFloat()
 				else
-					self.Damage = 80 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+					self.Damage = 80 * BulletDMG:GetFloat()
 				end
 				self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
 				util.BlastDamage(self,self.Owner,hitpos,self.Radius*2, self.Damage)
 			else
 				if self.CustomDMG and !OpBullets then
-					self.Damage = self.Damage * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+					self.Damage = self.Damage * BulletDMG:GetFloat()
 				else
-					self.Damage = 120 * GetConVar("gred_sv_bullet_dmg"):GetFloat()
+					self.Damage = 120 * BulletDMG:GetFloat()
 				end
 				self.Entity:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
 				util.BlastDamage(self,self.Owner,hitpos,self.Radius*4, self.Damage)

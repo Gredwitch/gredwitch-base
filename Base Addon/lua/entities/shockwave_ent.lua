@@ -55,7 +55,6 @@ function ENT:Think()
 		for k, v in pairs(ents.FindInSphere(pos,self.CURRENTRANGE)) do
 			if (v:IsValid() or v:IsPlayer()) and (v.forcefielded==false or v.forcefielded==nil) then
 				local i = 0
-				-- local vdmg = self.SHOCKWAVEDAMAGE/((v:GetPos():Distance(pos))*0.01)
 				while i < v:GetPhysicsObjectCount() do
 					if self.GBOWNER == nil then
 						self.GBOWNER = self
@@ -68,15 +67,7 @@ function ENT:Think()
 						end
 					end
 					self.Owner = self.GBOWNER
-					-- local dmg = DamageInfo()
-					-- dmg:SetDamage(vdmg)
-					-- print("v to pos = ",v:GetPos():Distance(pos))
-					-- print("pos to v = ",pos:Distance(v:GetPos()))
-					-- print("dmg = ",self.SHOCKWAVEDAMAGE/((v:GetPos():Distance(pos))*0.01))
-					-- dmg:SetDamageType(DMG_BLAST)
-					-- dmg:SetAttacker(self.GBOWNER)
 					util.BlastDamage(self, self.Owner, pos, self.MAX_RANGE, self.SHOCKWAVEDAMAGE)
-					-- util.BlastDamageInfo(dmg,pos,self.MAX_RANGE)
 					
 					local ent = ents.Create("env_physexplosion")
 					ent:SetPos( pos ) 
@@ -111,7 +102,6 @@ function ENT:Think()
 							if (v:GetClass()=="func_breakable" or class=="func_breakable_surf" or class=="func_physbox") then
 								v:Fire("Break", 0)
 							end
-							-- v:TakeDamageInfo(dmg)
 						end
 						if v:IsPlayer() and !v:IsOnGround() then
 							
@@ -126,7 +116,6 @@ function ENT:Think()
 								F_dir = (v:GetPos() - pos) * 1
 							end
 							v:SetVelocity( F_dir )
-							-- v:TakeDamageInfo(dmg)
 						elseif v:IsPlayer() and v:IsOnGround() then
 							v:SetMoveType( MOVETYPE_WALK )
 							local mass = phys:GetMass()
@@ -139,7 +128,6 @@ function ENT:Think()
 								F_dir = (v:GetPos() - pos) * 1
 							end
 							v:SetVelocity( F_dir )
-							-- v:TakeDamageInfo(dmg)
 						end
 					end
 				i = i + 1

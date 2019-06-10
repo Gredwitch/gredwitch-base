@@ -310,6 +310,8 @@ tableinsert(gred.Particles,"gred_ap_impact")
 tableinsert(gred.Particles,"AP_impact_wall")
 tableinsert(gred.Particles,"ins_m203_explosion")
 tableinsert(gred.Particles,"ins_weapon_rpg_frontblast")
+tableinsert(gred.Particles,"gred_arti_muzzle_blast_alt")
+tableinsert(gred.Particles,"doi_wprocket_explosion")
 for k,v in pairs(gred.Particles) do PrecacheParticleSystem(v) end
 
 
@@ -351,7 +353,6 @@ gred.AddonList = gred.AddonList or {}
 tableinsert(gred.AddonList,1582297878) -- Materials
 
 if CLIENT then
-	
 	net.Receive ("gred_net_message_ply",function()
 		local ply = net.ReadEntity()
 		local msg = net.ReadString()
@@ -367,9 +368,8 @@ if CLIENT then
 		util.Decal(decal,start,hitpos)
 	end)
 	
-	net.Receive("gred_net_sound_lowsh",function(len,pl)
-		local sound = net.ReadString()
-		LocalPlayer():GetViewEntity():EmitSound(sound)
+	net.Receive("gred_net_sound_lowsh",function()
+		LocalPlayer():GetViewEntity():EmitSound(net.ReadString())
 	end)
 	
 	net.Receive("gred_net_nw_var",function()

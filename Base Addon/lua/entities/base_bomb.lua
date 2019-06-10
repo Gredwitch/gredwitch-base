@@ -20,7 +20,6 @@ ENT.EffectAir                        =  ""
 ENT.EffectWater                      =  ""
 ENT.ArmSound                         =  ""
 ENT.ActivationSound                  =  ""
-ENT.NBCEntity                        =  ""
 ENT.AngEffect						 =	false
 
 ENT.ExplosionSound                   =  ""
@@ -30,20 +29,13 @@ ENT.DistExplosionSound				 =  ""
 ENT.WaterExplosionSound				 =	nil
 ENT.WaterFarExplosionSound			 =  nil
 
-ENT.ShouldUnweld                     =  false
-ENT.ShouldIgnite                     =  false
 ENT.ShouldExplodeOnImpact            =  false
 ENT.Flamable                         =  false
-ENT.UseRandomSounds                  =  false
-ENT.UseRandomModels                  =  false
 ENT.Timed                            =  false
-ENT.IsNBC                            =  false
 
 ENT.Decal							 =	"scorch_medium"
 ENT.ExplosionDamage                  =  0
-ENT.PhysForce                        =  0
 ENT.ExplosionRadius                  =  0
-ENT.SpecialRadius                    =  0
 ENT.MaxIgnitionTime                  =  5
 ENT.Life                             =  20
 ENT.MaxDelay                         =  2
@@ -61,12 +53,17 @@ ENT.DEFAULT_PHYSFORCE_PLYAIR         = 500
 ENT.DEFAULT_PHYSFORCE_PLYGROUND      = 5000
 ENT.GBOWNER                          = nil
 
+local fragility = GetConVar("gred_sv_fragility")
+local spawnablebombs = GetConVar("gred_sv_spawnable_bombs")
+local SERVER = SERVER
+
 function ENT:Initialize()
-	if (SERVER) then
-		if (GetConVar("gred_sv_spawnable_bombs"):GetInt() == 0 and not self.IsOnPlane) then
+	if SERVER then
+		if spawnablebombs:GetInt() == 0 and not self.IsOnPlane then
 			self:Remove()
+			return
 		end
-		self:LoadModel()
+		self:SetModel(self.Model)
 		self:PhysicsInit( SOLID_VPHYSICS )
 		self:SetSolid( SOLID_VPHYSICS )
 		self:SetMoveType( MOVETYPE_VPHYSICS )
@@ -143,14 +140,6 @@ function ENT:TriggerInput(iname, value)
 	end		
 end 
 
-function ENT:LoadModel()
-	if self.UseRandomModels then
-		self:SetModel(table.Random(Models))
-	else
-		self:SetModel(self.Model)
-	end
-end
-
 function ENT:AddOnExplode() end
 
 function ENT:AddOnThink() end
@@ -165,7 +154,7 @@ function ENT:Explode()
 	self:AddOnExplode(pos)
 	if not self.Smoke then
 		local ent = ents.Create("shockwave_ent")
-		ent:SetPos( pos ) 
+		ent:SetPos(pos)
 		ent:Spawn()
 		ent:Activate()
 		ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
@@ -176,8 +165,8 @@ function ENT:Explode()
 		ent:SetVar("MAX_RANGE",self.ExplosionRadius)
 		ent:SetVar("SHOCKWAVE_INCREMENT",50)
 		ent:SetVar("DELAY",0.01)
-		ent.trace=self.TraceLength
-		ent.decal=self.Decal
+		ent.trace = self.TraceLength
+		ent.decal = self.Decal
 	end
 	local effectdata = EffectData()
 	if(self:WaterLevel() >= 1) then
@@ -216,10 +205,10 @@ function ENT:Explode()
 			end
 		end
 	else
-		 local tracedata    = {}
+		local tracedata    = {}
 		tracedata.start    = pos
-		 tracedata.endpos   = tracedata.start - Vector(0, 0, self.TraceLength)
-		 tracedata.filter   = self.Entity
+		tracedata.endpos   = tracedata.start - Vector(0, 0, self.TraceLength)
+		tracedata.filter   = self.Entity
 				
 		 local trace = util.TraceLine(tracedata)
 		
@@ -247,53 +236,72 @@ function ENT:Explode()
     end
 	util.Effect("gred_particle_simple",effectdata)
 	
-	local ent = ents.Create("shockwave_sound_lowsh")
-	ent:SetPos( pos ) 
-	ent:Spawn()
-	ent:Activate()
-	ent:SetVar("GBOWNER", self.GBOWNER)
-	ent:SetVar("MAX_RANGE",self.ExplosionDamage*self.ExplosionRadius)
-	if self.RSound == nil then ent:SetVar("NOFARSOUND",1) else
-		ent:SetVar("NOFARSOUND",self.RSound) 
-	end
-	ent:SetVar("SHOCKWAVE_INCREMENT",200)
+	local currange = 1000 / GetConVar("gred_sv_soundspeed_divider"):GetInt()
 	
-	ent:SetVar("DELAY",0.01)
-	ent:SetVar("SOUNDCLOSE", self.ExplosionSound)
-	ent:SetVar("SOUND", self.FarExplosionSound)
-	ent:SetVar("SOUNDFAR", self.DistExplosionSound)
-	ent:SetVar("Shocktime", 0)
-	 
-	if self.IsNBC then
-		local nbc = ents.Create(self.NBCEntity)
-		nbc:SetVar("GBOWNER",self.GBOWNER)
-		nbc:SetPos(self:GetPos())
-		nbc:Spawn()
-		nbc:Activate()
+	local curRange_min = currange*5
+	local curRange_mid = currange*14
+	local curRange_max = currange*40
+	
+	local rsound = self.RSound == 1
+	local e1 = self.ExplosionSound
+	local e2 = self.FarExplosionSound
+	local e3 = self.DistExplosionSound
+	local soundSpeed = 16797.9 -- 320m/s
+	
+	for k,v in pairs(player.GetHumans()) do
+		local ply = v:GetViewEntity()
+		local distance = ply:GetPos():Distance(pos)
+		
+		if distance <= curRange_min then
+		
+			if v:GetInfoNum("gred_sound_shake",1) == 1 then
+				util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+			end
+			
+			net.Start("gred_net_sound_lowsh")
+				net.WriteString(e1)
+			net.Send(v)
+			
+		elseif distance <= curRange_mid then
+			timer.Simple(distance/soundSpeed,function()
+				if v:GetInfoNum("gred_sound_shake",1) == 1 then
+					util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+				end
+				net.Start("gred_net_sound_lowsh")
+					net.WriteString(!rsound and e2 or e1)
+				net.Send(v)
+			end)
+		elseif distance <= curRange_max then
+			timer.Simple(distance/soundSpeed,function()
+				net.Start("gred_net_sound_lowsh")
+					net.WriteString(!rsound and e3 or e1)
+				net.Send(v)
+			end)
+		end
 	end
+		
 	self:Remove()
 end
 
 function ENT:OnTakeDamage(dmginfo)
 	if self.Exploded then return end
-	exploDamage = dmginfo:IsDamageType(64)
-	if exploDamage == true then return end
+	if dmginfo:IsDamageType(64) then return end
+	
 	self:TakePhysicsDamage(dmginfo)
-	 
-	local phys = self:GetPhysicsObject()
-	 
-	if (self.Life <= 0) then return end
-	if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then
+	
+	if self.Life <= 0 then return end
+	
+	if fragility:GetInt() >= 1 then
 		if(!self.Armed and !self.Arming) then
 		    self:Arm()
 		end
 	end
 	 
-	if(!self.Armed) then return end
+	if !self.Armed then return end
 
 	if self:IsValid() then
 		self.Life = self.Life - dmginfo:GetDamage()
-		if (self.Life <= self.Life/2) and !self.Exploded and self.Flamable then
+		if (self.Life <= self.Life*0.5) and !self.Exploded and self.Flamable then
 			self:Ignite(self.MaxDelay,0)
 		end
 		if (self.Life <= 0) then 
@@ -308,34 +316,29 @@ end
 
 function ENT:PhysicsCollide( data, physobj )
 	timer.Simple(0,function()
-	if(self.Exploded) then return end
-	if(!self:IsValid()) then return end
-	 if(self.Life <= 0) then return end
-		 if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then
-			 if(data.Speed > self.ImpactSpeed) then
-				 if(!self.Armed and !self.Arming) then
-					 self:EmitSound(damagesound)
-					 self:Arm()
-				 end
-			 end
-		 end
-		 if(!self.Armed) then return end
-		 if self.ShouldExplodeOnImpact then
-			 if (data.Speed > self.ImpactSpeed ) then
-				 self.Exploded = true
-				 self:Explode()
-			 end
-		 end
+		if self.Exploded then return end
+		if !IsValid(self) then return end
+		if self.Life <= 0 then return end
+		
+		if fragility:GetInt() >= 1 then
+			if(data.Speed > self.ImpactSpeed) then
+				if(!self.Armed and !self.Arming) then
+					self:EmitSound(damagesound)
+					self:Arm()
+				end
+			end
+		end
+		if !self.Armed then return end
+		if self.ShouldExplodeOnImpact then
+			if (data.Speed > self.ImpactSpeed ) then
+				self.Exploded = true
+				self:Explode()
+			end
+		end
+		
 	end)
 end
-sound.Add( {
-	name = "bombSND",
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 100,
-	pitch = {100},
-	sound = "bomb/bomb_whistle.wav"
-} )
+
 function ENT:Arm()
     if(!self:IsValid()) then return end
 	if(self.Exploded) then return end
