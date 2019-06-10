@@ -15,7 +15,7 @@ sound.Add( {
 	volume = 1.0,
 	level = 140,
 	pitch = {100},
-	sound = "impactsounds/gun_impact_"..i
+	sound = "impactsounds/gun_impact_"..i..".wav"
 } )
 end
 
