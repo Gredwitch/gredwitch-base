@@ -76,28 +76,93 @@ function ENT:Explode(tr)
 		effectdata:SetAngles(Angle(0))
 	end
 	util.Effect("gred_particle_simple",effectdata)
-	local ent = ents.Create("shockwave_sound_lowsh")
-	ent:SetPos(pos)
-	ent:SetVar("GBOWNER",self.Owner)
-	ent:SetVar("MAX_RANGE",self.Damage*self.Radius)
-	ent:SetVar("NOFARSOUND",0)
-	ent:SetVar("SHOCKWAVE_INCREMENT",200)
-	ent:SetVar("DELAY",0.01)
+	
+	local currange = 1000 / GetConVar("gred_sv_soundspeed_divider"):GetInt()
+	
+	local curRange_min = currange*5
+	local curRange_mid = currange*14
+	local curRange_max = currange*40
+	
+	local soundSpeed = 16797.9 -- 320m/s
+	
 	local expl = ents.Create("env_physexplosion")
 	if !self.hellfire then
-		ent:SetVar("SOUNDCLOSE", self.ExplosionSound)
-		ent:SetVar("SOUND", self.FarExplosionSound)
-		ent:SetVar("SOUNDFAR", self.DistExplosionSound)
+		local rsound = false
+		local e1 = self.ExplosionSound
+		local e2 = self.FarExplosionSound
+		local e3 = self.DistExplosionSound
+		for k,v in pairs(player.GetHumans()) do
+			local ply = v:GetViewEntity()
+			local distance = ply:GetPos():Distance(pos)
+			
+			if distance <= curRange_min then
+			
+				if v:GetInfoNum("gred_sound_shake",1) == 1 then
+					util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+				end
+				
+				net.Start("gred_net_sound_lowsh")
+					net.WriteString(e1)
+				net.Send(v)
+				
+			elseif distance <= curRange_mid then
+				timer.Simple(distance/soundSpeed,function()
+					if v:GetInfoNum("gred_sound_shake",1) == 1 then
+						util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+					end
+					net.Start("gred_net_sound_lowsh")
+						net.WriteString(!rsound and e2 or e1)
+					net.Send(v)
+				end)
+			elseif distance <= curRange_max then
+				timer.Simple(distance/soundSpeed,function()
+					net.Start("gred_net_sound_lowsh")
+						net.WriteString(!rsound and e3 or e1)
+					net.Send(v)
+				end)
+			end
+		end
 		util.BlastDamage(self,self.Owner,pos,self.Radius/2,self.Damage)
 		expl:SetKeyValue("magnitude", self.Damage)
 		expl:SetKeyValue("radius", self.Radius/2)
 		expl:SetKeyValue("spawnflags","19")
 	else
-		ent:SetVar("SOUND","explosions/gbomb_4.mp3")
-		ent:SetVar("SOUNDCLOSE","explosions/gbomb_4.mp3")
-		ent:SetVar("SOUND","explosions/gbomb_4.mp3")
-		ent:SetVar("SOUNDFAR","explosions/gbomb_4.mp3")
-		ent:SetVar("NOFARSOUND",1)
+		local rsound = true
+		local e1 = "explosions/gbomb_4.mp3"
+		local e2 = e1
+		local e3 = e1
+		
+		for k,v in pairs(player.GetHumans()) do
+			local ply = v:GetViewEntity()
+			local distance = ply:GetPos():Distance(pos)
+			
+			if distance <= curRange_min then
+			
+				if v:GetInfoNum("gred_sound_shake",1) == 1 then
+					util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+				end
+				
+				net.Start("gred_net_sound_lowsh")
+					net.WriteString(e1)
+				net.Send(v)
+				
+			elseif distance <= curRange_mid then
+				timer.Simple(distance/soundSpeed,function()
+					if v:GetInfoNum("gred_sound_shake",1) == 1 then
+						util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+					end
+					net.Start("gred_net_sound_lowsh")
+						net.WriteString(!rsound and e2 or e1)
+					net.Send(v)
+				end)
+			elseif distance <= curRange_max then
+				timer.Simple(distance/soundSpeed,function()
+					net.Start("gred_net_sound_lowsh")
+						net.WriteString(!rsound and e3 or e1)
+					net.Send(v)
+				end)
+			end
+		end
 		util.BlastDamage(self,self.Owner,pos,self.Radius*2.5,self.Damage*2)
 		expl:SetKeyValue("magnitude", self.Damage*2)
 		expl:SetKeyValue("radius", self.Radius*2.5)
