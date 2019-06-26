@@ -236,49 +236,7 @@ function ENT:Explode()
     end
 	util.Effect("gred_particle_simple",effectdata)
 	
-	local currange = 1000 / GetConVar("gred_sv_soundspeed_divider"):GetInt()
-	
-	local curRange_min = currange*5
-	local curRange_mid = currange*14
-	local curRange_max = currange*40
-	
-	local rsound = self.RSound == 1
-	local e1 = self.ExplosionSound
-	local e2 = self.FarExplosionSound
-	local e3 = self.DistExplosionSound
-	local soundSpeed = 16797.9 -- 320m/s
-	
-	for k,v in pairs(player.GetHumans()) do
-		local ply = v:GetViewEntity()
-		local distance = ply:GetPos():Distance(pos)
-		
-		if distance <= curRange_min then
-		
-			if v:GetInfoNum("gred_sound_shake",1) == 1 then
-				util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
-			end
-			
-			net.Start("gred_net_sound_lowsh")
-				net.WriteString(e1)
-			net.Send(v)
-			
-		elseif distance <= curRange_mid then
-			timer.Simple(distance/soundSpeed,function()
-				if v:GetInfoNum("gred_sound_shake",1) == 1 then
-					util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
-				end
-				net.Start("gred_net_sound_lowsh")
-					net.WriteString(!rsound and e2 or e1)
-				net.Send(v)
-			end)
-		elseif distance <= curRange_max then
-			timer.Simple(distance/soundSpeed,function()
-				net.Start("gred_net_sound_lowsh")
-					net.WriteString(!rsound and e3 or e1)
-				net.Send(v)
-			end)
-		end
-	end
+	gred.CreateSound(pos,self.RSound == 1,self.ExplosionSound,self.FarExplosionSound,self.DistExplosionSound)
 		
 	self:Remove()
 end

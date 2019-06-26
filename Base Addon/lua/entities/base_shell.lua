@@ -126,6 +126,11 @@ ENT.PlyPickup						 =	nil
 
 ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
+function ENT:SetupDataTables()
+	self:NetworkVar("Bool",0,"Fired")
+	self:NetworkVar("Bool",1,"IsAP")
+end
+
 function ENT:AddOnInit()
 	local m = GetConVar("gred_sv_shellspeed_multiplier"):GetFloat()
 	if m > 0 then
@@ -147,20 +152,14 @@ function ENT:AddOnInit()
 			net.WriteString("true")
 		net.Broadcast()
 	end
+	self:SetIsAP(self.AP)
 	self:SetModelScale(self.ModelSize)
 	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
 end
-
-function ENT:AddOnThink()
-	if self.Fired and not self.Sent then
-		net.Start("gred_net_nw_var")
-			net.WriteEntity(self)
-			net.WriteString("fired")
-			net.WriteInt(1,4)
-			net.WriteString("false")
-		net.Broadcast()
-		self.Sent = true
-	end
+local baseclass = baseclass.Get("base_rocket")
+function ENT:Launch()
+	baseclass.Launch(self)
+	self:SetFired(self.Fired)
 end
 
 function ENT:AddOnExplode(pos) 
@@ -221,35 +220,34 @@ function ENT:OnRemove()
 end
 
 if CLIENT then
+	local ply
 	function ENT:Initialize()
+		ply = LocalPlayer()
 		self.shouldOwnerNotHearSnd = false
 		self.snd = {}
 		self.snd["wiz"] = CreateSound(self,"bomb/tank_shellwhiz.wav")
 		self.snd["trail"] = CreateSound(self,"bomb/shell_trail.wav")
-		timer.Simple(0,function()
-			local a = tobool(self:GetNWString("ap"))
-			if a == false then
+		timer.Simple(0.1,function()
+			if !self:GetIsAP() then
 				self.snd["wiz_mortar"] = CreateSound(self,"bomb/shellwhiz_mortar_"..math.random(1,2)..".wav")
 			end
 		end)
 	end
 	function ENT:Think()
-		if !self.Fired then
-			self.Fired = !tobool(self:GetNWString("fired"))
-		end
-		if !self.snd or !self.Fired then return end
-		local e=LocalPlayer():GetViewEntity()
+		if !self.snd then self:Initialize() end
+		if !self:GetFired() then return end
+		local e = ply:GetViewEntity()
 		if (e != self.GBOWNER and e != self.Owner) or self.shouldOwnerHearSnd then
 			local pos=e:GetPos()
 			local spos=self:GetPos()
-			local val1=(pos:Distance(spos+e:GetVelocity())-pos:Distance(spos+self:GetVelocity()))/300
-			local pitch = math.Clamp(1*100+1*1*3+val1, 0, 200)
-			local volume = 1*math.Clamp(pitch*pitch/4000, 0, false and 1 or 5)
+			local val1=(pos:DistToSqr(spos+e:GetVelocity())-pos:DistToSqr(spos+self:GetVelocity()))*0.01
+			local pitch = math.Clamp(val1, 0, 200)
+			local volume = math.Clamp(pitch, 0,1)
 			for k,v in pairs (self.snd) do
 				v:Play()
-				v:ChangePitch(pitch,0.1)
+				v:ChangePitch(pitch,math.random(3,10))
 				v:ChangeVolume(volume,0.1)
-				v:SetSoundLevel(0)
+				v:SetSoundLevel(140)
 			end
 		else
 			for k,v in pairs (self.snd) do

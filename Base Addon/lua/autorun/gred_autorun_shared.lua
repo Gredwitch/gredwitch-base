@@ -1,23 +1,78 @@
-if SERVER then 
-	AddCSLuaFile() 
+local util = util
+local pairs = pairs
+local table = table
+local istable = istable
+local IsInWorld = util.IsInWorld
+local TraceLine = util.TraceLine
+local QuickTrace = util.QuickTrace
+local Effect = util.Effect
+local MASK_ALL = MASK_ALL
+local game = game
+local gameAddParticles = game.AddParticles
+local gameAddDecal = game.AddDecal
+local PrecacheParticleSystem = PrecacheParticleSystem
+local GRED_SVAR = { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_SERVER_CAN_EXECUTE, FCVAR_NOTIFY }
+local CreateConVar = CreateConVar
+local CreateClientConVar = CreateClientConVar
+local tableinsert = table.insert
+local IsValid = IsValid
+
+if SERVER then
 	resource.AddWorkshop(1131455085) -- Base addon
 	local utilAddNetworkString = util.AddNetworkString
 	utilAddNetworkString("gred_net_sound_lowsh")
 	utilAddNetworkString("gred_net_message_ply")
 	utilAddNetworkString("gred_net_bombs_decals")
 	utilAddNetworkString("gred_net_nw_var")
+	local soundSpeed = 16797.9*16797.9 -- 320m/s
+	
+	gred.CreateSound = function(pos,rsound,e1,e2,e3)
+		local currange = 1000 / GetConVar("gred_sv_soundspeed_divider"):GetInt()
+		
+		local curRange_min = currange*5
+		curRange_min = curRange_min*curRange_min
+		local curRange_mid = currange*14
+		curRange_mid = curRange_mid * curRange_mid
+		local curRange_max = currange*40
+		curRange_max = curRange_max * curRange_max
+		
+		for k,v in pairs(player.GetHumans()) do
+			local ply = v:GetViewEntity()
+			local distance = ply:GetPos():DistToSqr(pos)
+			
+			if distance <= curRange_min then
+			
+				if v:GetInfoNum("gred_sound_shake",1) == 1 then
+					util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+				end
+				
+				net.Start("gred_net_sound_lowsh")
+					net.WriteString(e1)
+				net.Send(v)
+				
+			elseif distance <= curRange_mid then
+				timer.Simple(distance/soundSpeed,function()
+					if v:GetInfoNum("gred_sound_shake",1) == 1 then
+						util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+					end
+					net.Start("gred_net_sound_lowsh")
+						net.WriteString(!rsound and e2 or e1)
+					net.Send(v)
+				end)
+			elseif distance <= curRange_max then
+				timer.Simple(distance/soundSpeed,function()
+					net.Start("gred_net_sound_lowsh")
+						net.WriteString(!rsound and e3 or e1)
+					net.Send(v)
+				end)
+			end
+		end
+	end
 end
 
 -- Adding particles
-local gameAddParticles = game.AddParticles
-local PrecacheParticleSystem = PrecacheParticleSystem
-local gameAddDecal = game.AddDecal
-local GRED_SVAR = { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_SERVER_CAN_EXECUTE, FCVAR_NOTIFY }
-local CreateConVar = CreateConVar
-local CreateClientConVar = CreateClientConVar
-local tableinsert = table.insert
 
-CreateConVar("gred_sv_easyuse"					,  "1"  , GRED_SVAR)
+CreateConVar("gred_sv_easyuse"					,  "1"  , GRED_SVAR) 
 CreateConVar("gred_sv_maxforcefield_range"		, "5000", GRED_SVAR)
 CreateConVar("gred_sv_12mm_he_impact"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_7mm_he_impact"			,  "1"  , GRED_SVAR)
@@ -46,7 +101,6 @@ CreateConVar("gred_sv_wac_heli_spin"			,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_heli_spin_chance"		,  "0"  , GRED_SVAR)
 CreateConVar("gred_sv_lfs_healthmultiplier"		,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_lfs_healthmultiplier_all"	,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_lfs_normal_bullets"		,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_override"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_override_hab"				,  "0"  , GRED_SVAR)
 
@@ -99,7 +153,7 @@ gameAddParticles( "particles/ins_smokegrenade.pcf" )
 gameAddParticles( "particles/ww1_gas.pcf" )
 
 -- Precaching main particles
-gred.Particles = {}
+gred.Particles = {} 
 gred.Mats = {
 	default_silent			=	-1,
 	floatingstandable		=	-1,
@@ -283,7 +337,6 @@ tableinsert(gred.Particles,"100lb_air")
 tableinsert(gred.Particles,"500lb_ground")
 tableinsert(gred.Particles,"rockettrail")
 tableinsert(gred.Particles,"grenadetrail")
-tableinsert(gred.Particles,"weapon_tracers_smoke")
 tableinsert(gred.Particles,"gred_ap_impact")
 tableinsert(gred.Particles,"doi_mortar_explosion")
 tableinsert(gred.Particles,"doi_wparty_explosion")
@@ -296,6 +349,7 @@ tableinsert(gred.Particles,"doi_wpgrenade_explosion")
 tableinsert(gred.Particles,"ins_c4_explosion")
 tableinsert(gred.Particles,"doi_artillery_explosion_OLD")
 tableinsert(gred.Particles,"gred_highcal_rocket_explosion")
+tableinsert(gred.Particles,"gred_tracers")
 
 tableinsert(gred.Particles,"muzzleflash_bar_3p")
 tableinsert(gred.Particles,"muzzleflash_garand_3p")
@@ -312,8 +366,27 @@ tableinsert(gred.Particles,"ins_m203_explosion")
 tableinsert(gred.Particles,"ins_weapon_rpg_frontblast")
 tableinsert(gred.Particles,"gred_arti_muzzle_blast_alt")
 tableinsert(gred.Particles,"doi_wprocket_explosion")
+tableinsert(gred.Particles,"gred_tracers_red_7mm")
+tableinsert(gred.Particles,"gred_tracers_green_7mm")
+tableinsert(gred.Particles,"gred_tracers_white_7mm")
+tableinsert(gred.Particles,"gred_tracers_yellow_7mm")
+tableinsert(gred.Particles,"gred_tracers_red_12mm")
+tableinsert(gred.Particles,"gred_tracers_green_12mm")
+tableinsert(gred.Particles,"gred_tracers_white_12mm")
+tableinsert(gred.Particles,"gred_tracers_yellow_12mm")
+tableinsert(gred.Particles,"gred_tracers_red_20mm")
+tableinsert(gred.Particles,"gred_tracers_green_20mm")
+tableinsert(gred.Particles,"gred_tracers_white_20mm")
+tableinsert(gred.Particles,"gred_tracers_yellow_20mm")
+tableinsert(gred.Particles,"gred_tracers_red_30mm")
+tableinsert(gred.Particles,"gred_tracers_green_30mm")
+tableinsert(gred.Particles,"gred_tracers_white_30mm")
+tableinsert(gred.Particles,"gred_tracers_yellow_30mm")
+tableinsert(gred.Particles,"gred_tracers_red_40mm")
+tableinsert(gred.Particles,"gred_tracers_green_40mm")
+tableinsert(gred.Particles,"gred_tracers_white_40mm")
+tableinsert(gred.Particles,"gred_tracers_yellow_40mm")
 for k,v in pairs(gred.Particles) do PrecacheParticleSystem(v) end
-
 
 gameAddDecal( "scorch_small",		"decals/scorch_small" );
 gameAddDecal( "scorch_medium",		"decals/scorch_medium" );
@@ -328,7 +401,7 @@ local foldercount = 0
 local utilPrecacheModel = util.PrecacheModel
 local precache = function( dir, flst ) -- .mdl file list precahcer
 	for _, _f in ipairs( flst ) do
-		util.PrecacheModel( dir.."/".._f )
+		utilPrecacheModel( dir.."/".._f )
 		filecount = filecount + 1
 	end
 end
@@ -342,10 +415,11 @@ findDir = function( parent, direcotry, foot ) -- internal shit
 	end
 	precache( parent.."/"..direcotry, flst )
 end
+timer.Simple(1,function()
+	findDir( "models", "gredwitch", "*.mdl" )
 
-findDir( "models", "gredwitch", "*.mdl" )
-
-print("[GREDWITCH'S BASE] Precached "..filecount.." files in "..foldercount.." folders.")
+	print("[GREDWITCH'S BASE] Precached "..filecount.." files in "..foldercount.." folders.")
+end)
 
 -- end
 
@@ -354,10 +428,8 @@ tableinsert(gred.AddonList,1582297878) -- Materials
 
 if CLIENT then
 	net.Receive ("gred_net_message_ply",function()
-		local ply = net.ReadEntity()
 		local msg = net.ReadString()
-		ply:PrintMessage(HUD_PRINTTALK,msg)
-		-- ply:ChatPrint(msg)
+		LocalPlayer():PrintMessage(HUD_PRINTTALK,msg)
 	end)
 
 	net.Receive("gred_net_bombs_decals",function()
@@ -541,8 +613,6 @@ if CLIENT then
 			
 			CPanel:AddControl( "CheckBox", { Label = "Should the health multiplier only apply to Gredwitch's LFS aircrafts?", Command = "gred_sv_lfs_healthmultiplier_all" } );
 			
-			CPanel:AddControl( "CheckBox", { Label = "Should bullets have their default damage? (OP)", Command = "gred_sv_lfs_normal_bullets" } );
-			
 		end
 	end
 
@@ -696,6 +766,279 @@ if CLIENT then
 			end
 		end
 	end)
+else
+
+	local OverrideHAB = GetConVar("gred_sv_override_hab")
+	local Tracers = GetConVar("gred_sv_tracers")
+	local BulletDMG = GetConVar("gred_sv_bullet_dmg")
+	local HE12MM = GetConVar("gred_sv_12mm_he_impact")
+	local HE7MM = GetConVar("gred_sv_7mm_he_impact")
+	local HERADIUS = GetConVar("gred_sv_bullet_radius")
+	local SoundAdd = sound.Add
+	local BulletID = 0
+	local angle_zero = angle_zero
+	local vector_zero = vector_zero
+	
+	local CAL_TABLE = {
+		["wac_base_7mm"] = 1,
+		["wac_base_12mm"] = 2,
+		["wac_base_20mm"] = 3,
+		["wac_base_30mm"] = 4,
+		["wac_base_40mm"] = 5,
+	}
+	local COL_TABLE = {
+		["red"]    = 1,
+		["green"]  = 2,
+		["white"]  = 3,
+		["yellow"] = 4,
+	}
+	local function BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime)
+		ply = IsValid(ply) and ply or Entity(0)
+		local hitang
+		local hitpos
+		local HitSky = false
+		if istable(tr) then -- if tr isn't a table, then it's a vector
+			hitang = tr.HitNormal:Angle()
+			hitpos = tr.HitPos
+			if cal == "wac_base_7mm" then
+				hitang:Add(Angle(90))
+			end
+			HitSky = tr.HitSky
+		else
+			hitang = angle_zero
+			hitpos = tr
+			HitSky = true
+		end
+		if not explodable then
+			if HitSky then return end
+			local shouldExplode = (cal == "wac_base_12mm" and  HE12MM:GetInt() == 1) or (cal == "wac_base_7mm" and  HE7MM:GetInt() == 1)
+			if !NoBullet then
+				local bullet = {}
+				bullet["Attacker"] = ply
+				bullet["Callback"] = nil
+				bullet["Damage"] = shouldExplode and 0 or dmg
+				bullet["Force"] = 5
+				bullet["HullSize"] = 0
+				bullet["Num"] = 1
+				bullet["Tracer"] = 0
+				bullet["AmmoType"] = nil
+				bullet["TracerName"] = nil
+				bullet["Dir"] = ang:Forward()
+				bullet["Spread"] = vector_zero
+				bullet["Src"] = hitpos
+				bullet["IgnoreEntity"] = filter
+				ply:FireBullets(bullet,false)
+			end
+			if shouldExplode then
+				util.BlastDamage(ply,ply,hitpos,radius,dmg)
+			end
+			if !NoParticle then
+				local effectdata = EffectData()
+				effectdata:SetOrigin(hitpos)
+				effectdata:SetAngles(hitang)
+				effectdata:SetFlags(table.KeyFromValue(gred.Calibre,cal))
+				if cal == "wac_base_7mm" then
+					effectdata:SetSurfaceProp(gred.Mats[util.GetSurfacePropName(tr.SurfaceProps)] or 24,6)
+				else
+					effectdata:SetSurfaceProp(0)
+				end
+				effectdata:SetMaterialIndex(1)
+				Effect("gred_particle_impact",effectdata)
+			end
+			
+			if cal == "wac_base_12mm" then
+				sound.Play("impactsounds/gun_impact_"..math.random(1,14)..".wav",hitpos,75,100,0.5)
+			end
+		else
+			if cal == "wac_base_30mm" then
+				sound.Play("impactsounds/30mm_old.wav",hitpos,110,math.random(90,110),1)
+			elseif cal == "wac_base_20mm" then
+				sound.Play("impactsounds/20mm_0"..math.random(1,5)..".wav",hitpos,100,100,0.7)
+			else
+				sound.Play("impactsounds/20mm_0"..math.random(1,5)..".wav",hitpos,100,100,0.7)
+			end
+			if !HitSky and !NoBullet then
+				local bullet = {}
+				bullet.Damage = 0
+				bullet.Attacker = ply
+				bullet.Callback = nil
+				bullet.Damage = 0
+				bullet.Force = 100
+				bullet.HullSize = 0
+				bullet.Num = 1
+				bullet.Tracer = 0
+				bullet.AmmoType = nil
+				bullet.TracerName = nil
+				bullet.Dir = ang:Forward()
+				bullet.Spread = vector_zero
+				bullet.Src = hitpos
+				bullet.IgnoreEntity = filter
+				ply:FireBullets(bullet,false)
+			end
+			util.BlastDamage(ply,ply,hitpos,radius,dmg)
+			if !NoParticle then
+				local effectdata = EffectData()
+				effectdata:SetOrigin(hitpos)
+				if !HitSky then 
+					effectdata:SetAngles(hitang)
+					effectdata:SetSurfaceProp(0)
+				else 
+					effectdata:SetAngles(Angle(0,0,0))
+					effectdata:SetSurfaceProp(1)
+				end
+				effectdata:SetMaterialIndex(1)
+				effectdata:SetFlags(table.KeyFromValue(gred.Calibre,cal))
+				util.Effect("gred_particle_impact",effectdata)
+			end
+		end
+	end
+	
+	function gred.CreateBullet(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg,radius)
+		if hab and hab.Module.PhysBullet and OverrideHAB:GetInt() == 1 then
+			--[[local bullet = {}
+			bullet.Attacker = ply
+			bullet.Callback = nil
+			bullet.Tracer = Tracers:GetInt()
+			if cal == "wac_base_12mm" then
+				if self.CustomDMG and !OpBullets then
+						self.Damage = self.Damage * BulletDMG:GetFloat()
+				else
+					self.Damage = 60 * BulletDMG:GetFloat()
+				end
+				if HE12MM:GetInt() >= 1 then 
+					bullet.Damage = zero 
+					-- util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
+				else
+					bullet.Damage = self.Damage
+				end
+				if self.col == "Green" then
+					bullet.AmmoType = "hvap_127x108_ap"
+				else
+					bullet.AmmoType = "hvap_127x99_ap"
+				end
+			elseif self.Caliber == "wac_base_7mm" then
+				if self.CustomDMG and !OpBullets then
+					self.Damage = self.Damage *BulletDMG:GetFloat()
+				else
+					self.Damage = 40 * BulletDMG:GetFloat()
+				end
+				if HE7MM:GetInt() >= 1 then
+					bullet.Damage = zero
+					-- util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
+				else
+					bullet.Damage = self.Damage 
+				end
+				if self.col == "Green" then
+					bullet.AmmoType = "hab_792x57"
+				elseif self.col == "Yellow" then
+					bullet.AmmoType = "hab_77x56"
+				else
+					bullet.AmmoType = "hab_762x63"
+				end
+			elseif self.Caliber == "wac_base_30mm" then
+				if self.CustomDMG and !OpBullets then
+					self.Damage = self.Damage * BulletDMG:GetFloat()
+				else
+					self.Damage = 100 * BulletDMG:GetFloat()
+				end
+				-- self:EmitSound("impactsounds/30mm_old.wav",100, math.random(90,110),1, CHAN_AUTO)
+			elseif self.Caliber == "wac_base_20mm" then
+				if self.CustomDMG and !OpBullets then
+					self.Damage = self.Damage * BulletDMG:GetFloat()
+				else
+					self.Damage = 80 * BulletDMG:GetFloat()
+				end
+				-- self:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
+				bullet.AmmoType = "hvap_20x102_hei"
+			else
+				if self.CustomDMG and !OpBullets then
+					self.Damage = self.Damage * BulletDMG:GetFloat()
+				else
+					self.Damage = 120 * BulletDMG:GetFloat()
+				end
+				-- self:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
+			end
+			bullet.Force = 5
+			bullet.HullSize = 0
+			bullet.Num = 1
+			bullet.Dir = self:GetForward()
+			bullet.Spread = Vector(0)
+			bullet.Src = self:GetPos()
+			bullet.IgnoreEntity = {}
+			for k,v in pairs(self.Filter) do tableinsert(bullet.IgnoreEntity,v) end
+			
+			self:FireBullets(bullet,false)--]]
+		else
+			World = IsValid(World) or Entity(0)
+			BulletID = BulletID + 1
+			local ct = CurTime()
+			local speed = cal == "wac_base_7mm" and 1000 or (cal == "wac_base_12mm" and 700 or (cal == "wac_base_20mm" and 600 or (cal == "wac_base_30mm" and 500 or (cal == "wac_base_40mm" and 400))))
+			local dmg = (dmg and dmg or (cal == "wac_base_7mm" and 40 or (cal == "wac_base_12mm" and 60 or (cal == "wac_base_20mm" and 80 or (cal == "wac_base_30mm" and 100 or (cal == "wac_base_40mm" and 120)))))) * BulletDMG:GetFloat()
+			local radius = (radius and radius or 70) * HERADIUS:GetFloat()
+			radius = (cal == "wac_base_7mm" and radius or (cal == "wac_base_12mm" and radius or (cal == "wac_base_20mm" and radius*2 or (cal == "wac_base_30mm" and radius*3 or (cal == "wac_base_40mm" and radius*4)))))
+			local orpos = pos
+			local expltime = fusetime and ct + fusetime or nil
+			local fwd = ang:Forward()
+			local oldpos = orpos - fwd * speed
+			local explodable = cal == "wac_base_20mm" or cal == "wac_base_30mm" or cal == "wac_base_40mm"
+			local dif
+			local NoParticle
+			local oldbullet = BulletID
+			
+			if tracer then
+				local effect = EffectData()
+				effect:SetOrigin(pos)
+				effect:SetFlags(CAL_TABLE[cal])
+				effect:SetMaterialIndex(COL_TABLE[tracer])
+				if expltime then
+					-- d = v*t
+					effect:SetStart(QuickTrace(pos,fwd*(fusetime*speed),filter).HitPos)
+				else
+					effect:SetStart(QuickTrace(pos,fwd*99999999999999,filter).HitPos)
+				end
+				Effect("gred_particle_tracer",effect)
+			end
+			
+			timer.Create("gred_bullet_"..oldbullet,0,0,function()
+				dif = pos + pos - oldpos
+				oldpos = pos
+				local tr = TraceLine({start = pos,endpos = dif,filter = filter,mask = MASK_ALL})
+				
+				if tr.MatType == 83 then
+					local effectdata = EffectData()
+					effectdata:SetOrigin(tr.HitPos)
+					effectdata:SetAngles(Angle(0,0,0))
+					effectdata:SetSurfaceProp(0)
+					effectdata:SetMaterialIndex(0)
+					effectdata:SetFlags(table.KeyFromValue(gred.Calibre,cal))
+					Effect("gred_particle_impact",effectdata)
+					
+					NoParticle = true
+					sound.Play("impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",pos,75,100,1)
+				end
+				
+				if tr.Hit then
+					BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime)
+					timer.Remove("gred_bullet_"..oldbullet)
+					return
+				else
+					if !IsInWorld(dif) then
+						if explodable then 
+							BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime)
+						end
+						timer.Remove("gred_bullet_"..oldbullet)
+					else
+						pos = dif
+					end
+				end
+				if expltime and CurTime() >= expltime then
+					BulletExplode(ply,NoBullet,pos,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime)
+					timer.Remove("gred_bullet_"..oldbullet)
+					return
+				end
+			end)
+		end
+	end
 end
 
 hook.Add("OnEntityCreated","gred_ent_override",function(ent)
@@ -797,20 +1140,8 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 						if GetConVar("gred_sv_wac_explosion"):GetInt() <= 0 then return end
 						local radius = self:BoundingRadius()
 						local hitang = Angle(0,self:GetAngles().y+90,0)
-						local ent = ents.Create("shockwave_sound_lowsh")
-						ent:SetPos(pos) 
-						ent:Spawn()
-						ent:Activate()
-						ent:SetVar("GBOWNER", self)
-						ent:SetVar("MAX_RANGE",50000)
-						ent:SetVar("NOFARSOUND",0)
-						ent:SetVar("SHOCKWAVE_INCREMENT",200)
 						
-						ent:SetVar("DELAY",0.01)
-						ent:SetVar("SOUNDCLOSE","explosions/fuel_depot_explode_close.wav")
-						ent:SetVar("SOUND","explosions/fuel_depot_explode_dist.wav")
-						ent:SetVar("SOUNDFAR","explosions/fuel_depot_explode_far.wav")
-						ent:SetVar("Shocktime", 0)
+						gred.CreateSound(pos,false,"explosions/fuel_depot_explode_close.wav","explosions/fuel_depot_explode_dist.wav","explosions/fuel_depot_explode_far.wav")
 						
 						local ent = ents.Create("shockwave_ent")
 						ent:SetPos( pos ) 
@@ -854,7 +1185,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 							ent:SetVar("MAX_RANGE",1000)
 						end
 					end
-					
+					 
 					ent.PhysicsCollide = function(self,cdat, phys)
 						timer.Simple(0,function()
 							if wac.aircraft.cvars.nodamage:GetInt() == 1 then
@@ -926,19 +1257,9 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 									effectdata:SetFlags(2)
 									util.Effect("gred_particle_wac_explosion",effectdata)
 								end
-								local ent = ents.Create("shockwave_sound_lowsh")
-								ent:SetPos(tr.HitPos) 
-								ent:Spawn()
-								ent:Activate()
-								ent:SetVar("GBOWNER", self.Owner)
-								ent:SetVar("MAX_RANGE",radius*self.Weight)
-								ent:SetVar("NOFARSOUND",0)
-								ent:SetVar("SHOCKWAVE_INCREMENT",200)
-								ent:SetVar("DELAY",0.01)
-								ent:SetVar("SOUNDCLOSE", "/explosions/aircraft_water_close.wav")
-								ent:SetVar("SOUND", "/explosions/aircraft_water_dist.wav")
-								ent:SetVar("SOUNDFAR", "/explosions/aircraft_water_far.wav")
-								ent:SetVar("Shocktime", 0)
+								
+								gred.CreateSound(pos,false,"/explosions/aircraft_water_close.wav","/explosions/aircraft_water_dist.wav","/explosions/aircraft_water_far.wav")
+								
 								local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
 								for k, p in pairs(self.passengers) do
 									if p and p:IsValid() then

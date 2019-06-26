@@ -28,12 +28,16 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Vector", 0, "ShootPos" );
 	self:NetworkVar( "Angle", 1, "ShootAng" );
 end
+local tracers = 0 
+local num = 0
+local SERVER = SERVER
+local ammovar
 function ENT:Initialize()
 	self:base("wac_pod_base").Initialize(self)
 	
-	if tracer == nil then tracer = 0 end
-	tracerConvar=GetConVar("gred_sv_tracers"):GetInt()
-	ammovar=GetConVar("gred_sv_default_wac_munitions"):GetInt()
+	self.TracerConvar = GetConVar("gred_sv_tracers"):GetInt()
+	ammovar = GetConVar("gred_sv_default_wac_munitions"):GetInt()
+	self.TracerConvar = GetConVar("gred_sv_tracers"):GetInt()
 	if self.BulletType == "wac_base_7mm" then
 		num = 0.5
 	elseif self.BulletType == "wac_base_12mm" then
@@ -43,10 +47,17 @@ function ENT:Initialize()
 	elseif self.BulletType == "wac_base_30mm" then
 		num = 3
 	end
+	self.TracerColor = string.lower(self.TracerColor)
+	if SERVER then
+		self.FILTER = {self,self.aircraft}
+		for k,v in pairs(self.aircraft.entities) do
+			table.insert(self.FILTER,v)
+		end
+	end
 end
 
 function ENT:fireBullet(pos)
-	if !self:takeAmmo(self.TkAmmo) then return end
+	if !self:takeAmmo(self.TkAmmo) or !SERVER then return end
 	local ang = self.aircraft:GetAngles()
 	if ammovar >= 1 then
 		local bullet = {}
@@ -62,36 +73,7 @@ function ENT:fireBullet(pos)
 	else
 		local pos2=self.aircraft:LocalToWorld(pos+Vector(self.aircraft:GetVelocity():Length()*0.6,0,0))
 		ang:Add(Angle(axis,axis,0) + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-		local b=ents.Create("gred_base_bullet")
-		b:SetPos(pos2)
-		b:SetAngles(ang)
-		b.col = tracercolor
-		b.Speed=1000
-		b.Caliber = self.BulletType
-		b.Size=0
-		b.Width=0
-		b.Damage=40
-		b.Radius=70
-		b.sequential=self.Sequential
-		b.npod=#self.Pods
-		b.gunRPM=self.FireRate
-		b:Spawn()
-		b:Activate()
-		b.Filter = {self,self.aircraft,self.aircraft.entities}
-		b.Owner=self:getAttacker()
-		
-		if tracer >= GetConVarNumber("gred_sv_tracers") then
-			if self.Color == "Red" then
-				b:SetSkin(1)
-			elseif self.Color == "Green" then
-				b:SetSkin(3)
-			elseif self.Color == "Yellow" then
-				b:SetSkin(0)
-			end
-			b:SetModelScale(20)
-			tracer = 0
-		else b.noTracer = true end
-		tracer = tracer + 1
+		gred.CreateBullet(self:getAttacker(),pos2,ang,self.BulletType,self.FILTER,nil,false,self:UpdateTracers())
 	end
 	local effectdata = EffectData()
 	effectdata:SetOrigin(self:LocalToWorld(pos))
@@ -100,6 +82,15 @@ function ENT:fireBullet(pos)
 	util.Effect("gred_particle_aircraft_muzzle",effectdata)
 end
 
+function ENT:UpdateTracers()
+	tracers = tracers + 1
+	if tracers >= self.TracerConvar then
+		tracers = 0
+		return self.TracerColor
+	else
+		return false
+	end
+end
 
 function ENT:fire()
 	if !self.shooting then

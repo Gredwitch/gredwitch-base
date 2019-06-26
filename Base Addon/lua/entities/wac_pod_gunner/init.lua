@@ -4,6 +4,8 @@ AddCSLuaFile("shared.lua")
 AddCSLuaFile("cl_init.lua")
 include("shared.lua")
 
+local tracers = 0
+local num = 0
 function ENT:Initialize()
 	self:base("wac_pod_base").Initialize(self)
 	self.sounds.spin:ChangePitch(0,0.1)
@@ -19,8 +21,8 @@ function ENT:Initialize()
 	end
 	self.sounds.stop3p:SetSoundLevel(110)
 	if tracer == nil then tracer = 0 end
-	tracerConvar=GetConVar("gred_sv_tracers"):GetInt()
-	ammovar=GetConVar("gred_sv_default_wac_munitions"):GetInt()
+	self.TracerConvar = GetConVar("gred_sv_tracers"):GetInt()
+	ammovar = GetConVar("gred_sv_default_wac_munitions"):GetInt()
 	if ammovar >= 1 then
 		num = 1
 	else
@@ -32,6 +34,13 @@ function ENT:Initialize()
 			num = 1.4
 		elseif self.BulletType == "wac_base_30mm" then
 			num = 2
+		end
+	end
+	self.TracerColor = string.lower(self.TracerColor)
+	if SERVER then
+		self.FILTER = {self,self.aircraft}
+		for k,v in pairs(self.aircraft.entities) do
+			table.insert(self.FILTER,v)
 		end
 	end
 	
@@ -85,36 +94,8 @@ function ENT:fire()
 			self.Entity:Remove()
 		end
 	else
-		local b = ents.Create("gred_base_bullet")
 		local ang = camAng + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num))
-		b:SetPos(pos)
-		b:SetAngles(ang)
-		b.Speed=1000
-		b.Size=0
-		b.col = tracercolor
-		b.Caliber = self.BulletType
-		b.Width=0
-		b.Damage=40
-		b.Radius=70
-		b.gunRPM=self.FireRate
-		constraint.NoCollide(b,self.aircraft,0,0)
-		b:Spawn()
-		b:Activate()
-		b.Filter = {self,self.aircraft,self.aircraft.entities}
-		b.Owner=self:getAttacker()
-		
-		if tracer >= GetConVarNumber("gred_sv_tracers") then
-			if self.Color == "Red" then
-				b:SetSkin(1)
-			elseif self.Color == "Green" then
-				b:SetSkin(3)
-			elseif self.Color == "Yellow" then
-				b:SetSkin(0)
-			end
-			b:SetModelScale(20)
-			tracer = 0
-		else b.noTracer = true end
-		tracer = tracer + 1
+		gred.CreateBullet(self:getAttacker(),pos,ang,self.BulletType,self.FILTER,nil,false,self:UpdateTracers())
 		
 		local effectdata = EffectData()
 		effectdata:SetOrigin(self:LocalToWorld(pos))
@@ -138,6 +119,17 @@ function ENT:fire()
 	end
 	self:SetIsShooting(true)
 end
+
+function ENT:UpdateTracers()
+	tracers = tracers + 1
+	if tracers >= self.TracerConvar then
+		tracers = 0
+		return self.TracerColor
+	else
+		return false
+	end
+end
+
 function ENT:stop()
 	if self:GetIsShooting() then
 		self.sounds.shoot1p:Stop()
@@ -149,6 +141,7 @@ function ENT:stop()
 		self:SetIsShooting(false)
 	end
 end
+
 function ENT:canFire()
 	return self:GetSpinSpeed() > 0.8
 end
