@@ -1,5 +1,5 @@
 # gredwitch-base
-*dO yOu KnOw ThE dEfInItIoN oF cAnCeR ?*
+hi
 # HOW TO PLAY
 
  - Step 1 : click on clone or download
