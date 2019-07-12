@@ -541,80 +541,159 @@ if CLIENT then
 	
 	-- Adding the spawnmenu options
 	
-	local notdedicated = !game.IsDedicated()
+	local Created
 
 	local function gred_settings_bullets(CPanel)
 		CPanel:ClearControls()
 		
-		if notdedicated then
-			CPanel:AddControl( "CheckBox", { Label = "Should 12mm MGs have a blast radius? (Kills tanks!)", Command = "gred_sv_12mm_he_impact" } );
+		-- if notdedicated then
+			local this = CPanel:CheckBox("Should 12mm MGs have a blast radius? (Kills tanks!)","gred_sv_12mm_he_impact" );
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_override",val)
+			end
 					
-			CPanel:AddControl( "CheckBox", { Label = "Should 7mm MGs have a blast radius? (Kills tanks!)", Command = "gred_sv_7mm_he_impact" } );
+			local this = CPanel:CheckBox("Should 7mm MGs have a blast radius? (Kills tanks!)","gred_sv_7mm_he_impact" );
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_override",val)
+			end
 			
-			CPanel:NumSlider( "Bullet damage multiplier","gred_sv_bullet_dmg",0,10,2 );
+			local this = CPanel:NumSlider( "Bullet damage multiplier","gred_sv_bullet_dmg",0,10,2 );
+			this.ValueChanged = function(this,val)
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_bullet_dmg",val)
+			end
 			
-			CPanel:NumSlider( "Bullet radius multiplier","gred_sv_bullet_radius",0,10,2 );
+			local this = CPanel:NumSlider( "Bullet radius multiplier","gred_sv_bullet_radius",0,10,2 );
+			this.ValueChanged = function(this,val)
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_bullet_radius",val)
+			end
 			
-			CPanel:NumSlider( "Tracer ammo apparition", "gred_sv_tracers", 0, 20, 0 );
+			local this = CPanel:NumSlider( "Tracer ammo apparition", "gred_sv_tracers", 0, 20, 0 );
+			this.ValueChanged = function(this,val)
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_tracers",val)
+			end
 			
 			if hab and hab.Module.PhysBullet then
-				CPanel:AddControl( "CheckBox", { Label = "Override Havok's physical bullets?", Command = "gred_sv_override_hab" } );
+				local this = CPanel:CheckBox("Override Havok's physical bullets?","gred_sv_override_hab" );
+				this.OnChange = function(this,val)
+					val = val and 1 or 0
+					LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_override",val)
+				end
 			end
-		end
+		-- end
 		
-		CPanel:AddControl( "CheckBox", { Label = "Use Insurgency impact effects for 7mm MGs?", Command = "gred_cl_insparticles" } );
-				
-		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 7mm MGs?", Command = "gred_cl_noparticles_7mm" } );
-				
-		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 12mm MGs?", Command = "gred_cl_noparticles_12mm" } );
-			
-		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 20mm cannons?", Command = "gred_cl_noparticles_20mm" } );
-				
-		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 30mm cannons?", Command = "gred_cl_noparticles_30mm" } );
-			
-		CPanel:AddControl( "CheckBox", { Label = "Disable impact effects for 40mm cannons?", Command = "gred_cl_noparticles_40mm" } );
-				
-		CPanel:AddControl( "CheckBox", { Label = "Disable water impact effects?", Command = "gred_cl_nowaterimpacts" } );
+		CPanel:CheckBox("Use Insurgency impact effects for 7mm MGs?","gred_cl_insparticles" );
+		
+		CPanel:CheckBox("Disable impact effects for 7mm MGs?","gred_cl_noparticles_7mm" );
+		
+		CPanel:CheckBox("Disable impact effects for 12mm MGs?","gred_cl_noparticles_12mm" );
+		
+		CPanel:CheckBox("Disable impact effects for 20mm cannons?","gred_cl_noparticles_20mm" );
+		
+		CPanel:CheckBox("Disable impact effects for 30mm cannons?","gred_cl_noparticles_30mm" );
+		
+		CPanel:CheckBox("Disable impact effects for 40mm cannons?","gred_cl_noparticles_40mm" );
+		
+		CPanel:CheckBox("Disable water impact effects?","gred_cl_nowaterimpacts" );
 	end
 
 	local function gred_settings_wac(CPanel)
 		CPanel:ClearControls()
 		
 		CPanel:AddPanel( plane );
-		if notdedicated then
+		-- if notdedicated then
 		
-			CPanel:AddControl( "CheckBox", { Label = "Override the WAC base?", Command = "gred_sv_wac_override" } );
+			local this = CPanel:CheckBox("Override the WAC base?","gred_sv_wac_override");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_override",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Use old rockets?", Command = "gred_sv_oldrockets" } );
+			local this = CPanel:CheckBox("Use old rockets?","gred_sv_oldrockets");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_oldrockets",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Enable bombs in aircrafts?", Command = "gred_sv_wac_bombs" } );
+			local this = CPanel:CheckBox("Enable bombs in aircrafts?","gred_sv_wac_bombs");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_bombs",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Enable radio sounds?", Command = "gred_sv_wac_radio" } );
+			local this = CPanel:CheckBox("Enable radio sounds?","gred_sv_wac_radio");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_radio",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Should jets be very fast?", Command = "gred_jets_speed" } );
+			local this = CPanel:CheckBox("Should jets be very fast?","gred_jets_speed");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_jets_speed",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Should aircrafts crash underwater?", Command = "gred_sv_wac_explosion_water" } );
+			local this = CPanel:CheckBox("Should aircrafts crash underwater?","gred_sv_wac_explosion_water");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_explosion_water",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Should aircrafts crash?", Command = "gred_sv_wac_explosion" } );
+			local this = CPanel:CheckBox("Should aircrafts crash?","gred_sv_wac_explosion");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_explosion",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Use the default WAC munitions?", Command = "gred_sv_default_wac_munitions" } );
+			local this = CPanel:CheckBox("Use the default WAC munitions?","gred_sv_default_wac_munitions");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_default_wac_munitions",val)
+			end
 		
-			CPanel:AddControl( "CheckBox", { Label = "Should helicopters spin when their health is low?", Command = "gred_sv_wac_heli_spin" } );
+			local this = CPanel:CheckBox("Should helicopters spin when their health is low?","gred_sv_wac_heli_spin");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_heli_spin",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Use a custom health system?", Command = "gred_sv_enablehealth" } );
+			local this = CPanel:CheckBox("Use a custom health system?","gred_sv_enablehealth");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_enablehealth",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Use a health per engine system?", Command = "gred_sv_enableenginehealth" } );
+			local this = CPanel:CheckBox("Use a health per engine system?","gred_sv_enableenginehealth");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_enableenginehealth",val)
+			end
 			
-			CPanel:NumSlider( "Default engine health", "gred_sv_healthslider", 1, 1000, 0 );
+			local this = CPanel:NumSlider( "Default engine health", "gred_sv_healthslider", 1, 1000, 0 );
+			this.ValueChanged = function(this,val)
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_healthslider",val)
+			end
 			
-			CPanel:NumSlider( "Helicopter spin chance", "gred_sv_wac_heli_spin_chance", 1, 10, 0 );
+			local this = CPanel:NumSlider( "Helicopter spin chance", "gred_sv_wac_heli_spin_chance", 1, 10, 0 );
+			this.ValueChanged = function(this,val)
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_heli_spin_chance",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Use alternative fire particles?", Command = "gred_sv_fire_effect" } );
+			local this = CPanel:CheckBox("Use alternative fire particles?","gred_sv_fire_effect");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_fire_effect",val)
+			end
 				
-			CPanel:AddControl( "CheckBox", { Label = "Use multiple fire particles?", Command = "gred_sv_multiple_fire_effects" } );
-		end
+			local this = CPanel:CheckBox("Use multiple fire particles?","gred_sv_multiple_fire_effects");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_multiple_fire_effects",val)
+			end
+		-- end
 		
-		CPanel:AddControl( "CheckBox", { Label = "Enable explosion particles?", Command = "gred_cl_wac_explosions" } );
+		CPanel:CheckBox("Enable explosion particles?","gred_cl_wac_explosions");
 		
 	end
 
@@ -634,9 +713,8 @@ if CLIENT then
 		-- end
 		-- CPanel:AddPanel( plane );
 		
-		CPanel:AddControl( "CheckBox", { Label = "Use an alternative muzzleflash?", Command = "gred_cl_altmuzzleeffect" } );
-		
-		CPanel:AddControl( "CheckBox", { Label = "Enable pop ups about missing content?", Command = "gred_cl_enable_popups" } );
+		CPanel:CheckBox("Use an alternative muzzleflash?","gred_cl_altmuzzleeffect");
+		CPanel:CheckBox("Enable pop ups about missing content?","gred_cl_enable_popups");
 	end
 
 	local function gred_settings_lfs(CPanel)
@@ -654,13 +732,20 @@ if CLIENT then
 			-- surface.PlaySound( psnd );
 		-- end
 		-- CPanel:AddPanel( plane );
-		if notdedicated then
+		-- if notdedicated then
 		
-			CPanel:NumSlider( "Aircraft health multiplier", "gred_sv_lfs_healthmultiplier", 1, 10, 2 );
+			local this = CPanel:NumSlider( "Aircraft health multiplier", "gred_sv_lfs_healthmultiplier", 1, 10, 2 );
+			this.ValueChanged = function(this,val)
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_lfs_healthmultiplier",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Should the health multiplier only apply to Gredwitch's LFS aircrafts?", Command = "gred_sv_lfs_healthmultiplier_all" } );
+			local this = CPanel:CheckBox("Should the health multiplier only apply to Gredwitch's LFS aircrafts?","gred_sv_lfs_healthmultiplier_all");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_lfs_healthmultiplier_all",val)
+			end
 			
-		end
+		-- end
 	end
 
 	local function gred_settings_bombs(CPanel)
@@ -678,24 +763,50 @@ if CLIENT then
 		end
 		CPanel:AddPanel( logo );
 		
-		CPanel:AddControl( "CheckBox", { Label = "Should there be sound shake?", Command = "gred_cl_sound_shake" } );
-		if notdedicated then
-			CPanel:AddControl( "CheckBox", { Label = "Should all bombs unweld and unfreeze?", Command = "gred_sv_shockwave_unfreeze" } );
-			
-			CPanel:NumSlider( "Forcefield Max Range", "gred_sv_maxforcefield_range", 10, 10000, 0 );
-			
-			CPanel:NumSlider( "Sound muffling divider", "gred_sv_soundspeed_divider", 1, 3, 0 );
+		CPanel:CheckBox("Should there be sound shake?","gred_cl_sound_shake");
 		
-			CPanel:NumSlider( "Shell speed multiplier", "gred_sv_shellspeed_multiplier", 0, 3, 2 );
+		-- if notdedicated then
+			local this = CPanel:CheckBox("Should all bombs unweld and unfreeze?","gred_sv_shockwave_unfreeze");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_shockwave_unfreeze",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Should bombs be easily armed?", Command = "gred_sv_easyuse" } );
+			local this = CPanel:NumSlider( "Forcefield Max Range","gred_sv_maxforcefield_range", 10, 10000, 0 );
+			this.ValueChanged = function(this,val)
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_maxforcefield_range",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Should explosives be spawnable?", Command = "gred_sv_spawnable_bombs" } );
+			local this = CPanel:NumSlider( "Sound muffling divider", "gred_sv_soundspeed_divider", 1, 3, 0 );
+			this.ValueChanged = function(this,val)
+				LocalPlayer():ConCommand("gred_changesetting", "gred_sv_soundspeed_divider",val)
+			end
+		
+			local this = CPanel:NumSlider( "Shell speed multiplier", "gred_sv_shellspeed_multiplier", 0, 3, 2 );
+			this.ValueChanged = function(this,val)
+				LocalPlayer():ConCommand("gred_changesetting", "gred_sv_shellspeed_multiplier",val)
+			end
 			
-			CPanel:AddControl( "CheckBox", { Label = "Should bombs arm when hit or dropped?", Command = "gred_sv_fragility" } );
-		end
+			local this = CPanel:CheckBox("Should bombs be easily armed?","gred_sv_easyuse");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_easyuse",val)
+			end
 			
-		CPanel:AddControl( "CheckBox", { Label = "Should bombs leave decals behind?", Command = "gred_cl_decals" } );
+			local this = CPanel:CheckBox("Should explosives be spawnable?","gred_sv_spawnable_bombs");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_easyuse",val)
+			end
+			
+			local this = CPanel:CheckBox("Should bombs arm when hit or dropped?","gred_sv_fragility");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				LocalPlayer():ConCommand("gred_changesetting","gred_sv_fragility",val)
+			end
+		-- end
+			
+		CPanel:CheckBox("Should bombs leave decals behind?","gred_cl_decals");
 		
 	end
 	
@@ -828,7 +939,15 @@ if CLIENT then
 		end
 	end)
 else
-
+	concommand.Add("gred_changesetting",function(ply,cmd,args)
+		local str,val = args[1],args[2]
+		if !str or !val then return end
+		local cvar = GetConVar(str)
+		if !cvar then return end
+		if !ply:IsAdmin() then return end
+		cvar:SetFloat(val)
+		
+	end)
 	local OverrideHAB = GetConVar("gred_sv_override_hab")
 	local Tracers = GetConVar("gred_sv_tracers")
 	local BulletDMG = GetConVar("gred_sv_bullet_dmg")
@@ -1204,21 +1323,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 						
 						gred.CreateSound(pos,false,"explosions/fuel_depot_explode_close.wav","explosions/fuel_depot_explode_dist.wav","explosions/fuel_depot_explode_far.wav")
 						
-						local ent = ents.Create("shockwave_ent")
-						ent:SetPos( pos ) 
-						ent:Spawn()
-						ent:Activate()
-						ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
-						ent:SetVar("DEFAULT_PHYSFORCE_PLYAIR", self.DEFAULT_PHYSFORCE_PLYAIR)
-						ent:SetVar("DEFAULT_PHYSFORCE_PLYGROUND", self.DEFAULT_PHYSFORCE_PLYGROUND)
-						ent:SetVar("GBOWNER", self.GBOWNER)
-						ent:SetVar("SHOCKWAVEDAMAGE",1000)
-						ent:SetVar("SHOCKWAVE_INCREMENT",50)
-						ent:SetVar("DELAY",0.01)
-						ent.trace=self.TraceLength
-						ent.decal=self.Decal
 						self:Remove()
-						-- local effect = "doi_petrol_explosion"
 						if radius <= 300 then
 							local effectdata = EffectData()
 							effectdata:SetOrigin(pos)
@@ -1226,7 +1331,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 							effectdata:SetFlags(1)
 							effectdata:SetSurfaceProp(1)
 							util.Effect("gred_particle_wac_explosion",effectdata)
-							ent:SetVar("MAX_RANGE",600)
+							radius = 600
 						elseif radius <= 500 then
 							local effectdata = EffectData()
 							effectdata:SetOrigin(pos)
@@ -1235,7 +1340,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 							effectdata:SetSurfaceProp(1)
 							util.Effect("gred_particle_wac_explosion",effectdata)
 							
-							ent:SetVar("MAX_RANGE",800)
+							radius = 800
 						elseif radius <= 2000 then
 							local effectdata = EffectData()
 							effectdata:SetOrigin(pos)
@@ -1243,8 +1348,9 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 							effectdata:SetFlags(9)
 							effectdata:SetSurfaceProp(1)
 							util.Effect("gred_particle_wac_explosion",effectdata)
-							ent:SetVar("MAX_RANGE",1000)
+							radius = 1000
 						end
+						gred.CreateExplosion(pos,radius,1000,self.Decal,self.TraceLength,self.GBOWNER,self,self.DEFAULT_PHYSFORCE,self.DEFAULT_PHYSFORCE_PLYGROUND,self.DEFAULT_PHYSFORCE_PLYAIR)
 					end
 					 
 					ent.PhysicsCollide = function(self,cdat, phys)
