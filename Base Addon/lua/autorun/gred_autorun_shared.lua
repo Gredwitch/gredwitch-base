@@ -16,7 +16,7 @@ local CreateConVar = CreateConVar
 local CreateClientConVar = CreateClientConVar
 local tableinsert = table.insert
 local IsValid = IsValid
-
+local DMG_BLAST = DMG_BLAST
 if SERVER then
 	resource.AddWorkshop(1131455085) -- Base addon
 	local utilAddNetworkString = util.AddNetworkString
@@ -25,6 +25,69 @@ if SERVER then
 	utilAddNetworkString("gred_net_bombs_decals")
 	utilAddNetworkString("gred_net_nw_var")
 	local soundSpeed = 16797.9*16797.9 -- 320m/s
+	
+	gred.CreateExplosion = function(pos,radius,damage,decal,trace,ply,bomb,DEFAULT_PHYSFORCE,DEFAULT_PHYSFORCE_PLYGROUND,DEFAULT_PHYSFORCE_PLYAIR)
+		local ConVar = GetConVar("gred_sv_shockwave_unfreeze"):GetInt() >= 1
+		net.Start("gred_net_bombs_decals")
+			net.WriteString(decal and decal or "scorch_medium")
+			net.WriteVector(pos)
+			net.WriteVector(pos-Vector(0,0,trace))
+		net.Broadcast()
+		debugoverlay.Sphere(pos,radius,3, Color( 255, 255, 255 ))
+		ply = IsValid(ply) and ply or bomb
+		util.BlastDamage(bomb,ply,pos,radius,damage)
+		for k,v in pairs(ents.FindInSphere(pos,radius)) do
+			local v_pos = v:GetPos()
+			
+			local phys = v:GetPhysicsObject()
+			local F_dir
+			if IsValid(phys) then
+				if !v.IsOnPlane then
+					local F_ang = DEFAULT_PHYSFORCE
+					local dist = (pos - v_pos):Length()
+					local relation = math.Clamp((radius - dist) / radius, 0, 1)
+					if not DEFAULT_PHYSFORCE == nil then
+						F_dir = (v_pos - pos) * DEFAULT_PHYSFORCE
+					else
+						F_dir = (v_pos - pos) * 1
+					end
+					phys:AddAngleVelocity(Vector(F_ang, F_ang, F_ang) * relation)
+					phys:AddVelocity(F_dir)
+					if ConVar then
+						if !v.isWacAircraft and !v.LFS then
+							phys:Wake()
+							phys:EnableMotion(true)
+							constraint.RemoveAll(v)
+						end
+					end
+					-- local class = v:GetClass()
+					-- if class == "func_breakable" or class == "func_breakable_surf" or class == "func_physbox" then
+						-- v:Fire("Break", 0)
+					-- end
+				end
+			end
+			if v:IsPlayer() then
+				if !v:IsOnGround() then
+					v:SetMoveType(MOVETYPE_WALK)
+					if not DEFAULT_PHYSFORCE_PLYAIR == nil then
+						F_dir = (v_pos - pos) * DEFAULT_PHYSFORCE_PLYAIR
+					else
+						F_dir = (v_pos - pos)
+					end
+					v:SetVelocity( F_dir )
+				else
+					v:SetMoveType( MOVETYPE_WALK )
+					local F_ang = DEFAULT_PHYSFORCE_PLYGROUND
+					if not DEFAULT_PHYSFORCE_PLYGROUND == nil then
+						F_dir = (v_pos - pos) * DEFAULT_PHYSFORCE_PLYGROUND
+					else
+						F_dir = (v_pos - pos)
+					end
+					v:SetVelocity( F_dir )
+				end
+			end
+		end
+	end
 	
 	gred.CreateSound = function(pos,rsound,e1,e2,e3)
 		local currange = 1000 / GetConVar("gred_sv_soundspeed_divider"):GetInt()
@@ -71,7 +134,7 @@ if SERVER then
 end
 
 -- Adding particles
-
+-- [[
 CreateConVar("gred_sv_easyuse"					,  "1"  , GRED_SVAR) 
 CreateConVar("gred_sv_maxforcefield_range"		, "5000", GRED_SVAR)
 CreateConVar("gred_sv_12mm_he_impact"			,  "1"  , GRED_SVAR)
@@ -349,7 +412,6 @@ tableinsert(gred.Particles,"doi_wpgrenade_explosion")
 tableinsert(gred.Particles,"ins_c4_explosion")
 tableinsert(gred.Particles,"doi_artillery_explosion_OLD")
 tableinsert(gred.Particles,"gred_highcal_rocket_explosion")
-tableinsert(gred.Particles,"gred_tracers")
 
 tableinsert(gred.Particles,"muzzleflash_bar_3p")
 tableinsert(gred.Particles,"muzzleflash_garand_3p")
@@ -425,7 +487,7 @@ end)
 
 gred.AddonList = gred.AddonList or {}
 tableinsert(gred.AddonList,1582297878) -- Materials
-
+--]]
 if CLIENT then
 	net.Receive ("gred_net_message_ply",function()
 		local msg = net.ReadString()
@@ -518,21 +580,6 @@ if CLIENT then
 	local function gred_settings_wac(CPanel)
 		CPanel:ClearControls()
 		
-		local psounds={}
-		psounds[1]="extras/american/outgoingstraferun1.ogg"
-		psounds[2]="extras/american/outgoingstraferun2.ogg"
-		psounds[3]="extras/american/outgoingstraferun3.ogg"
-		psounds[4]="extras/american/outgoingstraferun4.ogg"
-		psounds[5]="extras/american/outgoingstraferun5.ogg"
-		Created = true;
-		
-		local plane = vgui.Create( "DImageButton" );
-		plane:SetImage( "hud/planes_settings.png" );
-		plane:SetSize( 200, 80 );
-		plane.DoClick = function()
-			local psnd = Sound( table.Random(psounds) );
-			surface.PlaySound( psnd );
-		end
 		CPanel:AddPanel( plane );
 		if notdedicated then
 		
@@ -638,6 +685,8 @@ if CLIENT then
 			CPanel:NumSlider( "Forcefield Max Range", "gred_sv_maxforcefield_range", 10, 10000, 0 );
 			
 			CPanel:NumSlider( "Sound muffling divider", "gred_sv_soundspeed_divider", 1, 3, 0 );
+		
+			CPanel:NumSlider( "Shell speed multiplier", "gred_sv_shellspeed_multiplier", 0, 3, 2 );
 			
 			CPanel:AddControl( "CheckBox", { Label = "Should bombs be easily armed?", Command = "gred_sv_easyuse" } );
 			
@@ -692,6 +741,18 @@ if CLIENT then
 									gred_settings_misc
 		)
 	end );
+	
+	if jit.arch != "x86" then
+		local DFrame = vgui.Create("DFrame")
+		DFrame:SetSize(ScrW()*0.9,ScrH()*0.9)
+		DFrame:SetTitle("YOU ARE USING THE 64 BITS BRANCH WHICH IS BROKEN")
+		DFrame:Center()
+		DFrame:MakePopup()
+		
+		local DHTML = vgui.Create("DHTML",DFrame)
+		DHTML:Dock(FILL)
+		DHTML:OpenURL("https://steamcommunity.com/workshop/filedetails/discussion/1131455085/1640915206496660582/")
+	end
 	
 	-- HAB PhysBullet compatibility
 	timer.Simple(0.1,function()
@@ -972,7 +1033,7 @@ else
 			World = IsValid(World) or Entity(0)
 			BulletID = BulletID + 1
 			local ct = CurTime()
-			local speed = cal == "wac_base_7mm" and 1000 or (cal == "wac_base_12mm" and 700 or (cal == "wac_base_20mm" and 600 or (cal == "wac_base_30mm" and 500 or (cal == "wac_base_40mm" and 400))))
+			local speed = cal == "wac_base_7mm" and 1500 or (cal == "wac_base_12mm" and 1300 or (cal == "wac_base_20mm" and 950 or (cal == "wac_base_30mm" and 830 or (cal == "wac_base_40mm" and 680))))
 			local dmg = (dmg and dmg or (cal == "wac_base_7mm" and 40 or (cal == "wac_base_12mm" and 60 or (cal == "wac_base_20mm" and 80 or (cal == "wac_base_30mm" and 100 or (cal == "wac_base_40mm" and 120)))))) * BulletDMG:GetFloat()
 			local radius = (radius and radius or 70) * HERADIUS:GetFloat()
 			radius = (cal == "wac_base_7mm" and radius or (cal == "wac_base_12mm" and radius or (cal == "wac_base_20mm" and radius*2 or (cal == "wac_base_30mm" and radius*3 or (cal == "wac_base_40mm" and radius*4)))))
@@ -998,12 +1059,10 @@ else
 				end
 				Effect("gred_particle_tracer",effect)
 			end
-			
 			timer.Create("gred_bullet_"..oldbullet,0,0,function()
 				dif = pos + pos - oldpos
 				oldpos = pos
 				local tr = TraceLine({start = pos,endpos = dif,filter = filter,mask = MASK_ALL})
-				
 				if tr.MatType == 83 then
 					local effectdata = EffectData()
 					effectdata:SetOrigin(tr.HitPos)
@@ -1048,6 +1107,8 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 				ent.MaxHealth = ent.MaxHealth * GetConVar("gred_sv_lfs_healthmultiplier"):GetFloat()
 				ent.OldSetupDataTables = ent.SetupDataTables
 				ent.SetupDataTables = function()
+					if ent.DataSet then return end
+					ent.DataSet = true
 					ent:OldSetupDataTables()
 					ent:NetworkVar( "Float",6, "HP", { KeyName = "health", Edit = { type = "Float", order = 2,min = 0, max = ent.MaxHealth, category = "Misc"} } )
 				end

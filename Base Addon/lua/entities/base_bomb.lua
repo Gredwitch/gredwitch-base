@@ -53,12 +53,13 @@ ENT.DEFAULT_PHYSFORCE_PLYAIR         = 500
 ENT.DEFAULT_PHYSFORCE_PLYGROUND      = 5000
 ENT.GBOWNER                          = nil
 
-local fragility = GetConVar("gred_sv_fragility")
+local fragility = GetConVar("gred_sv_fragility") 
 local spawnablebombs = GetConVar("gred_sv_spawnable_bombs")
 local SERVER = SERVER
 
 function ENT:Initialize()
 	if SERVER then
+		spawnablebombs = spawnablebombs or GetConVar("gred_sv_spawnable_bombs")
 		if spawnablebombs:GetInt() == 0 and not self.IsOnPlane then
 			self:Remove()
 			return
@@ -84,10 +85,8 @@ function ENT:Initialize()
 		self.Exploded = false
 		self.Used	= false
 		self.Arming   = false
-		timer.Simple(0,function()
-			if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
-			self:AddOnInit()
-		end)
+		if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
+		self:AddOnInit()
 	end
 end
 
@@ -153,20 +152,21 @@ function ENT:Explode()
 	local pos = self:LocalToWorld(self:OBBCenter())
 	self:AddOnExplode(pos)
 	if not self.Smoke then
-		local ent = ents.Create("shockwave_ent")
-		ent:SetPos(pos)
-		ent:Spawn()
-		ent:Activate()
-		ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
-		ent:SetVar("DEFAULT_PHYSFORCE_PLYAIR", self.DEFAULT_PHYSFORCE_PLYAIR)
-		ent:SetVar("DEFAULT_PHYSFORCE_PLYGROUND", self.DEFAULT_PHYSFORCE_PLYGROUND)
-		ent:SetVar("GBOWNER", self.GBOWNER)
-		ent:SetVar("SHOCKWAVEDAMAGE",self.ExplosionDamage)
-		ent:SetVar("MAX_RANGE",self.ExplosionRadius)
-		ent:SetVar("SHOCKWAVE_INCREMENT",50)
-		ent:SetVar("DELAY",0.01)
-		ent.trace = self.TraceLength
-		ent.decal = self.Decal
+		gred.CreateExplosion(pos,self.ExplosionRadius,self.ExplosionDamage,self.Decal,self.TraceLength,self.GBOWNER,self,self.DEFAULT_PHYSFORCE,self.DEFAULT_PHYSFORCE_PLYGROUND,self.DEFAULT_PHYSFORCE_PLYAIR)
+		-- local ent = ents.Create("shockwave_ent")
+		-- ent:SetPos(pos)
+		-- ent:Spawn()
+		-- ent:Activate()
+		-- ent:SetVar("DEFAULT_PHYSFORCE", self.DEFAULT_PHYSFORCE)
+		-- ent:SetVar("DEFAULT_PHYSFORCE_PLYAIR", self.DEFAULT_PHYSFORCE_PLYAIR)
+		-- ent:SetVar("DEFAULT_PHYSFORCE_PLYGROUND", self.DEFAULT_PHYSFORCE_PLYGROUND)
+		-- ent:SetVar("GBOWNER", self.GBOWNER)
+		-- ent:SetVar("SHOCKWAVEDAMAGE",self.ExplosionDamage)
+		-- ent:SetVar("MAX_RANGE",self.ExplosionRadius)
+		-- ent:SetVar("SHOCKWAVE_INCREMENT",50)
+		-- ent:SetVar("DELAY",0.01)
+		-- ent.trace = self.TraceLength
+		-- ent.decal = self.Decal
 	end
 	local effectdata = EffectData()
 	if(self:WaterLevel() >= 1) then

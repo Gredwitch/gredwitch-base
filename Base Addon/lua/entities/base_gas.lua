@@ -32,7 +32,7 @@ function ENT:Think()
 	if !self:IsValid() then return end
 	local ct = CurTime()
 	local dmg = DamageInfo()
-	dmg:SetDamage(math.random(self.Damage))
+	dmg:SetDamage(self.Damage)
 	valid = IsValid(self.GBOWNER)
 	ovalid = IsValid(self.Owner)
 	if !valid and ovalid then self.GBOWNER = self.Owner

@@ -54,8 +54,8 @@ ENT.ShouldIgnite                     =  false
 ENT.SmartLaunch                      =  true
 ENT.Timed                            =  false
 
-ENT.APDamage						 =  1005
-ENT.ExplosionDamage                  =  350
+ENT.APDamage						 =  1000
+ENT.ExplosionDamage                  =  150
 ENT.EnginePower                      =  100
 ENT.ExplosionRadius                  =  350
 ENT.ModelSize						 =	0.5

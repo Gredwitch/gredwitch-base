@@ -211,48 +211,53 @@ function ENT:Launch()
 	
 	local phys = self:GetPhysicsObject()
 	if !phys:IsValid() then return end
-	
 	self.Fired = true
 	if(self.SmartLaunch) then
 		constraint.RemoveAll(self)
 	end
-	timer.Simple(0.05,function()
-	    if not self:IsValid() then return end
-	    if(phys:IsValid()) then
-		   phys:Wake()
-		    phys:EnableMotion(true)
-	    end
-	end)
-	timer.Simple(self.IgnitionDelay,function()
-	    if not self:IsValid() then return end  -- Make a short ignition delay!
-		self:SetNetworkedBool("Exploded",true)
-		self:SetNetworkedInt("LightRed", self.LightRed)
-		self:SetNetworkedInt("LightBlue", self.LightBlue)
-		self:SetNetworkedInt("LightGreen", self.LightGreen)	
-		self:SetNetworkedBool("EmitLight",true)
-		self:SetNetworkedInt("LightEmitTime", self.LightEmitTime)
-		self:SetNetworkedInt("LightBrightness", self.LightBrightness)
-		self:SetNetworkedInt("LightSize", self.LightSize)
-		local phys = self:GetPhysicsObject()
-		self.Ignition = true
-		self:Arm()
-		local pos = self:GetPos()
-		sound.Play(self.StartSound, pos, 120, 100,1)
-	    -- self:EmitSound(self.EngineSound)
-		self:SetNetworkedBool("EmitLight",true)
-		self:SetNetworkedBool("self.Ignition",true)
-		if self.RocketTrail != "" then ParticleEffectAttach(self.RocketTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
-		if(self.FuelBurnoutTime != 0) then 
-		   timer.Simple(self.FuelBurnoutTime,function()
-			  if not self:IsValid() then return end 
-			  self.Burnt = true
-			  self:StopParticles()
-			  self:StopSound(self.EngineSound)
-				self:StopSound(self.StartSound)
-			 if self.RocketBurnoutTrail != "" then ParticleEffectAttach(self.RocketBurnoutTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
-		   end)	
-		end
-	end)		
+	phys:Wake()
+	phys:EnableMotion(true)
+	if self.IgnitionDelay > 0 then
+		timer.Simple(self.IgnitionDelay,function()
+			if not IsValid(phys) then return end
+			self:InitLaunch(phys)
+		end)
+	else
+		self:InitLaunch(phys)
+	end
+end
+
+function ENT:InitLaunch(phys)
+	self:SetNetworkedBool("Exploded",true)
+	self:SetNetworkedInt("LightRed", self.LightRed)
+	self:SetNetworkedInt("LightBlue", self.LightBlue)
+	self:SetNetworkedInt("LightGreen", self.LightGreen)	
+	self:SetNetworkedBool("EmitLight",true)
+	self:SetNetworkedInt("LightEmitTime", self.LightEmitTime)
+	self:SetNetworkedInt("LightBrightness", self.LightBrightness)
+	self:SetNetworkedInt("LightSize", self.LightSize)
+	self.Ignition = true
+	self:Arm()
+	local pos = self:GetPos()
+	sound.Play(self.StartSound, pos, 120, 100,1)
+	-- self:EmitSound(self.EngineSound)
+	self:SetNetworkedBool("EmitLight",true)
+	self:SetNetworkedBool("self.Ignition",true)
+	if self.IsShell then
+		phys:AddVelocity(self:GetForward() * self.EnginePower)
+		return
+	end
+	if self.RocketTrail != "" then ParticleEffectAttach(self.RocketTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
+	if(self.FuelBurnoutTime != 0) then 
+		timer.Simple(self.FuelBurnoutTime,function()
+			if not self:IsValid() then return end
+			self.Burnt = true
+			self:StopParticles()
+			self:StopSound(self.EngineSound)
+			self:StopSound(self.StartSound)
+			if self.RocketBurnoutTrail != "" then ParticleEffectAttach(self.RocketBurnoutTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
+		end)
+	end
 end
 
 function ENT:Think()
@@ -262,18 +267,20 @@ function ENT:Think()
 	if(!self:IsValid()) then return end -- if we aren't good then something fucked up
 	local phys = self:GetPhysicsObject()
 	local thrustpos = self:GetPos()
-	if(self.ForceOrientation == "RIGHT") then
-	    phys:AddVelocity(self:GetRight() * self.EnginePower) -- Continuous engine impulse
-	elseif(self.ForceOrientation == "LEFT") then
-	    phys:AddVelocity(self:GetRight() * -self.EnginePower) -- Continuous engine impulse
-	elseif(self.ForceOrientation == "UP") then
-	    phys:AddVelocity(self:GetUp() * self.EnginePower) -- Continuous engine impulse
-	elseif(self.ForceOrientation == "DOWN") then 
-	    phys:AddVelocity(self:GetUp() * -self.EnginePower) -- Continuous engine impulse
-	elseif(self.ForceOrientation == "INV") then
-	    phys:AddVelocity(self:GetForward() * -self.EnginePower) -- Continuous engine impulse
-	else
-		phys:AddVelocity(self:GetForward() * self.EnginePower) -- Continuous engine impulse
+	if !self.IsShell then
+		if(self.ForceOrientation == "RIGHT") then
+			phys:AddVelocity(self:GetRight() * self.EnginePower) -- Continuous engine impulse
+		elseif(self.ForceOrientation == "LEFT") then
+			phys:AddVelocity(self:GetRight() * -self.EnginePower) -- Continuous engine impulse
+		elseif(self.ForceOrientation == "UP") then
+			phys:AddVelocity(self:GetUp() * self.EnginePower) -- Continuous engine impulse
+		elseif(self.ForceOrientation == "DOWN") then 
+			phys:AddVelocity(self:GetUp() * -self.EnginePower) -- Continuous engine impulse
+		elseif(self.ForceOrientation == "INV") then
+			phys:AddVelocity(self:GetForward() * -self.EnginePower) -- Continuous engine impulse
+		else
+			phys:AddVelocity(self:GetForward() * self.EnginePower) -- Continuous engine impulse
+		end
 	end
 	if (self.Armed) then
 	   phys:AddAngleVelocity(Vector(self.RotationalForce,0,0)) -- Rotational force

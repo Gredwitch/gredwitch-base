@@ -32,9 +32,7 @@ function ENT:Think()
 		if !self:IsValid() then return end
 		
 		for k, v in pairs(ents.FindInSphere(self:GetPos(),self.Radius)) do
-			if !v:IsOnFire() then
 				if v:IsPlayer() or v:IsNPC() then
-					if v:GetClass()=="npc_helicopter" then return end
 					v:Ignite(10,10)
 				else
 					local phys = self:GetPhysicsObject()
@@ -42,7 +40,6 @@ function ENT:Think()
 						v:Ignite(10,10)
 					end
 				end
-			end
 		end
 		self.Bursts = self.Bursts + 1
 		if (self.Bursts >= self.Lifetime) then

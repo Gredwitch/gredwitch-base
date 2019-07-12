@@ -119,6 +119,7 @@ ENT.ArmDelay                         =  0
 ENT.ForceOrientation                 =  "NORMAL"
 ENT.Timer                            =  0
 ENT.Smoke							 =  false
+ENT.IsShell							 =	true
 
 ENT.RSound   						 =  1
 ENT.ModelSize						 =	1
@@ -134,7 +135,7 @@ end
 function ENT:AddOnInit()
 	local m = GetConVar("gred_sv_shellspeed_multiplier"):GetFloat()
 	if m > 0 then
-		self.EnginePower = self.EnginePower * m
+		self.EnginePower = (self.EnginePower * m) - (self.AP and 0 or self.Mass*30)
 	end
 	if !self.AP then 
 		self:SetBodygroup(1,1)
@@ -182,8 +183,17 @@ function ENT:AddOnExplode(pos)
 		if self.AP then
 			self.EffectAir = "AP_impact_wall"
 			local fwd = self:GetForward()
-			local tr = util.QuickTrace(pos - fwd*2,pos + pos-self:GetAngles():Forward()*1000,self.Entity)
+			local tr = util.QuickTrace(pos - fwd*2,fwd*(self.APDamage*0.001),self)
 			local hitmat = util.GetSurfacePropName(tr.SurfaceProps)
+			local class
+			for k,v in pairs(ents.FindInSphere(tr.HitPos,15)) do
+				class = v:GetClass()
+				if class == "gmod_sent_vehicle_fphysics_base" or class == "gmod_sent_vehicle_fphysics_wheel" then
+					hitmat = "metal"
+					self.ExplosionRadius = 80
+					break
+				end
+			end
 			if materials[hitmat] == 1 then
 				self.Effect = "AP_impact_wall"
 				self.ExplosionSound = table.Random(APMetalSounds)
@@ -228,7 +238,7 @@ if CLIENT then
 		self.snd["wiz"] = CreateSound(self,"bomb/tank_shellwhiz.wav")
 		self.snd["trail"] = CreateSound(self,"bomb/shell_trail.wav")
 		timer.Simple(0.1,function()
-			if !self:GetIsAP() then
+			if self.GetIsAP and !self:GetIsAP() then -- sometimes the func just doesn't exist
 				self.snd["wiz_mortar"] = CreateSound(self,"bomb/shellwhiz_mortar_"..math.random(1,2)..".wav")
 			end
 		end)

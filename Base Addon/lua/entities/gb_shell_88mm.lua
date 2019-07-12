@@ -40,7 +40,7 @@ ENT.Author			                 =  "Gredwitch"
 ENT.Contact			                 =  "qhamitouche@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 ENT.Model                            =  "models/gredwitch/bombs/75mm_shell.mdl"
-ENT.Mass                             =  137
+ENT.Mass                             =  107
 
 ENT.Effect                           =  "doi_artillery_explosion"
 ENT.EffectAir                        =  "doi_artillery_explosion"
@@ -61,8 +61,8 @@ ENT.ShouldIgnite                     =  false
 ENT.SmartLaunch                      =  true
 ENT.Timed                            =  false
 
-ENT.APDamage						 =  880
-ENT.EnginePower                      =  150
+ENT.APDamage						 =  6000
+ENT.EnginePower                      =  6900
 ENT.ExplosionDamage                  =  100
 ENT.ExplosionRadius                  =  500
 
