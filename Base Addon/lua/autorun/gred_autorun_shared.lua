@@ -17,121 +17,6 @@ local CreateClientConVar = CreateClientConVar
 local tableinsert = table.insert
 local IsValid = IsValid
 local DMG_BLAST = DMG_BLAST
-if SERVER then
-	resource.AddWorkshop(1131455085) -- Base addon
-	local utilAddNetworkString = util.AddNetworkString
-	utilAddNetworkString("gred_net_sound_lowsh")
-	utilAddNetworkString("gred_net_message_ply")
-	utilAddNetworkString("gred_net_bombs_decals")
-	utilAddNetworkString("gred_net_nw_var")
-	local soundSpeed = 16797.9*16797.9 -- 320m/s
-	
-	gred.CreateExplosion = function(pos,radius,damage,decal,trace,ply,bomb,DEFAULT_PHYSFORCE,DEFAULT_PHYSFORCE_PLYGROUND,DEFAULT_PHYSFORCE_PLYAIR)
-		local ConVar = GetConVar("gred_sv_shockwave_unfreeze"):GetInt() >= 1
-		net.Start("gred_net_bombs_decals")
-			net.WriteString(decal and decal or "scorch_medium")
-			net.WriteVector(pos)
-			net.WriteVector(pos-Vector(0,0,trace))
-		net.Broadcast()
-		debugoverlay.Sphere(pos,radius,3, Color( 255, 255, 255 ))
-		ply = IsValid(ply) and ply or bomb
-		util.BlastDamage(bomb,ply,pos,radius,damage)
-		for k,v in pairs(ents.FindInSphere(pos,radius)) do
-			local v_pos = v:GetPos()
-			
-			local phys = v:GetPhysicsObject()
-			local F_dir
-			if IsValid(phys) then
-				if !v.IsOnPlane then
-					local F_ang = DEFAULT_PHYSFORCE
-					local dist = (pos - v_pos):Length()
-					local relation = math.Clamp((radius - dist) / radius, 0, 1)
-					if not DEFAULT_PHYSFORCE == nil then
-						F_dir = (v_pos - pos) * DEFAULT_PHYSFORCE
-					else
-						F_dir = (v_pos - pos) * 1
-					end
-					phys:AddAngleVelocity(Vector(F_ang, F_ang, F_ang) * relation)
-					phys:AddVelocity(F_dir)
-					if ConVar then
-						if !v.isWacAircraft and !v.LFS then
-							phys:Wake()
-							phys:EnableMotion(true)
-							constraint.RemoveAll(v)
-						end
-					end
-					-- local class = v:GetClass()
-					-- if class == "func_breakable" or class == "func_breakable_surf" or class == "func_physbox" then
-						-- v:Fire("Break", 0)
-					-- end
-				end
-			end
-			if v:IsPlayer() then
-				if !v:IsOnGround() then
-					v:SetMoveType(MOVETYPE_WALK)
-					if not DEFAULT_PHYSFORCE_PLYAIR == nil then
-						F_dir = (v_pos - pos) * DEFAULT_PHYSFORCE_PLYAIR
-					else
-						F_dir = (v_pos - pos)
-					end
-					v:SetVelocity( F_dir )
-				else
-					v:SetMoveType( MOVETYPE_WALK )
-					local F_ang = DEFAULT_PHYSFORCE_PLYGROUND
-					if not DEFAULT_PHYSFORCE_PLYGROUND == nil then
-						F_dir = (v_pos - pos) * DEFAULT_PHYSFORCE_PLYGROUND
-					else
-						F_dir = (v_pos - pos)
-					end
-					v:SetVelocity( F_dir )
-				end
-			end
-		end
-	end
-	
-	gred.CreateSound = function(pos,rsound,e1,e2,e3)
-		local currange = 1000 / GetConVar("gred_sv_soundspeed_divider"):GetInt()
-		
-		local curRange_min = currange*5
-		curRange_min = curRange_min*curRange_min
-		local curRange_mid = currange*14
-		curRange_mid = curRange_mid * curRange_mid
-		local curRange_max = currange*40
-		curRange_max = curRange_max * curRange_max
-		
-		for k,v in pairs(player.GetHumans()) do
-			local ply = v:GetViewEntity()
-			local distance = ply:GetPos():DistToSqr(pos)
-			
-			if distance <= curRange_min then
-			
-				if v:GetInfoNum("gred_sound_shake",1) == 1 then
-					util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
-				end
-				
-				net.Start("gred_net_sound_lowsh")
-					net.WriteString(e1)
-				net.Send(v)
-				
-			elseif distance <= curRange_mid then
-				timer.Simple(distance/soundSpeed,function()
-					if v:GetInfoNum("gred_sound_shake",1) == 1 then
-						util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
-					end
-					net.Start("gred_net_sound_lowsh")
-						net.WriteString(!rsound and e2 or e1)
-					net.Send(v)
-				end)
-			elseif distance <= curRange_max then
-				timer.Simple(distance/soundSpeed,function()
-					net.Start("gred_net_sound_lowsh")
-						net.WriteString(!rsound and e3 or e1)
-					net.Send(v)
-				end)
-			end
-		end
-	end
-end
 
 -- Adding particles
 -- [[
@@ -174,49 +59,6 @@ tableinsert(gred.Calibre,"wac_base_12mm")
 tableinsert(gred.Calibre,"wac_base_20mm")
 tableinsert(gred.Calibre,"wac_base_30mm")
 tableinsert(gred.Calibre,"wac_base_40mm")
-
--- if true then
-gameAddParticles( "particles/doi_explosion_fx.pcf")
-gameAddParticles( "particles/doi_explosion_fx_b.pcf")
-gameAddParticles( "particles/doi_explosion_fx_c.pcf")
-gameAddParticles( "particles/doi_explosion_fx_grenade.pcf")
-gameAddParticles( "particles/doi_explosion_fx_new.pcf")
-gameAddParticles( "particles/doi_impact_fx.pcf" )
-gameAddParticles( "particles/doi_weapon_fx.pcf" )
-
-gameAddParticles( "particles/gb_water.pcf")
-gameAddParticles( "particles/gb5_100lb.pcf")
-gameAddParticles( "particles/gb5_500lb.pcf")
-gameAddParticles( "particles/gb5_1000lb.pcf")
-gameAddParticles( "particles/gb5_jdam.pcf")
-gameAddParticles( "particles/gb5_large_explosion.pcf")
-gameAddParticles( "particles/gb5_napalm.pcf")
-gameAddParticles( "particles/gb5_light_bomb.pcf")
-gameAddParticles( "particles/gb5_high_explosive_2.pcf")
-gameAddParticles( "particles/gb5_high_explosive.pcf")
-gameAddParticles( "particles/gb5_fireboom.pcf")
-gameAddParticles( "particles/neuro_tank_ap.pcf")
-
-gameAddParticles( "particles/ins_rockettrail.pcf")
-gameAddParticles( "particles/ammo_cache_ins.pcf")
-gameAddParticles( "particles/doi_rockettrail.pcf")
-gameAddParticles( "particles/mnb_flamethrower.pcf")
-gameAddParticles( "particles/impact_fx_ins.pcf" )
-gameAddParticles( "particles/environment_fx.pcf")
-gameAddParticles( "particles/water_impact.pcf")
-gameAddParticles( "particles/explosion_fx_ins.pcf")
-gameAddParticles( "particles/weapon_fx_tracers.pcf" )
-gameAddParticles( "particles/weapon_fx_ins.pcf" )
-
-gameAddParticles( "particles/gred_particles.pcf" )
-gameAddParticles( "particles/fire_01.pcf" )
-gameAddParticles( "particles/doi_explosions_smoke.pcf" )
-gameAddParticles( "particles/explosion_fx_ins_b.pcf" )
-gameAddParticles( "particles/ins_smokegrenade.pcf" )
-gameAddParticles( "particles/ww1_gas.pcf" )
-
--- Precaching main particles
-gred.Particles = {} 
 gred.Mats = {
 	default_silent			=	-1,
 	floatingstandable		=	-1,
@@ -332,178 +174,224 @@ gred.Mats = {
 		
 	computer				=	24,
 }
-						
-tableinsert(gred.Particles,"gred_20mm")
-tableinsert(gred.Particles,"gred_20mm_airburst")
-tableinsert(gred.Particles,"gred_40mm")
-tableinsert(gred.Particles,"gred_40mm_airburst")
-tableinsert(gred.Particles,"30cal_impact")
-tableinsert(gred.Particles,"fire_large_01")
-tableinsert(gred.Particles,"30cal_impact")
-tableinsert(gred.Particles,"doi_gunrun_impact")
-tableinsert(gred.Particles,"doi_artillery_explosion")
-tableinsert(gred.Particles,"doi_stuka_explosion")
-tableinsert(gred.Particles,"gred_mortar_explosion")
-tableinsert(gred.Particles,"gred_50mm")
-tableinsert(gred.Particles,"ins_rpg_explosion")
-tableinsert(gred.Particles,"ins_water_explosion")
-tableinsert(gred.Particles,"fireboom_explosion_midair")
-tableinsert(gred.Particles,"doi_petrol_explosion")
 
-tableinsert(gred.Particles,"doi_impact_water")
-tableinsert(gred.Particles,"impact_water")
-tableinsert(gred.Particles,"water_small")
-tableinsert(gred.Particles,"water_medium")
-tableinsert(gred.Particles,"water_huge")
+gred.Precache = function()
+	gameAddParticles( "particles/doi_explosion_fx.pcf")
+	gameAddParticles( "particles/doi_explosion_fx_b.pcf")
+	gameAddParticles( "particles/doi_explosion_fx_c.pcf")
+	gameAddParticles( "particles/doi_explosion_fx_grenade.pcf")
+	gameAddParticles( "particles/doi_explosion_fx_new.pcf")
+	gameAddParticles( "particles/doi_impact_fx.pcf" )
+	gameAddParticles( "particles/doi_weapon_fx.pcf" )
 
-tableinsert(gred.Particles,"muzzleflash_sparks_variant_6")
-tableinsert(gred.Particles,"muzzleflash_1p_glow")
-tableinsert(gred.Particles,"muzzleflash_m590_1p_core")
-tableinsert(gred.Particles,"muzzleflash_smoke_small_variant_1")
-for i = 0,1 do
-	if i == 1 then pcfD = "" else pcfD = "doi_" end
-	tableinsert(gred.Particles,""..pcfD.."impact_concrete")
-	tableinsert(gred.Particles,""..pcfD.."impact_dirt")
-	tableinsert(gred.Particles,""..pcfD.."impact_glass")
-	tableinsert(gred.Particles,""..pcfD.."impact_metal")
-	tableinsert(gred.Particles,""..pcfD.."impact_sand")
-	tableinsert(gred.Particles,""..pcfD.."impact_snow")
-	tableinsert(gred.Particles,""..pcfD.."impact_leaves")
-	tableinsert(gred.Particles,""..pcfD.."impact_wood")
-	tableinsert(gred.Particles,""..pcfD.."impact_grass")
-	tableinsert(gred.Particles,""..pcfD.."impact_tile")
-	tableinsert(gred.Particles,""..pcfD.."impact_plastic")
-	tableinsert(gred.Particles,""..pcfD.."impact_rock")
-	tableinsert(gred.Particles,""..pcfD.."impact_gravel")
-	tableinsert(gred.Particles,""..pcfD.."impact_mud")
-	tableinsert(gred.Particles,""..pcfD.."impact_fruit")
-	tableinsert(gred.Particles,""..pcfD.."impact_asphalt")
-	tableinsert(gred.Particles,""..pcfD.."impact_cardboard")
-	tableinsert(gred.Particles,""..pcfD.."impact_rubber")
-	tableinsert(gred.Particles,""..pcfD.."impact_carpet")
-	tableinsert(gred.Particles,""..pcfD.."impact_brick")
-	tableinsert(gred.Particles,""..pcfD.."impact_leaves")
-	tableinsert(gred.Particles,""..pcfD.."impact_paper")
-	tableinsert(gred.Particles,""..pcfD.."impact_computer")
-end
+	gameAddParticles( "particles/gb_water.pcf")
+	gameAddParticles( "particles/gb5_100lb.pcf")
+	gameAddParticles( "particles/gb5_500lb.pcf")
+	gameAddParticles( "particles/gb5_1000lb.pcf")
+	gameAddParticles( "particles/gb5_jdam.pcf")
+	gameAddParticles( "particles/gb5_large_explosion.pcf")
+	gameAddParticles( "particles/gb5_napalm.pcf")
+	gameAddParticles( "particles/gb5_light_bomb.pcf")
+	gameAddParticles( "particles/gb5_high_explosive_2.pcf")
+	gameAddParticles( "particles/gb5_high_explosive.pcf")
+	gameAddParticles( "particles/gb5_fireboom.pcf")
+	gameAddParticles( "particles/neuro_tank_ap.pcf")
 
-tableinsert(gred.Particles,"high_explosive_main_2")
-tableinsert(gred.Particles,"high_explosive_air_2")
-tableinsert(gred.Particles,"water_torpedo")
-tableinsert(gred.Particles,"high_explosive_air")
-tableinsert(gred.Particles,"napalm_explosion")
-tableinsert(gred.Particles,"napalm_explosion_midair")
-tableinsert(gred.Particles,"cloudmaker_ground")
-tableinsert(gred.Particles,"1000lb_explosion")
-tableinsert(gred.Particles,"500lb_air")
-tableinsert(gred.Particles,"100lb_air")
-tableinsert(gred.Particles,"500lb_ground")
-tableinsert(gred.Particles,"rockettrail")
-tableinsert(gred.Particles,"grenadetrail")
-tableinsert(gred.Particles,"gred_ap_impact")
-tableinsert(gred.Particles,"doi_mortar_explosion")
-tableinsert(gred.Particles,"doi_wparty_explosion")
-tableinsert(gred.Particles,"doi_smoke_artillery")
-tableinsert(gred.Particles,"doi_ceilingDust_large")
-tableinsert(gred.Particles,"m203_smokegrenade")
-tableinsert(gred.Particles,"doi_GASarty_explosion")
-tableinsert(gred.Particles,"doi_compb_explosion")
-tableinsert(gred.Particles,"doi_wpgrenade_explosion")
-tableinsert(gred.Particles,"ins_c4_explosion")
-tableinsert(gred.Particles,"doi_artillery_explosion_OLD")
-tableinsert(gred.Particles,"gred_highcal_rocket_explosion")
+	gameAddParticles( "particles/ins_rockettrail.pcf")
+	gameAddParticles( "particles/ammo_cache_ins.pcf")
+	gameAddParticles( "particles/doi_rockettrail.pcf")
+	gameAddParticles( "particles/mnb_flamethrower.pcf")
+	gameAddParticles( "particles/impact_fx_ins.pcf" )
+	gameAddParticles( "particles/environment_fx.pcf")
+	gameAddParticles( "particles/water_impact.pcf")
+	gameAddParticles( "particles/explosion_fx_ins.pcf")
+	gameAddParticles( "particles/weapon_fx_tracers.pcf" )
+	gameAddParticles( "particles/weapon_fx_ins.pcf" )
 
-tableinsert(gred.Particles,"muzzleflash_bar_3p")
-tableinsert(gred.Particles,"muzzleflash_garand_3p")
-tableinsert(gred.Particles,"muzzleflash_mg42_3p")
-tableinsert(gred.Particles,"ins_weapon_at4_frontblast")
-tableinsert(gred.Particles,"ins_weapon_rpg_dust")
-tableinsert(gred.Particles,"gred_arti_muzzle_blast")
-tableinsert(gred.Particles,"gred_mortar_explosion_smoke_ground")
-tableinsert(gred.Particles,"weapon_muzzle_smoke")
-tableinsert(gred.Particles,"ins_ammo_explosionOLD")
-tableinsert(gred.Particles,"gred_ap_impact")
-tableinsert(gred.Particles,"AP_impact_wall")
-tableinsert(gred.Particles,"ins_m203_explosion")
-tableinsert(gred.Particles,"ins_weapon_rpg_frontblast")
-tableinsert(gred.Particles,"gred_arti_muzzle_blast_alt")
-tableinsert(gred.Particles,"doi_wprocket_explosion")
-tableinsert(gred.Particles,"gred_tracers_red_7mm")
-tableinsert(gred.Particles,"gred_tracers_green_7mm")
-tableinsert(gred.Particles,"gred_tracers_white_7mm")
-tableinsert(gred.Particles,"gred_tracers_yellow_7mm")
-tableinsert(gred.Particles,"gred_tracers_red_12mm")
-tableinsert(gred.Particles,"gred_tracers_green_12mm")
-tableinsert(gred.Particles,"gred_tracers_white_12mm")
-tableinsert(gred.Particles,"gred_tracers_yellow_12mm")
-tableinsert(gred.Particles,"gred_tracers_red_20mm")
-tableinsert(gred.Particles,"gred_tracers_green_20mm")
-tableinsert(gred.Particles,"gred_tracers_white_20mm")
-tableinsert(gred.Particles,"gred_tracers_yellow_20mm")
-tableinsert(gred.Particles,"gred_tracers_red_30mm")
-tableinsert(gred.Particles,"gred_tracers_green_30mm")
-tableinsert(gred.Particles,"gred_tracers_white_30mm")
-tableinsert(gred.Particles,"gred_tracers_yellow_30mm")
-tableinsert(gred.Particles,"gred_tracers_red_40mm")
-tableinsert(gred.Particles,"gred_tracers_green_40mm")
-tableinsert(gred.Particles,"gred_tracers_white_40mm")
-tableinsert(gred.Particles,"gred_tracers_yellow_40mm")
-for k,v in pairs(gred.Particles) do PrecacheParticleSystem(v) end
+	gameAddParticles( "particles/gred_particles.pcf" )
+	gameAddParticles( "particles/fire_01.pcf" )
+	gameAddParticles( "particles/doi_explosions_smoke.pcf" )
+	gameAddParticles( "particles/explosion_fx_ins_b.pcf" )
+	gameAddParticles( "particles/ins_smokegrenade.pcf" )
+	gameAddParticles( "particles/ww1_gas.pcf" )
 
-gameAddDecal( "scorch_small",		"decals/scorch_small" );
-gameAddDecal( "scorch_medium",		"decals/scorch_medium" );
-gameAddDecal( "scorch_big",			"decals/scorch_big" );
-gameAddDecal( "scorch_huge",		"decals/scorch_huge" );
-gameAddDecal( "scorch_gigantic",	"decals/scorch_gigantic" );
-gameAddDecal( "scorch_x10",			"decals/scorch_x10" );
+	-- Precaching main particles
+	gred.Particles = {} 						
+	tableinsert(gred.Particles,"gred_20mm")
+	tableinsert(gred.Particles,"gred_20mm_airburst")
+	tableinsert(gred.Particles,"gred_40mm")
+	tableinsert(gred.Particles,"gred_40mm_airburst")
+	tableinsert(gred.Particles,"30cal_impact")
+	tableinsert(gred.Particles,"fire_large_01")
+	tableinsert(gred.Particles,"30cal_impact")
+	tableinsert(gred.Particles,"doi_gunrun_impact")
+	tableinsert(gred.Particles,"doi_artillery_explosion")
+	tableinsert(gred.Particles,"doi_stuka_explosion")
+	tableinsert(gred.Particles,"gred_mortar_explosion")
+	tableinsert(gred.Particles,"gred_50mm")
+	tableinsert(gred.Particles,"ins_rpg_explosion")
+	tableinsert(gred.Particles,"ins_water_explosion")
+	tableinsert(gred.Particles,"fireboom_explosion_midair")
+	tableinsert(gred.Particles,"doi_petrol_explosion")
 
+	tableinsert(gred.Particles,"doi_impact_water")
+	tableinsert(gred.Particles,"impact_water")
+	tableinsert(gred.Particles,"water_small")
+	tableinsert(gred.Particles,"water_medium")
+	tableinsert(gred.Particles,"water_huge")
 
-local filecount = 0
-local foldercount = 0
-local utilPrecacheModel = util.PrecacheModel
-local precache = function( dir, flst ) -- .mdl file list precahcer
-	for _, _f in ipairs( flst ) do
-		utilPrecacheModel( dir.."/".._f )
-		filecount = filecount + 1
+	tableinsert(gred.Particles,"muzzleflash_sparks_variant_6")
+	tableinsert(gred.Particles,"muzzleflash_1p_glow")
+	tableinsert(gred.Particles,"muzzleflash_m590_1p_core")
+	tableinsert(gred.Particles,"muzzleflash_smoke_small_variant_1")
+	for i = 0,1 do
+		if i == 1 then pcfD = "" else pcfD = "doi_" end
+		tableinsert(gred.Particles,""..pcfD.."impact_concrete")
+		tableinsert(gred.Particles,""..pcfD.."impact_dirt")
+		tableinsert(gred.Particles,""..pcfD.."impact_glass")
+		tableinsert(gred.Particles,""..pcfD.."impact_metal")
+		tableinsert(gred.Particles,""..pcfD.."impact_sand")
+		tableinsert(gred.Particles,""..pcfD.."impact_snow")
+		tableinsert(gred.Particles,""..pcfD.."impact_leaves")
+		tableinsert(gred.Particles,""..pcfD.."impact_wood")
+		tableinsert(gred.Particles,""..pcfD.."impact_grass")
+		tableinsert(gred.Particles,""..pcfD.."impact_tile")
+		tableinsert(gred.Particles,""..pcfD.."impact_plastic")
+		tableinsert(gred.Particles,""..pcfD.."impact_rock")
+		tableinsert(gred.Particles,""..pcfD.."impact_gravel")
+		tableinsert(gred.Particles,""..pcfD.."impact_mud")
+		tableinsert(gred.Particles,""..pcfD.."impact_fruit")
+		tableinsert(gred.Particles,""..pcfD.."impact_asphalt")
+		tableinsert(gred.Particles,""..pcfD.."impact_cardboard")
+		tableinsert(gred.Particles,""..pcfD.."impact_rubber")
+		tableinsert(gred.Particles,""..pcfD.."impact_carpet")
+		tableinsert(gred.Particles,""..pcfD.."impact_brick")
+		tableinsert(gred.Particles,""..pcfD.."impact_leaves")
+		tableinsert(gred.Particles,""..pcfD.."impact_paper")
+		tableinsert(gred.Particles,""..pcfD.."impact_computer")
 	end
-end
 
-findDir = function( parent, direcotry, foot ) -- internal shit
-	local flst, a = file.Find( parent.."/"..direcotry.."/"..foot, "GAME" )
-	local b, dirs = file.Find( parent.."/"..direcotry.."/*", "GAME" )
-	for k,v in ipairs(dirs) do
-		findDir(parent.."/"..direcotry,v,foot)
-		foldercount = foldercount + 1
+	tableinsert(gred.Particles,"high_explosive_main_2")
+	tableinsert(gred.Particles,"high_explosive_air_2")
+	tableinsert(gred.Particles,"water_torpedo")
+	tableinsert(gred.Particles,"high_explosive_air")
+	tableinsert(gred.Particles,"napalm_explosion")
+	tableinsert(gred.Particles,"napalm_explosion_midair")
+	tableinsert(gred.Particles,"cloudmaker_ground")
+	tableinsert(gred.Particles,"1000lb_explosion")
+	tableinsert(gred.Particles,"500lb_air")
+	tableinsert(gred.Particles,"100lb_air")
+	tableinsert(gred.Particles,"500lb_ground")
+	tableinsert(gred.Particles,"rockettrail")
+	tableinsert(gred.Particles,"grenadetrail")
+	tableinsert(gred.Particles,"gred_ap_impact")
+	tableinsert(gred.Particles,"doi_mortar_explosion")
+	tableinsert(gred.Particles,"doi_wparty_explosion")
+	tableinsert(gred.Particles,"doi_smoke_artillery")
+	tableinsert(gred.Particles,"doi_ceilingDust_large")
+	tableinsert(gred.Particles,"m203_smokegrenade")
+	tableinsert(gred.Particles,"doi_GASarty_explosion")
+	tableinsert(gred.Particles,"doi_compb_explosion")
+	tableinsert(gred.Particles,"doi_wpgrenade_explosion")
+	tableinsert(gred.Particles,"ins_c4_explosion")
+	tableinsert(gred.Particles,"doi_artillery_explosion_OLD")
+	tableinsert(gred.Particles,"gred_highcal_rocket_explosion")
+
+	tableinsert(gred.Particles,"muzzleflash_bar_3p")
+	tableinsert(gred.Particles,"muzzleflash_garand_3p")
+	tableinsert(gred.Particles,"muzzleflash_mg42_3p")
+	tableinsert(gred.Particles,"ins_weapon_at4_frontblast")
+	tableinsert(gred.Particles,"ins_weapon_rpg_dust")
+	tableinsert(gred.Particles,"gred_arti_muzzle_blast")
+	tableinsert(gred.Particles,"gred_mortar_explosion_smoke_ground")
+	tableinsert(gred.Particles,"weapon_muzzle_smoke")
+	tableinsert(gred.Particles,"ins_ammo_explosionOLD")
+	tableinsert(gred.Particles,"gred_ap_impact")
+	tableinsert(gred.Particles,"AP_impact_wall")
+	tableinsert(gred.Particles,"ins_m203_explosion")
+	tableinsert(gred.Particles,"ins_weapon_rpg_frontblast")
+	tableinsert(gred.Particles,"gred_arti_muzzle_blast_alt")
+	tableinsert(gred.Particles,"doi_wprocket_explosion")
+	tableinsert(gred.Particles,"gred_tracers_red_7mm")
+	tableinsert(gred.Particles,"gred_tracers_green_7mm")
+	tableinsert(gred.Particles,"gred_tracers_white_7mm")
+	tableinsert(gred.Particles,"gred_tracers_yellow_7mm")
+	tableinsert(gred.Particles,"gred_tracers_red_12mm")
+	tableinsert(gred.Particles,"gred_tracers_green_12mm")
+	tableinsert(gred.Particles,"gred_tracers_white_12mm")
+	tableinsert(gred.Particles,"gred_tracers_yellow_12mm")
+	tableinsert(gred.Particles,"gred_tracers_red_20mm")
+	tableinsert(gred.Particles,"gred_tracers_green_20mm")
+	tableinsert(gred.Particles,"gred_tracers_white_20mm")
+	tableinsert(gred.Particles,"gred_tracers_yellow_20mm")
+	tableinsert(gred.Particles,"gred_tracers_red_30mm")
+	tableinsert(gred.Particles,"gred_tracers_green_30mm")
+	tableinsert(gred.Particles,"gred_tracers_white_30mm")
+	tableinsert(gred.Particles,"gred_tracers_yellow_30mm")
+	tableinsert(gred.Particles,"gred_tracers_red_40mm")
+	tableinsert(gred.Particles,"gred_tracers_green_40mm")
+	tableinsert(gred.Particles,"gred_tracers_white_40mm")
+	tableinsert(gred.Particles,"gred_tracers_yellow_40mm")
+	for k,v in pairs(gred.Particles) do PrecacheParticleSystem(v) end
+
+	gameAddDecal( "scorch_small",		"decals/scorch_small" );
+	gameAddDecal( "scorch_medium",		"decals/scorch_medium" );
+	gameAddDecal( "scorch_big",			"decals/scorch_big" );
+	gameAddDecal( "scorch_huge",		"decals/scorch_huge" );
+	gameAddDecal( "scorch_gigantic",	"decals/scorch_gigantic" );
+	gameAddDecal( "scorch_x10",			"decals/scorch_x10" );
+
+
+	local filecount = 0
+	local foldercount = 0
+	local utilPrecacheModel = util.PrecacheModel
+	local precache = function( dir, flst ) -- .mdl file list precahcer
+		for _, _f in ipairs( flst ) do
+			utilPrecacheModel( dir.."/".._f )
+			filecount = filecount + 1
+		end
 	end
-	precache( parent.."/"..direcotry, flst )
+
+	findDir = function( parent, direcotry, foot ) -- internal shit
+		local flst, a = file.Find( parent.."/"..direcotry.."/"..foot, "GAME" )
+		local b, dirs = file.Find( parent.."/"..direcotry.."/*", "GAME" )
+		for k,v in ipairs(dirs) do
+			findDir(parent.."/"..direcotry,v,foot)
+			foldercount = foldercount + 1
+		end
+		precache( parent.."/"..direcotry, flst )
+	end
+	timer.Simple(1,function()
+		findDir( "models", "gredwitch", "*.mdl" )
+
+		print("[GREDWITCH'S BASE] Precached "..filecount.." files in "..foldercount.." folders.")
+	end)
 end
-timer.Simple(1,function()
-	findDir( "models", "gredwitch", "*.mdl" )
 
-	print("[GREDWITCH'S BASE] Precached "..filecount.." files in "..foldercount.." folders.")
-end)
-
--- end
+gred.Precache()
 
 gred.AddonList = gred.AddonList or {}
 tableinsert(gred.AddonList,1582297878) -- Materials
---]]
+
 if CLIENT then
-	net.Receive ("gred_net_message_ply",function()
+	local ply = LocalPlayer()
+	net.Receive("gred_net_message_ply",function()
+		ply = IsValid(ply) and ply or LocalPlayer()
 		local msg = net.ReadString()
-		LocalPlayer():PrintMessage(HUD_PRINTTALK,msg)
+		ply:PrintMessage(HUD_PRINTTALK,msg)
 	end)
 
 	net.Receive("gred_net_bombs_decals",function()
-		if GetConVar("gred_cl_decals"):GetInt() <= 0 then return end
 		local decal = net.ReadString()
 		local start = net.ReadVector()
 		local hitpos = net.ReadVector()
+		if GetConVar("gred_cl_decals"):GetInt() <= 0 then return end
 		util.Decal(decal,start,hitpos)
 	end)
 	
 	net.Receive("gred_net_sound_lowsh",function()
-		LocalPlayer():GetViewEntity():EmitSound(net.ReadString())
+		ply = IsValid(ply) and ply or LocalPlayer()
+		ply:GetViewEntity():EmitSound(net.ReadString())
 	end)
 	
 	net.Receive("gred_net_nw_var",function()
@@ -522,6 +410,9 @@ if CLIENT then
 		end
 	end)
 	
+	net.Receive("gred_net_key_lfs_health",function()
+		net.ReadEntity().MaxHealth = net.ReadFloat()
+	end)
 	
 	CreateClientConVar("gred_cl_sound_shake"		, "1" , true,false)
 	CreateClientConVar("gred_cl_nowaterimpacts"		, "0" , true,false)
@@ -938,7 +829,313 @@ if CLIENT then
 			end
 		end
 	end)
+	
+
+	gred.UpdateBoneTable = function(self)
+		if self.CreatingBones then return end
+		self.Bones = nil
+		timer.Simple(0,function()
+			if !self or (self and !IsValid(self)) then return end
+			if self.CreatingBones then return end
+			self.CreatingBones = true
+			self:SetLOD(0)
+			self.Bones = {}
+			local name
+			for i=0, self:GetBoneCount()-1 do
+				name = self:GetBoneName(i)
+				if name == "__INVALIDBONE__" and (self.BoneBlackList and !self.BoneBlackList[i]) then
+					print("["..self.ClassName.."] INVALID BONE : "..i)
+					self.Bones = nil
+					break
+				end
+				self.Bones[name] = i
+			end
+			self:SetLOD(-1)
+			self.CreatingBones = false
+		end)
+	end
+	
+	gred.ManipulateBoneAngles = function(self,bone,angle)
+		if !self.Bones or (self.Bones and !self.Bones[bone]) then
+			gred.UpdateBoneTable(self)
+			return
+		end
+		
+		self:ManipulateBoneAngles(self.Bones[bone],angle)
+	end
+	
+	gred.ManipulateBonePosition = function(self,bone,pos)
+		if !self.Bones or (self.Bones and !self.Bones[bone]) then
+			gred.UpdateBoneTable(self)
+			return
+		end
+		
+		self:ManipulateBonePosition(self.Bones[bone],pos)
+	end
 else
+	resource.AddWorkshop(1131455085) -- Base addon
+	
+	local AddNetworkString = util.AddNetworkString
+	AddNetworkString("gred_net_sound_lowsh")
+	AddNetworkString("gred_net_message_ply")
+	AddNetworkString("gred_net_bombs_decals")
+	AddNetworkString("gred_net_nw_var")
+	AddNetworkString("gred_net_key_lfs_health")
+	
+	local soundSpeed = 16797.9*16797.9 -- 320m/s
+	
+	gred.GunnersInit = function(self)
+		local ATT
+		local seat
+		for k,v in pairs(self.Gunners) do
+		
+			v.tracer = 0
+			v.UpdateTracers = function(self)
+				v.tracer = v.tracer + 1
+				if v.tracer >= self.TracerConvar:GetInt() then
+					v.tracer = 0
+					return "red"
+				else
+					return false
+				end
+			end
+			for a,b in pairs(v.att) do
+				v.att[a] = self:LookupAttachment(b)
+			end
+			seat = self:AddPassengerSeat(v.pos,v.ang)
+			seat.Shoot = v.snd_loop and CreateSound(seat,v.snd_loop) or nil
+			seat.Stop = v.snd_stop and CreateSound(seat,v.snd_stop) or nil
+			self["SetGunnerSeat"..k](self,seat)
+		end
+	end
+	
+	gred.GunnersTick = function(self,Driver,DriverSeat,DriverFireGunners,ct)
+		ct = ct and ct or CurTime()
+		Driver = Driver and Driver or self:GetDriver()
+		DriverSeat = DriverSeat and DriverSeat or self:GetDriverSeat()
+		DriverFireGunners = DriverFireGunners != nil and DriverFireGunners or (IsValid(Driver) and Driver:lfsGetInput("FREELOOK") and Driver:KeyDown(IN_ATTACK))
+		
+		local ang
+		local pod
+		local gunner
+		local gunnerValid
+		local shootAng
+		local tracer
+		local startpos = self:GetRotorPos()
+		local tr
+		local IsShooting
+		local poseang
+		local gunnerpod
+		
+		for k,v in pairs(self.Gunners) do
+			pod = self["GetGunnerSeat"..k](self)
+			gunnerpod = pod
+			if IsValid(pod) then
+				gunner = pod:GetDriver()
+				gunnerValid = IsValid(gunner)
+				if gunnerValid or (!gunnerValid and DriverFireGunners) then
+					gunner = gunnerValid and gunner or Driver
+					pod = gunner == Driver and driverSeat or pod
+					
+					IsShooting = gunner:KeyDown(IN_ATTACK)
+					
+					for C,att in pairs(v.att) do
+						att = self:GetAttachment(att)
+						if C == 1 then
+							tr = util.TraceHull( {
+								start = startpos,
+								endpos = (startpos + pod:WorldToLocalAngles(gunner:EyeAngles()):Forward() * 50000),
+								mins = Vector( -40, -40, -40 ),
+								maxs = Vector( 40, 40, 40 ),
+								filter = self.FILTER
+							} )
+							ang = v.AngleOperate(self:WorldToLocalAngles((tr.HitPos - att.Pos):Angle()))
+							
+							ang:Normalize()
+							
+							self:SetPoseParameter(v.poseparams[1],ang.p)
+							self:SetPoseParameter(v.poseparams[2],ang.y)
+							if (ang.y > v.maxang.y or ang.p > v.maxang.p or ang.y < v.minang.y or ang.p < v.minang.p) and DriverFireGunners then break end
+							if IsShooting and v.nextshot <= ct then
+								tracer = v.UpdateTracers(self)
+							end
+						end
+						if IsShooting then
+							v.IsShooting = true
+							if gunnerpod.Stop then
+								gunnerpod.Stop:Stop()
+							else
+								gunnerpod.Shoot:Stop()
+							end
+							gunnerpod.Shoot:Play()
+							if v.nextshot <= ct then
+								v.spread = v.spread and v.spread or 0.3
+								shootAng = att.Ang + Angle(math.Rand(-v.spread,v.spread), math.Rand(-v.spread,v.spread), math.Rand(-v.spread,v.spread))
+								
+								gred.CreateBullet(gunner,att.Pos,shootAng,v.cal,self.FILTER,nil,false,tracer)
+								
+								local effectdata = EffectData()
+								effectdata:SetFlags(self.MUZZLEEFFECT)
+								effectdata:SetOrigin(att.Pos)
+								effectdata:SetAngles(shootAng)
+								effectdata:SetSurfaceProp(0)
+								util.Effect("gred_particle_simple",effectdata)
+								if C == #v.att or v.Sequential then
+									v.nextshot = ct + v.delay
+								end
+							end
+						else
+							if v.IsShooting then
+								v.IsShooting = false
+								if gunnerpod.Stop then
+									gunnerpod.Stop:Play()
+									gunnerpod.Shoot:Stop()
+								end
+							end
+						end
+					end
+				else
+					if v.IsShooting then
+						v.IsShooting = false
+						if gunnerpod.Stop then
+							gunnerpod.Stop:Play()
+							gunnerpod.Shoot:Stop()
+						end
+					end
+				end
+			end
+			
+			pod = nil
+			gunner = nil
+		end
+	end
+	
+	gred.HandleActiveGunners = function(self)
+		local gpod
+		local gunner
+		for k,v in pairs(self.Gunners) do
+			gpod = self["GetGunnerSeat"..k](self)
+			if IsValid(gpod) then
+				local Gunner = gpod:GetDriver()
+				
+				gunner = self["GetGunner"..k](self)
+				if Gunner ~= gunner then
+					self:SetGunner( Gunner )
+					
+					if IsValid( Gunner ) then
+						Gunner:CrosshairEnable() 
+					end
+				end
+			end
+		end
+	end
+	
+	gred.CreateExplosion = function(pos,radius,damage,decal,trace,ply,bomb,DEFAULT_PHYSFORCE,DEFAULT_PHYSFORCE_PLYGROUND,DEFAULT_PHYSFORCE_PLYAIR)
+		local ConVar = GetConVar("gred_sv_shockwave_unfreeze"):GetInt() >= 1
+		net.Start("gred_net_bombs_decals")
+			net.WriteString(decal and decal or "scorch_medium")
+			net.WriteVector(pos)
+			net.WriteVector(pos-Vector(0,0,trace))
+		net.Broadcast()
+		debugoverlay.Sphere(pos,radius,3, Color( 255, 255, 255 ))
+		ply = IsValid(ply) and ply or bomb
+		util.BlastDamage(bomb,ply,pos,radius,damage)
+		for k,v in pairs(ents.FindInSphere(pos,radius)) do
+			local v_pos = v:GetPos()
+			
+			local phys = v:GetPhysicsObject()
+			local F_dir
+			if IsValid(phys) then
+				if !v.IsOnPlane then
+					local F_ang = DEFAULT_PHYSFORCE
+					local dist = (pos - v_pos):Length()
+					local relation = math.Clamp((radius - dist) / radius, 0, 1)
+					if not DEFAULT_PHYSFORCE == nil then
+						F_dir = (v_pos - pos) * DEFAULT_PHYSFORCE
+					else
+						F_dir = (v_pos - pos) * 1
+					end
+					phys:AddAngleVelocity(Vector(F_ang, F_ang, F_ang) * relation)
+					phys:AddVelocity(F_dir)
+					if ConVar then
+						if !v.isWacAircraft and !v.LFS then
+							phys:Wake()
+							phys:EnableMotion(true)
+							constraint.RemoveAll(v)
+						end
+					end
+					-- local class = v:GetClass()
+					-- if class == "func_breakable" or class == "func_breakable_surf" or class == "func_physbox" then
+						-- v:Fire("Break", 0)
+					-- end
+				end
+			end
+			if v:IsPlayer() then
+				if !v:IsOnGround() then
+					v:SetMoveType(MOVETYPE_WALK)
+					if not DEFAULT_PHYSFORCE_PLYAIR == nil then
+						F_dir = (v_pos - pos) * DEFAULT_PHYSFORCE_PLYAIR
+					else
+						F_dir = (v_pos - pos)
+					end
+					v:SetVelocity( F_dir )
+				else
+					v:SetMoveType( MOVETYPE_WALK )
+					local F_ang = DEFAULT_PHYSFORCE_PLYGROUND
+					if not DEFAULT_PHYSFORCE_PLYGROUND == nil then
+						F_dir = (v_pos - pos) * DEFAULT_PHYSFORCE_PLYGROUND
+					else
+						F_dir = (v_pos - pos)
+					end
+					v:SetVelocity( F_dir )
+				end
+			end
+		end
+	end
+	
+	gred.CreateSound = function(pos,rsound,e1,e2,e3)
+		local currange = 1000 / GetConVar("gred_sv_soundspeed_divider"):GetInt()
+		
+		local curRange_min = currange*5
+		curRange_min = curRange_min*curRange_min
+		local curRange_mid = currange*14
+		curRange_mid = curRange_mid * curRange_mid
+		local curRange_max = currange*40
+		curRange_max = curRange_max * curRange_max
+		
+		for k,v in pairs(player.GetHumans()) do
+			local ply = v:GetViewEntity()
+			local distance = ply:GetPos():DistToSqr(pos)
+			
+			if distance <= curRange_min then
+			
+				if v:GetInfoNum("gred_sound_shake",1) == 1 then
+					util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+				end
+				
+				net.Start("gred_net_sound_lowsh")
+					net.WriteString(e1)
+				net.Send(v)
+				
+			elseif distance <= curRange_mid then
+				timer.Simple(distance/soundSpeed,function()
+					if v:GetInfoNum("gred_sound_shake",1) == 1 then
+						util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+					end
+					net.Start("gred_net_sound_lowsh")
+						net.WriteString(!rsound and e2 or e1)
+					net.Send(v)
+				end)
+			elseif distance <= curRange_max then
+				timer.Simple(distance/soundSpeed,function()
+					net.Start("gred_net_sound_lowsh")
+						net.WriteString(!rsound and e3 or e1)
+					net.Send(v)
+				end)
+			end
+		end
+	end
+	
 	concommand.Add("gred_changesetting",function(ply,cmd,args)
 		local str,val = args[1],args[2]
 		if !str or !val then return end
@@ -948,6 +1145,7 @@ else
 		cvar:SetFloat(val)
 		
 	end)
+	
 	local OverrideHAB = GetConVar("gred_sv_override_hab")
 	local Tracers = GetConVar("gred_sv_tracers")
 	local BulletDMG = GetConVar("gred_sv_bullet_dmg")
@@ -958,6 +1156,8 @@ else
 	local BulletID = 0
 	local angle_zero = angle_zero
 	local vector_zero = vector_zero
+	local healthmultiplier = GetConVar("gred_sv_lfs_healthmultiplier_all")
+	local healthmultiplier_all = GetConVar("gred_sv_lfs_healthmultiplier_all")
 	
 	local CAL_TABLE = {
 		["wac_base_7mm"] = 1,
@@ -972,6 +1172,7 @@ else
 		["white"]  = 3,
 		["yellow"] = 4,
 	}
+	
 	local function BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime)
 		ply = IsValid(ply) and ply or Entity(0)
 		local hitang
@@ -1217,13 +1418,11 @@ else
 			end)
 		end
 	end
-end
 
-hook.Add("OnEntityCreated","gred_ent_override",function(ent)
-	timer.Simple(0,function()
+	hook.Add("OnEntityCreated","gred_lfs_override",function(ent)
 		if ent.LFS then
-			if ent.Author == "Gredwitch" or GetConVar("gred_sv_lfs_healthmultiplier_all"):GetInt() == 1 then
-				ent.MaxHealth = ent.MaxHealth * GetConVar("gred_sv_lfs_healthmultiplier"):GetFloat()
+			if ent.Author == "Gredwitch" or healthmultiplier:GetInt() == 1 then
+				ent.MaxHealth = ent.MaxHealth * healthmultiplier_all:GetFloat()
 				ent.OldSetupDataTables = ent.SetupDataTables
 				ent.SetupDataTables = function()
 					if ent.DataSet then return end
@@ -1234,12 +1433,22 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 				ent:SetupDataTables()
 				
 				ent:SetHP(ent.MaxHealth)
+				
+				net.Start("gred_net_key_lfs_health")
+					net.WriteEntity(ent)
+					net.WriteFloat(ent.MaxHealth)
+				net.Broadcast()
 			end
-			
-			
+		end
+	end)
+end
+
+hook.Add("OnEntityCreated","gred_ent_override",function(ent)
+	timer.Simple(0,function()
+	
 		-----------------------------------
 		
-		elseif ent.isWacAircraft then
+		if ent.isWacAircraft then
 			if GetConVar("gred_sv_wac_override"):GetInt() == 1 then
 			-- if ent.Base == "wac_hc_base" then
 				
