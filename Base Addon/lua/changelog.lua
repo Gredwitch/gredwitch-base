@@ -30,20 +30,6 @@ OLDER CHANGES
 - Rewrote the explosion function from scratch ; explosions shouldn't cause server crashes anymore
 - Rewrote the shells so AP does damage to tanks and HE does less damage to tanks and so shells don't act like rockets anymore
 
-15/10/2017 (10/15/2017)
-- Added POD_MGUNNER (POD_GUNNER with green tracers)
-- Added HAWX rocket models (testing)
-- Added German and American radios
-- Added POD_HYDRA (Hydra 70 pod with crosshair)
-- Updated MG 17, added crosshair for gun camera
-- Updated all of the PODs, merged init and cl_init to shared (if it was possible)
-- Removed HC_HEROUNDSGAU4
-- Removed POD_GHYDRA
-- Removed POD_GMINIGUN
-- Renamed POD_CANNON_GAU4 to POD_OPCANNON
-- Renamed HC_HEROUNDS and HC_GROCKET to BASE_HEROUNDS and BASE_GROCKET
-- Renamed POD_AIM7 to POD_MIS
-
 26/06/2019 (06/26/2019)
 - Added gred_particle_tracer
 - Fixed wac_base_grocket using the old sound system, creating errors
@@ -124,26 +110,6 @@ OLDER CHANGES
 - Removed the artillery sweps as they are going to be uploaded in a different addon
 - Removed unused base_dumb
 
-04/09/2018 (09/04/2018)
-- Updated BASE_BULLET : Fixed writeInt error
-- Updated GRED_ADD : Removed a hook and applied the physenv manually to the shells / Fixed a missing particle precache
-- Updated shockwave_ent Fixed explosions making everything fly away forever
-- Updated WAC_HC_BASE : Improved the radio sounds activation / Added a new water explosion effect when WAC aircrafts are crashing
-- Updated BASE_SHELL : Physenv should now apply localy to prevent problems with other stuff
-
-29/10/2017 (10/27/2017)
-- Added GBombs compatiblity with POD_GBOMB
-- Added basic Gbombs base stuff (BASE_BOMB / SHOCKWAVE_ENT / SHOCKWAVE_SOUND_LOWSH )
-- Added BOMB_250GP / BOMB_GBU12 / BOMB_GBU38 / BOMB_MK82 / BOMB_SC100 / BOMB_SC500
-- Added Day of Infamy and Insurgency particle systems, materials / models
-- Updated impact effect and replaced them by Day of Infamy gunrun impact effects
-- Updated sounds
-- Removed WAC_A10WARTHOGSHOT
-- Removed WAC_BIG_IMPACT
-- Removed WAC_GAU_IMPACT
-- Removed WAC_AFTERBURNER
-- Removed WAC_HEATWAVE
-
 23/10/2018 (10/23/2018)
 - Added base_gas
 - Added gb_shell_gas
@@ -157,6 +123,13 @@ OLDER CHANGES
 - Updated HC_BASE : Helicopters should now spin when their health is low / Made the explosion effects client-side
 - Updated the spawnmenu options : server-side options are not showing anymore since you can only modify the convars with RCon
 - Removed unused base_fire
+
+04/09/2018 (09/04/2018)
+- Updated BASE_BULLET : Fixed writeInt error
+- Updated GRED_ADD : Removed a hook and applied the physenv manually to the shells / Fixed a missing particle precache
+- Updated shockwave_ent Fixed explosions making everything fly away forever
+- Updated WAC_HC_BASE : Improved the radio sounds activation / Added a new water explosion effect when WAC aircrafts are crashing
+- Updated BASE_SHELL : Physenv should now apply localy to prevent problems with other stuff
 
 29/08/2018 (08/28/2018)
 
@@ -386,4 +359,31 @@ OLDER CHANGES
 - Renamed BASE_HEROUNDS to BASE_MG
 - Renamed POD_M2G to POD_MG
 - Removed all the admin PODs
+
+29/10/2017 (10/27/2017)
+- Added GBombs compatiblity with POD_GBOMB
+- Added basic Gbombs base stuff (BASE_BOMB / SHOCKWAVE_ENT / SHOCKWAVE_SOUND_LOWSH )
+- Added BOMB_250GP / BOMB_GBU12 / BOMB_GBU38 / BOMB_MK82 / BOMB_SC100 / BOMB_SC500
+- Added Day of Infamy and Insurgency particle systems, materials / models
+- Updated impact effect and replaced them by Day of Infamy gunrun impact effects
+- Updated sounds
+- Removed WAC_A10WARTHOGSHOT
+- Removed WAC_BIG_IMPACT
+- Removed WAC_GAU_IMPACT
+- Removed WAC_AFTERBURNER
+- Removed WAC_HEATWAVE
+
+15/10/2017 (10/15/2017)
+- Added POD_MGUNNER (POD_GUNNER with green tracers)
+- Added HAWX rocket models (testing)
+- Added German and American radios
+- Added POD_HYDRA (Hydra 70 pod with crosshair)
+- Updated MG 17, added crosshair for gun camera
+- Updated all of the PODs, merged init and cl_init to shared (if it was possible)
+- Removed HC_HEROUNDSGAU4
+- Removed POD_GHYDRA
+- Removed POD_GMINIGUN
+- Renamed POD_CANNON_GAU4 to POD_OPCANNON
+- Renamed HC_HEROUNDS and HC_GROCKET to BASE_HEROUNDS and BASE_GROCKET
+- Renamed POD_AIM7 to POD_MIS
 --]]
