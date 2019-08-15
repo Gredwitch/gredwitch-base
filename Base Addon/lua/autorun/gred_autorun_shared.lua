@@ -17,6 +17,7 @@ local CreateClientConVar = CreateClientConVar
 local tableinsert = table.insert
 local IsValid = IsValid
 local DMG_BLAST = DMG_BLAST
+local CLIENT = CLIENT
 
 -- Adding particles
 -- [[
@@ -51,8 +52,11 @@ CreateConVar("gred_sv_lfs_healthmultiplier"		,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_lfs_healthmultiplier_all"	,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_wac_override"				,  "1"  , GRED_SVAR)
 CreateConVar("gred_sv_override_hab"				,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_lfs_godmode"				,  "0"  , GRED_SVAR)
+CreateConVar("gred_sv_lfs_infinite_ammo"		,  "0"  , GRED_SVAR)
 
 gred = gred or {}
+gred.AllNPCs = {}
 gred.Calibre = {}
 tableinsert(gred.Calibre,"wac_base_7mm")
 tableinsert(gred.Calibre,"wac_base_12mm")
@@ -410,10 +414,6 @@ if CLIENT then
 		end
 	end)
 	
-	net.Receive("gred_net_key_lfs_health",function()
-		net.ReadEntity().MaxHealth = net.ReadFloat()
-	end)
-	
 	CreateClientConVar("gred_cl_sound_shake"		, "1" , true,false)
 	CreateClientConVar("gred_cl_nowaterimpacts"		, "0" , true,false)
 	CreateClientConVar("gred_cl_insparticles"		, "0" , true,false)
@@ -441,35 +441,35 @@ if CLIENT then
 			local this = CPanel:CheckBox("Should 12mm MGs have a blast radius? (Kills tanks!)","gred_sv_12mm_he_impact" );
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_override",val)
+				gred.CheckConCommand("gred_sv_12mm_he_impact",val)
 			end
 					
 			local this = CPanel:CheckBox("Should 7mm MGs have a blast radius? (Kills tanks!)","gred_sv_7mm_he_impact" );
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_override",val)
+				gred.CheckConCommand("gred_sv_7mm_he_impact",val)
 			end
 			
 			local this = CPanel:NumSlider( "Bullet damage multiplier","gred_sv_bullet_dmg",0,10,2 );
 			this.ValueChanged = function(this,val)
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_bullet_dmg",val)
+				gred.CheckConCommand("gred_sv_bullet_dmg",val)
 			end
 			
 			local this = CPanel:NumSlider( "Bullet radius multiplier","gred_sv_bullet_radius",0,10,2 );
 			this.ValueChanged = function(this,val)
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_bullet_radius",val)
+				gred.CheckConCommand("gred_sv_bullet_radius",val)
 			end
 			
 			local this = CPanel:NumSlider( "Tracer ammo apparition", "gred_sv_tracers", 0, 20, 0 );
 			this.ValueChanged = function(this,val)
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_tracers",val)
+				gred.CheckConCommand("gred_sv_tracers",val)
 			end
 			
 			if hab and hab.Module.PhysBullet then
 				local this = CPanel:CheckBox("Override Havok's physical bullets?","gred_sv_override_hab" );
 				this.OnChange = function(this,val)
 					val = val and 1 or 0
-					LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_override",val)
+					gred.CheckConCommand("gred_sv_override_hab",val)
 				end
 			end
 		-- end
@@ -498,89 +498,89 @@ if CLIENT then
 			local this = CPanel:CheckBox("Override the WAC base?","gred_sv_wac_override");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_override",val)
+				gred.CheckConCommand("gred_sv_wac_override",val)
 			end
 			
 			local this = CPanel:CheckBox("Use old rockets?","gred_sv_oldrockets");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_oldrockets",val)
+				gred.CheckConCommand("gred_sv_oldrockets",val)
 			end
 			
 			local this = CPanel:CheckBox("Enable bombs in aircrafts?","gred_sv_wac_bombs");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_bombs",val)
+				gred.CheckConCommand("gred_sv_wac_bombs",val)
 			end
 			
 			local this = CPanel:CheckBox("Enable radio sounds?","gred_sv_wac_radio");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_radio",val)
+				gred.CheckConCommand("gred_sv_wac_radio",val)
 			end
 			
 			local this = CPanel:CheckBox("Should jets be very fast?","gred_jets_speed");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_jets_speed",val)
+				gred.CheckConCommand("gred_jets_speed",val)
 			end
 			
 			local this = CPanel:CheckBox("Should aircrafts crash underwater?","gred_sv_wac_explosion_water");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_explosion_water",val)
+				gred.CheckConCommand("gred_sv_wac_explosion_water",val)
 			end
 			
 			local this = CPanel:CheckBox("Should aircrafts crash?","gred_sv_wac_explosion");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_explosion",val)
+				gred.CheckConCommand("gred_sv_wac_explosion",val)
 			end
 			
 			local this = CPanel:CheckBox("Use the default WAC munitions?","gred_sv_default_wac_munitions");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_default_wac_munitions",val)
+				gred.CheckConCommand("gred_sv_default_wac_munitions",val)
 			end
 		
 			local this = CPanel:CheckBox("Should helicopters spin when their health is low?","gred_sv_wac_heli_spin");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_heli_spin",val)
+				gred.CheckConCommand("gred_sv_wac_heli_spin",val)
 			end
 			
 			local this = CPanel:CheckBox("Use a custom health system?","gred_sv_enablehealth");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_enablehealth",val)
+				gred.CheckConCommand("gred_sv_enablehealth",val)
 			end
 			
 			local this = CPanel:CheckBox("Use a health per engine system?","gred_sv_enableenginehealth");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_enableenginehealth",val)
+				gred.CheckConCommand("gred_sv_enableenginehealth",val)
 			end
 			
 			local this = CPanel:NumSlider( "Default engine health", "gred_sv_healthslider", 1, 1000, 0 );
 			this.ValueChanged = function(this,val)
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_healthslider",val)
+				gred.CheckConCommand("gred_sv_healthslider",val)
 			end
 			
 			local this = CPanel:NumSlider( "Helicopter spin chance", "gred_sv_wac_heli_spin_chance", 1, 10, 0 );
 			this.ValueChanged = function(this,val)
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_wac_heli_spin_chance",val)
+				gred.CheckConCommand("gred_sv_wac_heli_spin_chance",val)
 			end
 			
 			local this = CPanel:CheckBox("Use alternative fire particles?","gred_sv_fire_effect");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_fire_effect",val)
+				gred.CheckConCommand("gred_sv_fire_effect",val)
 			end
 				
 			local this = CPanel:CheckBox("Use multiple fire particles?","gred_sv_multiple_fire_effects");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_multiple_fire_effects",val)
+				gred.CheckConCommand("gred_sv_multiple_fire_effects",val)
 			end
 		-- end
 		
@@ -627,13 +627,25 @@ if CLIENT then
 		
 			local this = CPanel:NumSlider( "Aircraft health multiplier", "gred_sv_lfs_healthmultiplier", 1, 10, 2 );
 			this.ValueChanged = function(this,val)
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_lfs_healthmultiplier",val)
+				gred.CheckConCommand("gred_sv_lfs_healthmultiplier",val)
 			end
 			
 			local this = CPanel:CheckBox("Should the health multiplier only apply to Gredwitch's LFS aircrafts?","gred_sv_lfs_healthmultiplier_all");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_lfs_healthmultiplier_all",val)
+				gred.CheckConCommand("gred_sv_lfs_healthmultiplier_all",val)
+			end
+			
+			local this = CPanel:CheckBox("Should LFS aircrafts be invincible?","gred_sv_lfs_godmode");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				gred.CheckConCommand("gred_sv_lfs_godmode",val)
+			end
+			
+			local this = CPanel:CheckBox("Should LFS aircrafts have infinite ammo?","gred_sv_lfs_infinite_ammo");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				gred.CheckConCommand("gred_sv_lfs_infinite_ammo",val)
 			end
 			
 		-- end
@@ -660,47 +672,52 @@ if CLIENT then
 			local this = CPanel:CheckBox("Should all bombs unweld and unfreeze?","gred_sv_shockwave_unfreeze");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_shockwave_unfreeze",val)
+				gred.CheckConCommand("gred_sv_shockwave_unfreeze",val)
 			end
 			
 			local this = CPanel:NumSlider( "Forcefield Max Range","gred_sv_maxforcefield_range", 10, 10000, 0 );
 			this.ValueChanged = function(this,val)
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_maxforcefield_range",val)
+				gred.CheckConCommand("gred_sv_maxforcefield_range",val)
 			end
 			
 			local this = CPanel:NumSlider( "Sound muffling divider", "gred_sv_soundspeed_divider", 1, 3, 0 );
 			this.ValueChanged = function(this,val)
-				LocalPlayer():ConCommand("gred_changesetting", "gred_sv_soundspeed_divider",val)
+				gred.CheckConCommand( "gred_sv_soundspeed_divider",val)
 			end
 		
 			local this = CPanel:NumSlider( "Shell speed multiplier", "gred_sv_shellspeed_multiplier", 0, 3, 2 );
 			this.ValueChanged = function(this,val)
-				LocalPlayer():ConCommand("gred_changesetting", "gred_sv_shellspeed_multiplier",val)
+				gred.CheckConCommand( "gred_sv_shellspeed_multiplier",val)
 			end
 			
 			local this = CPanel:CheckBox("Should bombs be easily armed?","gred_sv_easyuse");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_easyuse",val)
+				gred.CheckConCommand("gred_sv_easyuse",val)
 			end
 			
 			local this = CPanel:CheckBox("Should explosives be spawnable?","gred_sv_spawnable_bombs");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_easyuse",val)
+				gred.CheckConCommand("gred_sv_easyuse",val)
 			end
 			
 			local this = CPanel:CheckBox("Should bombs arm when hit or dropped?","gred_sv_fragility");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				LocalPlayer():ConCommand("gred_changesetting","gred_sv_fragility",val)
+				gred.CheckConCommand("gred_sv_fragility",val)
 			end
 		-- end
 			
 		CPanel:CheckBox("Should bombs leave decals behind?","gred_cl_decals");
 		
 	end
-	
+	gred.CheckConCommand = function(cmd,val)
+		net.Start("gred_net_checkconcommand")
+			net.WriteString(cmd)
+			net.WriteFloat(val)
+		net.SendToServer()
+	end
 	hook.Add( "PopulateToolMenu", "gred_menu", function()
 		spawnmenu.AddToolMenuOption("Options",					-- Tab
 									"Gredwitch's Stuff",		-- Sub-tab
@@ -743,6 +760,40 @@ if CLIENT then
 									gred_settings_misc
 		)
 	end );
+	
+	local CURRENT_VERSION = ""
+	local changelogs = file.Read("changelog.lua","LUA")
+	for i = 1,15 do CURRENT_VERSION = CURRENT_VERSION..changelogs[i] end
+	
+	local GITHUB_VERSION = "" 
+	local GitHub = http.Fetch("https://raw.githubusercontent.com/Gredwitch/gredwitch-base/master/Base%20Addon/lua/changelog.lua",function(body)
+		for i = 1,15 do GITHUB_VERSION = GITHUB_VERSION..body[i] end
+		if CURRENT_VERSION != GITHUB_VERSION then
+			local DFrame = vgui.Create("DFrame")
+			DFrame:SetSize(ScrW()*0.9,ScrH()*0.9)
+			DFrame:SetTitle("GREDWITCH'S BASE IS OUT OF DATE. EXPECT LUA ERRORS!")
+			DFrame:Center()
+			DFrame:MakePopup()
+			
+			local DHTML = vgui.Create("DHTML",DFrame)
+			DHTML:Dock(FILL)
+			DHTML:OpenURL("https://steamcommunity.com/workshop/filedetails/discussion/1131455085/1640915206496685563/")
+		end
+	end)
+	 
+	if !file.Exists("gredwitch_base.txt","DATA") or file.Read("gredwitch_base.txt","DATA") != CURRENT_VERSION then
+		local DFrame = vgui.Create("DFrame")
+		DFrame:SetSize(ScrW()*0.5,ScrH()*0.5)
+		DFrame:SetTitle("Gredwitch's Base : last update changelogs")
+		DFrame:Center()
+		DFrame:MakePopup()
+		
+		local DHTML = vgui.Create("DHTML",DFrame)
+		DHTML:Dock(FILL)
+		DHTML:OpenURL("https://raw.githubusercontent.com/Gredwitch/gredwitch-base/master/Base%20Addon/lua/changelog.lua")
+		
+		file.Write("gredwitch_base.txt",CURRENT_VERSION)
+	end
 	
 	if jit.arch != "x86" then
 		local DFrame = vgui.Create("DFrame")
@@ -830,6 +881,26 @@ if CLIENT then
 		end
 	end)
 	
+	net.Receive("gred_lfs_setparts",function()
+		local self = net.ReadEntity()
+		if not self then print("[F-86] ERROR! ENTITY NOT INITALIZED CLIENT SIDE! PLEASE, RE-SPAWN!") return end
+		self.Parts = {}
+		for k,v in pairs(net.ReadTable()) do
+			self.Parts[k] = v
+		end
+	end)
+	net.Receive("gred_lfs_remparts",function()
+		local self = net.ReadEntity()
+		local k = net.ReadString()
+		
+		self.EmitNow = self.EmitNow and self.EmitNow or {}
+		if (k == "wing_l" or k == "wing_r") and self.EmitNow[k] != "CEASE" then
+			self.EmitNow[k] = true
+		end
+		if self.Parts then
+			self.Parts[k] = nil
+		end
+	end)
 
 	gred.UpdateBoneTable = function(self)
 		if self.CreatingBones then return end
@@ -872,16 +943,135 @@ if CLIENT then
 		
 		self:ManipulateBonePosition(self.Bones[bone],pos)
 	end
+	
+	gred.ManipulateBoneScale = function(self,bone,scale)
+		if !self.Bones or (self.Bones and !self.Bones[bone]) then
+			gred.UpdateBoneTable(self)
+			return
+		end
+		
+		self:ManipulateBoneScale(self.Bones[bone],scale)
+	end
+	
+	gred.HandleFlyBySound = function(self,ply,ct,minvel,maxdist,delay,snd)
+		ply.NGPLAY = ply.NGPLAY or 0
+		ply.lfsGetPlane = ply.lfsGetPlane or function() return nil end
+		if ply:lfsGetPlane() != self and (ply.NGPLAY < ct) and self:GetEngineActive() then
+			local vel = self:GetVelocity():Length()
+			if vel >= minvel then
+				local plypos = ply:GetPos()
+				local pos = self:GetPos()
+				local dist = pos:Distance(plypos)
+				if dist < maxdist then
+					ply.NGPLAY = ct + delay
+					ply:EmitSound(snd)
+				end
+			end
+		end
+	end
+	
+	gred.HandleVoiceLines = function(self,ply,ct,hp)
+		ply.lfsGetPlane = ply.lfsGetPlane or function() return nil end
+		self.BumpSound = self.BumpSound or ct
+		if self.BumpSound < ct then
+			for k,v in pairs(self.SoundQueue) do
+				ply:EmitSound(v)
+				
+				table.RemoveByValue(self.SoundQueue,v)
+				self.BumpSound = ct + 4
+				break
+			end
+		end
+		
+		if self.IsDead then
+			local Driver = self:GetDriver()
+			if self.CheckDriver and Driver != self.OldDriver and !IsValid(Driver) then
+				for k,v in pairs(player.GetAll()) do
+					if v:lfsGetAITeam() == self.OldDriver:lfsGetAITeam() and (IsValid(v:lfsGetPlane()) or v == self.OldDriver) then
+						v:EmitSound("GRED_VO_BAILOUT_0"..math.random(1,3))
+					end
+				end
+			end
+			self.CheckDriver = true
+			self.OldDriver = Driver
+		end
+		if ply:lfsGetPlane() == self then
+			if self.EmitNow.wing_r and self.EmitNow.wing_r != "CEASE" then
+				self.EmitNow.wing_r = "CEASE"
+				table.insert(self.SoundQueue,"GRED_VO_HOLE_RIGHT_WING_0"..math.random(1,3))
+			end
+			if self.EmitNow.wing_l and self.EmitNow.wing_l != "CEASE" then
+				self.EmitNow.wing_l = "CEASE"
+				table.insert(self.SoundQueue,"GRED_VO_HOLE_LEFT_WING_0"..math.random(1,3))
+			end
+			if hp == 0 then
+				self.IsDead = true
+			end
+		end
+	end
+	
+	gred.LFSHUDPaintFilterParts = function(self)
+		local partnum = {}
+		local a = 1
+		if self.Parts then
+			for k,v in pairs(self.Parts) do
+				partnum[a] = v
+				a = a + 1
+			end
+		end
+		partnum[a] = self
+		
+		return partnum
+	end
+	
+	gred.CalcViewThirdPersonLFSParts = function(self,view,ply)
+		view.origin = ply:EyePos()
+		local Parent = ply:lfsGetPlane()
+		local Pod = ply:GetVehicle()
+		local radius = 550
+		radius = radius + radius * Pod:GetCameraDistance()
+		local TargetOrigin = view.origin - view.angles:Forward() * radius  + view.angles:Up() * radius * 0.2
+		local WallOffset = 4
+		local tr = util.TraceHull( {
+			start = view.origin,
+			endpos = TargetOrigin,
+			filter = function( e )
+				local c = e:GetClass()
+				local collide = not c:StartWith( "prop_physics" ) and not c:StartWith( "prop_dynamic" ) and not c:StartWith( "prop_ragdoll" ) and not e:IsVehicle() and not c:StartWith( "gmod_" ) and not c:StartWith( "player" ) and not e.LFS and Parent:GetCalcViewFilter(e)
+				
+				return collide
+			end,
+			mins = Vector( -WallOffset, -WallOffset, -WallOffset ),
+			maxs = Vector( WallOffset, WallOffset, WallOffset ),
+		} )
+		view.origin = tr.HitPos
+		
+		if tr.Hit and not tr.StartSolid then
+			view.origin = view.origin + tr.HitNormal * WallOffset
+		end
+		
+		return view
+	end
 else
 	resource.AddWorkshop(1131455085) -- Base addon
 	
 	local AddNetworkString = util.AddNetworkString
+	AddNetworkString("gred_net_checkconcommand")
 	AddNetworkString("gred_net_sound_lowsh")
 	AddNetworkString("gred_net_message_ply")
 	AddNetworkString("gred_net_bombs_decals")
 	AddNetworkString("gred_net_nw_var")
-	AddNetworkString("gred_net_key_lfs_health")
+	AddNetworkString("gred_lfs_setparts")
+	AddNetworkString("gred_lfs_remparts")
 	
+	net.Receive("gred_net_checkconcommand",function(len,ply)
+		local str = net.ReadString()
+		local cvar = GetConVar(str)
+		local val = net.ReadFloat()
+		if !cvar then return end
+		if !ply:IsAdmin() then return end
+		cvar:SetFloat(val)
+	end)
 	local soundSpeed = 16797.9*16797.9 -- 320m/s
 	
 	gred.GunnersInit = function(self)
@@ -909,24 +1099,19 @@ else
 		end
 	end
 	
-	gred.GunnersTick = function(self,Driver,DriverSeat,DriverFireGunners,ct)
+	gred.GunnersTick = function(self,Driver,DriverSeat,DriverFireGunners,ct,IsShooting)
 		ct = ct and ct or CurTime()
 		Driver = Driver and Driver or self:GetDriver()
 		DriverSeat = DriverSeat and DriverSeat or self:GetDriverSeat()
 		DriverFireGunners = DriverFireGunners != nil and DriverFireGunners or (IsValid(Driver) and Driver:lfsGetInput("FREELOOK") and Driver:KeyDown(IN_ATTACK))
-		
 		local ang
 		local pod
 		local gunner
 		local gunnerValid
 		local shootAng
 		local tracer
-		local startpos = self:GetRotorPos()
-		local tr
-		local IsShooting
-		local poseang
 		local gunnerpod
-		
+		local IsDriver
 		for k,v in pairs(self.Gunners) do
 			pod = self["GetGunnerSeat"..k](self)
 			gunnerpod = pod
@@ -935,24 +1120,18 @@ else
 				gunnerValid = IsValid(gunner)
 				if gunnerValid or (!gunnerValid and DriverFireGunners) then
 					gunner = gunnerValid and gunner or Driver
-					pod = gunner == Driver and driverSeat or pod
+					IsDriver = gunner == Driver
+					-- pod = IsDriver and DriverSeat or pod
 					
-					IsShooting = gunner:KeyDown(IN_ATTACK)
+					IsShooting = IsShooting or gunner:KeyDown(IN_ATTACK)
 					
 					for C,att in pairs(v.att) do
 						att = self:GetAttachment(att)
 						if C == 1 then
-							tr = util.TraceHull( {
-								start = startpos,
-								endpos = (startpos + pod:WorldToLocalAngles(gunner:EyeAngles()):Forward() * 50000),
-								mins = Vector( -40, -40, -40 ),
-								maxs = Vector( 40, 40, 40 ),
-								filter = self.FILTER
-							} )
-							ang = v.AngleOperate(self:WorldToLocalAngles((tr.HitPos - att.Pos):Angle()))
-							
+							ang = v.AngleOperate(self:WorldToLocalAngles(pod:WorldToLocalAngles(gunner:EyeAngles())),IsDriver)
 							ang:Normalize()
-							
+							local vec = gunner:GetAimVector():Angle()
+							vec:Normalize()
 							self:SetPoseParameter(v.poseparams[1],ang.p)
 							self:SetPoseParameter(v.poseparams[2],ang.y)
 							if (ang.y > v.maxang.y or ang.p > v.maxang.p or ang.y < v.minang.y or ang.p < v.minang.p) and DriverFireGunners then break end
@@ -1136,16 +1315,6 @@ else
 		end
 	end
 	
-	concommand.Add("gred_changesetting",function(ply,cmd,args)
-		local str,val = args[1],args[2]
-		if !str or !val then return end
-		local cvar = GetConVar(str)
-		if !cvar then return end
-		if !ply:IsAdmin() then return end
-		cvar:SetFloat(val)
-		
-	end)
-	
 	local OverrideHAB = GetConVar("gred_sv_override_hab")
 	local Tracers = GetConVar("gred_sv_tracers")
 	local BulletDMG = GetConVar("gred_sv_bullet_dmg")
@@ -1156,8 +1325,6 @@ else
 	local BulletID = 0
 	local angle_zero = angle_zero
 	local vector_zero = vector_zero
-	local healthmultiplier = GetConVar("gred_sv_lfs_healthmultiplier_all")
-	local healthmultiplier_all = GetConVar("gred_sv_lfs_healthmultiplier_all")
 	
 	local CAL_TABLE = {
 		["wac_base_7mm"] = 1,
@@ -1419,37 +1586,234 @@ else
 		end
 	end
 
-	hook.Add("OnEntityCreated","gred_lfs_override",function(ent)
-		if ent.LFS then
-			if ent.Author == "Gredwitch" or healthmultiplier:GetInt() == 1 then
-				ent.MaxHealth = ent.MaxHealth * healthmultiplier_all:GetFloat()
-				ent.OldSetupDataTables = ent.SetupDataTables
-				ent.SetupDataTables = function()
-					if ent.DataSet then return end
-					ent.DataSet = true
-					ent:OldSetupDataTables()
-					ent:NetworkVar( "Float",6, "HP", { KeyName = "health", Edit = { type = "Float", order = 2,min = 0, max = ent.MaxHealth, category = "Misc"} } )
+	local startsWith = string.StartWith
+	local function IsSmall(k)
+		return startsWith(k,"gear") or startsWith(k,"wheel") or startsWith(k,"airbrake")
+	end
+	
+	gred.InitAircraftParts = function(self,ForceToDestroy)
+		self.Attachements = {}
+		self.Parts = {}
+		local tostring = tostring
+		local pairs = pairs
+		local GetModel = GetModel
+		
+		for k,v in pairs (self:GetAttachments()) do
+			self.Attachements[v.name] = self:LookupAttachment(tostring(v.name))
+		end
+		for k,v in pairs(self.Attachements) do
+			if k != "blister" then
+				local ent = ents.Create("gred_prop_part")
+				ent.ForceToDestroy = ForceToDestroy or 1000
+				ent:SetModel(self:GetPartModelPath(k))
+				ent:SetPos(self:GetAttachment(self.Attachements[k]).Pos)
+				ent:SetAngles(self:GetAngles())
+				ent:SetParent(self,self.Attachements[k])
+				if k == "tail" then
+					ent.MaxHealth = self.TailHealth and self.TailHealth or 1100
+				elseif k == "wing_r" or k == "wing_l" then
+					ent.MaxHealth = self.WingHealth and self.WingHealth or 600
+					ent.Mass = 500
+				elseif IsSmall(k) then
+					ent.MaxHealth = self.SmallPartHealth and self.SmallPartHealth or 100
+				else
+					ent.MaxHealth = self.PartHealth and self.PartHealth or 350
 				end
-				ent:SetupDataTables()
-				
-				ent:SetHP(ent.MaxHealth)
-				
-				net.Start("gred_net_key_lfs_health")
-					net.WriteEntity(ent)
-					net.WriteFloat(ent.MaxHealth)
-				net.Broadcast()
+				ent.CurHealth = ent.MaxHealth
+				ent:Spawn()
+				ent:Activate()
+				self.Parts[k] = ent
 			end
 		end
-	end)
+		self.GibModels = self.GibModels or {}
+		self.FILTER = {self}
+		for k,v in pairs(self.Parts) do
+			table.insert(self.FILTER,v)
+			v.Parts = self.Parts
+			v.Plane = self
+			self.GibModels[k] = v:GetModel()
+			v.PartParent = self.PartParents[k] and self.Parts[self.PartParents[k]] or self
+		end
+		self.LOADED = 1
+	end
+	
+	gred.PartCalcFlight = function(self,Pitch,Yaw,Roll,Stability,AddRoll,AddYaw)
+		AddRoll = AddRoll or 0.3
+		AddYaw = AddYaw or 0.09
+		local addRoll = 0
+		local addYaw = 0
+		local vel = self:GetVelocity():Length()
+		if not self.Parts.elevator then
+			Pitch = 0
+		end
+		if not self.Parts.rudder then
+			Yaw = 0
+		end
+		if not self.Parts.wing_l then
+			addRoll = AddRoll*vel
+			addYaw = vel*AddYaw
+		end
+		if not self.Parts.wing_r then
+			addRoll = !self.Parts.wing_l and addRoll or -AddRoll*vel
+			addYaw = !self.Parts.wing_l and addYaw - vel*AddYaw or addYaw + vel*(AddYaw*0.22)
+		end
+		if not self.Parts.aileron_l then
+			if Roll < 0 then Roll = Roll*0.5 end
+		end
+		if not self.Parts.aileron_r then
+			if Roll > 0 then Roll = Roll*0.5 end
+		end
+		Roll = Roll + addRoll
+		Yaw = Yaw + addYaw
+		return Pitch,Yaw,Roll,Stability,Stability,Stability
+	end
+	
+	gred.PartThink = function(self,skin)
+		if self.LOADED == 1 then
+			local NoCollide = constraint.NoCollide
+			for k,v in pairs(self.Parts) do
+				self:DeleteOnRemove(v)
+				NoCollide(v,self,0,0)
+				NoCollide(v,self.wheel_R,0,0)
+				NoCollide(v,self.wheel_L,0,0)
+				NoCollide(v,self.wheel_C,0,0)
+				NoCollide(v,self.wheel_C_master,0,0)
+				if k == "tail" or k == "wing_l" or k == "wing_r" then
+					v:SetParent(nil)
+					v:SetPos(self:GetAttachment(self.Attachements[k]).Pos)
+					v.Weld = constraint.Weld(v,self,0,0,0,true,false)
+				end
+				for a,p in pairs(self.Parts) do
+					NoCollide(v,p,0,0)
+				end
+				v.LOADED = true
+				v.PartName = k
+			end
+			net.Start("gred_lfs_setparts")
+				net.WriteEntity(self)
+				net.WriteTable(self.Parts)
+			net.Broadcast()
+			self.LOADED = true
+		end
+		skin = skin and skin or self:GetSkin()
+		for k,v in pairs(self.Parts) do
+			if not IsValid(v) then
+				if k == "wheel_c" or k == "wheel_b" then
+					self.wheel_C:Remove()
+					self.wheel_C_master:Remove()
+				end
+				if k == "wheel_r" then
+					self.wheel_R:Remove()
+				end
+				if k == "wheel_l" then
+					self.wheel_L:Remove()
+				end
+				net.Start("gred_lfs_remparts")
+					net.WriteEntity(self)
+					net.WriteString(k)
+				net.Broadcast()
+				self.Parts[k] = nil
+				self.GibModels[k] = nil
+				k = nil
+			return end
+			if !v.PartParent or !IsValid(v.PartParent) or v.PartParent.Destroyed then
+				v.CurHealth = 0
+				v.DONOTEMIT = true
+			end
+			if v.CurHealth <= v.MaxHealth/2 then
+				if not table.HasValue(self.DamageSkin,skin) then
+					v:SetSkin(skin+1)
+				end
+				if v.CurHealth <=0 then
+					if k == "wheel_c" or k == "wheel_b" then
+						self.wheel_C:Remove()
+						self.wheel_C_master:Remove()
+					end
+					if k == "wheel_r" then
+						self.wheel_R:Remove()
+					end
+					if k == "wheel_l" then
+						self.wheel_L:Remove()
+					end
+					constraint.RemoveAll(v)
+					if not v.DONOTEMIT then
+						v:EmitSound("LFS_PART_DESTROYED_0"..math.random(1,3))
+					end
+					v:SetParent(nil)
+					v:SetVelocity(self:GetVelocity())
+					v.Destroyed = true
+					self.Parts[k] = nil
+					self.GibModels[k] = nil
+				end
+				net.Start("gred_lfs_remparts")
+					net.WriteEntity(self)
+					net.WriteString(k)
+				net.Broadcast()
+			else
+				if table.HasValue(self.DamageSkin,skin) then
+					v:SetSkin(skin-1)
+				else
+					v:SetSkin(skin)
+				end
+			end
+		end
+	end
+	
+	gred.HandleLandingGear = function(self,animName)
+		if not self.CurSeq then
+			self.CurSeq = self:GetSequenceName(self:GetSequence())
+		end
+		if self.CurSeq != animName then
+			self:ResetSequence(animName)
+			self.CurSeq = self:GetSequenceName(self:GetSequence())
+		end
+		self:SetCycle(self:GetLGear())
+	end
 end
 
+for i = 1,3 do
+	sound.Add( 	{
+		name = "GRED_VO_HOLE_LEFT_WING_0"..i,
+		channel = CHAN_STATIC,
+		volume = 1.0,
+		level = 125,
+		sound = "gredwitch/voice/eng_left_wing_v1_r"..i.."_t1_mood_high.wav"
+	} )
+	sound.Add( 	{
+		name = "GRED_VO_HOLE_RIGHT_WING_0"..i,
+		channel = CHAN_STATIC,
+		volume = 1.0,
+		level = 125,
+		sound = "gredwitch/voice/eng_right_wing_v1_r"..i.."_t1_mood_high.wav"
+	} )
+	sound.Add( 	{
+		name = "GRED_VO_BAILOUT_0"..i,
+		channel = CHAN_STATIC,
+		volume = 1.0,
+		level = 90,
+		sound = "gredwitch/voice/eng_bailout_v1_r"..i.."_t1_mood_high.wav"
+	} )
+end
+
+local LFSInifniteAmmo = GetConVar("gred_sv_lfs_infinite_ammo")
+local LFSGodmode = GetConVar("gred_sv_lfs_godmode")
+local WACOverride = GetConVar("gred_sv_wac_override")
+local healthmultiplier = GetConVar("gred_sv_lfs_healthmultiplier")
+local healthmultiplier_all = GetConVar("gred_sv_lfs_healthmultiplier_all")
+local nextRefil = 0.5
+local bigNum = 999999
+
 hook.Add("OnEntityCreated","gred_ent_override",function(ent)
+	if ent:IsNPC() then
+		table.insert(gred.AllNPCs,ent)
+		return
+	end
 	timer.Simple(0,function()
 	
 		-----------------------------------
 		
 		if ent.isWacAircraft then
-			if GetConVar("gred_sv_wac_override"):GetInt() == 1 then
+			if WACOverride:GetInt() == 1 then
 			-- if ent.Base == "wac_hc_base" then
 				
 				ent.Engines = 1
@@ -1934,30 +2298,86 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 				ent:addSounds()
 			end
 		
-		elseif ent.ClassName == "wac_hc_rocket" then
-			ent.Initialize = function(self)
-				math.randomseed(CurTime())
-				self.Entity:SetModel("models/weltensturm/wac/rockets/rocket01.mdl")
-				self.Entity:PhysicsInit(SOLID_VPHYSICS)
-				self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
-				self.Entity:SetSolid(SOLID_VPHYSICS)
-				self.phys = self.Entity:GetPhysicsObject()
-				if (self.phys:IsValid()) then
-					self.phys:SetMass(400)
-					self.phys:EnableGravity(false)
-					self.phys:EnableCollisions(true)
-					self.phys:EnableDrag(false)
-					self.phys:Wake()
+		elseif ent.LFS then
+			if ent.Author == "Gredwitch" or healthmultiplier_all:GetInt() == 1 then
+				ent.MaxHealth = ent.MaxHealth * healthmultiplier:GetFloat()
+				ent.OldSetupDataTables = ent.SetupDataTables
+				ent.SetupDataTables = function()
+					if ent.DataSet then return end
+					ent.DataSet = true
+					ent:OldSetupDataTables()
+					ent:NetworkVar( "Float",6, "HP", { KeyName = "health", Edit = { type = "Float", order = 2,min = 0, max = ent.MaxHealth, category = "Misc"} } )
 				end
-				self.sound = CreateSound(self.Entity, "WAC/rocket_idle.wav")
-				self.matType = MAT_DIRT
-				self.hitAngle = Angle(270, 0, 0)
-				if self.calcTarget then
-					self.Speed = 70
-				else
-					self.Speed = 100
+				ent:SetupDataTables()
+				
+				ent:SetHP(ent.MaxHealth)
+			end
+			if LFSGodmode:GetInt() == 1 then
+				ent.Explode = function() return end
+				ent.OnTakeDamage = function() return end
+				ent.CheckRotorClearance = function() return end
+				ent.nextDFX = 999999999999
+			end
+			if !CLIENT then
+				if LFSInifniteAmmo:GetInt() == 1 then
+					local oldthink = ent.Think
+					ent.Think = function(self)
+						if nextRefil < CurTime() then
+							if self.MaxPrimaryAmmo != -1 then
+								self:SetAmmoPrimary(self.MaxPrimaryAmmo)
+							end
+							if self.MaxSecondaryAmmo != -1 then
+								self:SetAmmoSecondary(self.MaxSecondaryAmmo)
+							end
+							if self.SetAmmoMGFF then
+								self:SetAmmoMGFF(self.AmmoMGFF)
+							end
+							if self.SetAmmoCannon then
+								self:SetAmmoCannon(self.AmmoCannon)
+							end
+						end
+						return oldthink(self)
+					end
+				end
+			end
+		end
+		if !CLIENT then
+			if ent.ClassName == "wac_hc_rocket" then
+				ent.Initialize = function(self)
+					math.randomseed(CurTime())
+					self.Entity:SetModel("models/weltensturm/wac/rockets/rocket01.mdl")
+					self.Entity:PhysicsInit(SOLID_VPHYSICS)
+					self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
+					self.Entity:SetSolid(SOLID_VPHYSICS)
+					self.phys = self.Entity:GetPhysicsObject()
+					if (self.phys:IsValid()) then
+						self.phys:SetMass(400)
+						self.phys:EnableGravity(false)
+						self.phys:EnableCollisions(true)
+						self.phys:EnableDrag(false)
+						self.phys:Wake()
+					end
+					self.sound = CreateSound(self.Entity, "WAC/rocket_idle.wav")
+					self.matType = MAT_DIRT
+					self.hitAngle = Angle(270, 0, 0)
+					if self.calcTarget then
+						self.Speed = 70
+					else
+						self.Speed = 100
+					end
+				end
+			elseif ent.ClassName == "gred_prop_part" or ent.ClassName == "gred_prop_tail" then
+				if LFSGodmode:GetInt() == 1 then
+					ent.OnTakeDamage = function() return end
 				end
 			end
 		end
 	end)
+end)
+
+hook.Add("EntityRemoved","gred_ent_removed",function(ent)
+	if ent:IsNPC() then
+		table.RemoveByValue(gred.AllNPCs,ent)
+		return
+	end
 end)
