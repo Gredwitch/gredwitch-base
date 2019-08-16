@@ -1112,6 +1112,9 @@ else
 		local tracer
 		local gunnerpod
 		local IsDriver
+		local selfAngle = self:GetAngles()
+		local calcSelfAnglePitch = selfAngle.p*0.01
+		selfAngle:Normalize()
 		for k,v in pairs(self.Gunners) do
 			pod = self["GetGunnerSeat"..k](self)
 			gunnerpod = pod
@@ -1128,10 +1131,10 @@ else
 					for C,att in pairs(v.att) do
 						att = self:GetAttachment(att)
 						if C == 1 then
-							ang = v.AngleOperate(self:WorldToLocalAngles(pod:WorldToLocalAngles(gunner:EyeAngles())),IsDriver)
+							ang = v.AngleOperate(self:WorldToLocalAngles(pod:WorldToLocalAngles(gunner:EyeAngles())),IsDriver,selfAngle)
+							ang.p = ang.p - (IsDriver and calcSelfAnglePitch or calcSelfAnglePitch)
+							-- ang.y = ang.y - 0
 							ang:Normalize()
-							local vec = gunner:GetAimVector():Angle()
-							vec:Normalize()
 							self:SetPoseParameter(v.poseparams[1],ang.p)
 							self:SetPoseParameter(v.poseparams[2],ang.y)
 							if (ang.y > v.maxang.y or ang.p > v.maxang.p or ang.y < v.minang.y or ang.p < v.minang.p) and DriverFireGunners then break end

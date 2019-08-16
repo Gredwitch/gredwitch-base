@@ -1,4 +1,15 @@
---[[15/08/2019 (08/15/2019)
+--[[I6/08/2019 (08/16/2019)
+- Updated the GunnersTick function
+
+If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
+If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
+Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
+
+If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
+
+OLDER CHANGES
+
+15/08/2019 (08/15/2019)
 - Added gred_prop_part.lua and gred_prop_tail.lua
 - Added a function that gets all the NPCs
 - Added a version checker that screams at you when the addon is not up to date
@@ -9,14 +20,6 @@
 - Fixed the convars not toggleing on servers
 - Fixed some issues with the LFS Health slider
 - Updated the thumbnail
-
-If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
-If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
-Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
-
-If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
-
-OLDER CHANGES
 
 20/07/2019 (07/20/2019)
 - "Fixed" the "particle" error
