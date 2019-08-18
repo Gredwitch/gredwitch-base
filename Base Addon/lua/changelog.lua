@@ -1,5 +1,5 @@
---[[I6/08/2019 (08/16/2019)
-- Updated the GunnersTick function
+--[[18/08/2019 (08/18/2019)
+- Hopefully fixed the bugs
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -8,6 +8,9 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+16/08/2019 (08/16/2019)
+- Updated the GunnersTick function
 
 15/08/2019 (08/15/2019)
 - Added gred_prop_part.lua and gred_prop_tail.lua
