@@ -760,41 +760,42 @@ if CLIENT then
 									gred_settings_misc
 		)
 	end );
-	
-	local CURRENT_VERSION = ""
-	local changelogs = file.Read("changelog.lua","LUA")
-	for i = 1,15 do CURRENT_VERSION = CURRENT_VERSION..changelogs[i] end
-	
-	local GITHUB_VERSION = "" 
-	local GitHub = http.Fetch("https://raw.githubusercontent.com/Gredwitch/gredwitch-base/master/Base%20Addon/lua/changelog.lua",function(body)
-		for i = 1,15 do GITHUB_VERSION = GITHUB_VERSION..body[i] end
-		if CURRENT_VERSION != GITHUB_VERSION then
+	local function CheckForUpdates()
+		local CURRENT_VERSION = ""
+		local changelogs = file.Read("changelog.lua","LUA")
+		for i = 1,15 do CURRENT_VERSION = CURRENT_VERSION..changelogs[i] end
+		
+		local GITHUB_VERSION = "" 
+		local GitHub = http.Fetch("https://raw.githubusercontent.com/Gredwitch/gredwitch-base/master/Base%20Addon/lua/changelog.lua",function(body)
+			if !body then return end
+			for i = 1,15 do GITHUB_VERSION = GITHUB_VERSION..body[i] end
+			if CURRENT_VERSION != GITHUB_VERSION then
+				local DFrame = vgui.Create("DFrame")
+				DFrame:SetSize(ScrW()*0.9,ScrH()*0.9)
+				DFrame:SetTitle("GREDWITCH'S BASE IS OUT OF DATE. EXPECT LUA ERRORS!")
+				DFrame:Center()
+				DFrame:MakePopup()
+				
+				local DHTML = vgui.Create("DHTML",DFrame)
+				DHTML:Dock(FILL)
+				DHTML:OpenURL("https://steamcommunity.com/workshop/filedetails/discussion/1131455085/1640915206496685563/")
+			end
+		end)
+		local exists = file.Exists("gredwitch_base.txt","DATA")
+		if !exists or (exists and file.Read("gredwitch_base.txt","DATA") != CURRENT_VERSION) then
 			local DFrame = vgui.Create("DFrame")
-			DFrame:SetSize(ScrW()*0.9,ScrH()*0.9)
-			DFrame:SetTitle("GREDWITCH'S BASE IS OUT OF DATE. EXPECT LUA ERRORS!")
+			DFrame:SetSize(ScrW()*0.5,ScrH()*0.5)
+			DFrame:SetTitle("Gredwitch's Base : last update changelogs")
 			DFrame:Center()
 			DFrame:MakePopup()
 			
 			local DHTML = vgui.Create("DHTML",DFrame)
 			DHTML:Dock(FILL)
-			DHTML:OpenURL("https://steamcommunity.com/workshop/filedetails/discussion/1131455085/1640915206496685563/")
+			DHTML:OpenURL("https://raw.githubusercontent.com/Gredwitch/gredwitch-base/master/Base%20Addon/lua/changelog.lua")
+			
+			file.Write("gredwitch_base.txt",CURRENT_VERSION)
 		end
-	end)
-	 
-	if !file.Exists("gredwitch_base.txt","DATA") or file.Read("gredwitch_base.txt","DATA") != CURRENT_VERSION then
-		local DFrame = vgui.Create("DFrame")
-		DFrame:SetSize(ScrW()*0.5,ScrH()*0.5)
-		DFrame:SetTitle("Gredwitch's Base : last update changelogs")
-		DFrame:Center()
-		DFrame:MakePopup()
-		
-		local DHTML = vgui.Create("DHTML",DFrame)
-		DHTML:Dock(FILL)
-		DHTML:OpenURL("https://raw.githubusercontent.com/Gredwitch/gredwitch-base/master/Base%20Addon/lua/changelog.lua")
-		
-		file.Write("gredwitch_base.txt",CURRENT_VERSION)
 	end
-	
 	if jit.arch != "x86" then
 		local DFrame = vgui.Create("DFrame")
 		DFrame:SetSize(ScrW()*0.9,ScrH()*0.9)
@@ -1052,6 +1053,7 @@ if CLIENT then
 		
 		return view
 	end
+	CheckForUpdates()
 else
 	resource.AddWorkshop(1131455085) -- Base addon
 	
