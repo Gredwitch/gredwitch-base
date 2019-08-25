@@ -1,5 +1,6 @@
---[[18/08/2019 (08/18/2019)
-- Hopefully fixed the bugs
+--[[25/08/2019 (08/25/2019)
+- Fixed the DFrames showing too early
+- Removed the 64 bit branch warnings
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -8,6 +9,9 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+18/08/2019 (08/18/2019)
+- Hopefully fixed the bugs
 
 16/08/2019 (08/16/2019)
 - Updated the GunnersTick function

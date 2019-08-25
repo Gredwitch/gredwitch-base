@@ -796,17 +796,6 @@ if CLIENT then
 			file.Write("gredwitch_base.txt",CURRENT_VERSION)
 		end
 	end
-	if jit.arch != "x86" then
-		local DFrame = vgui.Create("DFrame")
-		DFrame:SetSize(ScrW()*0.9,ScrH()*0.9)
-		DFrame:SetTitle("YOU ARE USING THE 64 BITS BRANCH WHICH IS BROKEN")
-		DFrame:Center()
-		DFrame:MakePopup()
-		
-		local DHTML = vgui.Create("DHTML",DFrame)
-		DHTML:Dock(FILL)
-		DHTML:OpenURL("https://steamcommunity.com/workshop/filedetails/discussion/1131455085/1640915206496660582/")
-	end
 	
 	-- HAB PhysBullet compatibility
 	timer.Simple(0.1,function()
@@ -1053,7 +1042,9 @@ if CLIENT then
 		
 		return view
 	end
-	CheckForUpdates()
+	timer.Simple(5,function()
+		CheckForUpdates()
+	end)
 else
 	resource.AddWorkshop(1131455085) -- Base addon
 	
