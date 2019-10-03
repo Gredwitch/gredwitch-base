@@ -1249,13 +1249,13 @@ if CLIENT then
 	end)
 	
 	hook.Add("CalcView","gred_simfphys_tanksightview",function(ply,ang,pos)
-		if not IsValid(ply) or not ply:Alive() or not ply:InVehicle() or ply:GetViewEntity() ~= ply then return end
+		if !IsValid(ply) or !ply:Alive() or !ply:InVehicle() or ply:GetViewEntity() != ply then return end
 		local vehicle = ply:GetVehicle()
 		if not IsValid(vehicle) then return end
 		local Base = ply.GetSimfphys and ply:GetSimfphys() or vehicle.vehiclebase
 		if not IsValid(Base) then return end
 		if !vehicle.GetThirdPersonMode or ply:GetViewEntity() ~= ply then return end
-		if vehicle:GetThirdPersonMode() then 
+		if vehicle.GRED_USE_SIGHT and vehicle:GetThirdPersonMode() then 
 			vehicle:SetThirdPersonMode(false)
 		end
 		if vehicle:GetNWBool("simfphys_SpecialCam") or not vehicle.GRED_USE_SIGHT or vehicle.GRED_SIGHT_ATT == 0 then return end
@@ -2970,7 +2970,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 				if LFSGodmode:GetInt() == 1 then
 					ent.OnTakeDamage = function() return end
 				end
-			elseif simfphys.IsCar(ent) then
+			elseif simfphys and simfphys.IsCar and simfphys.IsCar(ent) then
 				timer.Simple(0.3,function()
 					if !IsValid(ent) then return end
 					

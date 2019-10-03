@@ -1,4 +1,5 @@
---[[03/10/2019 (10/03/2019)
+--[[03b/10/2019 (10/03/2019)
+[HOTFIX] Fixed lua errors when simfphys isn't installed / fixed thirdperson with simfphys vehicles
 - Added some simfphys global functions for the upcoming tanks
 - Added options to make simfphys tanks not take damage from bullets
 - Cleaned a bunch of code in base_bomb and base_rocket
