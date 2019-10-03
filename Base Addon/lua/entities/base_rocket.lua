@@ -44,67 +44,23 @@ local damagesound                    =  "weapons/rpg/shotdown.wav"
 ENT.Spawnable		            	 =  false
 ENT.AdminSpawnable		             =  false
 
-ENT.PrintName		                 =  "Gredwitch's Rocket base"
+ENT.PrintName		                 =  "[ROCKETS]Base rocket"
 ENT.Author			                 =  "Gredwitch"
-ENT.Contact			                 =  "qhamitouche@gmail.com"
+ENT.Contact			                 =  "contact.gredwitch@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 
-ENT.Model                            =  ""
 ENT.RocketTrail                      =  ""
 ENT.RocketBurnoutTrail               =  ""
-ENT.Effect                           =  ""
-ENT.EffectAir                        =  ""
-ENT.EffectWater                      =  ""
-     
-ENT.ExplosionSound                   =  ENT.ExplosionSound
-ENT.FarExplosionSound				 =  ENT.ExplosionSound
-ENT.DistExplosionSound				 =  ENT.ExplosionSound
-ENT.AngEffect						 =	false
-
-ENT.WaterExplosionSound				 =	nil
-ENT.WaterFarExplosionSound			 =  nil
     
 ENT.StartSound                       =  ""
-ENT.ArmSound                         =  ""
-ENT.ActivationSound                  =  ""
 ENT.EngineSound                      =  "Missile.Ignite"
-ENT.NBCEntity                        =  ""
 
-ENT.ShouldUnweld                     =  false
-ENT.ShouldIgnite                     =  false
-ENT.UseRandomSounds                  =  false
-ENT.SmartLaunch                      =  true
-ENT.Timed                            =  false
-ENT.IsNBC                            =  false
-
-ENT.ExplosionDamage                  =  0
-ENT.ExplosionRadius                  =  0
-ENT.PhysForce                        =  0
-ENT.SpecialRadius                    =  0
-ENT.MaxIgnitionTime                  =  5
-ENT.Life                             =  20
-ENT.MaxDelay                         =  2
-ENT.TraceLength                      =  500
-ENT.ImpactSpeed                      =  500
-ENT.Mass                             =  0
+ENT.SmartLaunch                      =  false
 ENT.EnginePower                      =  0
 ENT.FuelBurnoutTime                  =  0
 ENT.IgnitionDelay                    =  0
 ENT.RotationalForce                  =  25
-ENT.ArmDelay                         =  2
 ENT.ForceOrientation                 =  "NORMAL"
-ENT.Timer                            =  0
-ENT.Smoke							 =  false
-
-ENT.LightEmitTime                    =  0
-ENT.LightRed                         =  0
-ENT.LightBlue						 =  0
-ENT.LightGreen						 =  0
-ENT.LightBrightness					 =  0
-ENT.LightSize   					 =  0
-ENT.RSound   						 =  1
-
-ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
 
 function ENT:AddOnInit() 
 	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
@@ -148,7 +104,7 @@ function ENT:OnTakeDamage(dmginfo)
 	if exploDamage == true then return end
 	if (self.Life <= 0) then return end
 	self:TakePhysicsDamage(dmginfo)
-	if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then  
+	if(gred.CVars["gred_sv_fragility"]:GetInt() >= 1) then  
 	    if(!self.Fired and !self.Burnt and !self.Arming and !self.Armed) then
 		   if(math.random(0,9) == 1) then
 			   self:Launch()
@@ -176,43 +132,61 @@ function ENT:OnTakeDamage(dmginfo)
 	end
 end
 
-function ENT:PhysicsCollide( data, physobj )
-	timer.Simple(0,function()
-	-- print(data.HitEntity:GetClass())
-	if(self.Exploded) then return end
-	if(!self:IsValid()) then return end
-	if(self.Life <= 0) then return end
-		if(GetConVar("gred_sv_fragility"):GetInt() >= 1) then
-			if(!self.Fired and !self.Burnt and !self.Arming and !self.Armed ) and (data.Speed > self.ImpactSpeed * 5) then --and !self.Arming and !self.Armed
-				if(math.random(0,9) == 1) then
-					self:Launch()
-					self:EmitSound(damagesound)
-				else
-					self:Arm()
-					self:EmitSound(damagesound)
-				end
+function ENT:PhysicsCollide(data,physobj)
+	self.LastVel = data.OurOldVelocity
+	if self.Exploded or !IsValid(self) or self.Life <= 0 then return end
+	if gred.CVars["gred_sv_fragility"]:GetInt() >= 1 then
+		if (!self.Fired and !self.Burnt and !self.Arming and !self.Armed) and (data.Speed > self.ImpactSpeed * 5) then 
+			if math.random(0,9) == 1 then
+				self:Launch()
+				self:EmitSound(damagesound)
+			else
+				self:Arm()
+				self:EmitSound(damagesound)
 			end
 		end
-
-		if(!self.Armed) then return end
-			
-		if (data.Speed > self.ImpactSpeed )then
-			self.Exploded = true
-			self:Explode()
+	end
+		
+	if (self.Fired or self.Armed) and data.Speed > self.ImpactSpeed then
+		if self.ShellType then
+			self.LastVel = data.OurOldVelocity
+			if self.ShellType == "AP" then
+				local HitNormal = data.HitNormal:Angle()
+				local HitAng = self:WorldToLocalAngles(HitNormal)
+				local c = os.clock()
+				local ricochetang = gred.CVars.gred_sv_minricochetangle:GetFloat()
+				if (math.abs(HitAng.p) >= ricochetang or math.abs(HitAng.y) >= ricochetang) and (!self.Ricochet or self.Ricochet+0.1 >= c) then
+					self.Ricochet = c
+					self.ImpactSpeed = 100
+					-- gred.CreateSound(data.HitPos,true,"gredwitch/ricochet.wav","gredwitch/ricochet.wav","")
+					sound.Play("gredwitch/ricochet.wav",data.HitPos,120,100,1)
+					local effectdata = EffectData()
+					effectdata:SetOrigin(data.HitPos)
+					HitAng = self:LocalToWorldAngles(HitAng)
+					HitAng:RotateAroundAxis(HitAng:Right(),180)
+					effectdata:SetNormal(HitAng:Forward())
+					util.Effect("ManhackSparks",effectdata)
+					return 
+				else
+					self:SetPos(data.HitPos)
+				end
+			else
+				self:SetPos(data.HitPos)
+			end
 		end
-	end)
+		self.Exploded = true
+		self:Explode()
+	end
 end
 
 function ENT:Launch()
-	if(self.Exploded) then return end
-	if(self.Burned) then return end
-	--if(self.Armed) then return end
-	if(self.Fired) then return end
-	
+	if self.Exploded or self.Burnt or self.Fired then return end
+	self.ImpactSpeed = 10
 	local phys = self:GetPhysicsObject()
-	if !phys:IsValid() then return end
+	if !IsValid(phys) then return end
+	
 	self.Fired = true
-	if(self.SmartLaunch) then
+	if self.SmartLaunch then
 		constraint.RemoveAll(self)
 	end
 	phys:Wake()
@@ -228,105 +202,73 @@ function ENT:Launch()
 end
 
 function ENT:InitLaunch(phys)
-	self:SetNetworkedBool("Exploded",true)
-	self:SetNetworkedInt("LightRed", self.LightRed)
-	self:SetNetworkedInt("LightBlue", self.LightBlue)
-	self:SetNetworkedInt("LightGreen", self.LightGreen)	
-	self:SetNetworkedBool("EmitLight",true)
-	self:SetNetworkedInt("LightEmitTime", self.LightEmitTime)
-	self:SetNetworkedInt("LightBrightness", self.LightBrightness)
-	self:SetNetworkedInt("LightSize", self.LightSize)
 	self.Ignition = true
 	self:Arm()
-	local pos = self:GetPos()
-	sound.Play(self.StartSound, pos, 120, 100,1)
-	-- self:EmitSound(self.EngineSound)
-	self:SetNetworkedBool("EmitLight",true)
-	self:SetNetworkedBool("self.Ignition",true)
+	sound.Play(self.StartSound,self:GetPos(),120,100,1)
+	
 	if self.IsShell then
-		phys:AddVelocity(self:GetForward() * self.EnginePower)
+		phys:SetVelocityInstantaneous(self:GetForward() * self.EnginePower)
 		return
 	end
-	if self.RocketTrail != "" then ParticleEffectAttach(self.RocketTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
-	if(self.FuelBurnoutTime != 0) then 
+	
+	if self.RocketTrail != "" then 
+		ParticleEffectAttach(self.RocketTrail,PATTACH_ABSORIGIN_FOLLOW,self,1)
+	end
+	if self.FuelBurnoutTime != 0 then 
 		timer.Simple(self.FuelBurnoutTime,function()
-			if not self:IsValid() then return end
+			if !IsValid(self) then return end
 			self.Burnt = true
 			self:StopParticles()
 			self:StopSound(self.EngineSound)
 			self:StopSound(self.StartSound)
-			if self.RocketBurnoutTrail != "" then ParticleEffectAttach(self.RocketBurnoutTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) end
+			if self.RocketBurnoutTrail != "" then 
+				ParticleEffectAttach(self.RocketBurnoutTrail,PATTACH_ABSORIGIN_FOLLOW,self,1) 
+			end
 		end)
 	end
 end
 
 function ENT:Think()
-	if(self.Burnt) then return end
-	if(!self.Ignition) then return end -- if there wasn't ignition, we won't fly
-	if(self.Exploded) then return end -- if we exploded then what the fuck are we doing here
-	if(!self:IsValid()) then return end -- if we aren't good then something fucked up
-	local phys = self:GetPhysicsObject()
-	local thrustpos = self:GetPos()
-	if !self.IsShell then
-		if(self.ForceOrientation == "RIGHT") then
-			phys:AddVelocity(self:GetRight() * self.EnginePower) -- Continuous engine impulse
-		elseif(self.ForceOrientation == "LEFT") then
-			phys:AddVelocity(self:GetRight() * -self.EnginePower) -- Continuous engine impulse
-		elseif(self.ForceOrientation == "UP") then
-			phys:AddVelocity(self:GetUp() * self.EnginePower) -- Continuous engine impulse
-		elseif(self.ForceOrientation == "DOWN") then 
-			phys:AddVelocity(self:GetUp() * -self.EnginePower) -- Continuous engine impulse
-		elseif(self.ForceOrientation == "INV") then
-			phys:AddVelocity(self:GetForward() * -self.EnginePower) -- Continuous engine impulse
-		else
+	if not (self.Burnt or !self.Ignition or self.Exploded) then
+		local phys = self:GetPhysicsObject()
+		if !self.IsShell then
 			phys:AddVelocity(self:GetForward() * self.EnginePower) -- Continuous engine impulse
 		end
-	end
-	if (self.Armed) then
-	   phys:AddAngleVelocity(Vector(self.RotationalForce,0,0)) -- Rotational force
-	end
-	if self.Fired then
-		if self:WaterLevel() >= 1 then self:Explode() end
+		if self.Armed then
+		   phys:AddAngleVelocity(Vector(self.RotationalForce,0,0)) -- Rotational force
+		end
+		if self.Fired then
+			if self:WaterLevel() >= 1 then self:Explode() end
+		end
 	end
 	self:AddOnThink()
-	self:NextThink(CurTime() + 0.01)
+	self:NextThink(CurTime())
 	return true
 end
 
 function ENT:Arm()
-	if(!self:IsValid()) then return end
-	if(self.Armed) then return end
+	if self.Armed then return end
 	self.Arming = true
 	
-	timer.Simple(self.ArmDelay, function()
-	    if not self:IsValid() then return end 
+	timer.Simple(self.ArmDelay,function()
+	    if !IsValid(self) then return end 
 	    self.Armed = true
 		self.Arming = false
 		self:EmitSound(self.ArmSound)
-		if(self.Timed) then
-		   timer.Simple(self.Timer, function()
-			  if !self:IsValid() then return end 
+		if self.Timed then
+		   timer.Simple(self.Timer,function()
+			  if !IsValid(self) then return end 
 			    self.Exploded = true
 			    self:Explode()
-				self.EmitLight = true
 		   end)
 		end
 	end)
 end	
 
 function ENT:Use( activator, caller )
-	if(self.Exploded) then return end
-	if(self.Dumb) then return end
-	if(GetConVar("gred_sv_easyuse"):GetInt() >= 1) then
-	    if(self:IsValid()) then
-		   if (!self.Exploded) and (!self.Burnt) and (!self.Fired) then
-			  if (activator:IsPlayer()) then
-				 self:EmitSound(self.ActivationSound)
-				 self:Launch()
-			   end
-		   end
-	    end
-	end
+	if gred.CVars["gred_sv_easyuse"]:GetInt() < 1 or self.Fired then return end
+	self:EmitSound(self.ActivationSound)
+	self:Launch()
 end
 
 function ENT:OnRemove()
@@ -335,34 +277,3 @@ function ENT:OnRemove()
 	self:StopParticles()
 end
 
--- if CLIENT then
-	-- function ENT:Initialize()
-		-- if self.EngineSound == "" then return end
-		-- self.snd = {}
-		-- self.snd["rocket"] = CreateSound(self,self.EngineSound)
-	-- end	
-	-- function ENT:Think()
-		-- if !self.snd or !self.Fired then return end
-		-- local e=LocalPlayer():GetViewEntity()
-		-- local pos=e:GetPos()
-		-- local spos=self:GetPos()
-		-- local val1=(pos:Distance(spos+e:GetVelocity())-pos:Distance(spos+self:GetVelocity()))/300
-		-- local pitch = math.Clamp(1*100+1*1*3+val1, 0, 200)
-		-- local volume = 1*math.Clamp(pitch*pitch/4000, 0, false and 1 or 5)
-		-- for k,v in pairs (self.snd) do
-			-- v:Play()
-			-- v:ChangePitch(pitch,0.1)
-			-- v:ChangeVolume(volume,0.1)
-			-- v:SetSoundLevel(120)
-		-- end
-	-- end
-	
-	-- function ENT:OnRemove()
-		-- if self.snd then 
-			-- for k,v in pairs (self.snd) do
-				-- v:Stop()
-				-- v = nil
-			-- end
-		-- end
-	-- end
--- end

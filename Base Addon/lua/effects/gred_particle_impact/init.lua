@@ -7,7 +7,7 @@ function EFFECT:Init(data)
 	if isGroundImpact then
 		if cal == "wac_base_7mm" then
 			if GetConVar("gred_cl_noparticles_7mm"):GetInt() == 1 then return end
-			if GetConVar("gred_cl_insparticles"):GetInt() == 1 then pcfD = "" else pcfD = "doi_" end
+			if GetConVar("gred_cl_insparticles"):GetInt() == 1 then pcfD = "ins_" else pcfD = "doi_" end
 			local mat = data:GetSurfaceProp()
 			if mat == 1 then
 				ParticleEffect(""..pcfD.."impact_concrete",pos,ang,nil)
@@ -106,7 +106,7 @@ function EFFECT:Init(data)
 		if cal == "wac_base_7mm" then
 			ParticleEffect("doi_impact_water",pos,Angle(-90),nil)
 		elseif cal == "wac_base_12mm" then
-			ParticleEffect("impact_water",pos,Angle(-90),nil)
+			ParticleEffect("ins_impact_water",pos,Angle(-90),nil)
 		elseif cal == "wac_base_20mm" then
 			ParticleEffect("water_small",pos,ang,nil)
 		elseif cal == "wac_base_30mm" or cal == "wac_base_40mm" then

@@ -34,163 +34,230 @@ local materials = {
 	wood_Panel				=	2,
 	wood_Solid				=	2,
 }
-local damagesound                    =  "weapons/rpg/shotdown.wav"
+local damagesound                   =  "weapons/rpg/shotdown.wav"
 
 local SmokeSnds = {}
-SmokeSnds[1]                         =  "gred_emp/nebelwerfer/artillery_strike_smoke_close_01.wav"
-SmokeSnds[2]                         =  "gred_emp/nebelwerfer/artillery_strike_smoke_close_02.wav"
-SmokeSnds[3]                         =  "gred_emp/nebelwerfer/artillery_strike_smoke_close_03.wav"
-SmokeSnds[4]                         =  "gred_emp/nebelwerfer/artillery_strike_smoke_close_04.wav"
+SmokeSnds[1]                        =  "gred_emp/nebelwerfer/artillery_strike_smoke_close_01.wav"
+SmokeSnds[2]                        =  "gred_emp/nebelwerfer/artillery_strike_smoke_close_02.wav"
+SmokeSnds[3]                        =  "gred_emp/nebelwerfer/artillery_strike_smoke_close_03.wav"
+SmokeSnds[4]                        =  "gred_emp/nebelwerfer/artillery_strike_smoke_close_04.wav"
 
 local APSounds = {}
-APSounds[1]							 =  "impactsounds/ap_impact_01.wav"
-APSounds[2]							 =  "impactsounds/ap_impact_02.wav"
-APSounds[3]							 =  "impactsounds/ap_impact_03.wav"
-APSounds[4]							 =  "impactsounds/ap_impact_04.wav"
+APSounds[1]							=  "impactsounds/ap_impact_01.wav"
+APSounds[2]							=  "impactsounds/ap_impact_02.wav"
+APSounds[3]							=  "impactsounds/ap_impact_03.wav"
+APSounds[4]							=  "impactsounds/ap_impact_04.wav"
 
 local APWoodSounds = {}
-APWoodSounds[1]							 =  "impactsounds/ap_impact_wood_01.wav"
-APWoodSounds[2]							 =  "impactsounds/ap_impact_wood_02.wav"
-APWoodSounds[3]							 =  "impactsounds/ap_impact_wood_03.wav"
-APWoodSounds[4]							 =  "impactsounds/ap_impact_wood_04.wav"
+APWoodSounds[1]						=  "impactsounds/ap_impact_wood_01.wav"
+APWoodSounds[2]						=  "impactsounds/ap_impact_wood_02.wav"
+APWoodSounds[3]						=  "impactsounds/ap_impact_wood_03.wav"
+APWoodSounds[4]						=  "impactsounds/ap_impact_wood_04.wav"
 
 local APSoundsDist = {}
-APSoundsDist[1]							 =  "impactsounds/ap_impact_dist_01.wav"
-APSoundsDist[2]							 =  "impactsounds/ap_impact_dist_02.wav"
-APSoundsDist[3]							 =  "impactsounds/ap_impact_dist_03.wav"
+APSoundsDist[1]						=  "impactsounds/ap_impact_dist_01.wav"
+APSoundsDist[2]						=  "impactsounds/ap_impact_dist_02.wav"
+APSoundsDist[3]						=  "impactsounds/ap_impact_dist_03.wav"
 
 local APMetalSounds = {}
-APMetalSounds[1]							 =  "impactsounds/ap_impact_metal_01.wav"
-APMetalSounds[2]							 =  "impactsounds/ap_impact_metal_02.wav"
-APMetalSounds[3]							 =  "impactsounds/ap_impact_metal_03.wav"
+APMetalSounds[1]					=  "impactsounds/ap_impact_metal_01.wav"
+APMetalSounds[2]					=  "impactsounds/ap_impact_metal_02.wav"
+APMetalSounds[3]					=  "impactsounds/ap_impact_metal_03.wav"
 
-ENT.Spawnable		            	 =  false
-ENT.AdminSpawnable		             =  false
+local ExploSnds = {}
+ExploSnds[1]                         =  "explosions/doi_generic_01.wav"
+ExploSnds[2]                         =  "explosions/doi_generic_02.wav"
+ExploSnds[3]                         =  "explosions/doi_generic_03.wav"
+ExploSnds[4]                         =  "explosions/doi_generic_04.wav"
 
-ENT.PrintName		                 =  "Gredwitch's Shell base"
-ENT.Author			                 =  "Gredwitch"
-ENT.Contact			                 =  "qhamitouche@gmail.com"
-ENT.Category                         =  "Gredwitch's Stuff"
+local CloseExploSnds = {}
+CloseExploSnds[1]                         =  "explosions/doi_generic_01_close.wav"
+CloseExploSnds[2]                         =  "explosions/doi_generic_02_close.wav"
+CloseExploSnds[3]                         =  "explosions/doi_generic_03_close.wav"
+CloseExploSnds[4]                         =  "explosions/doi_generic_04_close.wav"
 
-ENT.TOBEPRINTED						 =	0
+local DistExploSnds = {}
+DistExploSnds[1]                         =  "explosions/doi_generic_01_dist.wav"
+DistExploSnds[2]                         =  "explosions/doi_generic_02_dist.wav"
+DistExploSnds[3]                         =  "explosions/doi_generic_03_dist.wav"
+DistExploSnds[4]                         =  "explosions/doi_generic_04_dist.wav"
 
-ENT.Model                            =  ""
-ENT.Effect                           =  ""
-ENT.EffectAir                        =  ""
-ENT.EffectWater                      =  ""
-ENT.RocketTrail						 =	"grenadetrail"
-    
-ENT.NextUse							 =	0
-ENT.ExplosionSound                   =  ENT.ExplosionSound
-ENT.FarExplosionSound				 =  ENT.ExplosionSound
-ENT.DistExplosionSound				 =  ENT.ExplosionSound
-ENT.AngEffect						 =	false
+local WaterExploSnds = {}
+WaterExploSnds[1]                         =  "explosions/doi_generic_01_water.wav"
+WaterExploSnds[2]                         =  "explosions/doi_generic_02_water.wav"
+WaterExploSnds[3]                         =  "explosions/doi_generic_03_water.wav"
+WaterExploSnds[4]                         =  "explosions/doi_generic_04_water.wav"
 
-ENT.WaterExplosionSound				 =	nil
-ENT.WaterFarExplosionSound			 =  nil
-    
-ENT.StartSound                       =  ""
-ENT.ArmSound                         =  ""
-ENT.ActivationSound                  =  ""
-ENT.EngineSound                      =  ""--"Missile.Ignite"
-ENT.NBCEntity                        =  ""
+local CloseWaterExploSnds = {}
+CloseWaterExploSnds[1]                         =  "explosions/doi_generic_02_closewater.wav"
+CloseWaterExploSnds[2]                         =  "explosions/doi_generic_02_closewater.wav"
+CloseWaterExploSnds[3]                         =  "explosions/doi_generic_03_closewater.wav"
+CloseWaterExploSnds[4]                         =  "explosions/doi_generic_04_closewater.wav"
 
-ENT.ShouldUnweld                     =  false
-ENT.ShouldIgnite                     =  false
-ENT.UseRandomSounds                  =  false
-ENT.SmartLaunch                      =  true
-ENT.Timed                            =  false
-ENT.IsNBC                            =  false
+local WPExploSnds = {}
+WPExploSnds[1]                         =  "explosions/doi_wp_01.wav"
+WPExploSnds[2]                         =  "explosions/doi_wp_02.wav"
+WPExploSnds[3]                         =  "explosions/doi_wp_03.wav"
+WPExploSnds[4]                         =  "explosions/doi_wp_04.wav"
 
-ENT.AP								 =  false
-ENT.ExplosionDamage                  =  0
-ENT.ExplosionRadius                  =  0
-ENT.PhysForce                        =  ENT.ExplosionRadius / ENT.ExplosionDamage
-ENT.SpecialRadius                    =  ENT.ExplosionDamage / ENT.ExplosionRadius
-ENT.Life                             =  20
-ENT.TraceLength                      =  25
-ENT.ImpactSpeed                      =  50
-ENT.Mass                             =  0
-ENT.EnginePower                      =  200
-ENT.FuelBurnoutTime                  =  0.7
-ENT.IgnitionDelay                    =  0
-ENT.RotationalForce                  =  0
-ENT.ArmDelay                         =  0
-ENT.ForceOrientation                 =  "NORMAL"
-ENT.Timer                            =  0
-ENT.Smoke							 =  false
-ENT.IsShell							 =	true
+ENT.Spawnable		            	=  false
+ENT.AdminSpawnable		            =  false
 
-ENT.RSound   						 =  1
-ENT.ModelSize						 =	1
-ENT.PlyPickup						 =	nil
+ENT.PrintName		                =  "Gredwitch's Shell base"
+ENT.Author			                =  "Gredwitch"
+ENT.Contact			                =  "qhamitouche@gmail.com"
+ENT.Category                        =  "Gredwitch's Stuff"
 
-ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
+ENT.Model							=	"models/gredwitch/bombs/75mm_shell.mdl"
+ENT.IsShell							=	true
+ENT.MuzzleVelocity					=	0
+ENT.Caliber							=	0
+ENT.RSound							=	0
+ENT.ShellType						=	""
+ENT.EffectWater						=	"ins_water_explosion"
+
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Bool",0,"Fired")
-	self:NetworkVar("Bool",1,"IsAP")
+	self:NetworkVar("String",0,"ShellType")
+	self:NetworkVar("String",1,"TracerColor")
+	self:NetworkVar("Int",0,"Caliber")
 end
 
 function ENT:AddOnInit()
-	local m = GetConVar("gred_sv_shellspeed_multiplier"):GetFloat()
-	if m > 0 then
-		self.EnginePower = (self.EnginePower * m) - (self.AP and 0 or self.Mass*30)
-	end
-	if !self.AP then 
-		self:SetBodygroup(1,1)
-		net.Start("gred_net_nw_var")
-			net.WriteEntity(self)
-			net.WriteString("ap")
-			net.WriteInt(1,4)
-			net.WriteString("false")
-		net.Broadcast()
-	else
-		net.Start("gred_net_nw_var")
-			net.WriteEntity(self)
-			net.WriteString("ap")
-			net.WriteInt(1,4)
-			net.WriteString("true")
-		net.Broadcast()
-	end
-	self:SetIsAP(self.AP)
-	self:SetModelScale(self.ModelSize)
-	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
-end
-local baseclass = baseclass.Get("base_rocket")
-function ENT:Launch()
-	baseclass.Launch(self)
-	self:SetFired(self.Fired)
-end
-
-function ENT:AddOnExplode(pos) 
-	if self.Smoke then
+	
+	self.ExplosionSound			= table.Random(CloseExploSnds)
+	self.FarExplosionSound		= table.Random(ExploSnds)
+	self.DistExplosionSound		= table.Random(DistExploSnds)
+	self.WaterExplosionSound	= table.Random(CloseWaterExploSnds)
+	self.WaterFarExplosionSound	= table.Random(WaterExploSnds)
+	
+	if self.ShellType == "WP" then
+		self.ExplosionSound = table.Random(WPExploSnds)
+		self.FarExplosionSound = self.ExplosionSound
+		self.DistExplosionSound = self.ExplosionSound
+		
+		self.AngEffect = true
+		self.Effect = self.Caliber < 82 and "doi_wpgrenade_explosion" or "doi_wparty_explosion"
+		self.ExplosionDamage = 30
+		self.ExplosionRadius = self.Caliber < 82 and 300 or 500
+		self.AddOnExplode = function(self)
+			local ent = ents.Create("base_napalm")
+			local pos = self:GetPos()
+			ent:SetPos(pos)
+			ent.Radius	 = self.Caliber < 82 and 300 or 500
+			ent.Rate  	 = 1
+			ent.Lifetime = 15
+			ent:Spawn()
+			ent:Activate()
+			ent:SetVar("GBOWNER",self.GBOWNER)
+		end
+	elseif self.ShellType == "Smoke" then
 		self.ExplosionSound = table.Random(SmokeSnds)
 		self.FarExplosionSound = self.ExplosionSound
 		self.DistExplosionSound = ""
-		self.RSound = 0
 		self.Effect = self.SmokeEffect
 		self.EffectAir = self.SmokeEffect
-	elseif self.AP then
+		self.Effect = self.Caliber < 88 and "m203_smokegrenade" or "doi_smoke_artillery"
+	elseif self.ShellType == "HE" then
+		self.ExplosionDamage = 150 + self.Caliber
+		if self.Caliber >= 40 and self.Caliber < 50 then
+			self.ExplosionRadius = 350
+			self.Effect = "ins_m203_explosion"
+			self.AngEffect = true
+		elseif self.Caliber >= 50 and self.Caliber < 56 then
+			self.ExplosionRadius = 350
+			self.Effect = "gred_50mm"
+			self.AngEffect = true
+		elseif self.Caliber >= 56 and self.Caliber < 75 then
+			self.ExplosionRadius = 350
+			self.Effect = "ins_rpg_explosion"
+			self.AngEffect = true
+		elseif self.Caliber >= 75 and self.Caliber < 77 then
+			self.ExplosionRadius = 450
+			self.Effect = "doi_compb_explosion"
+			self.AngEffect = true
+		elseif self.Caliber >= 77 and self.Caliber < 82 then
+			self.ExplosionRadius = 350
+			self.Effect = "gred_mortar_explosion"
+			self.AngEffect = true
+		elseif self.Caliber >= 82 and self.Caliber < 100 then
+			self.ExplosionRadius = 500
+			self.Effect = "doi_artillery_explosion"
+			self.AngEffect = true
+		elseif self.Caliber >= 100 and self.Caliber < 128 then
+			self.ExplosionRadius = 500
+			self.Effect = "ins_c4_explosion"
+			self.AngEffect = true
+		elseif self.Caliber >= 128 and self.Caliber < 150 then
+			self.ExplosionRadius = 600
+			self.Effect = "gred_highcal_rocket_explosion"
+			self.AngEffect = true
+		elseif self.Caliber >= 150 then
+			self.ExplosionRadius = 600
+			self.Effect = "doi_artillery_explosion_OLD"
+			self.AngEffect = true
+		end
+	else
+		self.AngEffect = true
 		self.Effect = "gred_ap_impact"
 		self.EffectAir = "gred_ap_impact"
 		self.ExplosionRadius = 100
-		self.ExplosionDamage = self.APDamage
-		self.PhysForce = 10
 		self.Decal = "scorch_small"
 	end
+	
+	self.EnginePower 			= ((self.MuzzleVelocity*gred.CVars["gred_sv_shellspeed_multiplier"]:GetFloat())/0.02540002032) -- m/s
+	self.EffectAir 				= self.Effect
+	self.Smoke 					= self.ShellType == "Smoke"
+	
+	self:SetTracerColor(self.TracerColor)
+	self:SetCaliber(self.Caliber)
+	self:SetShellType(self.ShellType)
+	self:SetModelScale(self.Caliber / 75)
+	
+	for k,v in pairs(ents.FindByClass("gmod_sent_vehicle_fphysics_wheel")) do
+		constraint.NoCollide(self,v,0,0)
+	end
+	
+	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
+end
+
+local Baseclass = baseclass.Get("base_rocket")
+
+function ENT:Launch()
+	baseclass.Get("base_rocket").Launch(self)
+	self:SetBodygroup(0,1)
+	self:SetFired(self.Fired)
+end
+
+function ENT:AddOnThink()
+end
+
+function ENT:AddOnExplode(pos) 
+	if self.ShellType == "AP" then
+		self.Penetration = ((((self.LastVel and self.LastVel:Length()*0.02540002032 or self.MuzzleVelocity)/gred.CVars["gred_sv_shellspeed_multiplier"]:GetFloat())*math.sqrt(self.Mass))/(2400*math.sqrt(self.Caliber)))*1000
+		self.ExplosionDamage = self.Penetration*self.Caliber
+	end
 	if self:WaterLevel() < 1 then
-		if self.AP then
-			self.EffectAir = "AP_impact_wall"
+		if self.ShellType == "AP" then
 			local fwd = self:GetForward()
-			local tr = util.QuickTrace(pos - fwd*2,fwd*(self.APDamage*0.001),self)
+			local tr = util.QuickTrace(pos - fwd*2,fwd*(self.Penetration),self)
 			local hitmat = util.GetSurfacePropName(tr.SurfaceProps)
 			local class
-			for k,v in pairs(ents.FindInSphere(tr.HitPos,15)) do
+			self.EffectAir = "AP_impact_wall"
+			self.ExplosionDamage = self.ExplosionDamage*math.abs(math.cos(tr.HitNormal:Angle().p))
+			for k,v in pairs(ents.FindInSphere(tr.HitPos,50)) do
 				class = v:GetClass()
-				if class == "gmod_sent_vehicle_fphysics_base" or class == "gmod_sent_vehicle_fphysics_wheel" then
+				if class == "gmod_sent_vehicle_fphysics_base" then--or class == "gmod_sent_vehicle_fphysics_wheel" then
 					hitmat = "metal"
-					self.ExplosionRadius = 80
+					local dmg = DamageInfo()
+					dmg:SetAttacker(self.GBOWNER)
+					dmg:SetInflictor(self)
+					dmg:SetDamagePosition(pos)
+					dmg:SetDamage(self.ExplosionDamage)
+					dmg:SetDamageType(64) -- DMG_BLAST
+					v:TakeDamageInfo(dmg)
+					self.ExplosionDamage = 0
 					break
 				end
 			end
@@ -211,12 +278,13 @@ function ENT:AddOnExplode(pos)
 end
 
 function ENT:Use( activator, caller )
+	if self.Fired then return end
 	local ct = CurTime()
+	self.NextUse = self.NextUse or 0
 	if self.NextUse >= ct then return end
-    if(self.Exploded) then return end
-	if(self.Dumb) then return end
 	if self:IsPlayerHolding() then return end
 	activator:PickupObject(self)
+	activator:SetNWEntity("PickedUpObject",self)
 	self.PlyPickup = activator
 	self.NextUse = ct + 0.1
 end
@@ -225,39 +293,101 @@ function ENT:OnRemove()
 	if self.PlyPickup != nil then
 		self.PlyPickup:DropObject()
 	end
-    self:StopSound(self.EngineSound)
 	self:StopParticles()
 end
 
 if CLIENT then
-	local ply
+	-- local glow = Material("sprites/animglow02") 
+	local soundSpeed = 18005.25
+	local particle
+	local vector_zero = Vector(0,0,0)
+	local colors = {
+		["red"] = CreateMaterial("gred_mat_shell_tracer_red","VertexLitGeneric",{
+			["$basetexture"]				= "sprites/animglow02",
+			["$color"]						= "{255 0 0}",
+		}),
+		["green"] = CreateMaterial("gred_mat_shell_tracer_green","VertexLitGeneric",{
+			["$basetexture"]				= "sprites/animglow02",
+			["$color"]						= "{0 255 0}",
+		}),
+		["white"] = Material("sprites/animglow02") ,--CreateMaterial("gred_mat_shell_tracer_white","VertexLitGeneric",{
+			-- ["$basetexture"]				= "sprites/animglow02",
+			-- ["$color"]						= "{255 255 255}",
+		-- }),
+	}
+	
+	local function CalcLength(source,receiver)
+		local V_s,V_r = source:GetVelocity(),receiver:GetVelocity()
+		local vs,vr = source:WorldToLocal(receiver:GetPos())*V_s,receiver:WorldToLocal(source:GetPos())*V_r
+		V_s = vs.x > 0 and V_s:Length() or -V_s:Length()
+		V_r = vr.x > 0 and V_r:Length() or -V_r:Length()
+		return V_s,V_r
+	end
+	
+	local function VectorEqual(v1,v2)
+		return v1.x == v2.x and v1.y == v1.y and v1.z == v2.z
+	end
+	
 	function ENT:Initialize()
-		ply = LocalPlayer()
+		self.ply = LocalPlayer()
+		self.Emitter = ParticleEmitter(self:GetPos(),false)
 		self.shouldOwnerNotHearSnd = false
-		self.snd = {}
-		self.snd["wiz"] = CreateSound(self,"bomb/tank_shellwhiz.wav")
-		self.snd["trail"] = CreateSound(self,"bomb/shell_trail.wav")
-		timer.Simple(0.1,function()
-			if self.GetIsAP and !self:GetIsAP() then -- sometimes the func just doesn't exist
-				self.snd["wiz_mortar"] = CreateSound(self,"bomb/shellwhiz_mortar_"..math.random(1,2)..".wav")
+		
+		self.snd = self.snd or {
+			CreateSound(self,"bomb/tank_shellwhiz.wav"),
+			CreateSound(self,"bomb/shell_trail.wav"),
+		}
+		-- self:SetNoDraw(true)
+		for k,v in pairs(self.snd) do v:ChangeVolume(80) end
+		
+		timer.Simple(0,function()
+			if self.GetShellType then  -- sometimes the function just doesn't exist
+				if self:GetShellType() != "AP" and !self.snd["wiz_mortar"] then
+					table.insert(self.snd,CreateSound(self,"bomb/shellwhiz_mortar_"..math.random(1,2)..".wav"))
+					self.snd[#self.snd]:SetSoundLevel(80)
+				end
+				self.TracerColor = self:GetTracerColor()
+				self.TracerColor = colors[self.TracerColor] and colors[self.TracerColor] or colors["white"]
+				self.Caliber = self:GetCaliber()
+				self.Inited = true
 			end
 		end)
+		self.Rate = 0.03
+		self.DefaultF = math.random(110,190)
+	end
+	local function ClampVector(vec,min,max)
+		return Vector(math.Clamp(vec.x,min.x,max.x),math.Clamp(vec.y,min.y,max.y),math.Clamp(vec.z,min.z,max.z))
 	end
 	function ENT:Think()
-		if !self.snd then self:Initialize() end
-		if !self:GetFired() then return end
-		local e = ply:GetViewEntity()
-		if (e != self.GBOWNER and e != self.Owner) or self.shouldOwnerHearSnd then
-			local pos=e:GetPos()
-			local spos=self:GetPos()
-			local val1=(pos:DistToSqr(spos+e:GetVelocity())-pos:DistToSqr(spos+self:GetVelocity()))*0.01
-			local pitch = math.Clamp(val1, 0, 200)
-			local volume = math.Clamp(pitch, 0,1)
+		if !self.Inited then self:Initialize() end
+		if self.GetFired and !self:GetFired() then return end
+		local pos,fwd,v = self:GetPos(),self:GetForward(),self:GetVelocity()
+		local fwdv = v:Angle():Forward()
+		if self.TracerColor and !VectorEqual(v,vector_zero) then
+			for i = 1,10 do
+				particle = self.Emitter:Add(self.TracerColor,pos + fwdv*(i*-self.Caliber*0.1) )--+ ClampVector(fwdv*30,vector_zero,fwd*30))
+				if particle then
+					particle:SetVelocity(v)
+					particle:SetDieTime(0.05)
+					particle:SetAirResistance(0) 
+					particle:SetStartAlpha(255)
+					particle:SetStartSize(self.Caliber and self.Caliber*0.2 or 20)
+					particle:SetEndSize(0)
+					particle:SetRoll(math.Rand(-1,1))
+					particle:SetGravity(Vector(0,0,0))
+					particle:SetCollide(false)
+				end
+			end
+		end
+		if !IsValid(self.ply) then return end
+		
+		local ent = self.ply:GetViewEntity()
+		if (ent != self.GBOWNER and ent != self.Owner) or self.shouldOwnerHearSnd then
+			local vs,vr = CalcLength(self,ent)
+			local f = (self.DefaultF or 100) * (soundSpeed + vr) / (soundSpeed + vs)
 			for k,v in pairs (self.snd) do
 				v:Play()
-				v:ChangePitch(pitch,math.random(3,10))
-				v:ChangeVolume(volume,0.1)
-				v:SetSoundLevel(140)
+				v:ChangePitch(f,self.Rate or 0.1)
 			end
 		else
 			for k,v in pairs (self.snd) do
@@ -269,9 +399,10 @@ if CLIENT then
 	function ENT:OnRemove()
 		if self.snd then 
 			for k,v in pairs (self.snd) do
+				v:ChangeVolume(0)
 				v:Stop()
-				v = nil
 			end
 		end
+		if self.Emitter then self.Emitter:Finish() end
 	end
 end

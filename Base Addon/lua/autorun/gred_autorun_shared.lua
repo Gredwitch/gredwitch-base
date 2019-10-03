@@ -20,40 +20,44 @@ local DMG_BLAST = DMG_BLAST
 local CLIENT = CLIENT
 
 -- Adding particles
--- [[
-CreateConVar("gred_sv_easyuse"					,  "1"  , GRED_SVAR) 
-CreateConVar("gred_sv_maxforcefield_range"		, "5000", GRED_SVAR)
-CreateConVar("gred_sv_12mm_he_impact"			,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_7mm_he_impact"			,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_fragility"				,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_shockwave_unfreeze"		,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_tracers"					,  "5"  , GRED_SVAR)
-CreateConVar("gred_sv_oldrockets"				,  "0"  , GRED_SVAR)
-CreateConVar("gred_jets_speed"					,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_healthslider"				, "100" , GRED_SVAR)
-CreateConVar("gred_sv_enablehealth"				,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_enableenginehealth"		,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_fire_effect"				,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_multiple_fire_effects"	,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_bullet_dmg"				,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_bullet_radius"			,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_soundspeed_divider"		,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_arti_spawnaltitude"		, "1000", GRED_SVAR)
-CreateConVar("gred_sv_wac_radio"				,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_spawnable_bombs"			,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_wac_bombs"				,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_shellspeed_multiplier"	,  "2"  , GRED_SVAR)
-CreateConVar("gred_sv_wac_explosion_water"		,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_default_wac_munitions"	,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_wac_explosion"			,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_wac_heli_spin"			,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_wac_heli_spin_chance"		,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_lfs_healthmultiplier"		,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_lfs_healthmultiplier_all"	,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_wac_override"				,  "1"  , GRED_SVAR)
-CreateConVar("gred_sv_override_hab"				,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_lfs_godmode"				,  "0"  , GRED_SVAR)
-CreateConVar("gred_sv_lfs_infinite_ammo"		,  "0"  , GRED_SVAR)
+gred.CVars = gred.CVars or {}
+gred.CVars["gred_sv_easyuse"] 					= CreateConVar("gred_sv_easyuse"					,  "1"  , GRED_SVAR) 
+gred.CVars["gred_sv_12mm_he_impact"] 			= CreateConVar("gred_sv_12mm_he_impact"				,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_7mm_he_impact"] 			= CreateConVar("gred_sv_7mm_he_impact"				,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_fragility"] 				= CreateConVar("gred_sv_fragility"					,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_shockwave_unfreeze"] 		= CreateConVar("gred_sv_shockwave_unfreeze"			,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_tracers"] 					= CreateConVar("gred_sv_tracers"					,  "5"  , GRED_SVAR)
+gred.CVars["gred_sv_oldrockets"] 				= CreateConVar("gred_sv_oldrockets"					,  "0"  , GRED_SVAR)
+gred.CVars["gred_jets_speed"] 					= CreateConVar("gred_jets_speed"					,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_healthslider"] 				= CreateConVar("gred_sv_healthslider"				, "100" , GRED_SVAR)
+gred.CVars["gred_sv_enablehealth"] 				= CreateConVar("gred_sv_enablehealth"				,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_enableenginehealth"] 		= CreateConVar("gred_sv_enableenginehealth"			,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_fire_effect"] 				= CreateConVar("gred_sv_fire_effect"				,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_multiple_fire_effects"] 	= CreateConVar("gred_sv_multiple_fire_effects"		,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_bullet_dmg"] 				= CreateConVar("gred_sv_bullet_dmg"					,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_bullet_radius"] 			= CreateConVar("gred_sv_bullet_radius"				,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_soundspeed_divider"] 		= CreateConVar("gred_sv_soundspeed_divider"			,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_arti_spawnaltitude"] 		= CreateConVar("gred_sv_arti_spawnaltitude"			, "1000", GRED_SVAR)
+gred.CVars["gred_sv_wac_radio"] 				= CreateConVar("gred_sv_wac_radio"					,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_spawnable_bombs"] 			= CreateConVar("gred_sv_spawnable_bombs"			,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_wac_bombs"] 				= CreateConVar("gred_sv_wac_bombs"					,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_shellspeed_multiplier"] 	= CreateConVar("gred_sv_shellspeed_multiplier"		,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_wac_explosion_water"] 		= CreateConVar("gred_sv_wac_explosion_water"		,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_default_wac_munitions"] 	= CreateConVar("gred_sv_default_wac_munitions"		,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_wac_explosion"] 			= CreateConVar("gred_sv_wac_explosion"				,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_wac_heli_spin"] 			= CreateConVar("gred_sv_wac_heli_spin"				,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_wac_heli_spin_chance"] 		= CreateConVar("gred_sv_wac_heli_spin_chance"		,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_lfs_healthmultiplier"] 		= CreateConVar("gred_sv_lfs_healthmultiplier"		,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_lfs_healthmultiplier_all"] 	= CreateConVar("gred_sv_lfs_healthmultiplier_all"	,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_wac_override"] 				= CreateConVar("gred_sv_wac_override"				,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_override_hab"] 				= CreateConVar("gred_sv_override_hab"				,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_lfs_godmode"] 				= CreateConVar("gred_sv_lfs_godmode"				,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_lfs_infinite_ammo"] 		= CreateConVar("gred_sv_lfs_infinite_ammo"			,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_minricochetangle"] 			= CreateConVar("gred_sv_minricochetangle"			, "70"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_arcade"] 			= CreateConVar("gred_sv_simfphys_arcade"			,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_infinite_ammo"] 	= CreateConVar("gred_sv_simfphys_infinite_ammo"		,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_bullet_dmg_tanks"] = CreateConVar("gred_sv_simfphys_bullet_dmg_tanks"	,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_spawnwithoutammo"] = CreateConVar("gred_sv_simfphys_spawnwithoutammo"	,  "0"  , GRED_SVAR)
 
 gred = gred or {}
 gred.AllNPCs = {}
@@ -218,6 +222,7 @@ gred.Precache = function()
 	gameAddParticles( "particles/explosion_fx_ins_b.pcf" )
 	gameAddParticles( "particles/ins_smokegrenade.pcf" )
 	gameAddParticles( "particles/ww1_gas.pcf" )
+	-- gameAddParticles( "particles/world_fx_ins.pcf" )
 
 	-- Precaching main particles
 	gred.Particles = {} 						
@@ -249,7 +254,7 @@ gred.Precache = function()
 	tableinsert(gred.Particles,"muzzleflash_m590_1p_core")
 	tableinsert(gred.Particles,"muzzleflash_smoke_small_variant_1")
 	for i = 0,1 do
-		if i == 1 then pcfD = "" else pcfD = "doi_" end
+		if i == 1 then pcfD = "ins_" else pcfD = "doi_" end
 		tableinsert(gred.Particles,""..pcfD.."impact_concrete")
 		tableinsert(gred.Particles,""..pcfD.."impact_dirt")
 		tableinsert(gred.Particles,""..pcfD.."impact_glass")
@@ -336,6 +341,8 @@ gred.Precache = function()
 	tableinsert(gred.Particles,"gred_tracers_green_40mm")
 	tableinsert(gred.Particles,"gred_tracers_white_40mm")
 	tableinsert(gred.Particles,"gred_tracers_yellow_40mm")
+	tableinsert(gred.Particles,"flame_jet")
+	tableinsert(gred.Particles,"doi_flak88_explosion")
 	for k,v in pairs(gred.Particles) do PrecacheParticleSystem(v) end
 
 	gameAddDecal( "scorch_small",		"decals/scorch_small" );
@@ -414,20 +421,60 @@ if CLIENT then
 		end
 	end)
 	
-	CreateClientConVar("gred_cl_sound_shake"		, "1" , true,false)
-	CreateClientConVar("gred_cl_nowaterimpacts"		, "0" , true,false)
-	CreateClientConVar("gred_cl_insparticles"		, "0" , true,false)
-	CreateClientConVar("gred_cl_noparticles_7mm"	, "0" , true,false)
-	CreateClientConVar("gred_cl_noparticles_12mm"	, "0" , true,false)
-	CreateClientConVar("gred_cl_noparticles_20mm"	, "0" , true,false)
-	CreateClientConVar("gred_cl_noparticles_20mm"	, "0" , true,false)
-	CreateClientConVar("gred_cl_noparticles_30mm"	, "0" , true,false)
-	CreateClientConVar("gred_cl_noparticles_40mm"	, "0" , true,false)
-	CreateClientConVar("gred_cl_decals"				, "1" , true,false)
-	CreateClientConVar("gred_cl_altmuzzleeffect"	, "0" , true,false)
-	CreateClientConVar("gred_cl_wac_explosions" 	, "1" , true,false)
-	CreateClientConVar("gred_cl_enable_popups"	 	, "1" , true,false)
-	CreateClientConVar("gred_cl_firstload"			, "1" , true,false)
+	net.Receive("gred_net_createtracer",function()
+		local effect = EffectData()
+		effect:SetOrigin(net.ReadVector())
+		effect:SetFlags(net.ReadInt(4))
+		effect:SetMaterialIndex(net.ReadInt(4))
+		effect:SetStart(net.ReadVector())
+		Effect("gred_particle_tracer",effect)
+	end)
+	
+	net.Receive("gred_net_createimpact",function()
+		-- local tab = util.JSONToTable(net.ReadString())
+		-- local effectdata = EffectData()
+		-- effectdata:SetOrigin(tab[1])
+		-- effectdata:SetAngles(tab[2])
+		-- effectdata:SetSurfaceProp(tab[3])
+		-- effectdata:SetMaterialIndex(tab[4])
+		-- effectdata:SetFlags(tab[5])
+		-- Effect("gred_particle_impact",effectdata)
+		
+		local effectdata = EffectData()
+		effectdata:SetOrigin(net.ReadVector())
+		effectdata:SetAngles(net.ReadAngle())
+		effectdata:SetSurfaceProp(net.ReadInt(4))
+		effectdata:SetMaterialIndex(net.ReadInt(4))
+		effectdata:SetFlags(net.ReadInt(4))
+		Effect("gred_particle_impact",effectdata)
+	end)
+	
+	net.Receive("gred_net_createparticle",function()
+		local effectdata = EffectData()
+		effectdata:SetFlags(table.KeyFromValue(gred.Particles,net.ReadString()))
+		effectdata:SetOrigin(net.ReadVector())
+		effectdata:SetAngles(net.ReadAngle())
+		effectdata:SetSurfaceProp(net.ReadBool() and 1 or 0)
+		Effect("gred_particle_simple",effectdata)
+	end)
+			
+	CreateClientConVar("gred_cl_sound_shake"				, "1" ,true,false)
+	CreateClientConVar("gred_cl_nowaterimpacts"				, "0" ,true,false)
+	CreateClientConVar("gred_cl_insparticles"				, "0" ,true,false)
+	CreateClientConVar("gred_cl_noparticles_7mm"			, "0" ,true,false)
+	CreateClientConVar("gred_cl_noparticles_12mm"			, "0" ,true,false)
+	CreateClientConVar("gred_cl_noparticles_20mm"			, "0" ,true,false)
+	CreateClientConVar("gred_cl_noparticles_20mm"			, "0" ,true,false)
+	CreateClientConVar("gred_cl_noparticles_30mm"			, "0" ,true,false)
+	CreateClientConVar("gred_cl_noparticles_40mm"			, "0" ,true,false)
+	CreateClientConVar("gred_cl_decals"						, "1" ,true,false)
+	CreateClientConVar("gred_cl_altmuzzleeffect"			, "0" ,true,false)
+	CreateClientConVar("gred_cl_wac_explosions" 			, "1" ,true,false)
+	CreateClientConVar("gred_cl_enable_popups"	 			, "1" ,true,false)
+	CreateClientConVar("gred_cl_firstload"					, "1" ,true,false)
+	
+	CreateConVar("gred_cl_simfphys_key_changeshell"			, "21",{FCVAR_ARCHIVE,FCVAR_USERINFO})
+	CreateConVar("gred_cl_simfphys_key_togglesight"			, "22",{FCVAR_ARCHIVE,FCVAR_USERINFO})
 	
 	
 	-- Adding the spawnmenu options
@@ -450,18 +497,21 @@ if CLIENT then
 				gred.CheckConCommand("gred_sv_7mm_he_impact",val)
 			end
 			
-			local this = CPanel:NumSlider( "Bullet damage multiplier","gred_sv_bullet_dmg",0,10,2 );
-			this.ValueChanged = function(this,val)
+			local this = CPanel:NumSlider( "Bullet damage multiplier","gred_sv_bullet_dmg",0,10,2 );this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+			this.OnValueChanged = function(this,val)
+				if this.ConVarChanging then return end
 				gred.CheckConCommand("gred_sv_bullet_dmg",val)
 			end
 			
-			local this = CPanel:NumSlider( "Bullet radius multiplier","gred_sv_bullet_radius",0,10,2 );
-			this.ValueChanged = function(this,val)
+			local this = CPanel:NumSlider( "Bullet radius multiplier","gred_sv_bullet_radius",0,10,2 );this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+			this.OnValueChanged = function(this,val)
+				if this.ConVarChanging then return end
 				gred.CheckConCommand("gred_sv_bullet_radius",val)
 			end
 			
-			local this = CPanel:NumSlider( "Tracer ammo apparition", "gred_sv_tracers", 0, 20, 0 );
-			this.ValueChanged = function(this,val)
+			local this = CPanel:NumSlider( "Tracer ammo apparition", "gred_sv_tracers", 0, 20, 0 );this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+			this.OnValueChanged = function(this,val)
+				if this.ConVarChanging then return end
 				gred.CheckConCommand("gred_sv_tracers",val)
 			end
 			
@@ -561,13 +611,15 @@ if CLIENT then
 				gred.CheckConCommand("gred_sv_enableenginehealth",val)
 			end
 			
-			local this = CPanel:NumSlider( "Default engine health", "gred_sv_healthslider", 1, 1000, 0 );
-			this.ValueChanged = function(this,val)
+			local this = CPanel:NumSlider( "Default engine health", "gred_sv_healthslider", 1, 1000, 0 );this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+			this.OnValueChanged = function(this,val)
+				if this.ConVarChanging then return end
 				gred.CheckConCommand("gred_sv_healthslider",val)
 			end
 			
-			local this = CPanel:NumSlider( "Helicopter spin chance", "gred_sv_wac_heli_spin_chance", 1, 10, 0 );
-			this.ValueChanged = function(this,val)
+			local this = CPanel:NumSlider( "Helicopter spin chance", "gred_sv_wac_heli_spin_chance", 1, 10, 0 );this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+			this.OnValueChanged = function(this,val)
+				if this.ConVarChanging then return end
 				gred.CheckConCommand("gred_sv_wac_heli_spin_chance",val)
 			end
 			
@@ -591,21 +643,62 @@ if CLIENT then
 	local function gred_settings_misc(CPanel)
 		CPanel:ClearControls()
 		
-		-- local msounds={}
-		-- msounds[1]="extras/american/outgoingstraferun1.ogg"
 		Created = true;
-		
-		-- local plane = vgui.Create( "DImageButton" );
-		-- plane:SetImage( "hud/planes_settings.png" );
-		-- plane:SetSize( 200, 80 );
-		-- plane.DoClick = function()
-			-- local psnd = Sound( table.Random(psounds) );
-			-- surface.PlaySound( psnd );
-		-- end
-		-- CPanel:AddPanel( plane );
 		
 		CPanel:CheckBox("Use an alternative muzzleflash?","gred_cl_altmuzzleeffect");
 		CPanel:CheckBox("Enable pop ups about missing content?","gred_cl_enable_popups");
+	end
+	
+	local function gred_settings_simfphys(CPanel)
+		CPanel:ClearControls()
+		
+		Created = true;
+		
+		local this = CPanel:CheckBox("Arcade mode","gred_sv_simfphys_arcade");
+		local parent = this:GetParent()
+		this.OnChange = function(this,val)
+			val = val and 1 or 0
+			gred.CheckConCommand("gred_sv_simfphys_arcade",val)
+		end
+		
+		local this = CPanel:CheckBox("Infinite ammo","gred_sv_simfphys_infinite_ammo");
+		local parent = this:GetParent()
+		this.OnChange = function(this,val)
+			val = val and 1 or 0
+			gred.CheckConCommand("gred_sv_simfphys_infinite_ammo",val)
+		end
+		
+		local this = CPanel:CheckBox("Spawn without ammo","gred_sv_simfphys_spawnwithoutammo");
+		local parent = this:GetParent()
+		this.OnChange = function(this,val)
+			val = val and 1 or 0
+			gred.CheckConCommand("gred_sv_simfphys_spawnwithoutammo",val)
+		end
+		
+		local this = CPanel:CheckBox("Should bullets damage tanks?","gred_sv_simfphys_bullet_dmg_tanks");
+		local parent = this:GetParent()
+		this.OnChange = function(this,val)
+			val = val and 1 or 0
+			gred.CheckConCommand("gred_sv_simfphys_bullet_dmg_tanks",val)
+		end
+		
+		local DBinder = vgui.Create("DBinder")
+		DBinder:SetValue(GetConVar("gred_cl_simfphys_key_changeshell"):GetInt())
+		DBinder.OnChange = function(DBinder,key)
+			GetConVar("gred_cl_simfphys_key_changeshell"):SetInt(key)
+		end
+		CPanel:AddItem(CPanel:Help("Toggle shell types"),DBinder)
+		
+		local DBinder = vgui.Create("DBinder")
+		DBinder:SetValue(GetConVar("gred_cl_simfphys_key_togglesight"):GetInt())
+		DBinder.OnChange = function(DBinder,key)
+			GetConVar("gred_cl_simfphys_key_togglesight"):SetInt(key)
+		end
+		CPanel:AddItem(CPanel:Help("Toggle tank sight"),DBinder)
+		
+		-- local DBinder = vgui.Create("DBinder")
+		-- DBinder:SetValue(GetConVar("gred_cl_simfphys_key_changegun"):GetInt())
+		-- CPanel:AddItem(CPanel:Help("Toggle gun"),DBinder)
 	end
 
 	local function gred_settings_lfs(CPanel)
@@ -625,8 +718,9 @@ if CLIENT then
 		-- CPanel:AddPanel( plane );
 		-- if notdedicated then
 		
-			local this = CPanel:NumSlider( "Aircraft health multiplier", "gred_sv_lfs_healthmultiplier", 1, 10, 2 );
-			this.ValueChanged = function(this,val)
+			local this = CPanel:NumSlider( "Aircraft health multiplier", "gred_sv_lfs_healthmultiplier", 1, 10, 2 );this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+			this.OnValueChanged = function(this,val)
+				if this.ConVarChanging then return end
 				gred.CheckConCommand("gred_sv_lfs_healthmultiplier",val)
 			end
 			
@@ -653,7 +747,7 @@ if CLIENT then
 
 	local function gred_settings_bombs(CPanel)
 		CPanel:ClearControls()
-		local sound = "extras/terrorist/allahu.mp3"
+		--[[local sound = "extras/terrorist/allahu.mp3"
 		
 		Created = true;
 		
@@ -664,33 +758,38 @@ if CLIENT then
 			local snd = Sound( sound );
 			surface.PlaySound( snd );
 		end
-		CPanel:AddPanel( logo );
+		CPanel:AddPanel( logo );--]]
 		
-		CPanel:CheckBox("Should there be sound shake?","gred_cl_sound_shake");
+		CPanel:CheckBox("Should there be sound shake when something explodes?","gred_cl_sound_shake");
 		
 		-- if notdedicated then
-			local this = CPanel:CheckBox("Should all bombs unweld and unfreeze?","gred_sv_shockwave_unfreeze");
+			local this = CPanel:CheckBox("Should explosions unweld and unfreeze?","gred_sv_shockwave_unfreeze");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
 				gred.CheckConCommand("gred_sv_shockwave_unfreeze",val)
 			end
 			
-			local this = CPanel:NumSlider( "Forcefield Max Range","gred_sv_maxforcefield_range", 10, 10000, 0 );
-			this.ValueChanged = function(this,val)
-				gred.CheckConCommand("gred_sv_maxforcefield_range",val)
-			end
-			
 			local this = CPanel:NumSlider( "Sound muffling divider", "gred_sv_soundspeed_divider", 1, 3, 0 );
-			this.ValueChanged = function(this,val)
+			this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+			this.OnValueChanged = function(this,val)
+				if this.ConVarChanging then return end
 				gred.CheckConCommand( "gred_sv_soundspeed_divider",val)
 			end
 		
-			local this = CPanel:NumSlider( "Shell speed multiplier", "gred_sv_shellspeed_multiplier", 0, 3, 2 );
-			this.ValueChanged = function(this,val)
+			local this = CPanel:NumSlider( "Shell speed multiplier", "gred_sv_shellspeed_multiplier", 0.01, 1, 2 );
+			this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+			this.OnValueChanged = function(this,val)
+				if this.ConVarChanging then return end
 				gred.CheckConCommand( "gred_sv_shellspeed_multiplier",val)
 			end
+			local this = CPanel:NumSlider("Ricochet angle", "gred_sv_minricochetangle",50, 90, 1 );
+			this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+			this.OnValueChanged = function(this,val)
+				if this.ConVarChanging then return end
+				gred.CheckConCommand( "gred_sv_minricochetangle",val)
+			end
 			
-			local this = CPanel:CheckBox("Should bombs be easily armed?","gred_sv_easyuse");
+			local this = CPanel:CheckBox("Should explosives be easily armed?","gred_sv_easyuse");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
 				gred.CheckConCommand("gred_sv_easyuse",val)
@@ -699,25 +798,27 @@ if CLIENT then
 			local this = CPanel:CheckBox("Should explosives be spawnable?","gred_sv_spawnable_bombs");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
-				gred.CheckConCommand("gred_sv_easyuse",val)
+				gred.CheckConCommand("gred_sv_spawnable_bombs",val)
 			end
 			
-			local this = CPanel:CheckBox("Should bombs arm when hit or dropped?","gred_sv_fragility");
+			local this = CPanel:CheckBox("Should explosives arm when hit or dropped?","gred_sv_fragility");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
 				gred.CheckConCommand("gred_sv_fragility",val)
 			end
 		-- end
 			
-		CPanel:CheckBox("Should bombs leave decals behind?","gred_cl_decals");
+		CPanel:CheckBox("Should explosives leave decals behind?","gred_cl_decals");
 		
 	end
+	
 	gred.CheckConCommand = function(cmd,val)
 		net.Start("gred_net_checkconcommand")
 			net.WriteString(cmd)
 			net.WriteFloat(val)
 		net.SendToServer()
 	end
+	
 	hook.Add( "PopulateToolMenu", "gred_menu", function()
 		spawnmenu.AddToolMenuOption("Options",					-- Tab
 									"Gredwitch's Stuff",		-- Sub-tab
@@ -746,7 +847,7 @@ if CLIENT then
 		spawnmenu.AddToolMenuOption("Options",
 									"Gredwitch's Stuff",
 									"gred_settings_bombs",
-									"Bombs",
+									"Explosives",
 									"",
 									"",
 									gred_settings_bombs
@@ -759,7 +860,16 @@ if CLIENT then
 									"",
 									gred_settings_misc
 		)
+		spawnmenu.AddToolMenuOption("Options",
+									"Gredwitch's Stuff",
+									"gred_settings_simfphys",
+									"Simfphys",
+									"",
+									"",
+									gred_settings_simfphys
+		)
 	end );
+	
 	local function CheckForUpdates()
 		local CURRENT_VERSION = ""
 		local changelogs = file.Read("changelog.lua","LUA")
@@ -805,14 +915,14 @@ if CLIENT then
 				hab.hook("PhysBulletOnBulletCreateEffects_","gred_hab_physbullet_particle",function(ent,index,bullet,mode)
 					local isGred = ent.ClassName == "gred_base_bullet" and not ent.fuckHavok
 					if isGred then
-						local effectdata = EffectData()
-						effectdata:SetOrigin(bullet.Position)
-						effectdata:SetFlags(table.KeyFromValue(gred.Calibre,ent.Caliber))
+						net.Start("gred_net_createimpact")
+						net.WriteVector(bullet.Position)
+						
 						local ang = bullet.tr.HitNormal:Angle()
 						if ent.Caliber == "wac_base_7mm" then
-							effectdata:SetSurfaceProp(gred.Mats[util.GetSurfacePropName(bullet.tr.SurfaceProps)] or 24,6)
 							ang.p = ang.p + 90
-							effectdata:SetAngles(ang)
+							net.WriteAngle(ang)
+							net.WriteInt(gred.Mats[util.GetSurfacePropName(bullet.tr.SurfaceProps)] or 24,4)
 						else
 							if ent.Caliber == "wac_base_12mm" then
 								sound.Play("impactsounds/gun_impact_"..math.random(1,14)..".wav",bullet.Position,100,100,0.5)
@@ -823,11 +933,13 @@ if CLIENT then
 							elseif ent.Caliber == "wac_base_40mm" then
 								sound.Play("impactsounds/20mm_0"..math.random(1,5)..".wav",bullet.Position,100,100,0.7)
 							end
-							effectdata:SetSurfaceProp(0) 
-							effectdata:SetAngles(ang)
+							net.WriteAngle(ang)
+							net.WriteInt(0) 
 						end
-						effectdata:SetMaterialIndex(1)
-						util.Effect("gred_particle_impact",effectdata)
+						net.WriteInt(1,4)
+						net.WriteInt(table.KeyFromValue(gred.Calibre,ent.Caliber),4)
+							
+						net.Broadcast()
 					end
 					return isGred and (HAB_BULLET_EF_NOPARTICLES) or (bullet.AmmoType == "GaussEnergy" and HAB_BULLET_EF_DISABLEEFFECT or HAB_BULLET_EF_NONE)
 				end)
@@ -864,7 +976,7 @@ if CLIENT then
 						effectdata:SetSurfaceProp( Bullet.Surf or 0 ) -- hit material
 						effectdata:SetAttachment( Mode )
 						effectdata:SetFlags( flags )
-					util.Effect( "hab_physbullet_effects", effectdata )
+					Effect( "hab_physbullet_effects", effectdata )
 
 				end
 			end
@@ -873,7 +985,7 @@ if CLIENT then
 	
 	net.Receive("gred_lfs_setparts",function()
 		local self = net.ReadEntity()
-		if not self then print("[F-86] ERROR! ENTITY NOT INITALIZED CLIENT SIDE! PLEASE, RE-SPAWN!") return end
+		if not self then print("[LFS] ERROR! ENTITY NOT INITALIZED CLIENT SIDE! PLEASE, RE-SPAWN!") return end
 		self.Parts = {}
 		for k,v in pairs(net.ReadTable()) do
 			self.Parts[k] = v
@@ -891,7 +1003,13 @@ if CLIENT then
 			self.Parts[k] = nil
 		end
 	end)
-
+	net.Receive("gred_net_registertank",function(length)
+		local ent = net.ReadEntity()
+		if not IsValid(ent) then return end
+		
+		tableinsert(gred.simfphys[ent:GetSpawn_List()].entities,ent)
+	end)
+	
 	gred.UpdateBoneTable = function(self)
 		if self.CreatingBones then return end
 		self.Bones = nil
@@ -904,7 +1022,7 @@ if CLIENT then
 			local name
 			for i=0, self:GetBoneCount()-1 do
 				name = self:GetBoneName(i)
-				if name == "__INVALIDBONE__" and (self.BoneBlackList and !self.BoneBlackList[i]) then
+				if name == "__INVALIDBONE__" and ((self.BoneBlackList and !self.BoneBlackList[i]) or !self.BoneBlackList) and i != 0 then
 					print("["..self.ClassName.."] INVALID BONE : "..i)
 					self.Bones = nil
 					break
@@ -1042,6 +1160,265 @@ if CLIENT then
 		
 		return view
 	end
+	
+	
+	gred.simfphys = gred.simfphys or {}
+	
+	local function GetTrackPos(ent,div,smoother) -- taken from simfphys (by Luna)
+		local FT =  FrameTime()
+		local spin_left = ent.trackspin_l and (-ent.trackspin_l / div) or 0
+		local spin_right = ent.trackspin_r and (-ent.trackspin_r / div) or 0
+		
+		ent.sm_TrackDelta_L = ent.sm_TrackDelta_L and (ent.sm_TrackDelta_L + (spin_left - ent.sm_TrackDelta_L) * smoother) or 0
+		ent.sm_TrackDelta_R = ent.sm_TrackDelta_R and (ent.sm_TrackDelta_R + (spin_right- ent.sm_TrackDelta_R) * smoother) or 0
+
+		return {Left = ent.sm_TrackDelta_L,Right = ent.sm_TrackDelta_R}
+	end
+	
+	local function GetAllTanks()
+		local class
+		for k,v in pairs(gred.simfphys) do
+			v.entities = {}
+		end
+		for k,v in pairs(ents.FindByClass("gmod_sent_vehicle_fphysics_base")) do
+			class = v:GetSpawn_List()
+			if gred.simfphys[class] then
+				tableinsert(gred.simfphys[class].entities,v)
+			end
+		end
+	end
+	
+	local NextThink = 0
+	local NextFind = 0
+	local id = 0
+	hook.Add("Think","gred_simfphys_managetanks",function()
+		local ct = CurTime()
+		if ct > NextThink then
+			NextThink = ct + 0.02
+			if ct > NextFind then
+				NextFind = ct + 30
+				GetAllTanks()
+			end
+			for class,tab in pairs(gred.simfphys) do
+				for k,v in pairs(tab.entities) do
+					if IsValid(v) then
+						if !v.GRED_INDEX then
+							id = id + 1
+							v.GRED_INDEX = id
+						end
+						if not v.wheel_left_mat then
+							v.wheel_left_mat = CreateMaterial("gred_trackmat_"..class.."_"..v.GRED_INDEX.."_left","VertexLitGeneric",tab.trackTex)
+						end
+
+						if not v.wheel_right_mat then
+							v.wheel_right_mat = CreateMaterial("gred_trackmat_"..class.."_"..v.GRED_INDEX.."_right","VertexLitGeneric",tab.trackTex)
+						end
+						local TrackPos = GetTrackPos(v,tab.div,tab.smoother)
+						
+						v.wheel_left_mat:SetVector("$translate",Vector(0,TrackPos.Left,0))
+						v.wheel_right_mat:SetVector("$translate",Vector(0,TrackPos.Right,0))
+						-- PrintTable(v:GetMaterials())
+						if tab.SeparateTracks then
+							if !IsValid(v.LeftTrack) then v.LeftTrack = v:GetNWEntity("LeftTrack") end
+							if !IsValid(v.RightTrack) then v.RightTrack = v:GetNWEntity("RightTrack") end
+							if !IsValid(v.RightTrack) or !IsValid(v.LeftTrack) then return end -- one last check just to be safe
+							v.LeftTrack:SetSubMaterial(tab.LeftTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_left") 
+							v.RightTrack:SetSubMaterial(tab.RightTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_right")
+						else
+							v:SetSubMaterial(tab.LeftTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_left") 
+							v:SetSubMaterial(tab.RightTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_right")
+						end
+					else
+						table.remove(tab.entities,k)
+					end
+				end
+			end
+		end
+	end)
+	
+	net.Receive("gred_net_tank_setsight",function()
+		local ply = LocalPlayer()
+		local pod = ply:GetVehicle()
+		local offset = net.ReadVector()
+		local att = net.ReadString()
+		if !IsValid(pod) then return end
+		
+		pod.GRED_SIGHT_OFFSET 	= offset
+		pod.GRED_SIGHT_ATT 		= ply:GetSimfphys():LookupAttachment(att)
+		pod.GRED_USE_SIGHT 		= !pod.GRED_USE_SIGHT
+	end)
+	
+	hook.Add("CalcView","gred_simfphys_tanksightview",function(ply,ang,pos)
+		if not IsValid(ply) or not ply:Alive() or not ply:InVehicle() or ply:GetViewEntity() ~= ply then return end
+		local vehicle = ply:GetVehicle()
+		if not IsValid(vehicle) then return end
+		local Base = ply.GetSimfphys and ply:GetSimfphys() or vehicle.vehiclebase
+		if not IsValid(Base) then return end
+		if !vehicle.GetThirdPersonMode or ply:GetViewEntity() ~= ply then return end
+		if vehicle:GetThirdPersonMode() then 
+			vehicle:SetThirdPersonMode(false)
+		end
+		if vehicle:GetNWBool("simfphys_SpecialCam") or not vehicle.GRED_USE_SIGHT or vehicle.GRED_SIGHT_ATT == 0 then return end
+		
+		local view = {
+			origin = pos,
+			drawviewer = false,
+		}
+		ply.simfphys_smooth_out = 0
+		local attachment = Base:GetAttachment(vehicle.GRED_SIGHT_ATT)
+		view.angles = attachment.Ang
+		view.origin = attachment.Pos + attachment.Ang:Forward() * vehicle.GRED_SIGHT_OFFSET.x  + attachment.Ang:Right() * vehicle.GRED_SIGHT_OFFSET.y  + attachment.Ang:Up() *  vehicle.GRED_SIGHT_OFFSET.z
+		view.fov = 40
+		return view
+	end)
+	
+	local function DrawCircle( X, Y, radius )
+		local segmentdist = 360 / ( 2 * math.pi * radius / 2 )
+		
+		for a = 0, 360 - segmentdist, segmentdist do
+			surface.DrawLine( X + math.cos( math.rad( a ) ) * radius, Y - math.sin( math.rad( a ) ) * radius, X + math.cos( math.rad( a + segmentdist ) ) * radius, Y - math.sin( math.rad( a + segmentdist ) ) * radius )
+		end
+	end
+	-- print("woof")
+	local SIMFPHYS_COLOR = Color(255,235,0)
+	local function DrawAmmoLeft(vehicle,scrW,scrH)
+		local sizex = scrW * ((scrW / scrH) > (4/3) and 1 or 1.32)
+		local s_xpos = scrW * 0.5 - sizex * 0.115 - sizex * 0.032
+		local s_ypos = scrH - scrH * 0.092 - scrH * 0.02
+		local shelltype = vehicle:GetNWInt("ShellType",1)
+		draw.SimpleText("SHELLTYPE: "..vehicle.shellTypes[shelltype]..(vehicle:GetNWBool("Reloading",false) and " [RELOADING]" or ""),"simfphysfont", s_xpos + sizex * 0.185, s_ypos + scrH*0.012 ,SIMFPHYS_COLOR,0,1)
+		draw.SimpleText("AMMO: "..vehicle:GetNWInt("CurAmmo"..shelltype,0),"simfphysfont", s_xpos + sizex * 0.185, s_ypos + scrH*0.035 ,SIMFPHYS_COLOR,0,1)
+	end
+	
+	local function DrawWorldTip(text,pos,tipcol,font,offset)
+		pos = pos:ToScreen()
+		local black = Color(0,0,0,tipcol.a)
+		
+		local x = 0
+		local y = 0
+		local padding = 10
+		
+		surface.SetFont(font)
+		local w,h = surface.GetTextSize(text)
+		
+		x = pos.x - w*0.5
+		y = pos.y - h*0.5 - offset
+		
+		draw.RoundedBox(8, x-padding-2, y-padding-2, w+padding*2+4, h+padding*2+4, black)
+		draw.RoundedBox( 8, x-padding, y-padding, w+padding*2, h+padding*2, tipcol )
+		draw.DrawText(text,font,x+w/2,y,black,TEXT_ALIGN_CENTER)
+
+	end
+	
+	hook.Add("HUDPaint","gred_simfphys_tanksighthud",function()
+		local ply = LocalPlayer()
+		if not IsValid(ply) or not ply:Alive() then return end
+		if not ply:InVehicle() or ply:GetViewEntity() ~= ply then
+			local obj = ply:GetNWEntity("PickedUpObject",nil)
+			if !IsValid(obj) or obj.ClassName != "base_shell" then return end
+			local pos = ply:GetPos()
+			local sqr = 350*350
+			for k,ent in pairs(ents.FindInSphere(pos,350)) do
+				if ent.ClassName == "gmod_sent_vehicle_fphysics_base" then
+					if ent.GRED_ISTANK == nil then 
+						timer.Simple(0.4,function()
+							if IsValid(ent) and ent.GRED_ISTANK == nil then
+								ent.GRED_ISTANK = ent:GetNWBool("GRED_ISTANK")
+							end
+						end)
+					end
+					if ent.GRED_ISTANK and istable(ent.Seats) then
+						local _,maxs = ent:GetModelBounds()
+						maxs.x = 0
+						maxs.y = 0
+						local textpos = ent:LocalToWorld(maxs)
+						local col = Color(100,100,100,math.Clamp((1 - pos:DistToSqr(textpos) / sqr) * 1200,0,255))
+						local i = 0
+						for a,seat in pairs(ent.Seats) do
+							if IsValid(seat) and seat:GetNWBool("HasCannon") then
+								seat.shellTypes = seat.shellTypes or util.JSONToTable(seat:GetNWString("ShellTypes"))
+								seat.maxAmmo = seat.maxAmmo or seat:GetNWInt("MaxAmmo",0)
+								local curammo = 0
+								local ammo
+								local str = ""
+								for A = 1,#seat.shellTypes do
+									ammo = seat:GetNWInt("CurAmmo"..A,0)
+									curammo = curammo + ammo
+									str = str..seat.shellTypes[A]..": "..ammo..(A == #seat.shellTypes and "" or "\n")
+								end
+								str = seat:GetNWInt("Caliber",0).."mm cannon\nCapacity: "..curammo.."/"..seat.maxAmmo.."\n"..str
+								DrawWorldTip(str,textpos,col,"GModWorldtip",120*i)
+								i = i + 1
+							end
+						end
+					end
+				end
+			end
+			return
+		end
+		local vehicle = ply:GetVehicle()
+		if not IsValid(vehicle) then return end
+		local Base = ply.GetSimfphys and ply:GetSimfphys() or vehicle.vehiclebase
+		if not IsValid(Base) then return end
+		
+		vehicle.shellTypes = vehicle.shellTypes or util.JSONToTable(vehicle:GetNWString("ShellTypes"))
+		local scrW,scrH
+		if vehicle.shellTypes and !vehicle.GRED_USE_SIGHT then
+			scrW,scrH = ScrW(),ScrH()
+			DrawAmmoLeft(vehicle,scrW,scrH)
+		end
+		
+		if vehicle:GetNWBool("simfphys_SpecialCam") or not vehicle.GRED_USE_SIGHT or vehicle.GRED_SIGHT_ATT == 0 then return end
+		if !vehicle.GetThirdPersonMode or ply:GetViewEntity() ~= ply then return end
+		if vehicle:GetThirdPersonMode() then return end
+		
+		local ScrW,ScrH = scrW or ScrW(),scrH or ScrH()
+		surface.SetDrawColor(255,255,255,255)
+		surface.SetTexture(surface.GetTextureID(vehicle:GetNWString("SightTexture")))
+		surface.DrawTexturedRect(0,-(ScrW-ScrH)*0.5,ScrW,ScrW)
+		
+		if vehicle.shellTypes and vehicle.GRED_USE_SIGHT then
+			DrawAmmoLeft(vehicle,ScrW,ScrH)
+		end
+		
+		local startpos = Base:GetAttachment(vehicle.GRED_SIGHT_ATT).Pos
+		local scr = util.TraceLine({
+			start = startpos,
+			endpos = (startpos + ply:EyeAngles():Forward() * 50000),
+			filter = function(ent)
+				
+				return ent:GetClass() != "gmod_sent_vehicle_fphysics_wheel" and e != vehicle and e != ply and e != Base
+			end
+		}).HitPos:ToScreen()
+		
+		
+		surface.SetDrawColor(255,255,255)
+		DrawCircle(scr.x,scr.y,19)
+		surface.SetDrawColor(0,0,0)
+		DrawCircle(scr.x,scr.y,20)
+		
+		local scrW,scrH = ScrW*0.5,ScrH*0.518
+		
+		surface.SetDrawColor( 240, 200, 0, 255 ) 
+		local Yaw = Base:GetPoseParameter( "turret_yaw" ) * 360 - 90
+		
+		local dX = math.cos( math.rad( -Yaw ) )
+		local dY = math.sin( math.rad( -Yaw ) )
+		local len = scrH * 0.04
+		
+		DrawCircle( scrW, scrH * 1.85, len )
+		surface.DrawLine( scrW + dX * len, scrH * 1.85 + dY * len, scrW + dX * len * 3, scrH * 1.85 + dY * len * 3 )
+		
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW - len * 1.25, scrH * 1.85 + len * 2 )
+		surface.DrawLine( scrW + len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 - len * 2 )
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 + len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
+	end)
+	
+	net.Receive("gred_net_tank_networkseats",function()
+		local vehicle = net.ReadEntity()
+		vehicle.Seats = net.ReadTable()
+	end)
 	timer.Simple(5,function()
 		CheckForUpdates()
 	end)
@@ -1054,18 +1431,25 @@ else
 	AddNetworkString("gred_net_message_ply")
 	AddNetworkString("gred_net_bombs_decals")
 	AddNetworkString("gred_net_nw_var")
+	AddNetworkString("gred_net_createtracer")
+	AddNetworkString("gred_net_createimpact")
+	AddNetworkString("gred_net_createparticle")
+	AddNetworkString("gred_net_impact")
 	AddNetworkString("gred_lfs_setparts")
 	AddNetworkString("gred_lfs_remparts")
+	AddNetworkString("gred_net_registertank")
+	AddNetworkString("gred_net_tank_setsight")
+	AddNetworkString("gred_net_tank_networkseats")
 	
 	net.Receive("gred_net_checkconcommand",function(len,ply)
 		local str = net.ReadString()
-		local cvar = GetConVar(str)
+		local cvar = gred.CVars[str]
 		local val = net.ReadFloat()
 		if !cvar then return end
 		if !ply:IsAdmin() then return end
 		cvar:SetFloat(val)
 	end)
-	local soundSpeed = 16797.9*16797.9 -- 320m/s
+	local soundSpeed = 18005.25*18005.25 -- 343m/s
 	
 	gred.GunnersInit = function(self)
 		local ATT
@@ -1154,7 +1538,7 @@ else
 								effectdata:SetOrigin(att.Pos)
 								effectdata:SetAngles(shootAng)
 								effectdata:SetSurfaceProp(0)
-								util.Effect("gred_particle_simple",effectdata)
+								Effect("gred_particle_simple",effectdata)
 								if C == #v.att or v.Sequential then
 									v.nextshot = ct + v.delay
 								end
@@ -1206,7 +1590,7 @@ else
 	end
 	
 	gred.CreateExplosion = function(pos,radius,damage,decal,trace,ply,bomb,DEFAULT_PHYSFORCE,DEFAULT_PHYSFORCE_PLYGROUND,DEFAULT_PHYSFORCE_PLYAIR)
-		local ConVar = GetConVar("gred_sv_shockwave_unfreeze"):GetInt() >= 1
+		local ConVar = gred.CVars["gred_sv_shockwave_unfreeze"]:GetInt() >= 1
 		net.Start("gred_net_bombs_decals")
 			net.WriteString(decal and decal or "scorch_medium")
 			net.WriteVector(pos)
@@ -1269,7 +1653,7 @@ else
 	end
 	
 	gred.CreateSound = function(pos,rsound,e1,e2,e3)
-		local currange = 1000 / GetConVar("gred_sv_soundspeed_divider"):GetInt()
+		local currange = 1000 / gred.CVars["gred_sv_soundspeed_divider"]:GetInt()
 		
 		local curRange_min = currange*5
 		curRange_min = curRange_min*curRange_min
@@ -1311,16 +1695,17 @@ else
 		end
 	end
 	
-	local OverrideHAB = GetConVar("gred_sv_override_hab")
-	local Tracers = GetConVar("gred_sv_tracers")
-	local BulletDMG = GetConVar("gred_sv_bullet_dmg")
-	local HE12MM = GetConVar("gred_sv_12mm_he_impact")
-	local HE7MM = GetConVar("gred_sv_7mm_he_impact")
-	local HERADIUS = GetConVar("gred_sv_bullet_radius")
-	local SoundAdd = sound.Add
-	local BulletID = 0
-	local angle_zero = angle_zero
-	local vector_zero = vector_zero
+	local OverrideHAB 		= gred.CVars["gred_sv_override_hab"]
+	local Tracers 			= gred.CVars["gred_sv_tracers"]
+	local BulletDMG 		= gred.CVars["gred_sv_bullet_dmg"]
+	local HE12MM 			= gred.CVars["gred_sv_12mm_he_impact"]
+	local HE7MM 			= gred.CVars["gred_sv_7mm_he_impact"]
+	local HERADIUS 			= gred.CVars["gred_sv_bullet_radius"]
+	local SoundAdd 			= sound.Add
+	local NoCollide 		= constraint.NoCollide
+	local BulletID 			= 0
+	local angle_zero 		= angle_zero
+	local vector_zero 		= Vector(0,0,0)
 	
 	local CAL_TABLE = {
 		["wac_base_7mm"] = 1,
@@ -1377,17 +1762,25 @@ else
 				util.BlastDamage(ply,ply,hitpos,radius,dmg)
 			end
 			if !NoParticle then
-				local effectdata = EffectData()
-				effectdata:SetOrigin(hitpos)
-				effectdata:SetAngles(hitang)
-				effectdata:SetFlags(table.KeyFromValue(gred.Calibre,cal))
-				if cal == "wac_base_7mm" then
-					effectdata:SetSurfaceProp(gred.Mats[util.GetSurfacePropName(tr.SurfaceProps)] or 24,6)
-				else
-					effectdata:SetSurfaceProp(0)
-				end
-				effectdata:SetMaterialIndex(1)
-				Effect("gred_particle_impact",effectdata)
+				net.Start("gred_net_createimpact")
+					-- local tab = {hitpos,hitang}
+					net.WriteVector(hitpos)
+					net.WriteAngle(hitang)
+					if cal == "wac_base_7mm" then
+						-- tableinsert(tab,gred.Mats[util.GetSurfacePropName(tr.SurfaceProps)] or 24)
+						net.WriteInt(gred.Mats[util.GetSurfacePropName(tr.SurfaceProps)] or 24,4)
+					else
+						-- tableinsert(tab,0)
+						net.WriteInt(0,4)
+					end
+					-- tableinsert(tab,1)
+					net.WriteInt(1,4)
+					-- tableinsert(tab,table.KeyFromValue(gred.Calibre,cal))
+					net.WriteInt(table.KeyFromValue(gred.Calibre,cal),4)
+					
+					-- tab = util.TableToJSON(tab)
+					-- net.WriteString(tab)
+				net.Broadcast()
 			end
 			
 			if cal == "wac_base_12mm" then
@@ -1421,97 +1814,47 @@ else
 			end
 			util.BlastDamage(ply,ply,hitpos,radius,dmg)
 			if !NoParticle then
-				local effectdata = EffectData()
-				effectdata:SetOrigin(hitpos)
-				if !HitSky then 
-					effectdata:SetAngles(hitang)
-					effectdata:SetSurfaceProp(0)
-				else 
-					effectdata:SetAngles(Angle(0,0,0))
-					effectdata:SetSurfaceProp(1)
-				end
-				effectdata:SetMaterialIndex(1)
-				effectdata:SetFlags(table.KeyFromValue(gred.Calibre,cal))
-				util.Effect("gred_particle_impact",effectdata)
+				net.Start("gred_net_createimpact")
+					net.WriteVector(hitpos)
+					if !HitSky then 
+						net.WriteAngle(hitang)
+						net.WriteInt(0,4)
+					else 
+						net.WriteAngle(hitang)
+						net.WriteInt(1,4)
+					end
+					net.WriteInt(1,4)
+					net.WriteInt(table.KeyFromValue(gred.Calibre,cal),4)
+				net.Broadcast()
 			end
 		end
 	end
 	
 	function gred.CreateBullet(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg,radius)
 		if hab and hab.Module.PhysBullet and OverrideHAB:GetInt() == 1 then
-			--[[local bullet = {}
-			bullet.Attacker = ply
-			bullet.Callback = nil
-			bullet.Tracer = Tracers:GetInt()
-			if cal == "wac_base_12mm" then
-				if self.CustomDMG and !OpBullets then
-						self.Damage = self.Damage * BulletDMG:GetFloat()
-				else
-					self.Damage = 60 * BulletDMG:GetFloat()
-				end
-				if HE12MM:GetInt() >= 1 then 
-					bullet.Damage = zero 
-					-- util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
-				else
-					bullet.Damage = self.Damage
-				end
-				if self.col == "Green" then
-					bullet.AmmoType = "hvap_127x108_ap"
-				else
-					bullet.AmmoType = "hvap_127x99_ap"
-				end
-			elseif self.Caliber == "wac_base_7mm" then
-				if self.CustomDMG and !OpBullets then
-					self.Damage = self.Damage *BulletDMG:GetFloat()
-				else
-					self.Damage = 40 * BulletDMG:GetFloat()
-				end
-				if HE7MM:GetInt() >= 1 then
-					bullet.Damage = zero
-					-- util.BlastDamage(self, self.Owner,hitpos, self.Radius, self.Damage)
-				else
-					bullet.Damage = self.Damage 
-				end
-				if self.col == "Green" then
-					bullet.AmmoType = "hab_792x57"
-				elseif self.col == "Yellow" then
-					bullet.AmmoType = "hab_77x56"
-				else
-					bullet.AmmoType = "hab_762x63"
-				end
-			elseif self.Caliber == "wac_base_30mm" then
-				if self.CustomDMG and !OpBullets then
-					self.Damage = self.Damage * BulletDMG:GetFloat()
-				else
-					self.Damage = 100 * BulletDMG:GetFloat()
-				end
-				-- self:EmitSound("impactsounds/30mm_old.wav",100, math.random(90,110),1, CHAN_AUTO)
-			elseif self.Caliber == "wac_base_20mm" then
-				if self.CustomDMG and !OpBullets then
-					self.Damage = self.Damage * BulletDMG:GetFloat()
-				else
-					self.Damage = 80 * BulletDMG:GetFloat()
-				end
-				-- self:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
-				bullet.AmmoType = "hvap_20x102_hei"
-			else
-				if self.CustomDMG and !OpBullets then
-					self.Damage = self.Damage * BulletDMG:GetFloat()
-				else
-					self.Damage = 120 * BulletDMG:GetFloat()
-				end
-				-- self:EmitSound( "impactsounds/20mm_0"..math.random(1,5)..".wav",100, 100,0.7, CHAN_AUTO)
-			end
-			bullet.Force = 5
-			bullet.HullSize = 0
-			bullet.Num = 1
-			bullet.Dir = self:GetForward()
-			bullet.Spread = Vector(0)
-			bullet.Src = self:GetPos()
-			bullet.IgnoreEntity = {}
-			for k,v in pairs(self.Filter) do tableinsert(bullet.IgnoreEntity,v) end
-			
-			self:FireBullets(bullet,false)--]]
+			local tab = {
+				Src = pos,
+				Dir = ang:Forward(),
+				Spread = vector_zero,
+
+				Damage = ((cal == "wac_base_7mm" and HE7MM:GetInt() >= 1) or (cal == "wac_base_12mm" and HE12MM:GetInt() >= 1)) and 0 or (dmg and dmg or (cal == "wac_base_7mm" and 40 or (cal == "wac_base_12mm" and 60 or (cal == "wac_base_20mm" and 80 or (cal == "wac_base_30mm" and 100 or (cal == "wac_base_40mm" and 120)))))) * BulletDMG:GetFloat(),
+
+				Filter = filter,
+
+				AmmoType = (cal == "wac_base_12mm" and (tracer == "green" and "hvap_127x108_ap" or "hvap_127x99_ap")) or (cal == "wac_base_7mm" and (tracer == "green" and "hab_792x57" or (tracer == "yellow" and "hab_77x56" or "hab_762x63"))) or (cal == "wac_base_20mm" and "hvap_20x102_hei"),
+
+				WeaponFiring = IsValid(filter[1]) and filter[1] or ply,
+				Attacker = ply,
+
+				Num = 1,
+
+				IsNetworked = true,
+
+				Distance = false,
+
+			}
+			ply:FirePhysicalBullets(tab)
+			PrintTable(tab)
 		else
 			World = IsValid(World) or Entity(0)
 			BulletID = BulletID + 1
@@ -1530,30 +1873,25 @@ else
 			local oldbullet = BulletID
 			
 			if tracer then
-				local effect = EffectData()
-				effect:SetOrigin(pos)
-				effect:SetFlags(CAL_TABLE[cal])
-				effect:SetMaterialIndex(COL_TABLE[tracer])
-				if expltime then
-					-- d = v*t
-					effect:SetStart(QuickTrace(pos,fwd*(fusetime*speed),filter).HitPos)
-				else
-					effect:SetStart(QuickTrace(pos,fwd*99999999999999,filter).HitPos)
-				end
-				Effect("gred_particle_tracer",effect)
+				net.Start("gred_net_createtracer")
+					net.WriteVector(pos)
+					net.WriteInt(CAL_TABLE[cal],4)
+					net.WriteInt(COL_TABLE[tracer],4)
+					net.WriteVector(expltime and QuickTrace(pos,fwd*(fusetime*speed),filter).HitPos or QuickTrace(pos,fwd*99999999999999,filter).HitPos)
+				net.Broadcast()
 			end
 			timer.Create("gred_bullet_"..oldbullet,0,0,function()
 				dif = pos + pos - oldpos
 				oldpos = pos
 				local tr = TraceLine({start = pos,endpos = dif,filter = filter,mask = MASK_ALL})
 				if tr.MatType == 83 then
-					local effectdata = EffectData()
-					effectdata:SetOrigin(tr.HitPos)
-					effectdata:SetAngles(Angle(0,0,0))
-					effectdata:SetSurfaceProp(0)
-					effectdata:SetMaterialIndex(0)
-					effectdata:SetFlags(table.KeyFromValue(gred.Calibre,cal))
-					Effect("gred_particle_impact",effectdata)
+					net.Start("gred_net_createimpact")
+						net.WriteVector(tr.HitPos)
+						net.WriteAngle(angle_zero)
+						net.WriteInt(0,4)
+						net.WriteInt(0,4)
+						net.WriteInt(table.KeyFromValue(gred.Calibre,cal),4)
+					net.Broadcast()
 					
 					NoParticle = true
 					sound.Play("impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",pos,75,100,1)
@@ -1666,7 +2004,6 @@ else
 	
 	gred.PartThink = function(self,skin)
 		if self.LOADED == 1 then
-			local NoCollide = constraint.NoCollide
 			for k,v in pairs(self.Parts) do
 				self:DeleteOnRemove(v)
 				NoCollide(v,self,0,0)
@@ -1765,6 +2102,269 @@ else
 		end
 		self:SetCycle(self:GetLGear())
 	end
+
+	gred.CreateShell = function(pos,ang,ply,filter,caliber,shelltype,muzzlevelocity,mass,color,callback)
+		local ent = ents.Create("base_shell")
+		ent:SetPos(pos)
+		ent:SetAngles(ang)
+		ent:SetOwner(ply)
+		ent.Caliber = caliber
+		ent.ShellType = shelltype
+		ent.MuzzleVelocity = muzzlevelocity
+		ent.Mass = mass
+		ent.Filter = filter
+		ent.IsOnPlane = true
+		ent.TracerColor = color or "white"
+		
+		if callback then
+			callback(ent)
+		end
+		
+		ent:Spawn()
+		ent:Activate()
+		ent:SetBodygroup(1,shelltype == "AP" and 0 or 1)
+		
+		for k,v in pairs(filter) do
+			NoCollide(v,ent,0,0)
+		end
+		
+		return ent
+	end
+	
+	gred.TankInit = function(self,vehicle)
+		function self:HandleShellTypes(vehicle)
+			if !vehicle.HornKeyIsDown then return end
+			local ct = CurTime()
+			if NextChange > ct then return end
+			
+			local curshell = vehicle:GetNWInt("curshell",1)
+			curshell = curshell + 1
+			curshell = curshell > 3 and 1 or curshell
+			vehicle:SetNWInt("curshell",curshell)
+			print("CURSHELL = ",curshell,ShellTypes[curshell])
+			NextChange = ct + 0.1
+			
+			if not istable(vehicle.PassengerSeats) or not istable(vehicle.pSeat) then return end
+			
+			local pod = vehicle.pSeat[1]
+			
+			if not IsValid(pod) then return end
+			
+			local ply = pod:GetDriver()
+			
+			if not IsValid(ply) then return end
+			ply:ChatPrint("[simfphys] Switched shell type to "..ShellTypes[curshell]..".")
+			
+		end
+		
+		vehicle.CurShellType = 1
+		vehicle.OldSetPassenger = vehicle.SetPassenger
+		vehicle.SetPassenger = function(vehicle,ply)
+			vehicle:OldSetPassenger(ply)
+			if ply == vehicle:GetDriver() then
+				ply:ChatPrint("[PzKwG IV F1] Current shell type: "..ShellTypes[vehicle:GetNWInt("curshell",1)]..".")
+			end
+		end
+		
+		vehicle:SetSkin(math.random(0,vehicle:SkinCount()))
+		
+		
+		local tab = {}
+		local DriverSeat = vehicle:GetDriverSeat()
+		DriverSeat:SetNoDraw(false)
+		table.insert(tab,DriverSeat)
+		for k,v in pairs(vehicle.pSeat) do
+			table.insert(tab,v)
+			v:SetNoDraw(false)
+		end
+		timer.Simple(0.1,function()
+			net.Start("gred_net_tank_networkseats")
+				net.WriteEntity(vehicle)
+				net.WriteTable(tab)
+			net.Broadcast()
+			local shelltypes
+			for _,seat in pairs(tab) do
+				if seat:GetNWBool("HasCannon") then
+					shelltypes = {}
+					for k,v in pairs(seat.ShellTypes) do
+						table.insert(shelltypes,v.ShellType)
+					end
+					seat:SetNWString("ShellTypes",util.TableToJSON(shelltypes))
+				end
+				seat:SetNoDraw(true) 
+			end
+		end)
+			
+		timer.Simple(1,function()
+			if not IsValid(vehicle) then return end
+			if not vehicle.VehicleData["filter"] then 
+				print("[simfphys Armed Vehicle Pack] ERROR:TRACE FILTER IS INVALID. PLEASE UPDATE SIMFPHYS BASE") 
+				return
+			end
+			vehicle.WheelOnGround = function( ent )
+				ent.FrontWheelPowered = ent:GetPowerDistribution() ~= 1
+				ent.RearWheelPowered = ent:GetPowerDistribution() ~= -1
+				
+				for i = 1, table.Count( ent.Wheels ) do
+					local Wheel = ent.Wheels[i]		
+					if IsValid( Wheel ) then
+						local dmgMul = Wheel:GetDamaged() and 0.5 or 1
+						local surfacemul = simfphys.TractionData[Wheel:GetSurfaceMaterial():lower()]
+						
+						ent.VehicleData[ "SurfaceMul_" .. i ] = (surfacemul and math.max(surfacemul,0.001) or 1) * dmgMul
+						
+						local WheelPos = ent:LogicWheelPos( i )
+						
+						local WheelRadius = WheelPos.IsFrontWheel and ent.FrontWheelRadius or ent.RearWheelRadius
+						local startpos = Wheel:GetPos()
+						local dir = -ent.Up
+						local len = WheelRadius + math.Clamp(-ent.Vel.z / 50,2.5,6)
+						local HullSize = Vector(WheelRadius,WheelRadius,0)
+						local tr = util.TraceHull( {
+							start = startpos,
+							endpos = startpos + dir * len,
+							maxs = HullSize,
+							mins = -HullSize,
+							filter = ent.VehicleData["filter"]
+						} )
+						
+						local onground = self:IsOnGround( vehicle ) and 1 or 0
+						Wheel:SetOnGround( onground )
+						ent.VehicleData[ "onGround_" .. i ] = onground
+						
+						if tr.Hit then
+							Wheel:SetSpeed( Wheel.FX )
+							Wheel:SetSkidSound( Wheel.skid )
+							Wheel:SetSurfaceMaterial( util.GetSurfacePropName( tr.SurfaceProps ) )
+						end
+					end
+				end
+				
+				local FrontOnGround = math.max(ent.VehicleData[ "onGround_1" ],ent.VehicleData[ "onGround_2" ])
+				local RearOnGround = math.max(ent.VehicleData[ "onGround_3" ],ent.VehicleData[ "onGround_4" ])
+				
+				ent.DriveWheelsOnGround = math.max(ent.FrontWheelPowered and FrontOnGround or 0,ent.RearWheelPowered and RearOnGround or 0)
+			end
+			net.Start("gred_net_registertank")
+				net.WriteEntity(vehicle)
+			net.Broadcast()
+		end)
+	end
+	
+	gred.TankDestruction = function(ent,gib,ang,skin,pitch,yaw,CreateAmmoFire,StopAmmoFire,CreateExplosion,CreateTurret)
+		--[[
+			DESTRUCTION TYPES
+			- 0 = Normal gib
+			- 1 = Turret goes boom
+			- 2 = Jet fire only
+			- 3 = Jet fire and boom
+			- 4 = Jet fire and boom and turret goes boom
+			- 5 = Short jet fire and boom and turret goes boom
+			- 6 = Turret and tank go boom
+		]]
+		
+		if ent.DestructionType and ent.DestructionType != 0 then
+			if ent.DestructionType == 1 then
+				CreateTurret(gib,ang,pitch,yaw)
+			elseif ent.DestructionType == 6 then
+				local ang = gib:GetAngles()
+				CreateExplosion(gib,ang)
+				CreateTurret(gib,ang,pitch,yaw)
+			else
+				if ent.DestructionType == 2 then
+					CreateAmmoFire(gib,ang)
+					timer.Simple(4,function()
+						if !IsValid(gib) then return end
+						StopAmmoFire(gib)
+						
+						if IsValid(gib.particleeffect) then gib.particleeffect:Fire("Start") end
+						if gib.FireSound then
+							gib.FireSound:Play()
+						end
+					end)
+				elseif ent.DestructionType == 3 then
+					CreateAmmoFire(gib,ang)
+					timer.Simple(math.Rand(2,3),function()
+						if !IsValid(gib) then return end
+						StopAmmoFire(gib)
+						CreateExplosion(gib,gib:GetAngles())
+						
+						if IsValid(gib.particleeffect) then gib.particleeffect:Fire("Start") end
+						if gib.FireSound then
+							gib.FireSound:Play()
+						end
+					end)
+				elseif ent.DestructionType == 4 then
+					CreateAmmoFire(gib,ang)
+					timer.Simple(math.Rand(2,3),function()
+						if !IsValid(gib) then return end
+						StopAmmoFire(gib)
+						local ang = gib:GetAngles()
+						CreateExplosion(gib,ang)
+						CreateTurret(gib,ang,pitch,yaw)
+						
+						if IsValid(gib.particleeffect) then gib.particleeffect:Fire("Start") end
+						if gib.FireSound then
+							gib.FireSound:Play()
+						end
+					end)
+				elseif ent.DestructionType == 5 then
+					CreateAmmoFire(gib,ang)
+					timer.Simple(math.Rand(0.5,1.3),function()
+						if !IsValid(gib) then return end
+						StopAmmoFire(gib)
+						local ang = gib:GetAngles()
+						CreateExplosion(gib,ang)
+						CreateTurret(gib,ang,pitch,yaw)
+						
+						if IsValid(gib.particleeffect) then gib.particleeffect:Fire("Start") end
+						if gib.FireSound then
+							gib.FireSound:Play()
+						end
+					end)
+				end
+				timer.Simple(0.77,function()
+					if IsValid(gib) then
+						gib.particleeffect:Fire("Stop")
+						gib:OnRemove()
+					end
+				end)
+			end
+		end
+	end
+		
+	local function GetSeatID(ply,ent)
+		if !ent.pSeats then return end
+		if ply == ent:GetDriver() then return 0 end
+		for k,v in pairs(ent.pSeats) do
+			if ply == v:GetDriver() then return k end
+		end
+	end
+	
+	numpad.Register("k_gred_shell",function(ply,ent,key,bool)
+		if not IsValid(ply) or not IsValid(ent) then return false end
+		ent[key] = bool
+	end)
+	numpad.Register("k_gred_sight",function(ply,ent,key,bool)
+		if not IsValid(ply) or not IsValid(ent) then return false end
+		ent[key] = bool
+	end)
+	
+	local IN_USE = IN_USE
+	hook.Add("KeyPress","gred_keypress_shellhold",function(ply,key)
+		if key != IN_USE then return end
+		timer.Simple(0,function()
+			if !IsValid(ply) then return end
+			local ent = ply:GetNWEntity("PickedUpObject")
+			if !IsValid(ent) then return end
+			if !ent:IsPlayerHolding() then 
+				ply:SetNWEntity("PickedUpObject",Entity(0))
+			end
+		end)
+	end)
+	hook.Add("PlayerDeath","gred_playerdeath_shellhold",function(ply)
+		ply:SetNWEntity("PickedUpObject",Entity(0))
+	end)
 end
 
 for i = 1,3 do
@@ -1791,21 +2391,25 @@ for i = 1,3 do
 	} )
 end
 
-local LFSInifniteAmmo = GetConVar("gred_sv_lfs_infinite_ammo")
-local LFSGodmode = GetConVar("gred_sv_lfs_godmode")
-local WACOverride = GetConVar("gred_sv_wac_override")
-local healthmultiplier = GetConVar("gred_sv_lfs_healthmultiplier")
-local healthmultiplier_all = GetConVar("gred_sv_lfs_healthmultiplier_all")
-local nextRefil = 0.5
-local bigNum = 999999
+local LFSInifniteAmmo 		= gred.CVars["gred_sv_lfs_infinite_ammo"]
+local LFSGodmode 			= gred.CVars["gred_sv_lfs_godmode"]
+local WACOverride 			= gred.CVars["gred_sv_wac_override"]
+local healthmultiplier 		= gred.CVars["gred_sv_lfs_healthmultiplier"]
+local healthmultiplier_all 	= gred.CVars["gred_sv_lfs_healthmultiplier_all"]
+local nextRefil 			= 0.5
+local bigNum 				= 999999
 
+local no = {
+	[2] = true,
+	[8194] = true
+}
 hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 	if ent:IsNPC() then
 		table.insert(gred.AllNPCs,ent)
 		return
 	end
 	timer.Simple(0,function()
-	
+		if !IsValid(ent) then return end
 		-----------------------------------
 		
 		if ent.isWacAircraft then
@@ -1847,9 +2451,9 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 				
 				if SERVER then -- INIT.LUA
 					ent.addStuff = function(self)
-						local HealthsliderVAR = GetConVar("gred_sv_healthslider"):GetInt()
-						local HealthEnable = GetConVar("gred_sv_enablehealth"):GetInt()
-						local EngineHealthEnable = GetConVar("gred_sv_enableenginehealth"):GetInt()
+						local HealthsliderVAR = gred.CVars["gred_sv_healthslider"]:GetInt()
+						local HealthEnable = gred.CVars["gred_sv_enablehealth"]:GetInt()
+						local EngineHealthEnable = gred.CVars["gred_sv_enableenginehealth"]:GetInt()
 						local Healthslider = 100
 						if HealthEnable == 1 and EngineHealthEnable == 1 then
 							
@@ -1886,7 +2490,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 							end
 						end
 						self:TakeDamage(self.engineHealth)
-						if GetConVar("gred_sv_wac_explosion"):GetInt() <= 0 then return end
+						if gred.CVars["gred_sv_wac_explosion"]:GetInt() <= 0 then return end
 						local radius = self:BoundingRadius()
 						local hitang = Angle(0,self:GetAngles().y+90,0)
 						
@@ -1899,7 +2503,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 							effectdata:SetAngles(hitang)
 							effectdata:SetFlags(1)
 							effectdata:SetSurfaceProp(1)
-							util.Effect("gred_particle_wac_explosion",effectdata)
+							Effect("gred_particle_wac_explosion",effectdata)
 							radius = 600
 						elseif radius <= 500 then
 							local effectdata = EffectData()
@@ -1907,7 +2511,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 							effectdata:SetAngles(hitang)
 							effectdata:SetFlags(5)
 							effectdata:SetSurfaceProp(1)
-							util.Effect("gred_particle_wac_explosion",effectdata)
+							Effect("gred_particle_wac_explosion",effectdata)
 							
 							radius = 800
 						elseif radius <= 2000 then
@@ -1916,7 +2520,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 							effectdata:SetAngles(hitang)
 							effectdata:SetFlags(9)
 							effectdata:SetSurfaceProp(1)
-							util.Effect("gred_particle_wac_explosion",effectdata)
+							Effect("gred_particle_wac_explosion",effectdata)
 							radius = 1000
 						end
 						gred.CreateExplosion(pos,radius,1000,self.Decal,self.TraceLength,self.GBOWNER,self,self.DEFAULT_PHYSFORCE,self.DEFAULT_PHYSFORCE_PLYGROUND,self.DEFAULT_PHYSFORCE_PLYAIR)
@@ -1958,13 +2562,13 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 						self:base("wac_hc_base").Think(self)
 						-- START ADDED BY THE GREDWITCH
 						if self.sounds.Radio then
-							if self.active and GetConVar("gred_sv_wac_radio"):GetInt() == 1 then
+							if self.active and gred.CVars["gred_sv_wac_radio"]:GetInt() == 1 then
 								self.sounds.Radio:Play()
 							else
 								self.sounds.Radio:Stop()
 							end
 						end
-						if self:WaterLevel() >= 2 and GetConVar("gred_sv_wac_explosion_water"):GetInt() >= 1 and !self.hascrashed then
+						if self:WaterLevel() >= 2 and gred.CVars["gred_sv_wac_explosion_water"]:GetInt() >= 1 and !self.hascrashed then
 							local pos = self:GetPos()
 							local trdat   = {}
 							trdat.start   = pos+Vector(0,0,4000)
@@ -1984,14 +2588,14 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 									effectdata:SetAngles(ang)
 									effectdata:SetSurfaceProp(2)
 									effectdata:SetFlags(1)
-									util.Effect("gred_particle_wac_explosion",effectdata)
+									Effect("gred_particle_wac_explosion",effectdata)
 								else
 									local effectdata = EffectData()
 									effectdata:SetOrigin(pos)
 									effectdata:SetAngles(ang)
 									effectdata:SetSurfaceProp(2)
 									effectdata:SetFlags(2)
-									util.Effect("gred_particle_wac_explosion",effectdata)
+									Effect("gred_particle_wac_explosion",effectdata)
 								end
 								
 								gred.CreateSound(pos,false,"/explosions/aircraft_water_close.wav","/explosions/aircraft_water_dist.wav","/explosions/aircraft_water_far.wav")
@@ -2008,7 +2612,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 						end
 						
 						if self.ShouldRotate and self.backRotor and self.topRotor and self.Base != "wac_pl_base" and !self.disabled
-						and self.rotorRpm > 0.2 and GetConVar("gred_sv_wac_heli_spin"):GetInt() >= 1 then
+						and self.rotorRpm > 0.2 and gred.CVars["gred_sv_wac_heli_spin"]:GetInt() >= 1 then
 							local p = self:GetPhysicsObject()
 							if p and IsValid(p) then
 								if !self.sounds.crashsnd:IsPlaying() then
@@ -2075,7 +2679,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 								if !self.sounds.LowHealth:IsPlaying() then
 									self.sounds.LowHealth:Play()
 								end
-								f = math.random(0,GetConVar("gred_sv_wac_heli_spin_chance"):GetInt())
+								f = math.random(0,gred.CVars["gred_sv_wac_heli_spin_chance"]:GetInt())
 								if !self.ShouldRotate and f == 0 then
 									self.OldGredUP = self:GetUp()
 									self.ShouldRotate = true
@@ -2087,9 +2691,9 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 									fire:SetPos(self:LocalToWorld(self.FirePos))
 									fire:Spawn()
 									fire:SetParent(self.Entity)
-									if GetConVar("gred_sv_fire_effect"):GetInt() >= 1 then
+									if gred.CVars["gred_sv_fire_effect"]:GetInt() >= 1 then
 										ParticleEffectAttach("fire_large_01", 1, fire, 0)
-										if (GetConVar("gred_sv_multiple_fire_effects"):GetInt() >= 1) then
+										if (gred.CVars["gred_sv_multiple_fire_effects"]:GetInt() >= 1) then
 											if self.OtherRotors then 
 												for i = 1,3 do
 													if not self.OtherRotors[i] then return end
@@ -2100,8 +2704,8 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 											if self.rotor2 then ParticleEffectAttach("fire_large_01", 1, self.rotor2, 0) end
 											if self.topRotor2 then ParticleEffectAttach("fire_large_01", 1, self.topRotor2, 0) end
 										end
-									elseif GetConVar("gred_sv_fire_effect"):GetInt() <= 0 then
-										if GetConVar("gred_sv_multiple_fire_effects"):GetInt() >= 1 then
+									elseif gred.CVars["gred_sv_fire_effect"]:GetInt() <= 0 then
+										if gred.CVars["gred_sv_multiple_fire_effects"]:GetInt() >= 1 then
 											if self.OtherRotors then
 												for i = 1,3 do
 													if not self.OtherRotors[i] then return end
@@ -2166,9 +2770,9 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 									effectdata:SetStart(self.Entity:GetPos())
 									effectdata:SetOrigin(self.Entity:GetPos())
 									effectdata:SetScale(1)
-									util.Effect("Explosion", effectdata)
-									util.Effect("HelicopterMegaBomb", effectdata)
-									util.Effect("cball_explode", effectdata)
+									Effect("Explosion", effectdata)
+									Effect("HelicopterMegaBomb", effectdata)
+									Effect("cball_explode", effectdata)
 									util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), 300, 300)
 									self:setEngine(false)
 									if self.Smoke then
@@ -2179,7 +2783,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 										self.RotorWash:Remove()
 										self.RotorWash=nil
 									end
-									if self:WaterLevel() >= 1 and GetConVar("gred_sv_wac_explosion_water"):GetInt() >= 1 then
+									if self:WaterLevel() >= 1 and gred.CVars["gred_sv_wac_explosion_water"]:GetInt() >= 1 then
 										local pos = self:GetPos()
 										local trdat   = {}
 										trdat.start   = pos+Vector(0,0,4000)
@@ -2199,14 +2803,14 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 												effectdata:SetAngles(ang)
 												effectdata:SetSurfaceProp(2)
 												effectdata:SetFlags(1)
-												util.Effect("gred_particle_wac_explosion",effectdata)
+												Effect("gred_particle_wac_explosion",effectdata)
 											else
 												local effectdata = EffectData()
 												effectdata:SetOrigin(tr.HitPos)
 												effectdata:SetAngles(ang)
 												effectdata:SetSurfaceProp(2)
 												effectdata:SetFlags(2)
-												util.Effect("gred_particle_wac_explosion",effectdata)
+												Effect("gred_particle_wac_explosion",effectdata)
 											end
 											self.hascrashed = true
 											self:Remove()
@@ -2366,6 +2970,116 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 				if LFSGodmode:GetInt() == 1 then
 					ent.OnTakeDamage = function() return end
 				end
+			elseif simfphys.IsCar(ent) then
+				timer.Simple(0.3,function()
+					if !IsValid(ent) then return end
+					
+					local OldCollide = ent.PhysicsCollide
+					local OldDamage = ent.OnTakeDamage
+					local OldDestroyed = ent.OnDestroyed
+					local inflictor,DMG,T,dmgtype
+					
+					if gred.CVars["gred_sv_simfphys_bullet_dmg_tanks"]:GetInt() == 0 then
+						for i = 0, ent:GetNumPoseParameters() - 1 do
+							if ent:GetPoseParameterName(i) == "turret_yaw" then
+								ent.GRED_ISTANK = true
+								ent:SetNWBool("GRED_ISTANK",true)
+								break
+							end
+						end
+					end
+					
+					ent.OnDestroyed = function(ent)
+						DMG = ent.DMGDelt and ent.DMGDelt*10 or ent.Gred_OldHP
+						T = DMG/ent.Gred_MaxHP
+						
+						if T >= 0.1 then
+							if T >= 0.25 then
+								if T >= 0.35 then
+									if T >= 0.6 then
+										ent.DestructionType = math.random(5,6)
+									else
+										ent.DestructionType = math.random(3,4)
+									end
+								else
+									ent.DestructionType = math.random(2,3)
+								end
+							else
+								ent.DestructionType = 1
+							end
+						else
+							ent.DestructionType = 0
+						end
+						OldDestroyed(ent)
+					end
+					ent.OnTakeDamage = function(ent,dmg)
+						if ent.GRED_ISTANK and no[dmg:GetDamageType()] then return end
+						
+						inflictor = dmg:GetInflictor()
+						if ent.IsArmored and inflictor and inflictor.GetClass and inflictor:GetClass() == "base_shell" then
+							DMG = dmg:GetDamage()*0.1
+							dmg:SetDamage(DMG)
+						end
+						
+						ent.Gred_OldHP 	= ent:GetCurHealth()
+						ent.Gred_MaxHP 	= ent.Gred_MaxHP and ent.Gred_MaxHP or ent:GetMaxHealth()
+						ent.DMGDelt		= DMG
+						
+						OldDamage(ent,dmg)
+					end
+					
+					ent.PhysicsCollide = function(ent,data,phy)
+						if not (data.HitEntity and data.HitEntity.GetClass and data.HitEntity:GetClass() == "base_shell") then
+							OldCollide(ent,data,phy)
+						else
+							if !data.HitEntity.Fired then
+								local seat = ent:GetDriverSeat()
+								if seat:GetNWBool("HasCannon",false) then
+									local ammo = 0
+									PrintTable(seat.ShellTypes)
+									if seat:GetNWInt("Caliber",0) == data.HitEntity.Caliber then
+										local HasShelltype
+										local Caliber
+										for k,v in pairs(seat.ShellTypes) do
+											ammo = ammo + seat:GetNWInt("CurAmmo"..k,0)
+											HasShelltype = HasShelltype or v.ShellType == data.HitEntity.ShellType
+											Caliber = Caliber or (v.Caliber == data.HitEntity.Caliber and k or nil)
+										end
+										if ammo < seat:GetNWInt("MaxAmmo",0) then
+											local str = "CurAmmo"..Caliber
+											seat:SetNWInt(str,seat:GetNWInt(str,0) + 1)
+											data.HitEntity:Remove()
+											ent:EmitSound(seat.ReloadSound)
+										end
+										return
+									end
+								end
+								for k,seat in pairs(ent.pSeat) do
+									if seat:GetNWBool("HasCannon",false) then
+										local ammo = 0
+										PrintTable(seat.ShellTypes)
+										if seat:GetNWInt("Caliber",0) == data.HitEntity.Caliber then
+											local HasShelltype
+											local Caliber
+											for k,v in pairs(seat.ShellTypes) do
+												ammo = ammo + seat:GetNWInt("CurAmmo"..k,0)
+												HasShelltype = HasShelltype or v.ShellType == data.HitEntity.ShellType
+												Caliber = Caliber or (v.Caliber == data.HitEntity.Caliber and k or nil)
+											end
+											if ammo < seat:GetNWInt("MaxAmmo",0) then
+												local str = "CurAmmo"..Caliber
+												seat:SetNWInt(str,seat:GetNWInt(str,0) + 1)
+												data.HitEntity:Remove()
+												ent:EmitSound(seat.ReloadSound)
+											end
+											return
+										end
+									end
+								end
+							end
+						end
+					end
+				end)
 			end
 		end
 	end)

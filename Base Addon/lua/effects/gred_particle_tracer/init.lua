@@ -32,7 +32,7 @@ function EFFECT:Init(data)
 	local particle = CreateParticleSystem(World,"gred_tracers_"..COL_TABLE[data:GetMaterialIndex()].."_"..CAL_TABLE[cal],PATTACH_WORLDORIGIN,0,pos)
 	if !particle then return end
 	particle:SetControlPoint(1,endpos)
-	timer.Simple((pos:DistToSqr(endpos) / SPEED_TABLE[cal])+ 0.08,function()
+	timer.Simple((pos:DistToSqr(endpos)*6.8 / SPEED_TABLE[cal]),function()
 		particle:StopEmission(false,true)
 	end)
 end
