@@ -2161,12 +2161,12 @@ else
 		vehicle.OldSetPassenger = vehicle.OldSetPassenger and vehicle.OldSetPassenger or vehicle.SetPassenger
 		vehicle.SetPassenger = function(vehicle,ply)
 			if vehicle.passenger_set then return end
-			ent.passenger_set = true
+			vehicle.passenger_set = true
 			vehicle:OldSetPassenger(ply)
 			if ply == vehicle:GetDriver() then
 				ply:ChatPrint("[PzKwG IV F1] Current shell type: "..ShellTypes[vehicle:GetNWInt("curshell",1)]..".")
 			end
-			ent.passenger_set = false
+			vehicle.passenger_set = false
 		end
 		
 		vehicle:SetSkin(math.random(0,vehicle:SkinCount()))

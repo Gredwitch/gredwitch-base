@@ -1,4 +1,5 @@
 --[[05B/10/2019 (10/05/2019)
+[HOTFIX 2] Fixed le stinky poopoo
 [HOTFIX] Fixed missing sounds and another stack overflow
 - Fixed conflicts with some simfphys vehicles
 - Fixed some simfphys global functions
