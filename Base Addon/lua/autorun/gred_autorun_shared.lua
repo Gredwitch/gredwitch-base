@@ -244,7 +244,7 @@ gred.Precache = function()
 	tableinsert(gred.Particles,"doi_petrol_explosion")
 
 	tableinsert(gred.Particles,"doi_impact_water")
-	tableinsert(gred.Particles,"impact_water")
+	tableinsert(gred.Particles,"ins_impact_water")
 	tableinsert(gred.Particles,"water_small")
 	tableinsert(gred.Particles,"water_medium")
 	tableinsert(gred.Particles,"water_huge")
@@ -2141,7 +2141,6 @@ else
 			curshell = curshell + 1
 			curshell = curshell > 3 and 1 or curshell
 			vehicle:SetNWInt("curshell",curshell)
-			print("CURSHELL = ",curshell,ShellTypes[curshell])
 			NextChange = ct + 0.1
 			
 			if not istable(vehicle.PassengerSeats) or not istable(vehicle.pSeat) then return end
@@ -2158,7 +2157,7 @@ else
 		end
 		
 		vehicle.CurShellType = 1
-		vehicle.OldSetPassenger = vehicle.SetPassenger
+		vehicle.OldSetPassenger = vehicle.OldSetPassenger and vehicle.OldSetPassenger or vehicle.SetPassenger
 		vehicle.SetPassenger = function(vehicle,ply)
 			vehicle:OldSetPassenger(ply)
 			if ply == vehicle:GetDriver() then
@@ -2977,7 +2976,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 					local OldCollide = ent.PhysicsCollide
 					local OldDamage = ent.OnTakeDamage
 					local OldDestroyed = ent.OnDestroyed
-					local inflictor,DMG,T,dmgtype
+					local inflictor,gdmg,T,dmgtype
 					
 					if gred.CVars["gred_sv_simfphys_bullet_dmg_tanks"]:GetInt() == 0 then
 						for i = 0, ent:GetNumPoseParameters() - 1 do
@@ -2989,8 +2988,10 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 						end
 					end
 					
+					ent.Gred_MaxHP = ent:GetMaxHealth()
+					
 					ent.OnDestroyed = function(ent)
-						DMG = ent.DMGDelt and ent.DMGDelt*10 or ent.Gred_OldHP
+						DMG = ent.DMGDelt and ent.DMGDelt*10 or (ent.Gred_OldHP or ent.Gred_MaxHP)
 						T = DMG/ent.Gred_MaxHP
 						
 						if T >= 0.1 then
@@ -3022,7 +3023,6 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 						end
 						
 						ent.Gred_OldHP 	= ent:GetCurHealth()
-						ent.Gred_MaxHP 	= ent.Gred_MaxHP and ent.Gred_MaxHP or ent:GetMaxHealth()
 						ent.DMGDelt		= DMG
 						
 						OldDamage(ent,dmg)
@@ -3036,17 +3036,15 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 								local seat = ent:GetDriverSeat()
 								if seat:GetNWBool("HasCannon",false) then
 									local ammo = 0
-									PrintTable(seat.ShellTypes)
 									if seat:GetNWInt("Caliber",0) == data.HitEntity.Caliber then
-										local HasShelltype
+										local ShellType
 										local Caliber
 										for k,v in pairs(seat.ShellTypes) do
 											ammo = ammo + seat:GetNWInt("CurAmmo"..k,0)
-											HasShelltype = HasShelltype or v.ShellType == data.HitEntity.ShellType
-											Caliber = Caliber or (v.Caliber == data.HitEntity.Caliber and k or nil)
+											ShellType = ShellType and ShellType or (v.ShellType == data.HitEntity.ShellType and k or nil)
 										end
 										if ammo < seat:GetNWInt("MaxAmmo",0) then
-											local str = "CurAmmo"..Caliber
+											local str = "CurAmmo"..ShellType
 											seat:SetNWInt(str,seat:GetNWInt(str,0) + 1)
 											data.HitEntity:Remove()
 											ent:EmitSound(seat.ReloadSound)
@@ -3057,17 +3055,15 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 								for k,seat in pairs(ent.pSeat) do
 									if seat:GetNWBool("HasCannon",false) then
 										local ammo = 0
-										PrintTable(seat.ShellTypes)
 										if seat:GetNWInt("Caliber",0) == data.HitEntity.Caliber then
 											local HasShelltype
-											local Caliber
+											local ShellType
 											for k,v in pairs(seat.ShellTypes) do
 												ammo = ammo + seat:GetNWInt("CurAmmo"..k,0)
-												HasShelltype = HasShelltype or v.ShellType == data.HitEntity.ShellType
-												Caliber = Caliber or (v.Caliber == data.HitEntity.Caliber and k or nil)
+												ShellType = ShellType or (v.ShellType == data.HitEntity.ShellType and k or nil)
 											end
 											if ammo < seat:GetNWInt("MaxAmmo",0) then
-												local str = "CurAmmo"..Caliber
+												local str = "CurAmmo"..ShellType
 												seat:SetNWInt(str,seat:GetNWInt(str,0) + 1)
 												data.HitEntity:Remove()
 												ent:EmitSound(seat.ReloadSound)

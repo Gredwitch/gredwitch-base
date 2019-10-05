@@ -349,7 +349,7 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 		-- AddMortarShellMenu("gb_rocket_nebel",self,ply,frame)
 	-- end
 	
-	local EmplacementsMounted = file.Exists("autorun/gred_emp_autorun.lua","lsv")
+	local EmplacementsMounted = steamworks.ShouldMountAddon(1391460275) or file.Exists("autorun/gred_emp_autorun.lua","lsv")
 	hook.Run("GredAmmoBoxAddAmmo",DScrollPanel,self,ply,frame,EmplacementsMounted)
 	
 	if !EmplacementsMounted then return end

@@ -1,4 +1,19 @@
---[[03b/10/2019 (10/03/2019)
+--[[05/10/2019 (10/05/2019)
+- Fixed conflicts with some simfphys vehicles
+- Fixed some simfphys global functions
+- Fixed a stack overflow issue
+- Fixed missing 12mm water impacts
+- Fixed the emplacement pack's magazines not appearing in the ammo box
+
+If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
+If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
+Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
+
+If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
+
+OLDER CHANGES
+
+03/10/2019 (10/03/2019)
 [HOTFIX] Fixed lua errors when simfphys isn't installed / fixed thirdperson with simfphys vehicles
 - Added some simfphys global functions for the upcoming tanks
 - Added options to make simfphys tanks not take damage from bullets
@@ -12,14 +27,6 @@
 - Optimised the convars
 - Removed all of the shell entities
 - Reworked base_shell : shells now deal realistic damage and won't bug out when they hit simfphys vehicles / shells can now do ricochets / added fancy tracers to shells / reworked the shell whistle sounds / the shells' mass, velocity and caliber are now taken into account to calculate the damage that will be delt
-
-If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
-If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
-Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
-
-If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
-
-OLDER CHANGES
 
 25/08/2019 (08/25/2019)
 - Fixed the DFrames showing too early
