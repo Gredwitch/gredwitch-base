@@ -1,4 +1,5 @@
---[[05/10/2019 (10/05/2019)
+--[[05B/10/2019 (10/05/2019)
+[HOTFIX] Fixed missing sounds and another stack overflow
 - Fixed conflicts with some simfphys vehicles
 - Fixed some simfphys global functions
 - Fixed a stack overflow issue

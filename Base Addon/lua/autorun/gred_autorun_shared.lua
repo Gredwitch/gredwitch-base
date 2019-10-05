@@ -1390,7 +1390,8 @@ if CLIENT then
 				return ent:GetClass() != "gmod_sent_vehicle_fphysics_wheel" and e != vehicle and e != ply and e != Base
 			end
 		}).HitPos:ToScreen()
-		
+		scr.x = scr.x > ScrW and ScrW or (scr.x < 0 and 0 or scr.x)
+		scr.y = scr.y > ScrH and ScrH or (scr.y < 0 and 0 or scr.y)
 		
 		surface.SetDrawColor(255,255,255)
 		DrawCircle(scr.x,scr.y,19)
@@ -2159,10 +2160,13 @@ else
 		vehicle.CurShellType = 1
 		vehicle.OldSetPassenger = vehicle.OldSetPassenger and vehicle.OldSetPassenger or vehicle.SetPassenger
 		vehicle.SetPassenger = function(vehicle,ply)
+			if vehicle.passenger_set then return end
+			ent.passenger_set = true
 			vehicle:OldSetPassenger(ply)
 			if ply == vehicle:GetDriver() then
 				ply:ChatPrint("[PzKwG IV F1] Current shell type: "..ShellTypes[vehicle:GetNWInt("curshell",1)]..".")
 			end
+			ent.passenger_set = false
 		end
 		
 		vehicle:SetSkin(math.random(0,vehicle:SkinCount()))
