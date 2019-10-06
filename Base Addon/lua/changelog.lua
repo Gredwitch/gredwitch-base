@@ -1,11 +1,5 @@
---[[05B/10/2019 (10/05/2019)
-[HOTFIX 2] Fixed le stinky poopoo
-[HOTFIX] Fixed missing sounds and another stack overflow
-- Fixed conflicts with some simfphys vehicles
-- Fixed some simfphys global functions
-- Fixed a stack overflow issue
-- Fixed missing 12mm water impacts
-- Fixed the emplacement pack's magazines not appearing in the ammo box
+--[[06/10/2019 (10/06/2019)
+- Fixed the Panzer IV being Gredwitch's Base
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -14,6 +8,15 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+05/10/2019 (10/05/2019)
+[HOTFIX 2] Fixed le stinky poopoo
+[HOTFIX] Fixed missing sounds and another stack overflow
+- Fixed conflicts with some simfphys vehicles
+- Fixed some simfphys global functions
+- Fixed a stack overflow issue
+- Fixed missing 12mm water impacts
+- Fixed the emplacement pack's magazines not appearing in the ammo box
 
 03/10/2019 (10/03/2019)
 [HOTFIX] Fixed lua errors when simfphys isn't installed / fixed thirdperson with simfphys vehicles
