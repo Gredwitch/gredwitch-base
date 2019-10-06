@@ -158,8 +158,8 @@ function ENT:PhysicsCollide(data,physobj)
 				if (math.abs(HitAng.p) >= ricochetang or math.abs(HitAng.y) >= ricochetang) and (!self.Ricochet or self.Ricochet+0.1 >= c) then
 					self.Ricochet = c
 					self.ImpactSpeed = 100
-					-- gred.CreateSound(data.HitPos,true,"gredwitch/ricochet.wav","gredwitch/ricochet.wav","")
-					sound.Play("gredwitch/ricochet.wav",data.HitPos,120,100,1)
+					gred.CreateSound(data.HitPos,false,"impactsounds/Tank_shell_impact_ricochet_w_whizz_0"..math.random(1,5)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg")
+					-- sound.Play("gredwitch/ricochet.wav",data.HitPos,120,100,1)
 					local effectdata = EffectData()
 					effectdata:SetOrigin(data.HitPos)
 					HitAng = self:LocalToWorldAngles(HitAng)

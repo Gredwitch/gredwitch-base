@@ -473,8 +473,9 @@ if CLIENT then
 	CreateClientConVar("gred_cl_enable_popups"	 			, "1" ,true,false)
 	CreateClientConVar("gred_cl_firstload"					, "1" ,true,false)
 	
-	CreateConVar("gred_cl_simfphys_key_changeshell"			, "21",{FCVAR_ARCHIVE,FCVAR_USERINFO})
-	CreateConVar("gred_cl_simfphys_key_togglesight"			, "22",{FCVAR_ARCHIVE,FCVAR_USERINFO})
+	local TAB_PRESS = {FCVAR_ARCHIVE,FCVAR_USERINFO}
+	CreateConVar("gred_cl_simfphys_key_changeshell"			, "21",TAB_PRESS)
+	CreateConVar("gred_cl_simfphys_key_togglesight"			, "22",TAB_PRESS)
 	
 	
 	-- Adding the spawnmenu options
@@ -995,8 +996,8 @@ if CLIENT then
 		local self = net.ReadEntity()
 		local k = net.ReadString()
 		
-		self.EmitNow = self.EmitNow and self.EmitNow or {}
-		if (k == "wing_l" or k == "wing_r") and self.EmitNow[k] != "CEASE" then
+		self.EmitNow = istable(self.EmitNow) and self.EmitNow or {}
+		if self.EmitNow and (k == "wing_l" or k == "wing_r") and self.EmitNow[k] != "CEASE" then
 			self.EmitNow[k] = true
 		end
 		if self.Parts then
@@ -1279,7 +1280,7 @@ if CLIENT then
 			surface.DrawLine( X + math.cos( math.rad( a ) ) * radius, Y - math.sin( math.rad( a ) ) * radius, X + math.cos( math.rad( a + segmentdist ) ) * radius, Y - math.sin( math.rad( a + segmentdist ) ) * radius )
 		end
 	end
-	-- print("woof")
+	
 	local SIMFPHYS_COLOR = Color(255,235,0)
 	local function DrawAmmoLeft(vehicle,scrW,scrH)
 		local sizex = scrW * ((scrW / scrH) > (4/3) and 1 or 1.32)
@@ -1347,7 +1348,7 @@ if CLIENT then
 									str = str..seat.shellTypes[A]..": "..ammo..(A == #seat.shellTypes and "" or "\n")
 								end
 								str = seat:GetNWInt("Caliber",0).."mm cannon\nCapacity: "..curammo.."/"..seat.maxAmmo.."\n"..str
-								DrawWorldTip(str,textpos,col,"GModWorldtip",120*i)
+								DrawWorldTip(str,textpos,col,"GModWorldtip",150*i)
 								i = i + 1
 							end
 						end
@@ -1420,6 +1421,12 @@ if CLIENT then
 		local vehicle = net.ReadEntity()
 		vehicle.Seats = net.ReadTable()
 	end)
+	net.Receive("gred_net_send_ply_hint_key",function()
+		notification.AddLegacy("Press the '"..input.GetKeyName(net.ReadInt(9))..net.ReadString(),NOTIFY_HINT,10)
+	end)
+	net.Receive("gred_net_send_ply_hint_simple",function()
+		notification.AddLegacy(net.ReadString(),NOTIFY_HINT,10)
+	end)
 	timer.Simple(5,function()
 		CheckForUpdates()
 	end)
@@ -1441,6 +1448,8 @@ else
 	AddNetworkString("gred_net_registertank")
 	AddNetworkString("gred_net_tank_setsight")
 	AddNetworkString("gred_net_tank_networkseats")
+	AddNetworkString("gred_net_send_ply_hint_key")
+	AddNetworkString("gred_net_send_ply_hint_simple")
 	
 	net.Receive("gred_net_checkconcommand",function(len,ply)
 		local str = net.ReadString()
@@ -1974,7 +1983,7 @@ else
 	
 	gred.PartCalcFlight = function(self,Pitch,Yaw,Roll,Stability,AddRoll,AddYaw)
 		AddRoll = AddRoll or 0.3
-		AddYaw = AddYaw or 0.09
+		AddYaw = AddYaw or 0.2
 		local addRoll = 0
 		local addYaw = 0
 		local vel = self:GetVelocity():Length()
@@ -1990,13 +1999,19 @@ else
 		end
 		if not self.Parts.wing_r then
 			addRoll = !self.Parts.wing_l and addRoll or -AddRoll*vel
-			addYaw = !self.Parts.wing_l and addYaw - vel*AddYaw or addYaw + vel*(AddYaw*0.22)
+			addYaw = !self.Parts.wing_l and addYaw*2 or -vel*AddYaw
+			Pitch = !self.Parts.wing_l and addYaw or Pitch
 		end
 		if not self.Parts.aileron_l then
 			if Roll < 0 then Roll = Roll*0.5 end
 		end
 		if not self.Parts.aileron_r then
 			if Roll > 0 then Roll = Roll*0.5 end
+		end
+		if not self.Parts.tail then
+			Pitch = AddYaw*vel*10
+			addYaw = addYaw + Pitch*0.3
+			addRoll = addRoll + addYaw
 		end
 		Roll = Roll + addRoll
 		Yaw = Yaw + addYaw
@@ -2133,42 +2148,7 @@ else
 	end
 	
 	gred.TankInit = function(self,vehicle)
-		function self:HandleShellTypes(vehicle)
-			if !vehicle.HornKeyIsDown then return end
-			local ct = CurTime()
-			if NextChange > ct then return end
-			
-			local curshell = vehicle:GetNWInt("curshell",1)
-			curshell = curshell + 1
-			curshell = curshell > 3 and 1 or curshell
-			vehicle:SetNWInt("curshell",curshell)
-			NextChange = ct + 0.1
-			
-			if not istable(vehicle.PassengerSeats) or not istable(vehicle.pSeat) then return end
-			
-			local pod = vehicle.pSeat[1]
-			
-			if not IsValid(pod) then return end
-			
-			local ply = pod:GetDriver()
-			
-			if not IsValid(ply) then return end
-			ply:ChatPrint("[simfphys] Switched shell type to "..ShellTypes[curshell]..".")
-			
-		end
-		
 		vehicle.CurShellType = 1
-		vehicle.OldSetPassenger = vehicle.OldSetPassenger and vehicle.OldSetPassenger or vehicle.SetPassenger
-		vehicle.SetPassenger = function(vehicle,ply)
-			if vehicle.passenger_set then return end
-			vehicle.passenger_set = true
-			vehicle:OldSetPassenger(ply)
-			if ply == vehicle:GetDriver() then
-				ply:ChatPrint("[PzKwG IV F1] Current shell type: "..ShellTypes[vehicle:GetNWInt("curshell",1)]..".")
-			end
-			vehicle.passenger_set = false
-		end
-		
 		vehicle:SetSkin(math.random(0,vehicle:SkinCount()))
 		
 		
@@ -2367,6 +2347,53 @@ else
 	end)
 	hook.Add("PlayerDeath","gred_playerdeath_shellhold",function(ply)
 		ply:SetNWEntity("PickedUpObject",Entity(0))
+	end)
+	hook.Add("PlayerEnteredVehicle","gred_player_entervehicle_hint",function(ply,seat)
+		if !ply.GRED_HINT_SIMFPHYS_01_DONE and (seat.vehiclebase or (ply.GetSimfphys and IsValid(ply:GetSimfphys()))) and seat:GetNWBool("HasCannon",false) then
+			timer.Simple(0.2,function()
+				if !IsValid(ply) then return end
+				net.Start("gred_net_send_ply_hint_key")
+					net.WriteInt(ply:GetInfoNum("gred_cl_simfphys_key_togglesight",22),9)
+					net.WriteString("' key to toggle the tank sight while the turret is activated")
+				net.Send(ply)
+				timer.Simple(5,function()
+					if !IsValid(ply) then return end
+					net.Start("gred_net_send_ply_hint_key")
+						net.WriteInt(ply:GetInfoNum("gred_cl_simfphys_key_changeshell",21),9)
+						net.WriteString("' key to toggle shell types - Use HE against infantry or unarmored vehicles and AP against armored vehicles")
+					net.Send(ply)
+					timer.Simple(5,function()
+						if !IsValid(ply) then return end
+						net.Start("gred_net_send_ply_hint_simple")
+							net.WriteString("You can reload the tank by spawning an ammo box entity and by throwing the right shells at the tank")
+						net.Send(ply)
+						timer.Simple(5,function()
+							if !IsValid(ply) then return end
+							net.Start("gred_net_send_ply_hint_simple")
+								net.WriteString("You can change the settings by going to the 'Gredwitch's Stuff' category in the top right 'Options' menu of the spawnmenu")
+							net.Send(ply)
+						end)
+					end)
+				end)
+			end)
+			ply.GRED_HINT_SIMFPHYS_01_DONE = true
+		elseif !ply.GRED_HINT_LFS_01_DONE and ply.lfsGetPlane then
+			local plane = ply:lfsGetPlane()
+			timer.Simple(0,function()
+				if IsValid(ply) and IsValid(plane) and ply == plane:GetDriver() then
+					net.Start("gred_net_send_ply_hint_simple")
+						net.WriteString("Don't forget to check out the controls by going to the 'Controls' tab of the LFS Icon while holding the C key")
+					net.Send(ply)
+					timer.Simple(5,function()
+						if !IsValid(ply) then return end
+						net.Start("gred_net_send_ply_hint_simple")
+							net.WriteString("You can change some settings by going to the 'Gredwitch's Stuff' category in the top right 'Options' menu of the spawnmenu")
+						net.Send(ply)
+					end)
+					ply.GRED_HINT_LFS_01_DONE = true
+				end
+			end)
+		end
 	end)
 end
 
@@ -2974,7 +3001,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 					ent.OnTakeDamage = function() return end
 				end
 			elseif simfphys and simfphys.IsCar and simfphys.IsCar(ent) then
-				timer.Simple(0.3,function()
+				timer.Simple(0.35,function()
 					if !IsValid(ent) then return end
 					
 					local OldCollide = ent.PhysicsCollide

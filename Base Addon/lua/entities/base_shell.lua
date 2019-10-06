@@ -336,6 +336,7 @@ if CLIENT then
 		self.snd = self.snd or {
 			CreateSound(self,"bomb/tank_shellwhiz.wav"),
 			CreateSound(self,"bomb/shell_trail.wav"),
+			-- CreateSound(self,"gredwitch/Shell_fly_loop_03.wav"),
 		}
 		-- self:SetNoDraw(true)
 		for k,v in pairs(self.snd) do v:ChangeVolume(80) end
@@ -350,6 +351,15 @@ if CLIENT then
 				self.TracerColor = colors[self.TracerColor] and colors[self.TracerColor] or colors["white"]
 				self.Caliber = self:GetCaliber()
 				self.Inited = true
+				self:CallOnRemove("stopshellsnd",function(self)
+					if self.snd then 
+						for k,v in pairs (self.snd) do
+							v:ChangeVolume(0)
+							v:Stop()
+						end
+					end
+					if self.Emitter then self.Emitter:Finish() end
+				end)
 			end
 		end)
 		self.Rate = 0.03
@@ -394,15 +404,5 @@ if CLIENT then
 				v:Stop()
 			end
 		end
-	end
-		
-	function ENT:OnRemove()
-		if self.snd then 
-			for k,v in pairs (self.snd) do
-				v:ChangeVolume(0)
-				v:Stop()
-			end
-		end
-		if self.Emitter then self.Emitter:Finish() end
 	end
 end

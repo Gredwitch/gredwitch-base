@@ -1,5 +1,14 @@
---[[06/10/2019 (10/06/2019)
+--[[06/10/2019-(10/06/2019)
+- Added a hint system for my simfphys tanks and my LFS aircrafts
+- Added new ricochets sounds
+- Fixed players not being able to enter my simfphys vehicles
+- Fixed the manual simfphys reload system only adding HE rounds
+- Fixed missing flame jet particle
+- Fixed missing AP shell sounds
+- Fixed the shell whistle sounds playing forever
+- Fixed an EmitNow being nil
 - Fixed the Panzer IV being Gredwitch's Base
+- Tweaked the LFS aircraft parts destruction aerodynamics the you actually can't control them when they're destroyed
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
