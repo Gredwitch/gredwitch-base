@@ -486,13 +486,13 @@ if CLIENT then
 		CPanel:ClearControls()
 		
 		-- if notdedicated then
-			local this = CPanel:CheckBox("Should 12mm MGs have a blast radius? (Kills tanks!)","gred_sv_12mm_he_impact" );
+			local this = CPanel:CheckBox("Should 12mm MGs have a radius?","gred_sv_12mm_he_impact" );
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
 				gred.CheckConCommand("gred_sv_12mm_he_impact",val)
 			end
 					
-			local this = CPanel:CheckBox("Should 7mm MGs have a blast radius? (Kills tanks!)","gred_sv_7mm_he_impact" );
+			local this = CPanel:CheckBox("Should 7mm MGs have a radius?","gred_sv_7mm_he_impact" );
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
 				gred.CheckConCommand("gred_sv_7mm_he_impact",val)
@@ -1730,7 +1730,17 @@ else
 		["white"]  = 3,
 		["yellow"] = 4,
 	}
-	
+	local function CreateExplosion(ply,pos,radius,dmg)
+		local sqrR = radius*radius
+		local dmginfo = DamageInfo()
+		dmginfo:SetAttacker(ply)
+		dmginfo:SetDamagePosition(pos)
+		dmginfo:SetDamageType(2) -- DMG_BULLET
+		for k,v in pairs(ents.FindInSphere(pos,radius)) do
+			dmginfo:SetDamage(math.abs(1-math.Clamp(v:GetPos():DistToSqr(pos),0,sqrR)/sqrR)*dmg)
+			v:TakeDamageInfo(dmginfo)
+		end
+	end
 	local function BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime)
 		ply = IsValid(ply) and ply or Entity(0)
 		local hitang
@@ -1769,7 +1779,8 @@ else
 				ply:FireBullets(bullet,false)
 			end
 			if shouldExplode then
-				util.BlastDamage(ply,ply,hitpos,radius,dmg)
+				-- util.BlastDamage(ply,ply,hitpos,radius,dmg)
+				CreateExplosion(ply,hitpos,radius,dmg)
 			end
 			if !NoParticle then
 				net.Start("gred_net_createimpact")
@@ -1822,7 +1833,8 @@ else
 				bullet.IgnoreEntity = filter
 				ply:FireBullets(bullet,false)
 			end
-			util.BlastDamage(ply,ply,hitpos,radius,dmg)
+			CreateExplosion(ply,hitpos,radius,dmg)
+			-- util.BlastDamage(ply,ply,hitpos,radius,dmg)
 			if !NoParticle then
 				net.Start("gred_net_createimpact")
 					net.WriteVector(hitpos)
@@ -2119,7 +2131,7 @@ else
 		self:SetCycle(self:GetLGear())
 	end
 
-	gred.CreateShell = function(pos,ang,ply,filter,caliber,shelltype,muzzlevelocity,mass,color,callback)
+	gred.CreateShell = function(pos,ang,ply,filter,caliber,shelltype,muzzlevelocity,mass,color,dmg,callback)
 		local ent = ents.Create("base_shell")
 		ent:SetPos(pos)
 		ent:SetAngles(ang)
@@ -2138,6 +2150,7 @@ else
 		
 		ent:Spawn()
 		ent:Activate()
+		ent.ExplosionDamage = dmg and dmg or ent.ExplosionDamage
 		ent:SetBodygroup(1,shelltype == "AP" and 0 or 1)
 		
 		for k,v in pairs(filter) do

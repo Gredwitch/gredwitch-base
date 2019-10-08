@@ -152,6 +152,26 @@ function ENT:AddOnInit()
 			ent:Activate()
 			ent:SetVar("GBOWNER",self.GBOWNER)
 		end
+	elseif self.ShellType == "Gas" then
+		self.ExplosionSound = table.Random(WPExploSnds)
+		self.FarExplosionSound = self.ExplosionSound
+		self.DistExplosionSound = self.ExplosionSound
+		
+		self.AngEffect = true
+		self.Effect = "doi_GASarty_explosion"
+		self.ExplosionDamage = 30
+		self.ExplosionRadius = self.Caliber < 82 and 400 or 500
+		self.AddOnExplode = function(self)
+			local ent = ents.Create("base_gas")
+			local pos = self:GetPos()
+			ent:SetPos(pos)
+			ent.Radius	 = self.Caliber < 82 and 400 or 500
+			ent.Rate  	 = 1
+			ent.Lifetime = 15
+			ent:Spawn()
+			ent:Activate()
+			ent:SetVar("GBOWNER",self.GBOWNER)
+		end
 	elseif self.ShellType == "Smoke" then
 		self.ExplosionSound = table.Random(SmokeSnds)
 		self.FarExplosionSound = self.ExplosionSound

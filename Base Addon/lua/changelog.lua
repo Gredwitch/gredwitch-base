@@ -1,4 +1,17 @@
---[[06/10/2019-(10/06/2019)
+--[[08/10/2019 (10/08/2019)
+- Added gas shells support
+- Fixed HE bullets dealing damage to tanks
+- Made the bombs actually destroy tanks
+
+If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
+If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
+Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
+
+If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
+
+OLDER CHANGES
+
+06/10/2019 (10/06/2019)
 - Added a hint system for my simfphys tanks and my LFS aircrafts
 - Added new ricochets sounds
 - Fixed players not being able to enter my simfphys vehicles
@@ -9,14 +22,6 @@
 - Fixed an EmitNow being nil
 - Fixed the Panzer IV being Gredwitch's Base
 - Tweaked the LFS aircraft parts destruction aerodynamics the you actually can't control them when they're destroyed
-
-If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
-If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
-Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
-
-If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
-
-OLDER CHANGES
 
 05/10/2019 (10/05/2019)
 [HOTFIX 2] Fixed le stinky poopoo
