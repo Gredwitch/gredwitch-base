@@ -1,4 +1,5 @@
---[[08B/10/2019 (10/08/2019)
+--[[08C/10/2019 (10/08/2019)
+- Fixed bullets damaging players in seats
 - Fixed an ammobox issue
 - Added gas shells support
 - Fixed HE bullets dealing damage to tanks

@@ -1737,8 +1737,10 @@ else
 		dmginfo:SetDamagePosition(pos)
 		dmginfo:SetDamageType(2) -- DMG_BULLET
 		for k,v in pairs(ents.FindInSphere(pos,radius)) do
-			dmginfo:SetDamage(math.abs(1-math.Clamp(v:GetPos():DistToSqr(pos),0,sqrR)/sqrR)*dmg)
-			v:TakeDamageInfo(dmginfo)
+			if not (v.InVehicle and v:InVehicle()) and v:GetClass() != "prop_vehicle_prisoner_pod" then
+				dmginfo:SetDamage(math.abs(1-math.Clamp(v:GetPos():DistToSqr(pos),0,sqrR)/sqrR)*dmg)
+				v:TakeDamageInfo(dmginfo)
+			end
 		end
 	end
 	local function BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime)
