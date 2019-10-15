@@ -54,10 +54,12 @@ gred.CVars["gred_sv_override_hab"] 				= CreateConVar("gred_sv_override_hab"				
 gred.CVars["gred_sv_lfs_godmode"] 				= CreateConVar("gred_sv_lfs_godmode"				,  "0"  , GRED_SVAR)
 gred.CVars["gred_sv_lfs_infinite_ammo"] 		= CreateConVar("gred_sv_lfs_infinite_ammo"			,  "0"  , GRED_SVAR)
 gred.CVars["gred_sv_minricochetangle"] 			= CreateConVar("gred_sv_minricochetangle"			, "70"  , GRED_SVAR)
+gred.CVars["gred_sv_shell_ap_damagemultiplier"]	= CreateConVar("gred_sv_shell_ap_damagemultiplier"	, "1"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_arcade"] 			= CreateConVar("gred_sv_simfphys_arcade"			,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_infinite_ammo"] 	= CreateConVar("gred_sv_simfphys_infinite_ammo"		,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_bullet_dmg_tanks"] = CreateConVar("gred_sv_simfphys_bullet_dmg_tanks"	,  "0"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_spawnwithoutammo"] = CreateConVar("gred_sv_simfphys_spawnwithoutammo"	,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_serversuspension"] = CreateConVar("gred_sv_simfphys_serversuspension"	,  "1"  , GRED_SVAR)
 
 gred = gred or {}
 gred.AllNPCs = {}
@@ -458,20 +460,20 @@ if CLIENT then
 		Effect("gred_particle_simple",effectdata)
 	end)
 			
-	CreateClientConVar("gred_cl_sound_shake"				, "1" ,true,false)
-	CreateClientConVar("gred_cl_nowaterimpacts"				, "0" ,true,false)
-	CreateClientConVar("gred_cl_insparticles"				, "0" ,true,false)
-	CreateClientConVar("gred_cl_noparticles_7mm"			, "0" ,true,false)
-	CreateClientConVar("gred_cl_noparticles_12mm"			, "0" ,true,false)
-	CreateClientConVar("gred_cl_noparticles_20mm"			, "0" ,true,false)
-	CreateClientConVar("gred_cl_noparticles_20mm"			, "0" ,true,false)
-	CreateClientConVar("gred_cl_noparticles_30mm"			, "0" ,true,false)
-	CreateClientConVar("gred_cl_noparticles_40mm"			, "0" ,true,false)
-	CreateClientConVar("gred_cl_decals"						, "1" ,true,false)
-	CreateClientConVar("gred_cl_altmuzzleeffect"			, "0" ,true,false)
-	CreateClientConVar("gred_cl_wac_explosions" 			, "1" ,true,false)
-	CreateClientConVar("gred_cl_enable_popups"	 			, "1" ,true,false)
-	CreateClientConVar("gred_cl_firstload"					, "1" ,true,false)
+	gred.CVars["gred_cl_sound_shake"] 							= CreateClientConVar("gred_cl_sound_shake"							, "1" ,true,false)
+	gred.CVars["gred_cl_nowaterimpacts"] 						= CreateClientConVar("gred_cl_nowaterimpacts"						, "0" ,true,false)
+	gred.CVars["gred_cl_insparticles"]		 					= CreateClientConVar("gred_cl_insparticles"							, "0" ,true,false)
+	gred.CVars["gred_cl_noparticles_7mm"] 						= CreateClientConVar("gred_cl_noparticles_7mm"						, "0" ,true,false)
+	gred.CVars["gred_cl_noparticles_12mm"] 						= CreateClientConVar("gred_cl_noparticles_12mm"						, "0" ,true,false)
+	gred.CVars["gred_cl_noparticles_20mm"] 						= CreateClientConVar("gred_cl_noparticles_20mm"						, "0" ,true,false)
+	gred.CVars["gred_cl_noparticles_30mm"] 						= CreateClientConVar("gred_cl_noparticles_30mm"						, "0" ,true,false)
+	gred.CVars["gred_cl_noparticles_40mm"] 						= CreateClientConVar("gred_cl_noparticles_40mm"						, "0" ,true,false)
+	gred.CVars["gred_cl_decals"] 								= CreateClientConVar("gred_cl_decals"								, "1" ,true,false)
+	gred.CVars["gred_cl_altmuzzleeffect"] 						= CreateClientConVar("gred_cl_altmuzzleeffect"						, "0" ,true,false)
+	gred.CVars["gred_cl_wac_explosions"] 						= CreateClientConVar("gred_cl_wac_explosions" 						, "1" ,true,false)
+	gred.CVars["gred_cl_enable_popups"] 						= CreateClientConVar("gred_cl_enable_popups"	 					, "1" ,true,false)
+	gred.CVars["gred_cl_firstload"] 							= CreateClientConVar("gred_cl_firstload"							, "1" ,true,false)
+	gred.CVars["gred_cl_simfphys_maxsuspensioncalcdistance"] 	= CreateClientConVar("gred_cl_simfphys_maxsuspensioncalcdistance"	, "85000000" ,true,false)
 	
 	local TAB_PRESS = {FCVAR_ARCHIVE,FCVAR_USERINFO}
 	CreateConVar("gred_cl_simfphys_key_changeshell"			, "21",TAB_PRESS)
@@ -683,6 +685,13 @@ if CLIENT then
 			gred.CheckConCommand("gred_sv_simfphys_bullet_dmg_tanks",val)
 		end
 		
+		local this = CPanel:CheckBox("Do server side suspension checks?","gred_sv_simfphys_serversuspension");
+		local parent = this:GetParent()
+		this.OnChange = function(this,val)
+			val = val and 1 or 0
+			gred.CheckConCommand("gred_sv_simfphys_serversuspension",val)
+		end
+		
 		local DBinder = vgui.Create("DBinder")
 		DBinder:SetValue(GetConVar("gred_cl_simfphys_key_changeshell"):GetInt())
 		DBinder.OnChange = function(DBinder,key)
@@ -697,9 +706,11 @@ if CLIENT then
 		end
 		CPanel:AddItem(CPanel:Help("Toggle tank sight"),DBinder)
 		
-		-- local DBinder = vgui.Create("DBinder")
-		-- DBinder:SetValue(GetConVar("gred_cl_simfphys_key_changegun"):GetInt())
-		-- CPanel:AddItem(CPanel:Help("Toggle gun"),DBinder)
+		local this = CPanel:NumSlider("Max suspension calculation distance","gred_cl_simfphys_maxsuspensioncalcdistance",0,300000000,0);this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+		this.OnValueChanged = function(this,val)
+			if this.ConVarChanging then return end
+			GetConVar("gred_cl_simfphys_maxsuspensioncalcdistance"):SetInt(val)
+		end
 	end
 
 	local function gred_settings_lfs(CPanel)
@@ -788,6 +799,12 @@ if CLIENT then
 			this.OnValueChanged = function(this,val)
 				if this.ConVarChanging then return end
 				gred.CheckConCommand( "gred_sv_minricochetangle",val)
+			end
+			local this = CPanel:NumSlider("AP Shell damage multiplier", "gred_sv_shell_ap_damagemultiplier",0,10,2);
+			this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+			this.OnValueChanged = function(this,val)
+				if this.ConVarChanging then return end
+				gred.CheckConCommand( "gred_sv_shell_ap_damagemultiplier",val)
 			end
 			
 			local this = CPanel:CheckBox("Should explosives be easily armed?","gred_sv_easyuse");
@@ -1007,8 +1024,15 @@ if CLIENT then
 	net.Receive("gred_net_registertank",function(length)
 		local ent = net.ReadEntity()
 		if not IsValid(ent) then return end
-		
-		tableinsert(gred.simfphys[ent:GetSpawn_List()].entities,ent)
+		local tab = gred.simfphys[ent:GetSpawn_List()]
+		tableinsert(tab.entities,ent)
+		if tab.UpdateSuspension_CL then
+			local OldThink = ent.Think
+			ent.Think = function(ent)
+				OldThink(ent)
+				tab.UpdateSuspension_CL(ent)
+			end
+		end
 	end)
 	
 	gred.UpdateBoneTable = function(self)
@@ -1200,34 +1224,39 @@ if CLIENT then
 				NextFind = ct + 30
 				GetAllTanks()
 			end
+			ply = IsValid(ply) and ply or LocalPlayer()
+			local pos = ply:GetPos()
+			local var = gred.CVars["gred_cl_simfphys_maxsuspensioncalcdistance"]:GetInt()
 			for class,tab in pairs(gred.simfphys) do
 				for k,v in pairs(tab.entities) do
 					if IsValid(v) then
-						if !v.GRED_INDEX then
-							id = id + 1
-							v.GRED_INDEX = id
-						end
-						if not v.wheel_left_mat then
-							v.wheel_left_mat = CreateMaterial("gred_trackmat_"..class.."_"..v.GRED_INDEX.."_left","VertexLitGeneric",tab.trackTex)
-						end
+						if pos:DistToSqr(v:GetPos()) < var then
+							if !v.GRED_INDEX then
+								id = id + 1
+								v.GRED_INDEX = id
+							end
+							if not v.wheel_left_mat then
+								v.wheel_left_mat = CreateMaterial("gred_trackmat_"..class.."_"..v.GRED_INDEX.."_left","VertexLitGeneric",tab.trackTex)
+							end
 
-						if not v.wheel_right_mat then
-							v.wheel_right_mat = CreateMaterial("gred_trackmat_"..class.."_"..v.GRED_INDEX.."_right","VertexLitGeneric",tab.trackTex)
-						end
-						local TrackPos = GetTrackPos(v,tab.div,tab.smoother)
-						
-						v.wheel_left_mat:SetVector("$translate",Vector(0,TrackPos.Left,0))
-						v.wheel_right_mat:SetVector("$translate",Vector(0,TrackPos.Right,0))
-						-- PrintTable(v:GetMaterials())
-						if tab.SeparateTracks then
-							if !IsValid(v.LeftTrack) then v.LeftTrack = v:GetNWEntity("LeftTrack") end
-							if !IsValid(v.RightTrack) then v.RightTrack = v:GetNWEntity("RightTrack") end
-							if !IsValid(v.RightTrack) or !IsValid(v.LeftTrack) then return end -- one last check just to be safe
-							v.LeftTrack:SetSubMaterial(tab.LeftTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_left") 
-							v.RightTrack:SetSubMaterial(tab.RightTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_right")
-						else
-							v:SetSubMaterial(tab.LeftTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_left") 
-							v:SetSubMaterial(tab.RightTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_right")
+							if not v.wheel_right_mat then
+								v.wheel_right_mat = CreateMaterial("gred_trackmat_"..class.."_"..v.GRED_INDEX.."_right","VertexLitGeneric",tab.trackTex)
+							end
+							local TrackPos = GetTrackPos(v,tab.div,tab.smoother)
+							
+							v.wheel_left_mat:SetVector("$translate",Vector(0,TrackPos.Left,0))
+							v.wheel_right_mat:SetVector("$translate",Vector(0,TrackPos.Right,0))
+							-- PrintTable(v:GetMaterials())
+							if tab.SeparateTracks then
+								if !IsValid(v.LeftTrack) then v.LeftTrack = v:GetNWEntity("LeftTrack") end
+								if !IsValid(v.RightTrack) then v.RightTrack = v:GetNWEntity("RightTrack") end
+								if !IsValid(v.RightTrack) or !IsValid(v.LeftTrack) then return end -- one last check just to be safe
+								v.LeftTrack:SetSubMaterial(tab.LeftTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_left") 
+								v.RightTrack:SetSubMaterial(tab.RightTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_right")
+							else
+								v:SetSubMaterial(tab.LeftTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_left") 
+								v:SetSubMaterial(tab.RightTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_right")
+							end
 						end
 					else
 						table.remove(tab.entities,k)
@@ -1269,7 +1298,7 @@ if CLIENT then
 		local attachment = Base:GetAttachment(vehicle.GRED_SIGHT_ATT)
 		view.angles = attachment.Ang
 		view.origin = attachment.Pos + attachment.Ang:Forward() * vehicle.GRED_SIGHT_OFFSET.x  + attachment.Ang:Right() * vehicle.GRED_SIGHT_OFFSET.y  + attachment.Ang:Up() *  vehicle.GRED_SIGHT_OFFSET.z
-		view.fov = 40
+		view.fov = vehicle:GetNWFloat("SightZoom",40)
 		return view
 	end)
 	
@@ -1448,8 +1477,17 @@ else
 	AddNetworkString("gred_net_registertank")
 	AddNetworkString("gred_net_tank_setsight")
 	AddNetworkString("gred_net_tank_networkseats")
+	AddNetworkString("gred_net_tank_susonground")
 	AddNetworkString("gred_net_send_ply_hint_key")
 	AddNetworkString("gred_net_send_ply_hint_simple")
+	
+	net.Receive("gred_net_tank_susonground",function(len,ply)
+		if gred.CVars["gred_sv_simfphys_serversuspension"] then return end
+		local ent = net.ReadEntity()
+		if !IsValid(ent) then return end
+		if ply != ent:GetDriver() then return end
+		ent.susOnGround = net.ReadBool()
+	end)
 	
 	net.Receive("gred_net_checkconcommand",function(len,ply)
 		local str = net.ReadString()
@@ -2246,6 +2284,14 @@ else
 			net.Start("gred_net_registertank")
 				net.WriteEntity(vehicle)
 			net.Broadcast()
+			local tab = gred.simfphys[vehicle:GetSpawn_List()]
+			if tab and tab.UpdateSuspension_SV and gred.CVars["gred_sv_simfphys_serversuspension"]:GetInt() >= 1 then
+				local OldThink = vehicle.Think
+				vehicle.Think = function(vehicle)
+					tab.UpdateSuspension_SV(vehicle)
+					return OldThink(vehicle)
+				end
+			end
 		end)
 	end
 	

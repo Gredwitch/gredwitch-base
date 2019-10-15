@@ -269,6 +269,11 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 		AddShellMenu(56,self,ply,frame)
 	end]]
 	local SHELLS = {
+		["37"] = {
+			 ["HE"] = true,
+			 ["AP"] = true,
+			 ["Smoke"] = true,
+		},
 		["47"] = {
 			 ["HE"] = true,
 			 ["AP"] = true,
@@ -309,6 +314,11 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 			 ["AP"] = true,
 			 ["Smoke"] = true,
 		},
+		["100"] = {
+			 ["HE"] = true,
+			 ["AP"] = true,
+			 ["Smoke"] = true,
+		},
 		["105"] = {
 			 ["HE"] = true,
 			 ["WP"] = true,
@@ -330,6 +340,7 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 			 ["Smoke"] = true,
 		},
 	}
+	hook.Run("GredAmmoBoxAddShell",SHELLS)
 	local DButton
 	for k,v in SortedPairs(SHELLS) do
 		DButton = DScrollPanel:Add("DButton")

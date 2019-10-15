@@ -181,7 +181,7 @@ function ENT:AddOnInit()
 		self.Effect = self.Caliber < 88 and "m203_smokegrenade" or "doi_smoke_artillery"
 	elseif self.ShellType == "HE" then
 		self.ExplosionDamage = 150 + self.Caliber
-		if self.Caliber >= 40 and self.Caliber < 50 then
+		if self.Caliber < 50 then
 			self.ExplosionRadius = 350
 			self.Effect = "ins_m203_explosion"
 			self.AngEffect = true
@@ -256,7 +256,7 @@ end
 function ENT:AddOnExplode(pos) 
 	if self.ShellType == "AP" then
 		self.Penetration = ((((self.LastVel and self.LastVel:Length()*0.02540002032 or self.MuzzleVelocity)/gred.CVars["gred_sv_shellspeed_multiplier"]:GetFloat())*math.sqrt(self.Mass))/(2400*math.sqrt(self.Caliber)))*1000
-		self.ExplosionDamage = self.Penetration*self.Caliber
+		self.ExplosionDamage = self.Penetration*self.Caliber*gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
 	end
 	if self:WaterLevel() < 1 then
 		if self.ShellType == "AP" then

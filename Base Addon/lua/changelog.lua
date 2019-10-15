@@ -1,9 +1,8 @@
---[[08C/10/2019 (10/08/2019)
-- Fixed bullets damaging players in seats
-- Fixed an ammobox issue
-- Added gas shells support
-- Fixed HE bullets dealing damage to tanks
-- Made the bombs actually destroy tanks
+--[[15/10/2019 (10/15/2019)
+- Added an AP shell damage multiplier
+- Added 37mm and 100mm shells to the ammo box
+- Added a client side suspension system
+- Updated the 40mm muzzleflash particle
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -12,6 +11,13 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+08/10/2019 (10/08/2019)
+- Fixed bullets damaging players in seats
+- Fixed an ammobox issue
+- Added gas shells support
+- Fixed HE bullets dealing damage to tanks
+- Made the bombs actually destroy tanks
 
 06/10/2019 (10/06/2019)
 - Added a hint system for my simfphys tanks and my LFS aircrafts
