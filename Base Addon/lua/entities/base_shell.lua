@@ -310,7 +310,7 @@ function ENT:Use( activator, caller )
 end
 
 function ENT:OnRemove()
-	if self.PlyPickup != nil then
+	if IsValid(self.PlyPickup) then
 		self.PlyPickup:DropObject()
 	end
 	self:StopParticles()

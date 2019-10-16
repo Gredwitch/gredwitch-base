@@ -925,6 +925,19 @@ if CLIENT then
 		end
 	end
 	
+	local function CheckDXDiag()
+		if GetConVar("mat_dxlevel"):GetInt() < 80 then
+			local DFrame = vgui.Create("DFrame")
+			DFrame:SetSize(ScrW()*0.9,ScrH()*0.9)
+			DFrame:SetTitle("DXDIAG ERROR")
+			DFrame:Center()
+			DFrame:MakePopup()
+			
+			local DHTML = vgui.Create("DHTML",DFrame)
+			DHTML:Dock(FILL)
+			DHTML:OpenURL("https://steamcommunity.com/workshop/filedetails/discussion/1131455085/3166519278505386201/")
+		end
+	end
 	-- HAB PhysBullet compatibility
 	timer.Simple(0.1,function()
 		if hab then
@@ -1458,6 +1471,7 @@ if CLIENT then
 	end)
 	timer.Simple(5,function()
 		CheckForUpdates()
+		CheckDXDiag()
 	end)
 else
 	resource.AddWorkshop(1131455085) -- Base addon

@@ -1,7 +1,9 @@
---[[15/10/2019 (10/15/2019)
+--[[15C/10/2019 (10/15/2019)
 - Added an AP shell damage multiplier
 - Added 37mm and 100mm shells to the ammo box
 - Added a client side suspension system
+- Added a warning about DirectX
+- Fixed the shells sometime crashing the server
 - Updated the 40mm muzzleflash particle
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
