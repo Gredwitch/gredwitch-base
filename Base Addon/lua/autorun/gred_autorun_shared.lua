@@ -890,9 +890,9 @@ if CLIENT then
 	
 	local function CheckForUpdates()
 		local CURRENT_VERSION = ""
-		local changelogs = file.Read("changelog.lua","LUA")
-		for i = 1,15 do CURRENT_VERSION = CURRENT_VERSION..changelogs[i] end
-		
+		local changelogs = file.Exists("changelog.lua","LUA") and file.Read("changelog.lua","LUA") or false
+		changelogs = changelogs or (file.Exists("changelog.lua","lsv") and file.Read("changelog.lua","lsv") or "")
+		for i = 1,15 do if !changelogs[i] then break end CURRENT_VERSION = CURRENT_VERSION..changelogs[i] end
 		local GITHUB_VERSION = "" 
 		local GitHub = http.Fetch("https://raw.githubusercontent.com/Gredwitch/gredwitch-base/master/Base%20Addon/lua/changelog.lua",function(body)
 			if !body then return end
@@ -1782,15 +1782,18 @@ else
 		["white"]  = 3,
 		["yellow"] = 4,
 	}
-	local function CreateExplosion(ply,pos,radius,dmg)
+	local bad = {
+		["prop_vehicle_prisoner_pod"] = true,
+	}
+	local function CreateExplosion(ply,pos,radius,dmg,cal)
 		local sqrR = radius*radius
 		local dmginfo = DamageInfo()
 		dmginfo:SetAttacker(ply)
 		dmginfo:SetDamagePosition(pos)
-		dmginfo:SetDamageType(2) -- DMG_BULLET
+		dmginfo:SetDamageType(CAL_TABLE[cal] > 3 and 64 or 2) -- DMG_BLAST or DMG_BULLET
 		for k,v in pairs(ents.FindInSphere(pos,radius)) do
-			if not (v.InVehicle and v:InVehicle()) and v:GetClass() != "prop_vehicle_prisoner_pod" then
-				dmginfo:SetDamage(math.abs(1-math.Clamp(v:GetPos():DistToSqr(pos),0,sqrR)/sqrR)*dmg)
+			if !(v.InVehicle and v:InVehicle()) and !bad[v:GetClass()] and (!(v.IsOnPlane and !v.Armed) or !v.IsOnPlane) then
+				dmginfo:SetDamage(math.abs(1-math.Clamp(v:GetPos():DistToSqr(pos),0,sqrR)/sqrR)*(v.GRED_ISTANK and dmg*0.2 or dmg))
 				v:TakeDamageInfo(dmginfo)
 			end
 		end
@@ -1834,7 +1837,7 @@ else
 			end
 			if shouldExplode then
 				-- util.BlastDamage(ply,ply,hitpos,radius,dmg)
-				CreateExplosion(ply,hitpos,radius,dmg)
+				CreateExplosion(ply,hitpos,radius,dmg,cal)
 			end
 			if !NoParticle then
 				net.Start("gred_net_createimpact")
@@ -1887,7 +1890,7 @@ else
 				bullet.IgnoreEntity = filter
 				ply:FireBullets(bullet,false)
 			end
-			CreateExplosion(ply,hitpos,radius,dmg)
+			CreateExplosion(ply,hitpos,radius,dmg,cal)
 			-- util.BlastDamage(ply,ply,hitpos,radius,dmg)
 			if !NoParticle then
 				net.Start("gred_net_createimpact")
@@ -2215,7 +2218,7 @@ else
 	end
 	
 	gred.TankInit = function(self,vehicle)
-		vehicle.CurShellType = 1
+		vehicle.GRED_TANK = true
 		vehicle:SetSkin(math.random(0,vehicle:SkinCount()))
 		
 		
@@ -2381,11 +2384,20 @@ else
 						end
 					end)
 				end
-				timer.Simple(0.77,function()
+				local function RemoveGibFire(gib)
 					if IsValid(gib) then
-						gib.particleeffect:Fire("Stop")
-						gib:OnRemove()
+						if gib.particleeffect and IsValid(gib.particleeffect) then
+							gib.particleeffect:Fire("Stop")
+							gib:OnRemove()
+						else
+							timer.Simple(0.01,function()
+								RemoveGibFire(gib)
+							end)
+						end
 					end
+				end
+				timer.Simple(0.7,function()
+					RemoveGibFire(gib)
 				end)
 			end
 		end
@@ -3123,7 +3135,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 						if ent.GRED_ISTANK and no[dmg:GetDamageType()] then return end
 						
 						inflictor = dmg:GetInflictor()
-						if ent.IsArmored and inflictor and inflictor.GetClass and inflictor:GetClass() == "base_shell" then
+						if ent.IsArmored and inflictor and IsValid(inflictor) and inflictor.GetClass and inflictor:GetClass() == "base_shell" then
 							DMG = dmg:GetDamage()*0.1
 							dmg:SetDamage(DMG)
 						end

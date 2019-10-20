@@ -1,11 +1,6 @@
---[[15C/10/2019 (10/15/2019)
-- Added an AP shell damage multiplier
-- Added 37mm and 100mm shells to the ammo box
-- Added a client side suspension system
-- Added a warning about DirectX
-- Fixed the shells sometime crashing the server
-- Updated the 40mm muzzleflash particle
-
+--[[20/10/2019 (10/20/2019)
+- Fixed an issue related to changelogs
+- Fixed a simfphys error that could cause server crashes
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
 Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
@@ -13,6 +8,14 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+15/10/2019 (10/15/2019)
+- Added an AP shell damage multiplier
+- Added 37mm and 100mm shells to the ammo box
+- Added a client side suspension system
+- Added a warning about DirectX
+- Fixed the shells sometime crashing the server
+- Updated the 40mm muzzleflash particle
 
 08/10/2019 (10/08/2019)
 - Fixed bullets damaging players in seats
