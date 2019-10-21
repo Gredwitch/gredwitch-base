@@ -345,6 +345,7 @@ gred.Precache = function()
 	tableinsert(gred.Particles,"gred_tracers_yellow_40mm")
 	tableinsert(gred.Particles,"flame_jet")
 	tableinsert(gred.Particles,"doi_flak88_explosion")
+	tableinsert(gred.Particles,"flamethrower_long")
 	for k,v in pairs(gred.Particles) do PrecacheParticleSystem(v) end
 
 	gameAddDecal( "scorch_small",		"decals/scorch_small" );
@@ -3016,7 +3017,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 			end
 		
 		elseif ent.LFS then
-			if ent.Author == "Gredwitch" or healthmultiplier_all:GetInt() == 1 then
+			if ent.Author == "Gredwitch" or healthmultiplier_all:GetInt() == 1 and ent.MaxHealth then
 				ent.MaxHealth = ent.MaxHealth * healthmultiplier:GetFloat()
 				ent.OldSetupDataTables = ent.SetupDataTables
 				ent.SetupDataTables = function()
