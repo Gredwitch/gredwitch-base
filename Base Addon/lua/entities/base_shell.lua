@@ -274,7 +274,7 @@ function ENT:AddOnExplode(pos)
 					dmg:SetAttacker(self.GBOWNER)
 					dmg:SetInflictor(self)
 					dmg:SetDamagePosition(pos)
-					dmg:SetDamage(self.ExplosionDamage)
+					dmg:SetDamage(list.Get("simfphys_vehicles")[v:GetSpawn_List()].Members.ApplyDamage and self.ExplosionDamage*10 or self.ExplosionDamage)
 					dmg:SetDamageType(64) -- DMG_BLAST
 					v:TakeDamageInfo(dmg)
 					self.ExplosionDamage = 0
@@ -378,7 +378,7 @@ if CLIENT then
 							v:Stop()
 						end
 					end
-					if self.Emitter then self.Emitter:Finish() end
+					if self.Emitter and IsValid(self.Emitter) then self.Emitter:Finish() end
 				end)
 			end
 		end)

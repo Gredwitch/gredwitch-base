@@ -131,7 +131,7 @@ function ENT:OnTakeDamage(dmginfo)
 	    end)
 	end
 end
-
+local World = Entity(0)
 function ENT:PhysicsCollide(data,physobj)
 	self.LastVel = data.OurOldVelocity
 	if self.Exploded or !IsValid(self) or self.Life <= 0 then return end
@@ -151,8 +151,8 @@ function ENT:PhysicsCollide(data,physobj)
 		if self.ShellType then
 			self.LastVel = data.OurOldVelocity
 			if self.ShellType == "AP" then
-				local HitNormal = data.HitNormal:Angle()
-				local HitAng = self:WorldToLocalAngles(HitNormal)
+				-- local HitAng = self:WorldToLocalAngles(util.QuickTrace(data.HitPos,data.HitPos + self:GetForward()*10,{self}).HitNormal:Angle())
+				local HitAng = self:WorldToLocalAngles(data.HitNormal:Angle())
 				local c = os.clock()
 				local ricochetang = gred.CVars.gred_sv_minricochetangle:GetFloat()
 				if (math.abs(HitAng.p) >= ricochetang or math.abs(HitAng.y) >= ricochetang) and (!self.Ricochet or self.Ricochet+0.1 >= c) then
@@ -167,15 +167,11 @@ function ENT:PhysicsCollide(data,physobj)
 					effectdata:SetNormal(HitAng:Forward())
 					util.Effect("ManhackSparks",effectdata)
 					return 
-				else
-					self:SetPos(data.HitPos)
 				end
-			else
-				self:SetPos(data.HitPos)
 			end
 		end
 		self.Exploded = true
-		self:Explode()
+		self:Explode(data.HitPos)
 	end
 end
 

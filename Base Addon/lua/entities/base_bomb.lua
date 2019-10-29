@@ -173,9 +173,9 @@ function ENT:Think()
 	self:AddOnThink()
 end
 
-function ENT:Explode()
+function ENT:Explode(pos)
 	if !self.Exploded then return end
-	local pos = self:LocalToWorld(self:OBBCenter())
+	pos = pos or self:LocalToWorld(self:OBBCenter())
 	if self:AddOnExplode(pos) then self.Exploded = false return end
 	if not self.Smoke then
 		gred.CreateExplosion(pos,self.ExplosionRadius,self.ExplosionDamage,self.Decal,self.TraceLength,self.GBOWNER,self,self.DEFAULT_PHYSFORCE,self.DEFAULT_PHYSFORCE_PLYGROUND,self.DEFAULT_PHYSFORCE_PLYAIR)

@@ -57,9 +57,11 @@ gred.CVars["gred_sv_minricochetangle"] 			= CreateConVar("gred_sv_minricochetang
 gred.CVars["gred_sv_shell_ap_damagemultiplier"]	= CreateConVar("gred_sv_shell_ap_damagemultiplier"	, "1"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_arcade"] 			= CreateConVar("gred_sv_simfphys_arcade"			,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_infinite_ammo"] 	= CreateConVar("gred_sv_simfphys_infinite_ammo"		,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_simfphys_bullet_dmg_tanks"] = CreateConVar("gred_sv_simfphys_bullet_dmg_tanks"	,  "0"  , GRED_SVAR)
+-- gred.CVars["gred_sv_simfphys_bullet_dmg_tanks"] = CreateConVar("gred_sv_simfphys_bullet_dmg_tanks"	,  "0"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_spawnwithoutammo"] = CreateConVar("gred_sv_simfphys_spawnwithoutammo"	,  "0"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_serversuspension"] = CreateConVar("gred_sv_simfphys_serversuspension"	,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_enablecrosshair"] 	= CreateConVar("gred_sv_simfphys_enablecrosshair"	,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_lesswheels"] 		= CreateConVar("gred_sv_simfphys_lesswheels"		,  "0"  , GRED_SVAR)
 
 gred = gred or {}
 gred.AllNPCs = {}
@@ -384,6 +386,232 @@ end
 
 gred.Precache()
 
+local function AddHABAmmoTypes()
+	if not hab then return end
+	if not hab.Module.PhysBullet then return end
+	
+	local HAB_COLOR_RED 	= HAB_COLOR_RED or Color( 255, 0, 0, 255 )
+	local HAB_COLOR_GREEN 	= HAB_COLOR_GREEN or Color( 0, 255, 0, 255 )
+	local HAB_COLOR_YELLOW 	= HAB_COLOR_YELLOW or Color( 255, 255, 0, 255 )
+	local Types = {}
+	local hab_colors = {
+		["red"] = HAB_COLOR_RED,
+		["green"] = HAB_COLOR_GREEN,
+		["white"] = color_white,
+		["yellow"] = HAB_COLOR_YELLOW,
+		[""] = HAB_COLOR_RED,
+	}
+	
+	for k,v in pairs(hab_colors) do
+		Types["wac_base_7mm"..k] = {
+			name = "wac_base_7mm"..k,
+			
+			tracer = k == "" and nil or true,
+			dmgtype = DMG_BULLET,
+			plydmg = 15,
+			npcdmg = 15,
+
+			force = 32,
+			minsplash = 0,
+			maxsplash = 0,
+
+			maxcarry = 1000,
+			flags = 0,
+
+			Velocity = 853,
+			Color = v,
+			EffectSize = 1,
+			HullSize = 0,
+			Penetration = 7,
+
+			BlastDamage = 5,
+			BlastDamageType = DMG_BLAST,
+			BlastDamageRadius = 7,
+
+			BalisticsType = HAB_BULLET_MODEL_G7,
+			Fused = false,
+			Proximity = false,
+			Radius = 0,
+			TimeToLive = 10,
+			TracerTimeToLive = 10,
+
+			Caliber = 7.62,
+			Mass = 9.2,
+
+			Number = 1,
+
+			BulletType = HAB_BULLET_APHE
+		}
+		
+		Types["wac_base_12mm"..k] = {
+			name = "wac_base_12mm"..k,
+
+			tracer = k == "" and nil or true,
+			dmgtype = DMG_BULLET,
+			plydmg = 25,
+			npcdmg = 25,
+
+			force = 66,
+			minsplash = 0,
+			maxsplash = 0,
+
+			maxcarry = 1000,
+			flags = 0,
+
+			Velocity = 820,
+			Color = HAB_COLOR_GREEN,
+			EffectSize = 1,
+			HullSize = 0,
+			Penetration = 24,
+
+			BlastDamage = 16,
+			BlastDamageType = DMG_BLAST,
+			BlastDamageRadius = 12,
+
+			BalisticsType = HAB_BULLET_MODEL_G7,
+			Fused = false,
+			Proximity = false,
+			Radius = 0,
+			TimeToLive = 10,
+			TracerTimeToLive = 10,
+
+			Caliber = 12.7,
+			Mass = 50,
+
+			Number = 1,
+
+			BulletType = HAB_BULLET_APHE
+		}
+		
+		Types["wac_base_20mm"..k] = {
+			name = "wac_base_20mm"..k,
+			
+			tracer = k == "" and nil or true,
+			dmgtype = DMG_BULLET,
+			plydmg = 30,
+			npcdmg = 30,
+
+			force = 80,
+			minsplash = 0,
+			maxsplash = 0,
+
+			maxcarry = 1000,
+			flags = 0,
+
+			Velocity = 1030,
+			Color = HAB_COLOR_RED,
+			EffectSize = 2,
+			HullSize = 0,
+			Penetration = 13,
+
+			BlastDamage = 45,
+			BlastDamageType = DMG_BLAST,
+			BlastDamageRadius = 30,
+
+			BalisticsType = HAB_BULLET_MODEL_G7,
+			Fused = true,
+			Proximity = false,
+			Radius = 0,
+			TimeToLive = 8,
+			TracerTimeToLive = 8,
+
+			Caliber = 20,
+			Mass = 10.2,
+
+			Number = 1,
+
+			BulletType = HAB_BULLET_APHE
+		}
+		
+		Types["wac_base_30mm"..k] = {
+			name = "wac_base_30mm"..k,
+			
+			tracer = k == "" and nil or true,
+			dmgtype = DMG_BULLET,
+			plydmg = 42,
+			npcdmg = 42,
+
+			force = 80,
+			minsplash = 0,
+			maxsplash = 0,
+
+			maxcarry = 1000,
+			flags = 0,
+
+			Velocity = 960,
+			Color = HAB_COLOR_RED,
+			EffectSize = 3,
+			HullSize = 0,
+			Penetration = 15,
+
+			BlastDamage = 50,
+			BlastDamageType = DMG_BLAST,
+			BlastDamageRadius = 50,
+
+			BalisticsType = HAB_BULLET_MODEL_G7,
+			Fused = true,
+			Proximity = false,
+			Radius = 0,
+			TimeToLive = 8,
+			TracerTimeToLive = 8,
+
+			Caliber = 30,
+			Mass = 38.9,
+
+			Number = 1,
+
+			BulletType = HAB_BULLET_HE
+		}
+		
+		Types["wac_base_40mm"..k] = {
+			name = "wac_base_40mm"..k,
+			
+			tracer = k == "" and nil or true,
+			dmgtype = DMG_BULLET,
+			plydmg = 58,
+			npcdmg = 58,
+
+			force = 120,
+			minsplash = 0,
+			maxsplash = 0,
+
+			maxcarry = 1000,
+			flags = 0,
+
+			Velocity = 690,
+			Color = HAB_COLOR_RED,
+			EffectSize = 4,
+			HullSize = 0,
+			Penetration = 5,
+
+			BlastDamage = 48,
+			BlastDamageType = DMG_BLAST,
+			BlastDamageRadius = 60,
+
+			BalisticsType = HAB_BULLET_MODEL_G1,
+			Fused = true,
+			Proximity = false,
+			Radius = 0,
+			TimeToLive = 8,
+			TracerTimeToLive = 8,
+
+			Caliber = 37,
+			Mass = 30,
+
+			Number = 1,
+
+			BulletType = HAB_BULLET_HE
+		}
+		
+	end
+	
+	for k, v in pairs(Types) do
+		hab.Module.PhysBullet.AddAmmoType(v)
+	end
+end
+-- timer.Simple(1,function() AddHABAmmoTypes() end)
+hook.Add("PhysBulletOnAddAmmoTypes","gred_add_hab_ammotypes",AddHABAmmoTypes)
+
 gred.AddonList = gred.AddonList or {}
 tableinsert(gred.AddonList,1582297878) -- Materials
 
@@ -484,6 +712,14 @@ if CLIENT then
 	-- Adding the spawnmenu options
 	
 	local Created
+	
+	local function DrawCircle( X, Y, radius ) -- copyright LunasFlightSchool™
+		local segmentdist = 360 / ( 2 * math.pi * radius / 2 )
+		
+		for a = 0, 360 - segmentdist, segmentdist do
+			surface.DrawLine( X + math.cos( math.rad( a ) ) * radius, Y - math.sin( math.rad( a ) ) * radius, X + math.cos( math.rad( a + segmentdist ) ) * radius, Y - math.sin( math.rad( a + segmentdist ) ) * radius )
+		end
+	end
 
 	local function gred_settings_bullets(CPanel)
 		CPanel:ClearControls()
@@ -672,6 +908,20 @@ if CLIENT then
 			gred.CheckConCommand("gred_sv_simfphys_infinite_ammo",val)
 		end
 		
+		local this = CPanel:CheckBox("Enable 3rd person crosshair?","gred_sv_simfphys_enablecrosshair");
+		local parent = this:GetParent()
+		this.OnChange = function(this,val)
+			val = val and 1 or 0
+			gred.CheckConCommand("gred_sv_simfphys_enablecrosshair",val)
+		end
+		
+		local this = CPanel:CheckBox("Use 4 wheels instead of 6 for tanks?","gred_sv_simfphys_lesswheels");
+		local parent = this:GetParent()
+		this.OnChange = function(this,val)
+			val = val and 1 or 0
+			gred.CheckConCommand("gred_sv_simfphys_lesswheels",val)
+		end
+		
 		local this = CPanel:CheckBox("Spawn without ammo","gred_sv_simfphys_spawnwithoutammo");
 		local parent = this:GetParent()
 		this.OnChange = function(this,val)
@@ -679,12 +929,12 @@ if CLIENT then
 			gred.CheckConCommand("gred_sv_simfphys_spawnwithoutammo",val)
 		end
 		
-		local this = CPanel:CheckBox("Should bullets damage tanks?","gred_sv_simfphys_bullet_dmg_tanks");
-		local parent = this:GetParent()
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_simfphys_bullet_dmg_tanks",val)
-		end
+		-- local this = CPanel:CheckBox("Should bullets damage tanks?","gred_sv_simfphys_bullet_dmg_tanks");
+		-- local parent = this:GetParent()
+		-- this.OnChange = function(this,val)
+			-- val = val and 1 or 0
+			-- gred.CheckConCommand("gred_sv_simfphys_bullet_dmg_tanks",val)
+		-- end
 		
 		local this = CPanel:CheckBox("Do server side suspension checks?","gred_sv_simfphys_serversuspension");
 		local parent = this:GetParent()
@@ -890,6 +1140,7 @@ if CLIENT then
 	end );
 	
 	local function CheckForUpdates()
+		-- if !game.SinglePlayer() or !LocalPlayer():IsListenServerHost() then return end
 		local CURRENT_VERSION = ""
 		local changelogs = file.Exists("changelog.lua","LUA") and file.Read("changelog.lua","LUA") or false
 		changelogs = changelogs or (file.Exists("changelog.lua","lsv") and file.Read("changelog.lua","lsv") or "")
@@ -939,81 +1190,6 @@ if CLIENT then
 			DHTML:OpenURL("https://steamcommunity.com/workshop/filedetails/discussion/1131455085/3166519278505386201/")
 		end
 	end
-	-- HAB PhysBullet compatibility
-	timer.Simple(0.1,function()
-		if hab then
-			local MODULE = hab.Module.PhysBullet
-			if MODULE then
-				hab.hook("PhysBulletOnBulletCreateEffects_","gred_hab_physbullet_particle",function(ent,index,bullet,mode)
-					local isGred = ent.ClassName == "gred_base_bullet" and not ent.fuckHavok
-					if isGred then
-						net.Start("gred_net_createimpact")
-						net.WriteVector(bullet.Position)
-						
-						local ang = bullet.tr.HitNormal:Angle()
-						if ent.Caliber == "wac_base_7mm" then
-							ang.p = ang.p + 90
-							net.WriteAngle(ang)
-							net.WriteInt(gred.Mats[util.GetSurfacePropName(bullet.tr.SurfaceProps)] or 24,4)
-						else
-							if ent.Caliber == "wac_base_12mm" then
-								sound.Play("impactsounds/gun_impact_"..math.random(1,14)..".wav",bullet.Position,100,100,0.5)
-							elseif ent.Caliber == "wac_base_20mm" then
-								sound.Play("impactsounds/20mm_0"..math.random(1,5)..".wav",bullet.Position,100,100,0.7)
-							elseif ent.Caliber == "wac_base_30mm" then
-								sound.Play("impactsounds/30mm_old.wav",bullet.Position,100,math.random(90,110),0.7)
-							elseif ent.Caliber == "wac_base_40mm" then
-								sound.Play("impactsounds/20mm_0"..math.random(1,5)..".wav",bullet.Position,100,100,0.7)
-							end
-							net.WriteAngle(ang)
-							net.WriteInt(0) 
-						end
-						net.WriteInt(1,4)
-						net.WriteInt(table.KeyFromValue(gred.Calibre,ent.Caliber),4)
-							
-						net.Broadcast()
-					end
-					return isGred and (HAB_BULLET_EF_NOPARTICLES) or (bullet.AmmoType == "GaussEnergy" and HAB_BULLET_EF_DISABLEEFFECT or HAB_BULLET_EF_NONE)
-				end)
-				
-				function MODULE:CreateEffects( Ent, Index, Bullet, Mode )
-
-					local e = Bullet.tr.Entity
-
-					local flags = HAB_BULLET_EF_NONE
-					local override = hook.Call( "PhysBulletOnBulletCreateEffects_", MODULE, Ent, Index, Bullet, Mode )
-					if override then
-					
-						if override == HAB_BULLET_EF_DISABLEEFFECT then
-
-							return
-
-						else
-
-							flags = flags + override
-
-						end
-
-					end
-					
-					local effectdata = EffectData( )
-						effectdata:SetDamageType( Bullet.BulletType )
-						effectdata:SetEntity( e ) -- hit ent
-						effectdata:SetHitBox( Bullet.tr.HitGroup or -1 ) -- hitgroup
-						effectdata:SetMagnitude( Bullet.Caliber ) -- caliber
-						effectdata:SetNormal( Bullet.tr.HitNormal or Bullet.FlightDirection ) -- direction 1
-						effectdata:SetOrigin( Bullet.Position ) -- position
-						effectdata:SetScale( Bullet.Caliber / 64 ) -- size --EffectSize
-						effectdata:SetStart( -( Bullet.tr.Normal or Bullet.FlightDirection ) ) -- direction 2
-						effectdata:SetSurfaceProp( Bullet.Surf or 0 ) -- hit material
-						effectdata:SetAttachment( Mode )
-						effectdata:SetFlags( flags )
-					Effect( "hab_physbullet_effects", effectdata )
-
-				end
-			end
-		end
-	end)
 	
 	net.Receive("gred_lfs_setparts",function()
 		local self = net.ReadEntity()
@@ -1200,6 +1376,93 @@ if CLIENT then
 		return view
 	end
 	
+	gred.GunnersInit = function(self)
+		local ATT
+		local seat
+		for k,v in pairs(self.Gunners) do
+			for a,b in pairs(v.att) do
+				v.att[a] = self:LookupAttachment(b)
+			end
+		end
+	end
+	
+	gred.GunnersDriverHUDPaint = function(self,ply)
+		if !self.Initialized then
+			gred.GunnersInit(self)
+			self.Initialized = true
+		end
+		
+		local att
+		local tr
+		local filter = self:GetCrosshairFilterEnts()
+		local ScrW,ScrH = ScrW(),ScrH()
+		local pparam1
+		local pparam2
+		local alpha
+		
+		for k,v in pairs(self.Gunners) do
+			att = self:GetAttachment(v.att[1])
+			tr = util.TraceLine({
+				start = att.Pos,
+				endpos = (att.Pos + att.Ang:Forward() * 50000),
+				filter = filter
+			})
+			
+			alpha = !IsValid(self["GetGunner"..k](self)) and 255 or 0
+			
+			pparam1,pparam2 = self:GetPoseParameter(v.poseparams[1]),self:GetPoseParameter(v.poseparams[2])
+			
+			if pparam1 == 1 or pparam2 == 1 or pparam1 == 0 or pparam2 == 0 then -- yea but shut up ok
+				surface.SetDrawColor(255,0,0,alpha)
+			else
+				surface.SetDrawColor(0,255,0,alpha)
+			end
+			
+			tr.ScreenPos = tr.HitPos:ToScreen()
+			tr.ScreenPos.x = tr.ScreenPos.x > ScrW and tr.ScreenPosW or (tr.ScreenPos.x < 0 and 0 or tr.ScreenPos.x)
+			tr.ScreenPos.y = tr.ScreenPos.y > ScrH and tr.ScreenPosH or (tr.ScreenPos.y < 0 and 0 or tr.ScreenPos.y)
+			DrawCircle(tr.ScreenPos.x,tr.ScreenPos.y,5)
+		end
+	end
+	
+	gred.GunnersHUDPaint = function(self,ply)
+		if !self.Initialized then
+			gred.GunnersInit(self)
+			self.Initialized = true
+		end
+		
+		local att
+		local tr
+		local filter = self:GetCrosshairFilterEnts()
+		local ScrW,ScrH = ScrW(),ScrH()
+		local pparam1
+		local pparam2
+		local veh = ply:GetVehicle()
+		for k,v in pairs(self.Gunners) do
+			if veh == self["GetGunnerSeat"..k](self) then
+				att = self:GetAttachment(v.att[1])
+				tr = util.TraceLine({
+					start = att.Pos,
+					endpos = (att.Pos + att.Ang:Forward() * 50000),
+					filter = filter
+				})
+				
+				pparam1,pparam2 = self:GetPoseParameter(v.poseparams[1]),self:GetPoseParameter(v.poseparams[2])
+				
+				if pparam1 == 1 or pparam2 == 1 or pparam1 == 0 or pparam2 == 0 then -- yea but shut up ok
+					surface.SetDrawColor(255,0,0,255)
+				else
+					surface.SetDrawColor(0,255,0,255)
+				end
+				
+				tr.ScreenPos = tr.HitPos:ToScreen()
+				tr.ScreenPos.x = tr.ScreenPos.x > ScrW and tr.ScreenPosW or (tr.ScreenPos.x < 0 and 0 or tr.ScreenPos.x)
+				tr.ScreenPos.y = tr.ScreenPos.y > ScrH and tr.ScreenPosH or (tr.ScreenPos.y < 0 and 0 or tr.ScreenPos.y)
+				DrawCircle(tr.ScreenPos.x,tr.ScreenPos.y,5)
+				break
+			end
+		end
+	end
 	
 	gred.simfphys = gred.simfphys or {}
 	
@@ -1285,11 +1548,13 @@ if CLIENT then
 		local pod = ply:GetVehicle()
 		local offset = net.ReadVector()
 		local att = net.ReadString()
+		local angoffset = net.ReadAngle()
 		if !IsValid(pod) then return end
 		
-		pod.GRED_SIGHT_OFFSET 	= offset
-		pod.GRED_SIGHT_ATT 		= ply:GetSimfphys():LookupAttachment(att)
-		pod.GRED_USE_SIGHT 		= !pod.GRED_USE_SIGHT
+		pod.GRED_SIGHT_OFFSET_ANG 	= angoffset
+		pod.GRED_SIGHT_OFFSET 		= offset
+		pod.GRED_SIGHT_ATT 			= ply:GetSimfphys():LookupAttachment(att)
+		pod.GRED_USE_SIGHT 			= !pod.GRED_USE_SIGHT
 	end)
 	
 	hook.Add("CalcView","gred_simfphys_tanksightview",function(ply,ang,pos)
@@ -1310,19 +1575,11 @@ if CLIENT then
 		}
 		ply.simfphys_smooth_out = 0
 		local attachment = Base:GetAttachment(vehicle.GRED_SIGHT_ATT)
-		view.angles = attachment.Ang
+		view.angles = attachment.Ang + vehicle.GRED_SIGHT_OFFSET_ANG
 		view.origin = attachment.Pos + attachment.Ang:Forward() * vehicle.GRED_SIGHT_OFFSET.x  + attachment.Ang:Right() * vehicle.GRED_SIGHT_OFFSET.y  + attachment.Ang:Up() *  vehicle.GRED_SIGHT_OFFSET.z
 		view.fov = vehicle:GetNWFloat("SightZoom",40)
 		return view
 	end)
-	
-	local function DrawCircle( X, Y, radius )
-		local segmentdist = 360 / ( 2 * math.pi * radius / 2 )
-		
-		for a = 0, 360 - segmentdist, segmentdist do
-			surface.DrawLine( X + math.cos( math.rad( a ) ) * radius, Y - math.sin( math.rad( a ) ) * radius, X + math.cos( math.rad( a + segmentdist ) ) * radius, Y - math.sin( math.rad( a + segmentdist ) ) * radius )
-		end
-	end
 	
 	local SIMFPHYS_COLOR = Color(255,235,0)
 	local function DrawAmmoLeft(vehicle,scrW,scrH)
@@ -1370,6 +1627,10 @@ if CLIENT then
 								ent.GRED_ISTANK = ent:GetNWBool("GRED_ISTANK")
 							end
 						end)
+					end
+					if ent.Seats == nil then
+						ent.Seats = ent.pSeat and table.Copy(ent.pSeat) or {}
+						table.insert(ent.Seats,ent:GetDriverSeat())
 					end
 					if ent.GRED_ISTANK and istable(ent.Seats) then
 						local _,maxs = ent:GetModelBounds()
@@ -1460,10 +1721,6 @@ if CLIENT then
 		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 + len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
 	end)
 	
-	net.Receive("gred_net_tank_networkseats",function()
-		local vehicle = net.ReadEntity()
-		vehicle.Seats = net.ReadTable()
-	end)
 	net.Receive("gred_net_send_ply_hint_key",function()
 		notification.AddLegacy("Press the '"..input.GetKeyName(net.ReadInt(9))..net.ReadString(),NOTIFY_HINT,10)
 	end)
@@ -1491,7 +1748,6 @@ else
 	AddNetworkString("gred_lfs_remparts")
 	AddNetworkString("gred_net_registertank")
 	AddNetworkString("gred_net_tank_setsight")
-	AddNetworkString("gred_net_tank_networkseats")
 	AddNetworkString("gred_net_tank_susonground")
 	AddNetworkString("gred_net_send_ply_hint_key")
 	AddNetworkString("gred_net_send_ply_hint_simple")
@@ -1553,7 +1809,6 @@ else
 		local gunnerpod
 		local IsDriver
 		local selfAngle = self:GetAngles()
-		local calcSelfAnglePitch = selfAngle.p*0.01
 		selfAngle:Normalize()
 		for k,v in pairs(self.Gunners) do
 			pod = self["GetGunnerSeat"..k](self)
@@ -1564,16 +1819,16 @@ else
 				if gunnerValid or (!gunnerValid and DriverFireGunners) then
 					gunner = gunnerValid and gunner or Driver
 					IsDriver = gunner == Driver
-					-- pod = IsDriver and DriverSeat or pod
+					pod = IsDriver and DriverSeat or pod
 					
 					IsShooting = IsShooting or gunner:KeyDown(IN_ATTACK)
 					
 					for C,att in pairs(v.att) do
 						att = self:GetAttachment(att)
 						if C == 1 then
-							ang = v.AngleOperate(self:WorldToLocalAngles(pod:WorldToLocalAngles(gunner:EyeAngles())),IsDriver,selfAngle)
-							ang.p = ang.p - (IsDriver and calcSelfAnglePitch or calcSelfAnglePitch)
-							-- ang.y = ang.y - 0
+							ang = pod:WorldToLocalAngles(gunner:EyeAngles())
+							ang:Normalize() 
+							ang = v.AngleOperate(self:WorldToLocalAngles(ang),IsDriver,selfAngle)
 							ang:Normalize()
 							self:SetPoseParameter(v.poseparams[1],ang.p)
 							self:SetPoseParameter(v.poseparams[2],ang.y)
@@ -1601,7 +1856,7 @@ else
 								effectdata:SetOrigin(att.Pos)
 								effectdata:SetAngles(shootAng)
 								effectdata:SetSurfaceProp(0)
-								Effect("gred_particle_simple",effectdata)
+								util.Effect("gred_particle_simple",effectdata)
 								if C == #v.att or v.Sequential then
 									v.nextshot = ct + v.delay
 								end
@@ -1631,7 +1886,7 @@ else
 			gunner = nil
 		end
 	end
-	
+
 	gred.HandleActiveGunners = function(self)
 		local gpod
 		local gunner
@@ -1911,30 +2166,19 @@ else
 	end
 	
 	function gred.CreateBullet(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg,radius)
-		if hab and hab.Module.PhysBullet and OverrideHAB:GetInt() == 1 then
-			local tab = {
-				Src = pos,
-				Dir = ang:Forward(),
-				Spread = vector_zero,
-
-				Damage = ((cal == "wac_base_7mm" and HE7MM:GetInt() >= 1) or (cal == "wac_base_12mm" and HE12MM:GetInt() >= 1)) and 0 or (dmg and dmg or (cal == "wac_base_7mm" and 40 or (cal == "wac_base_12mm" and 60 or (cal == "wac_base_20mm" and 80 or (cal == "wac_base_30mm" and 100 or (cal == "wac_base_40mm" and 120)))))) * BulletDMG:GetFloat(),
-
-				Filter = filter,
-
-				AmmoType = (cal == "wac_base_12mm" and (tracer == "green" and "hvap_127x108_ap" or "hvap_127x99_ap")) or (cal == "wac_base_7mm" and (tracer == "green" and "hab_792x57" or (tracer == "yellow" and "hab_77x56" or "hab_762x63"))) or (cal == "wac_base_20mm" and "hvap_20x102_hei"),
-
-				WeaponFiring = IsValid(filter[1]) and filter[1] or ply,
-				Attacker = ply,
-
-				Num = 1,
-
-				IsNetworked = true,
-
-				Distance = false,
-
-			}
-			ply:FirePhysicalBullets(tab)
-			PrintTable(tab)
+		if hab and hab.Module.PhysBullet and OverrideHAB:GetInt() == 0 then
+			local bullet = {}
+			bullet.AmmoType		= cal..(tracer and tracer or "")
+			bullet.Num 			= 1
+			bullet.Src 			= pos
+			bullet.Dir 			= ang:Forward()
+			bullet.Spread 		= vector_zero
+			bullet.Tracer		= 0--tracer and 0 or 1
+			bullet.IsNetworked	= true
+			bullet.Distance		= false
+			bullet.Damage		= ((cal == "wac_base_7mm" and HE7MM:GetInt() >= 1) or (cal == "wac_base_12mm" and HE12MM:GetInt() >= 1)) and 0 or (dmg and dmg or (cal == "wac_base_7mm" and 40 or (cal == "wac_base_12mm" and 60 or (cal == "wac_base_20mm" and 80 or (cal == "wac_base_30mm" and 100 or (cal == "wac_base_40mm" and 120)))))) * BulletDMG:GetFloat()
+			bullet.Force		= bullet.Damage*0.1
+			ply:FirePhysicalBullets(bullet)
 		else
 			World = IsValid(World) or Entity(0)
 			BulletID = BulletID + 1
@@ -2223,19 +2467,10 @@ else
 		vehicle:SetSkin(math.random(0,vehicle:SkinCount()))
 		
 		
-		local tab = {}
-		local DriverSeat = vehicle:GetDriverSeat()
-		DriverSeat:SetNoDraw(false)
-		table.insert(tab,DriverSeat)
-		for k,v in pairs(vehicle.pSeat) do
-			table.insert(tab,v)
-			v:SetNoDraw(false)
-		end
+		local tab = vehicle.pSeat and table.Copy(vehicle.pSeat) or {}
+		table.insert(tab,vehicle:GetDriverSeat())
+		
 		timer.Simple(0.1,function()
-			net.Start("gred_net_tank_networkseats")
-				net.WriteEntity(vehicle)
-				net.WriteTable(tab)
-			net.Broadcast()
 			local shelltypes
 			for _,seat in pairs(tab) do
 				if seat:GetNWBool("HasCannon") then
@@ -2245,10 +2480,12 @@ else
 					end
 					seat:SetNWString("ShellTypes",util.TableToJSON(shelltypes))
 				end
-				seat:SetNoDraw(true) 
 			end
 		end)
-			
+		
+		vehicle.TOQUECENTER_D = 0
+		vehicle.TOQUECENTER_A = 0
+		
 		timer.Simple(1,function()
 			if not IsValid(vehicle) then return end
 			if not vehicle.VehicleData["filter"] then 
@@ -2282,7 +2519,7 @@ else
 							filter = ent.VehicleData["filter"]
 						} )
 						
-						local onground = self:IsOnGround( vehicle ) and 1 or 0
+						local onground = (self.IsOnGround and self:IsOnGround( vehicle )) and 1 or 0
 						Wheel:SetOnGround( onground )
 						ent.VehicleData[ "onGround_" .. i ] = onground
 						
@@ -2311,6 +2548,50 @@ else
 				end
 			end
 		end)
+	end
+	
+	gred.TankTurn = function(vehicle,MaxTurn,TorqueCenter,TorqueCenterRate)
+		if vehicle:EngineActive() and vehicle.susOnGround then
+			local phys = vehicle:GetPhysicsObject()
+			if !IsValid(phys) then return end
+			
+			local massvec
+			local vel = phys:GetAngleVelocity()
+			if math.abs(vel.z) <= MaxTurn then
+				local gear = vehicle:GetGear()
+				if (vehicle.PressedKeys.D and gear != 1) or (vehicle.PressedKeys.A and gear == 1) then
+					massvec = Vector(0,0,phys:GetMass())
+					vehicle.TOQUECENTER_D = math.Clamp(vehicle.TOQUECENTER_D+TorqueCenterRate,0,TorqueCenter)
+					if gear == 2 then
+						local torque = vehicle.TOQUECENTER_D*0.5
+						vehicle.VehicleData["spin_3"] = vehicle.VehicleData[ "spin_3" ] + torque
+						vehicle.VehicleData["spin_5"] = vehicle.VehicleData[ "spin_5" ] + torque
+					end
+					phys:ApplyTorqueCenter(massvec*-vehicle.TOQUECENTER_D)
+				else
+					vehicle.TOQUECENTER_D = 0
+				end
+				
+				if (vehicle.PressedKeys.A and gear != 1) or (vehicle.PressedKeys.D and gear == 1) then
+					massvec = massvec or Vector(0,0,phys:GetMass())
+					vehicle.TOQUECENTER_A = math.Clamp(vehicle.TOQUECENTER_A+TorqueCenterRate,0,TorqueCenter)
+					if gear == 2 then
+						local torque = vehicle.TOQUECENTER_A*0.5
+						vehicle.VehicleData["spin_4"] = vehicle.VehicleData[ "spin_4" ] + torque
+						vehicle.VehicleData["spin_6"] = vehicle.VehicleData[ "spin_6" ] + torque
+					end
+					-- phys:ApplyForceCenter(massvec*(vehicle.TOQUECENTER_A*0.5))
+					phys:ApplyTorqueCenter(massvec*vehicle.TOQUECENTER_A)
+				else
+					vehicle.TOQUECENTER_A = 0
+				end
+			end
+			
+			if !vehicle.PressedKeys.A and !vehicle.PressedKeys.D then
+				massvec = massvec or Vector(0,0,phys:GetMass())
+				phys:ApplyTorqueCenter(massvec*-vel.z)
+			end
+		end
 	end
 	
 	gred.TankDestruction = function(ent,gib,ang,skin,pitch,yaw,CreateAmmoFire,StopAmmoFire,CreateExplosion,CreateTurret)
@@ -2517,10 +2798,10 @@ local healthmultiplier_all 	= gred.CVars["gred_sv_lfs_healthmultiplier_all"]
 local nextRefil 			= 0.5
 local bigNum 				= 999999
 
-local no = {
-	[2] = true,
-	[8194] = true
-}
+-- local no = {
+	-- [2] = true,
+	-- [8194] = true
+-- }
 hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 	if ent:IsNPC() then
 		table.insert(gred.AllNPCs,ent)
@@ -3097,7 +3378,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 					local OldDestroyed = ent.OnDestroyed
 					local inflictor,gdmg,T,dmgtype
 					
-					if gred.CVars["gred_sv_simfphys_bullet_dmg_tanks"]:GetInt() == 0 then
+					-- if gred.CVars["gred_sv_simfphys_bullet_dmg_tanks"]:GetInt() == 0 then
 						for i = 0, ent:GetNumPoseParameters() - 1 do
 							if ent:GetPoseParameterName(i) == "turret_yaw" then
 								ent.GRED_ISTANK = true
@@ -3105,7 +3386,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 								break
 							end
 						end
-					end
+					-- end
 					
 					ent.Gred_MaxHP = ent:GetMaxHealth()
 					
@@ -3133,7 +3414,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 						OldDestroyed(ent)
 					end
 					ent.OnTakeDamage = function(ent,dmg)
-						if ent.GRED_ISTANK and no[dmg:GetDamageType()] then return end
+						-- if ent.GRED_ISTANK and no[dmg:GetDamageType()] then return end
 						
 						inflictor = dmg:GetInflictor()
 						if ent.IsArmored and inflictor and IsValid(inflictor) and inflictor.GetClass and inflictor:GetClass() == "base_shell" then

@@ -341,6 +341,21 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 		},
 	}
 	hook.Run("GredAmmoBoxAddShell",SHELLS)
+	--[[
+		This is a piece of code you can take to make your own shell entities
+		The currently available shell types are:
+		- HE
+		- AP
+		- WP
+		- Gas
+		
+		hook.Add("GredAmmoBoxAddShell","UNIQUE HOOK ID GOES HERE",function(SHELLS)
+			SHELLS["CALIBER IN MILLIMETERS GOES HERE"] = {
+				["SHELLTYPE #1"] = true,
+				["SHELLTYPE #2"] = true,
+			}
+		end)
+	]]
 	local DButton
 	for k,v in SortedPairs(SHELLS) do
 		DButton = DScrollPanel:Add("DButton")
@@ -362,7 +377,33 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 	
 	local EmplacementsMounted = steamworks.ShouldMountAddon(1391460275) or file.Exists("autorun/gred_emp_autorun.lua","lsv")
 	hook.Run("GredAmmoBoxAddAmmo",DScrollPanel,self,ply,frame,EmplacementsMounted)
-	
+	--[[
+		This is a piece of code you can take to make your own magazine entities
+		
+		hook.Add("GredAmmoBoxAddAmmo","UNIQUE HOOK ID GOES HERE",function(DScrollPanel,self,ply,frame,EmplacementsMounted)
+			if !EmplacementsMounted then return end
+			
+			local DButton = DScrollPanel:Add("DButton")
+			DButton:SetText("YOUR CALIBER GOES HERE")
+			DButton:Dock( TOP )
+			DButton:DockMargin( 0, 0, 0, 5 )
+			DButton.DoClick = function()
+				local d = DermaMenu()
+				d:AddOption("YOUR MAG NAME GOES HERE (E.g. 7.5mm MAC-31 Mag)",function()
+					net.Start("gred_net_ammobox_sv_createammo")
+						net.WriteString("YOUR MAG MODEL GOES HERE")
+						net.WriteEntity(self)
+						net.WriteEntity(ply)
+						net.WriteString("YOUR EMPLACEMENT CLASS NAME GOES HERRE")
+						net.WriteInt(0,1)
+						net.WriteInt(0,1)
+					net.SendToServer()
+					frame:Close()
+				end)
+				d:Open()
+			end
+		end)
+	]]
 	if !EmplacementsMounted then return end
 	
 	

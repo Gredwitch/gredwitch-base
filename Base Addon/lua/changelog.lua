@@ -1,6 +1,16 @@
---[[21/10/2019 (10/21/2019)
-- Added a flamethrower particle
-- Fixed an LFS error
+--[[29/10/2019
+- Added compatibility with Havok's Physical Bullet Module
+- Added a ConVar to toggle tank crosshairs in 3rd person
+- Added a ConVar to make tanks have 4 wheels instead of 6 (basically to improve performance)
+- Added some bunch of LFS gunners functions
+- Added an angle offset for the tank sights
+- Added a tank neutral turn feature so my tanks won't have problem steering anymore
+- Fixed base_shell: Changing collision rules within a callback is likely to cause crashes!
+- Fixed shells not dealing a lot of damage to tanks that use simfphys.TankApplyDamage
+- Fixed an error related to the shell tracer effect
+- Removed the simfphys seat networking code
+- Removed the "Should bullets damage tanks option" - Tanks now use simfphys.TankApplyDamage
+
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -10,11 +20,15 @@ If you want to play with other people with exclusive addons I made, you can join
 
 OLDER CHANGES
 
-20/10/2019 (10/20/2019)
+21/10/2019
+- Added a flamethrower particle
+- Fixed an LFS error
+
+20/10/2019
 - Fixed an issue related to changelogs
 - Fixed a simfphys error that could cause server crashes
 
-15/10/2019 (10/15/2019)
+15/10/2019
 - Added an AP shell damage multiplier
 - Added 37mm and 100mm shells to the ammo box
 - Added a client side suspension system
@@ -22,14 +36,14 @@ OLDER CHANGES
 - Fixed the shells sometime crashing the server
 - Updated the 40mm muzzleflash particle
 
-08/10/2019 (10/08/2019)
+08/10/2019
 - Fixed bullets damaging players in seats
 - Fixed an ammobox issue
 - Added gas shells support
 - Fixed HE bullets dealing damage to tanks
 - Made the bombs actually destroy tanks
 
-06/10/2019 (10/06/2019)
+06/10/2019
 - Added a hint system for my simfphys tanks and my LFS aircrafts
 - Added new ricochets sounds
 - Fixed players not being able to enter my simfphys vehicles
@@ -41,7 +55,7 @@ OLDER CHANGES
 - Fixed the Panzer IV being Gredwitch's Base
 - Tweaked the LFS aircraft parts destruction aerodynamics the you actually can't control them when they're destroyed
 
-05/10/2019 (10/05/2019)
+05/10/2019
 [HOTFIX 2] Fixed le stinky poopoo
 [HOTFIX] Fixed missing sounds and another stack overflow
 - Fixed conflicts with some simfphys vehicles
@@ -50,7 +64,7 @@ OLDER CHANGES
 - Fixed missing 12mm water impacts
 - Fixed the emplacement pack's magazines not appearing in the ammo box
 
-03/10/2019 (10/03/2019)
+03/10/2019
 [HOTFIX] Fixed lua errors when simfphys isn't installed / fixed thirdperson with simfphys vehicles
 - Added some simfphys global functions for the upcoming tanks
 - Added options to make simfphys tanks not take damage from bullets
@@ -65,17 +79,17 @@ OLDER CHANGES
 - Removed all of the shell entities
 - Reworked base_shell : shells now deal realistic damage and won't bug out when they hit simfphys vehicles / shells can now do ricochets / added fancy tracers to shells / reworked the shell whistle sounds / the shells' mass, velocity and caliber are now taken into account to calculate the damage that will be delt
 
-25/08/2019 (08/25/2019)
+25/08/2019
 - Fixed the DFrames showing too early
 - Removed the 64 bit branch warnings
 
-18/08/2019 (08/18/2019)
+18/08/2019
 - Hopefully fixed the bugs
 
-16/08/2019 (08/16/2019)
+16/08/2019
 - Updated the GunnersTick function
 
-15/08/2019 (08/15/2019)
+15/08/2019
 - Added gred_prop_part.lua and gred_prop_tail.lua
 - Added a function that gets all the NPCs
 - Added a version checker that screams at you when the addon is not up to date
@@ -87,19 +101,19 @@ OLDER CHANGES
 - Fixed some issues with the LFS Health slider
 - Updated the thumbnail
 
-20/07/2019 (07/20/2019)
+20/07/2019
 - "Fixed" the "particle" error
 - Updated the ConVar system
 - Updated some functions
 
-12/07/2019 (07/12/2019)
+12/07/2019
 - Added a warning that yells at players who use the 64 bits branch
 - Fixed the tracers not matching the bullet speed
 - Made the server side spawnmenu options toggleable by admins
 - Rewrote the explosion function from scratch ; explosions shouldn't cause server crashes anymore
 - Rewrote the shells so AP does damage to tanks and HE does less damage to tanks and so shells don't act like rockets anymore
 
-26/06/2019 (06/26/2019)
+26/06/2019
 - Added gred_particle_tracer
 - Fixed wac_base_grocket using the old sound system, creating errors
 - Made a new physical bullet system that is fully optimised (basically no more lag while firing) with new tracer effects
@@ -109,25 +123,25 @@ OLDER CHANGES
 - Updated wac_pod_gunner and wac_pod_mg : made them use the new physical bullet function
 - Removed gred_base_bullet
 
-10/06/2019 (06/10/2019)
+10/06/2019
 - Added new effects
 - Rewrote the bombs explosion sound system from scratch - the time the explosion sounds will play now depend on how far the player is from the explosion
 - Tweaked the WAC Hydra rocket
 - Updated the bullet code
 
-08/04/2019 (04/08/2019)
+08/04/2019
 - Added HAB Physbullet compatibility
 - Added a 128mm shell
 - Fixed a missing particle precache
 - Updated some particles
 
-23/02/2019 (02/23/2019)
+23/02/2019
 - Added a bunch of CEffectDatas : the particle effect spawning system has been updated, the effects don't use the Net Library anymore, which means that the servers will suffer less from the effects
 - Cleaned up A LOT of code
 - Fixed gb_shell_56mm having a 75mm shell explosion effect
 - Updated the autorun files : added a particle table, optimized the loading times, fixed some WAC errors, updated the missing addons popup
 
-10/02/2019 (02/10/2019)
+10/02/2019
 - Added a new way to override WAC so you don't have to install it in the legacy addons folder
 - Added new convars to block popups, fixed LFS being shit and prevent WAC aircrafts from being overridden
 - Added gb_shell_40mm
@@ -135,18 +149,18 @@ OLDER CHANGES
 - Organized the spawnmenu options
 - Removed unused files
 
-28/12/2018 (12/28/2018)
+28/12/2018
 - Fixed missing Network String
 - Fixed Physics Environnements
 
-26/12/2018 (12/26/2018)
+26/12/2018
 - Updated BASE_BULLET : updated the code
 - Updated gred_autorun_shared : precached some more particles
 - Updated BASE_BOMB : fixed explosives creating smoke out of the void
 - Updated ROCKET_HYDRA : the rocket will now work even if WAC isn't installed
 - Updated HC_ROCKET : no errors will be created if WAC isn't installed anymore
 
-03/12/2018 (12/03/2018)
+03/12/2018
 - Added brand new explosion effects
 - Added gb_shell_152mm and gb_shell_152mm
 - Added a file precache system
@@ -156,13 +170,13 @@ OLDER CHANGES
 - Updated base_shell : added a shell whistle SFX
 - Updated base_gas : fixed a bug
 
-24/10/2018 (10/24/2018)
+24/10/2018
 - Updated base_rocket: Shells and rockets will now explode when they hit water
 - Updated gred_base_bullet : Fixed the water impact effects not working / Removed useless variables
 - Updated wac_hc_base : Fixed helicopters blowing up in mid air while going down
 - Tweaked the explosives' decals so they can fit with their effect
 
-03/10/2018 (10/03/2018)
+03/10/2018
 - Added some materials
 - Added wac_hc_rocket : fixed the default wac rockets
 - Fixed shockwave_ent's explosions making everything fucking up
@@ -179,7 +193,7 @@ OLDER CHANGES
 - Removed the artillery sweps as they are going to be uploaded in a different addon
 - Removed unused base_dumb
 
-23/10/2018 (10/23/2018)
+23/10/2018
 - Added base_gas
 - Added gb_shell_gas
 - Updated shockwave_ent : decals should now be client-side / fixed the rockets making everything fly away
@@ -193,14 +207,14 @@ OLDER CHANGES
 - Updated the spawnmenu options : server-side options are not showing anymore since you can only modify the convars with RCon
 - Removed unused base_fire
 
-04/09/2018 (09/04/2018)
+04/09/2018
 - Updated BASE_BULLET : Fixed writeInt error
 - Updated GRED_ADD : Removed a hook and applied the physenv manually to the shells / Fixed a missing particle precache
 - Updated shockwave_ent Fixed explosions making everything fly away forever
 - Updated WAC_HC_BASE : Improved the radio sounds activation / Added a new water explosion effect when WAC aircrafts are crashing
 - Updated BASE_SHELL : Physenv should now apply localy to prevent problems with other stuff
 
-29/08/2018 (08/28/2018)
+29/08/2018
 
 - Added gred_sv_shellspeed_multiplier
 - Added physics.lua / Updated gred_add : Made the addon override gmod's default max physics object velocities
@@ -215,7 +229,7 @@ OLDER CHANGES
 - Updated all the rockets to improve the neurotec compatibility
 - Moved the shells from the Emplacement pack here
 
-18/08/2018 (08/18/2018)
+18/08/2018
 
 - Updated BASE_BULLET : added a new optimized tracer system / added a 30mm time-fuze shell / made impact effects client only
 / added a new 40mm bullet
@@ -229,7 +243,7 @@ OLDER CHANGES
 - Fixed a bug in shockwave_ent
 - Fixed wac_hc_base : fixed an issue that was preventing the players from getting in an aircraft in multiplayer
 
-16/07/2018 (07/16/2018)
+16/07/2018
 - Added a mortar white phosphorus artillery SWEP
 - Added an artillery strike base to optimize the code
 - Fixed dropped bombs flying away due to other bombs's explosions
@@ -238,7 +252,7 @@ OLDER CHANGES
 - Fixed explosion sounds not playing when switching to a camera
 - Fixed the JDAMs not working on servers
 
-10/07/2018 (07/10/2018)
+10/07/2018
 - Added working JDAMs
 - Fixed dropping bombs making the aircraft fuck up
 - Fixed a missing texture on the Mk 82
@@ -246,7 +260,7 @@ OLDER CHANGES
 - Fixed the V1 start sound not following the rocket
 - Most of the convars are now server side to prevent client lags and bugs
 
-30/06/2018 (06/30/2018)
+30/06/2018
 - Added a new option to customize the explosion sounds muffle
 - Fixed the Hydra 70 spawning without WAC being enabled
 - Fixed a bunch of bugs related to WAC not being installed
@@ -254,11 +268,11 @@ OLDER CHANGES
 - Fixed some stuff related to the SWEPs
 - Updated the particles
 
-27/06/2018 (06/27/2018)
+27/06/2018
 - Fixed the particles not showing
 - Fixed a typo in autorun/server/gred_add.lua
 
-25/06/2018 (06/25/2018)
+25/06/2018
 - Added GRED_BASE_BULLET : optimized the bullets as much as possible
 - Added editable bullet damage / radius
 - Finally fixed stuff related to client-side / server-side convars
@@ -276,7 +290,7 @@ OLDER CHANGES
 - Updated BASE_ROCKET / BASE_BOMB
 - Removed BASE_7MM / BASE_12MM / BASE_20MM / BASE_30MM
 
-27/05/2018 (05/27/2018)
+27/05/2018
 - Fixed POD_GUNNER
 - Fixed the bombing runs in gred_arti_ent
 - Fixed the deleted rocket sound
@@ -286,7 +300,7 @@ OLDER CHANGES
 - Fixed the missing mm1/box material error
 - Removed unused POD_HELLFIRE and POD_HYDRA
 
-24/05/2018 (05/24/2018)
+24/05/2018
 - Added gb_rocket_v1
 - Added a new Nebelwerfer rocket model
 - Fixed the mortar shell's collision model
@@ -308,7 +322,7 @@ OLDER CHANGES
 - Upated the materials
 - Removed useless POD_TURRET
 
-15/04/2018 (04/15/2018)
+15/04/2018
 - Added gred_overwrite_wac : this should fix WAC not getting overridden
 - Updated impact_fx_ins : smoke is now way less thick
 - Updated gred_convars
@@ -316,7 +330,7 @@ OLDER CHANGES
 - Updated POD_GBOMB : bombs shouldn't affect the aircraft's maniabillity anymore
 - Updated BASE_ROCKET / BASE_GBOMB : fixed the Insurgency water explosion effect being in the wrong angle
 
-08/04/2018 (04/08/2018)
+08/04/2018
 - Added a new 500LB GP model (thanks to damik)
 - Updated particles : fixed the Day of Infamy and Insurgency particles being white
 - Updated gred_stmenu
@@ -325,7 +339,7 @@ OLDER CHANGES
 - Updated POD_GROCKET / POD_MIS / POD_MG / POD_GUNNER : projectiles won't collide with the aircraft
 - Updated materials
 
-02/04/2018 (04/02/2018)
+02/04/2018
 - Updated BASE_7MM : buffed it and added an explosive damage options
 - Updated gred_stmenu : fixed the whole spawnmenu options
 - Updated BASE_ROCKET and BASE_BOMB : fixed "Changing collision rules within a callback is likely to cause crashes!" error
@@ -333,7 +347,7 @@ OLDER CHANGES
 - Updated shockwave_ent : fixed random errors
 - Updated gred_convars
 
-30/03/2018 (03/30/2018)
+30/03/2018
 - Added BASE_7MM
 - Added a new 20mm effect
 - Added a new Hellfire model (thanks to damik)
@@ -352,7 +366,7 @@ OLDER CHANGES
 - Renamed BASE_MG to BASE_12MM
 - Removed shockwave_sound_lowsh
 
-06/02/2018 (02/06/2018)
+06/02/2018
 - Added a new FAB-250 model (from ECF pack)
 - Added a 13cm Nebelwerfer rocket (model from Gbombs)
 - Added a 105mm shell (model from Day of Infamy)
@@ -363,7 +377,7 @@ OLDER CHANGES
 - Updated every BOMB_ : removed useless code
 - Removed RAPE SWEP
 
-02/02/2018 (02/02/2018)
+02/02/2018
 - Added BOMB_1000GP (credits goes to damik for the model)
 - Added a HVAR model (credits goes to damik for the model)
 - Added BASE_ROCKET / ROCKET_HYDRA / ROCKET_HVAR / ROCKET_RP3
@@ -386,7 +400,7 @@ OLDER CHANGES
 - Updated sounds
 - Updated BASE_MG / BASE_20MM / BASE_30MM / POD_MG / POD_GUNNER : tracers should only appear every X shots (default: 5)
 
-02/01/2018 (02/01/2018)
+02/01/2018
 - Added gred_stmenu (base settings in the spawnmenu options)
 - Added shockwave_sound_instant
 - Added client-side CVars
@@ -401,7 +415,7 @@ OLDER CHANGES
 - Removed the ugly backdoor from gb5_main ( https://imgur.com/a/WtNJw )
 - Removed useless SC500 model
 
-23/12/2017 (12/20/2017)
+23/12/2017
 - Added Day of Infamy artillery sweps (testing)
 - Added SHELL_105MM / SHELL_NEBELROCKET / BOMB_500GP / BOMB_2000GP / BOMB_SC1000
 - Added gredwitch_addon_verify (to verify if the base addon is installed)
@@ -417,7 +431,7 @@ OLDER CHANGES
 - Updated particles
 - Renamed BASE_HEROUNDS to BASE_MG
 
-27/11/2017 (11/27/2017)
+27/11/2017
 - Added BASE_20MM and BASE_30MM
 - Added BOMB_FAB250
 - Added WAC_PL_BASE (fixes inside sounds)
@@ -429,7 +443,7 @@ OLDER CHANGES
 - Renamed POD_M2G to POD_MG
 - Removed all the admin PODs
 
-29/10/2017 (10/27/2017)
+29/10/2017
 - Added GBombs compatiblity with POD_GBOMB
 - Added basic Gbombs base stuff (BASE_BOMB / SHOCKWAVE_ENT / SHOCKWAVE_SOUND_LOWSH )
 - Added BOMB_250GP / BOMB_GBU12 / BOMB_GBU38 / BOMB_MK82 / BOMB_SC100 / BOMB_SC500
@@ -442,7 +456,7 @@ OLDER CHANGES
 - Removed WAC_AFTERBURNER
 - Removed WAC_HEATWAVE
 
-15/10/2017 (10/15/2017)
+15/10/2017
 - Added POD_MGUNNER (POD_GUNNER with green tracers)
 - Added HAWX rocket models (testing)
 - Added German and American radios
