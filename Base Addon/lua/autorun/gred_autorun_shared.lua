@@ -41,7 +41,7 @@ gred.CVars["gred_sv_arti_spawnaltitude"] 		= CreateConVar("gred_sv_arti_spawnalt
 gred.CVars["gred_sv_wac_radio"] 				= CreateConVar("gred_sv_wac_radio"					,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_spawnable_bombs"] 			= CreateConVar("gred_sv_spawnable_bombs"			,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_wac_bombs"] 				= CreateConVar("gred_sv_wac_bombs"					,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_shellspeed_multiplier"] 	= CreateConVar("gred_sv_shellspeed_multiplier"		,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_shell_speed_multiplier"] 	= CreateConVar("gred_sv_shell_speed_multiplier"		,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_wac_explosion_water"] 		= CreateConVar("gred_sv_wac_explosion_water"		,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_default_wac_munitions"] 	= CreateConVar("gred_sv_default_wac_munitions"		,  "0"  , GRED_SVAR)
 gred.CVars["gred_sv_wac_explosion"] 			= CreateConVar("gred_sv_wac_explosion"				,  "1"  , GRED_SVAR)
@@ -702,6 +702,7 @@ if CLIENT then
 	gred.CVars["gred_cl_wac_explosions"] 						= CreateClientConVar("gred_cl_wac_explosions" 						, "1" ,true,false)
 	gred.CVars["gred_cl_enable_popups"] 						= CreateClientConVar("gred_cl_enable_popups"	 					, "1" ,true,false)
 	gred.CVars["gred_cl_firstload"] 							= CreateClientConVar("gred_cl_firstload"							, "1" ,true,false)
+	gred.CVars["gred_cl_simfphys_sightsensitivity"] 			= CreateClientConVar("gred_cl_simfphys_sightsensitivity"			,"0.25",true,false)
 	gred.CVars["gred_cl_simfphys_maxsuspensioncalcdistance"] 	= CreateClientConVar("gred_cl_simfphys_maxsuspensioncalcdistance"	, "85000000" ,true,false)
 	
 	local TAB_PRESS = {FCVAR_ARCHIVE,FCVAR_USERINFO}
@@ -956,6 +957,12 @@ if CLIENT then
 			GetConVar("gred_cl_simfphys_key_togglesight"):SetInt(key)
 		end
 		CPanel:AddItem(CPanel:Help("Toggle tank sight"),DBinder)
+		
+		local this = CPanel:NumSlider("Sensitivity in sight mode","gred_cl_simfphys_sightsensitivity",0,1,2);this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+		this.OnValueChanged = function(this,val)
+			if this.ConVarChanging then return end
+			GetConVar("gred_cl_simfphys_sightsensitivity"):SetInt(val)
+		end
 		
 		local this = CPanel:NumSlider("Max suspension calculation distance","gred_cl_simfphys_maxsuspensioncalcdistance",0,300000000,0);this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
 		this.OnValueChanged = function(this,val)
@@ -1610,7 +1617,17 @@ if CLIENT then
 		draw.DrawText(text,font,x+w/2,y,black,TEXT_ALIGN_CENTER)
 
 	end
-	
+	hook.Add("AdjustMouseSensitivity","gred_tank_sight",function(val)
+		local ply = LocalPlayer()
+		if not IsValid(ply) or not ply:Alive() then return end
+		local vehicle = ply:GetVehicle()
+		if not IsValid(vehicle) then return end
+		if not vehicle.GRED_USE_SIGHT or vehicle.GRED_SIGHT_ATT == 0 then return end
+		if !vehicle.GetThirdPersonMode then return end
+		if vehicle:GetThirdPersonMode() then return end
+		
+		return gred.CVars.gred_cl_simfphys_sightsensitivity:GetFloat()
+	end)
 	hook.Add("HUDPaint","gred_simfphys_tanksighthud",function()
 		local ply = LocalPlayer()
 		if not IsValid(ply) or not ply:Alive() then return end
@@ -1686,15 +1703,17 @@ if CLIENT then
 			DrawAmmoLeft(vehicle,ScrW,ScrH)
 		end
 		
+		Base.GRED_FILTER_ENTS = Base.GRED_FILTER_ENTS or {
+			Base,
+		}
 		local startpos = Base:GetAttachment(vehicle.GRED_SIGHT_ATT).Pos
 		local scr = util.TraceLine({
 			start = startpos,
 			endpos = (startpos + ply:EyeAngles():Forward() * 50000),
-			filter = function(ent)
-				
-				return ent:GetClass() != "gmod_sent_vehicle_fphysics_wheel" and e != vehicle and e != ply and e != Base
-			end
+			-- mask = MASK_WATER,
+			filter = Base.GRED_FILTER_ENTS,
 		}).HitPos:ToScreen()
+		
 		scr.x = scr.x > ScrW and ScrW or (scr.x < 0 and 0 or scr.x)
 		scr.y = scr.y > ScrH and ScrH or (scr.y < 0 and 0 or scr.y)
 		
@@ -1722,13 +1741,22 @@ if CLIENT then
 	end)
 	
 	net.Receive("gred_net_send_ply_hint_key",function()
+		surface.PlaySound("ambient/water/drip"..math.random(1,4)..".wav")
 		notification.AddLegacy("Press the '"..input.GetKeyName(net.ReadInt(9))..net.ReadString(),NOTIFY_HINT,10)
 	end)
 	net.Receive("gred_net_send_ply_hint_simple",function()
+		surface.PlaySound("ambient/water/drip"..math.random(1,4)..".wav")
 		notification.AddLegacy(net.ReadString(),NOTIFY_HINT,10)
 	end)
 	timer.Simple(5,function()
-		CheckForUpdates()
+		local singleplayerIPs = {
+			["loopback"] = true,
+			["0.0.0.0"] = true,
+			["0.0.0.0:port"] = true,
+		}
+		if singleplayerIPs[game.GetIPAddress()] then
+			CheckForUpdates()
+		end
 		CheckDXDiag()
 	end)
 else

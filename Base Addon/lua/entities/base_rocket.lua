@@ -200,8 +200,11 @@ end
 function ENT:InitLaunch(phys)
 	self.Ignition = true
 	self:Arm()
-	sound.Play(self.StartSound,self:GetPos(),120,100,1)
-	
+	if self.StartSoundFollow then
+		self:EmitSound(self.StartSound)
+	else
+		sound.Play(self.StartSound,self:GetPos(),120,100,1)
+	end
 	if self.IsShell then
 		phys:SetVelocityInstantaneous(self:GetForward() * self.EnginePower)
 		return

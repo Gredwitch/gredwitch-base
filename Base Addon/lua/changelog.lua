@@ -1,4 +1,19 @@
---[[29/10/2019
+--[[31/10/2019
+- Added a sensitivity slider for the tank sights
+- Fixed the circle in the tank sights
+- Fixed the V1
+- Removed the out of date warnings in multiplayer
+- Renamed gred_sv_shellspeed_multiplier to gred_sv_shell_speed_multiplier
+
+If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
+If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
+Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
+
+If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
+
+OLDER CHANGES
+
+29/10/2019
 - Added compatibility with Havok's Physical Bullet Module
 - Added a ConVar to toggle tank crosshairs in 3rd person
 - Added a ConVar to make tanks have 4 wheels instead of 6 (basically to improve performance)
@@ -10,15 +25,6 @@
 - Fixed an error related to the shell tracer effect
 - Removed the simfphys seat networking code
 - Removed the "Should bullets damage tanks option" - Tanks now use simfphys.TankApplyDamage
-
-
-If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
-If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
-Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
-
-If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
-
-OLDER CHANGES
 
 21/10/2019
 - Added a flamethrower particle

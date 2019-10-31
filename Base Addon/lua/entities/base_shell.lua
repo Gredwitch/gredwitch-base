@@ -226,7 +226,7 @@ function ENT:AddOnInit()
 		self.Decal = "scorch_small"
 	end
 	
-	self.EnginePower 			= ((self.MuzzleVelocity*gred.CVars["gred_sv_shellspeed_multiplier"]:GetFloat())/0.02540002032) -- m/s
+	self.EnginePower 			= ((self.MuzzleVelocity*gred.CVars["gred_sv_shell_speed_multiplier"]:GetFloat())/0.02540002032) -- m/s
 	self.EffectAir 				= self.Effect
 	self.Smoke 					= self.ShellType == "Smoke"
 	
@@ -255,7 +255,7 @@ end
 
 function ENT:AddOnExplode(pos) 
 	if self.ShellType == "AP" then
-		self.Penetration = ((((self.LastVel and self.LastVel:Length()*0.02540002032 or self.MuzzleVelocity)/gred.CVars["gred_sv_shellspeed_multiplier"]:GetFloat())*math.sqrt(self.Mass))/(2400*math.sqrt(self.Caliber)))*1000
+		self.Penetration = ((((self.LastVel and self.LastVel:Length()*0.02540002032 or self.MuzzleVelocity)/gred.CVars["gred_sv_shell_speed_multiplier"]:GetFloat())*math.sqrt(self.Mass))/(2400*math.sqrt(self.Caliber)))*1000
 		self.ExplosionDamage = self.Penetration*self.Caliber*gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
 	end
 	if self:WaterLevel() < 1 then
