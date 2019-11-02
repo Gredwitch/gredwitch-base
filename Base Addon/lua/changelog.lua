@@ -1,9 +1,12 @@
---[[31/10/2019
-- Added a sensitivity slider for the tank sights
-- Fixed the circle in the tank sights
-- Fixed the V1
-- Removed the out of date warnings in multiplayer
-- Renamed gred_sv_shellspeed_multiplier to gred_sv_shell_speed_multiplier
+--[[02/11/2019
+- Added gred_sv_simfphys_turnrate_multplier for low tickrate servers
+- Fixed a small issue with JDAMs
+- Fixed the shell speed multiplier slider
+- Fixed the out of date message appearing even if the addon is up to date
+- Updated the tank turn code so the tanks turn better
+- Updated the AP damage calculation so it's more realistic
+- Updated the ricochet system
+- Updated the Flak 36 particle so the smoke doesn't make you blind anymore
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -12,6 +15,13 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+31/10/2019
+- Added a sensitivity slider for the tank sights
+- Fixed the circle in the tank sights
+- Fixed the V1
+- Removed the out of date warnings in multiplayer
+- Renamed gred_sv_shellspeed_multiplier to gred_sv_shell_speed_multiplier
 
 29/10/2019
 - Added compatibility with Havok's Physical Bullet Module

@@ -100,6 +100,7 @@ function ENT:Initialize()
 		self:SetUseType(ONOFF_USE)
 		local phys = self:GetPhysicsObject()
 		local skincount = self:SkinCount()
+		
 		if (phys:IsValid()) then
 			phys:SetMass(self.Mass)
 			phys:Wake()
@@ -123,7 +124,7 @@ end
 function ENT:PhysicsUpdate(ph)
 	if not self.JDAM or not self.Armed then return end
 	local pos = self:GetPos()
-	local vel = self:WorldToLocal(pos+self:GetVelocity())*0.4
+	local vel = self:WorldToLocal(pos+ph:GetVelocity())*0.4
 	vel.x = 0
 	ph:AddAngleVelocity(
 		ph:GetAngleVelocity()*-0.4

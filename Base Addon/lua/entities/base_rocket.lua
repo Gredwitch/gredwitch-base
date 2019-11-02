@@ -132,6 +132,14 @@ function ENT:OnTakeDamage(dmginfo)
 	end
 end
 local World = Entity(0)
+local function CanRicochet(ang)
+	local ricochetang = gred.CVars.gred_sv_minricochetangle:GetFloat()
+	local abs_p,abs_y = math.abs(ang.p),math.abs(ang.y)
+	if abs_p >= ricochetang or abs_y >= ricochetang then return true end
+	ricochetang = ricochetang - 20
+	if (abs_p >= ricochetang and math.abs(math.random(0,ricochetang-abs_p)) >= 5) or (abs_y >= ricochetang and math.abs(math.random(0,ricochetang-abs_y)) >= 5) then return true end
+	return false
+end
 function ENT:PhysicsCollide(data,physobj)
 	self.LastVel = data.OurOldVelocity
 	if self.Exploded or !IsValid(self) or self.Life <= 0 then return end
@@ -154,8 +162,7 @@ function ENT:PhysicsCollide(data,physobj)
 				-- local HitAng = self:WorldToLocalAngles(util.QuickTrace(data.HitPos,data.HitPos + self:GetForward()*10,{self}).HitNormal:Angle())
 				local HitAng = self:WorldToLocalAngles(data.HitNormal:Angle())
 				local c = os.clock()
-				local ricochetang = gred.CVars.gred_sv_minricochetangle:GetFloat()
-				if (math.abs(HitAng.p) >= ricochetang or math.abs(HitAng.y) >= ricochetang) and (!self.Ricochet or self.Ricochet+0.1 >= c) then
+				if (!self.Ricochet or self.Ricochet+0.1 >= c) and CanRicochet(HitAng) then
 					self.Ricochet = c
 					self.ImpactSpeed = 100
 					gred.CreateSound(data.HitPos,false,"impactsounds/Tank_shell_impact_ricochet_w_whizz_0"..math.random(1,5)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg")
@@ -198,6 +205,8 @@ function ENT:Launch()
 end
 
 function ENT:InitLaunch(phys)
+	-- self.LAUNCHTIME = CurTime()
+	-- self.LAUNCHPOS = self:GetPos()
 	self.Ignition = true
 	self:Arm()
 	if self.StartSoundFollow then

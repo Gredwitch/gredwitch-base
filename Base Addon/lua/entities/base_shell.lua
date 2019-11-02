@@ -251,12 +251,15 @@ function ENT:Launch()
 end
 
 function ENT:AddOnThink()
+	-- print("VELOCITE = ",(self:GetPhysicsObject():GetVelocity():Length()*0.02540002032).."m/s")
 end
 
 function ENT:AddOnExplode(pos) 
 	if self.ShellType == "AP" then
-		self.Penetration = ((((self.LastVel and self.LastVel:Length()*0.02540002032 or self.MuzzleVelocity)/gred.CVars["gred_sv_shell_speed_multiplier"]:GetFloat())*math.sqrt(self.Mass))/(2400*math.sqrt(self.Caliber)))*1000
-		self.ExplosionDamage = self.Penetration*self.Caliber*gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
+		local vel = (self.LastVel and self.LastVel:Length()*0.02540002032 or self.MuzzleVelocity)
+		self.Penetration = (((vel/gred.CVars["gred_sv_shell_speed_multiplier"]:GetFloat())*math.sqrt(self.Mass))/(2400*math.sqrt(self.Caliber)))*1000
+		self.ExplosionDamage = self.Penetration*vel*0.1*gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
+		-- print("TEMPS DE VOL = "..(CurTime()-self.LAUNCHTIME).."s  -  DISTANCE = "..(self.LAUNCHPOS:Distance(pos)*0.02540002032).."m  - VELOCITE PERDUE = "..(self.MuzzleVelocity-vel).."  -  DEGATS = "..(self.ExplosionDamage).."  -  PENETRATION = "..(self.Penetration).."mm  -  VELOCITE EN SORTIE DE CANNON = "..self.MuzzleVelocity.."m/s  -  MASSE = "..self.Mass.."kg  -  CALIBRE = "..self.Caliber.."mm")
 	end
 	if self:WaterLevel() < 1 then
 		if self.ShellType == "AP" then
