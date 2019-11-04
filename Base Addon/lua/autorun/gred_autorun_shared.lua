@@ -59,10 +59,10 @@ gred.CVars["gred_sv_simfphys_arcade"] 				= CreateConVar("gred_sv_simfphys_arcad
 gred.CVars["gred_sv_simfphys_infinite_ammo"] 		= CreateConVar("gred_sv_simfphys_infinite_ammo"		,  "1"  , GRED_SVAR)
 -- gred.CVars["gred_sv_simfphys_bullet_dmg_tanks"] 	= CreateConVar("gred_sv_simfphys_bullet_dmg_tanks"	,  "0"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_spawnwithoutammo"] 	= CreateConVar("gred_sv_simfphys_spawnwithoutammo"	,  "0"  , GRED_SVAR)
-gred.CVars["gred_sv_simfphys_serversuspension"] 	= CreateConVar("gred_sv_simfphys_serversuspension"	,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_enablecrosshair"] 		= CreateConVar("gred_sv_simfphys_enablecrosshair"	,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_lesswheels"] 			= CreateConVar("gred_sv_simfphys_lesswheels"		,  "0"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_turnrate_multplier"] 	= CreateConVar("gred_sv_simfphys_turnrate_multplier",  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_health_multplier"] 	= CreateConVar("gred_sv_simfphys_health_multplier"	,  "1"  , GRED_SVAR)
 
 gred = gred or {}
 gred.AllNPCs = {}
@@ -931,11 +931,18 @@ if CLIENT then
 			gred.CheckConCommand("gred_sv_simfphys_spawnwithoutammo",val)
 		end
 		
-		local this = CPanel:NumSlider("Turn rate multipler", "gred_sv_simfphys_turnrate_multplier",0,2,2);
+		local this = CPanel:NumSlider("Turn rate multipler", "gred_sv_simfphys_turnrate_multplier",0,3,2);
 		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
 		this.OnValueChanged = function(this,val)
 			if this.ConVarChanging then return end
 			gred.CheckConCommand( "gred_sv_simfphys_turnrate_multplier",val)
+		end
+		
+		local this = CPanel:NumSlider("Health multipler", "gred_sv_simfphys_health_multplier",0,3,2);
+		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+		this.OnValueChanged = function(this,val)
+			if this.ConVarChanging then return end
+			gred.CheckConCommand( "gred_sv_simfphys_health_multplier",val)
 		end
 		
 		-- local this = CPanel:CheckBox("Should bullets damage tanks?","gred_sv_simfphys_bullet_dmg_tanks");
@@ -944,13 +951,6 @@ if CLIENT then
 			-- val = val and 1 or 0
 			-- gred.CheckConCommand("gred_sv_simfphys_bullet_dmg_tanks",val)
 		-- end
-		
-		local this = CPanel:CheckBox("Do server side suspension checks?","gred_sv_simfphys_serversuspension");
-		local parent = this:GetParent()
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_simfphys_serversuspension",val)
-		end
 		
 		local DBinder = vgui.Create("DBinder")
 		DBinder:SetValue(GetConVar("gred_cl_simfphys_key_changeshell"):GetInt())
@@ -1756,14 +1756,14 @@ if CLIENT then
 		notification.AddLegacy(net.ReadString(),NOTIFY_HINT,10)
 	end)
 	timer.Simple(5,function()
-		-- local singleplayerIPs = {
-			-- ["loopback"] = true,
-			-- ["0.0.0.0"] = true,
-			-- ["0.0.0.0:port"] = true,
-		-- }
-		-- if singleplayerIPs[game.GetIPAddress()] then
+		local singleplayerIPs = {
+			["loopback"] = true,
+			["0.0.0.0"] = true,
+			["0.0.0.0:port"] = true,
+		}
+		if singleplayerIPs[game.GetIPAddress()] then
 			CheckForUpdates()
-		-- end
+		end
 		CheckDXDiag()
 	end)
 else
@@ -1783,17 +1783,8 @@ else
 	AddNetworkString("gred_lfs_remparts")
 	AddNetworkString("gred_net_registertank")
 	AddNetworkString("gred_net_tank_setsight")
-	AddNetworkString("gred_net_tank_susonground")
 	AddNetworkString("gred_net_send_ply_hint_key")
 	AddNetworkString("gred_net_send_ply_hint_simple")
-	
-	net.Receive("gred_net_tank_susonground",function(len,ply)
-		if gred.CVars["gred_sv_simfphys_serversuspension"] then return end
-		local ent = net.ReadEntity()
-		if !IsValid(ent) then return end
-		if ply != ent:GetDriver() then return end
-		ent.susOnGround = net.ReadBool()
-	end)
 	
 	net.Receive("gred_net_checkconcommand",function(len,ply)
 		local str = net.ReadString()
@@ -2501,7 +2492,6 @@ else
 		vehicle.GRED_TANK = true
 		vehicle:SetSkin(math.random(0,vehicle:SkinCount()))
 		
-		
 		local tab = vehicle.pSeat and table.Copy(vehicle.pSeat) or {}
 		table.insert(tab,vehicle:GetDriverSeat())
 		
@@ -2527,6 +2517,10 @@ else
 				print("[simfphys Armed Vehicle Pack] ERROR:TRACE FILTER IS INVALID. PLEASE UPDATE SIMFPHYS BASE") 
 				return
 			end
+			local health = vehicle:GetMaxHealth() * gred.CVars.gred_sv_simfphys_health_multplier:GetFloat()
+			vehicle.MaxHealth = health
+			vehicle:SetMaxHealth(health)
+			vehicle:SetCurHealth(health)
 			vehicle.WheelOnGround = function( ent )
 				ent.FrontWheelPowered = ent:GetPowerDistribution() ~= 1
 				ent.RearWheelPowered = ent:GetPowerDistribution() ~= -1
@@ -2575,7 +2569,7 @@ else
 				net.WriteEntity(vehicle)
 			net.Broadcast()
 			local tab = gred.simfphys[vehicle:GetSpawn_List()]
-			if tab and tab.UpdateSuspension_SV and gred.CVars["gred_sv_simfphys_serversuspension"]:GetInt() >= 1 then
+			if tab and tab.UpdateSuspension_SV then
 				local OldThink = vehicle.Think
 				vehicle.Think = function(vehicle)
 					tab.UpdateSuspension_SV(vehicle)
@@ -2602,7 +2596,9 @@ else
 				phys:ApplyForceOffset(vehicle:GetRight()*(vehicle.TOQUECENTER_D > vehicle.TOQUECENTER_A and -vehicle.TOQUECENTER_D or vehicle.TOQUECENTER_A)*ForceMul,Vector(0,0,vehicle.ModelBounds.maxs.z*0.5))
 			end
 			if math.abs(vel.z) <= MaxTurn then
-				TorqueCenter = TorqueCenter * gred.CVars.gred_sv_simfphys_turnrate_multplier:GetFloat()
+				local var = gred.CVars.gred_sv_simfphys_turnrate_multplier:GetFloat()
+				TorqueCenter = TorqueCenter * var
+				TorqueCenterRate = TorqueCenterRate * var
 				
 				if (vehicle.PressedKeys.D and gear != 1) or (vehicle.PressedKeys.A and gear == 1) then
 					massvec = Vector(0,0,phys:GetMass())
@@ -3044,9 +3040,11 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 								gred.CreateSound(pos,false,"/explosions/aircraft_water_close.wav","/explosions/aircraft_water_dist.wav","/explosions/aircraft_water_far.wav")
 								
 								local lasta=(self.LastDamageTaken<CurTime()+6 and self.LastAttacker or self.Entity)
-								for k, p in pairs(self.passengers) do
-									if p and p:IsValid() then
-										p:TakeDamage(p:Health() + 20, lasta, self.Entity)
+								if istable(self.passengers) then
+									for k, p in pairs(self.passengers) do
+										if p and p:IsValid() then
+											p:TakeDamage(p:Health() + 20, lasta, self.Entity)
+										end
 									end
 								end
 								self.hascrashed = true

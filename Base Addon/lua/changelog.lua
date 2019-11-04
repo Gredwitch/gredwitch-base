@@ -1,12 +1,8 @@
---[[02/11/2019
-- Added gred_sv_simfphys_turnrate_multplier for low tickrate servers
-- Fixed a small issue with JDAMs
-- Fixed the shell speed multiplier slider
-- Fixed the out of date message appearing even if the addon is up to date
-- Updated the tank turn code so the tanks turn better
-- Updated the AP damage calculation so it's more realistic
-- Updated the ricochet system
-- Updated the Flak 36 particle so the smoke doesn't make you blind anymore
+--[[05/11/2019
+- Added a tank health multiplier
+- Fixed an annoying WAC error
+- Updated the turn rate multiplier so it works better
+- Removed the toggleable server side suspension check since they should always be checked server side
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -15,6 +11,16 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+02/11/2019
+- Added gred_sv_simfphys_turnrate_multplier for low tickrate servers
+- Fixed a small issue with JDAMs
+- Fixed the shell speed multiplier slider
+- Fixed the out of date message appearing even if the addon is up to date
+- Updated the tank turn code so the tanks turn better
+- Updated the AP damage calculation so it's more realistic
+- Updated the ricochet system
+- Updated the Flak 36 particle so the smoke doesn't make you blind anymore
 
 31/10/2019
 - Added a sensitivity slider for the tank sights
