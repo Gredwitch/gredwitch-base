@@ -2201,6 +2201,7 @@ else
 			bullet.Spread 		= vector_zero
 			bullet.Tracer		= 0--tracer and 0 or 1
 			bullet.IsNetworked	= true
+			bullet.IgnoreEntity = filter
 			bullet.Distance		= false
 			bullet.Damage		= ((cal == "wac_base_7mm" and HE7MM:GetInt() >= 1) or (cal == "wac_base_12mm" and HE12MM:GetInt() >= 1)) and 0 or (dmg and dmg or (cal == "wac_base_7mm" and 40 or (cal == "wac_base_12mm" and 60 or (cal == "wac_base_20mm" and 80 or (cal == "wac_base_30mm" and 100 or (cal == "wac_base_40mm" and 120)))))) * BulletDMG:GetFloat()
 			bullet.Force		= bullet.Damage*0.1

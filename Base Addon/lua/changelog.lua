@@ -1,6 +1,7 @@
 --[[05/11/2019
 - Added a tank health multiplier
 - Fixed an annoying WAC error
+- Fixed the HAB physbullet filter
 - Updated the turn rate multiplier so it works better
 - Removed the toggleable server side suspension check since they should always be checked server side
 
