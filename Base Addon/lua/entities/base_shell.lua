@@ -124,6 +124,40 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Int",0,"Caliber")
 end
 
+function ENT:PhysicsUpdate(ph)
+	if self.Fired and self:WaterLevel() >= 1 then
+		local vel = ph:GetVelocity()
+		if vel:Length() < self.ImpactSpeed then return end
+		if self.ShellType == "AP" then
+			self.LastVel = vel
+			local HitAng = vel:Angle()
+			HitAng:Normalize()
+			local c = os.clock()
+			if (!self.Ricochet or self.Ricochet+0.1 >= c) and self:CanRicochet(HitAng) then
+				local pos = ph:GetPos()
+				self.Ricochet = c
+				self.ImpactSpeed = 100
+				gred.CreateSound(pos,false,"impactsounds/Tank_shell_impact_ricochet_w_whizz_0"..math.random(1,5)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg")
+				local effectdata = EffectData()
+				effectdata:SetOrigin(pos)
+				-- HitAng = self:LocalToWorldAngles(HitAng)
+				-- HitAng:RotateAroundAxis(HitAng:Right(),0)
+				HitAng.p = HitAng.p - 90
+				effectdata:SetNormal(HitAng:Forward())
+				util.Effect("ManhackSparks",effectdata)
+				-- vel.y = -vel.y
+				vel.z = -vel.z
+				ph:SetVelocityInstantaneous(vel)
+				return
+			end
+			self.PhysObj = ph
+		end
+		self.Exploded = true
+		self:Explode()
+		return
+	end
+end
+
 function ENT:AddOnInit()
 	
 	self.ExplosionSound			= table.Random(CloseExploSnds)

@@ -73,9 +73,8 @@ function ENT:TriggerInput(iname, value)
 		    if (!self.Exploded and self.Armed) then
 			    timer.Simple(math.Rand(0,self.MaxDelay),function()
 				    if !self:IsValid() then return end
-				 self.Exploded = true
-					
-				   self:Explode()
+					self.Exploded = true
+					self:Explode()
 				end)
 		    end
 		end
@@ -98,7 +97,6 @@ function ENT:TriggerInput(iname, value)
 end
 
 function ENT:OnTakeDamage(dmginfo)
-	if !self:IsValid() then return end
 	if self.Exploded then return end
 	exploDamage = dmginfo:IsDamageType(64)
 	if exploDamage == true then return end
@@ -131,8 +129,10 @@ function ENT:OnTakeDamage(dmginfo)
 	    end)
 	end
 end
+
 local World = Entity(0)
-local function CanRicochet(ang)
+
+function ENT:CanRicochet(ang)
 	local ricochetang = gred.CVars.gred_sv_minricochetangle:GetFloat()
 	local abs_p,abs_y = math.abs(ang.p),math.abs(ang.y)
 	if abs_p >= ricochetang or abs_y >= ricochetang then return true end
@@ -140,8 +140,10 @@ local function CanRicochet(ang)
 	if (abs_p >= ricochetang and math.abs(math.random(0,ricochetang-abs_p)) >= 5) or (abs_y >= ricochetang and math.abs(math.random(0,ricochetang-abs_y)) >= 5) then return true end
 	return false
 end
+
 function ENT:PhysicsCollide(data,physobj)
 	self.LastVel = data.OurOldVelocity
+	
 	if self.Exploded or !IsValid(self) or self.Life <= 0 then return end
 	if gred.CVars["gred_sv_fragility"]:GetInt() >= 1 then
 		if (!self.Fired and !self.Burnt and !self.Arming and !self.Armed) and (data.Speed > self.ImpactSpeed * 5) then 
@@ -154,7 +156,6 @@ function ENT:PhysicsCollide(data,physobj)
 			end
 		end
 	end
-		
 	if (self.Fired or self.Armed) and data.Speed > self.ImpactSpeed then
 		if self.ShellType then
 			self.LastVel = data.OurOldVelocity
@@ -162,7 +163,7 @@ function ENT:PhysicsCollide(data,physobj)
 				-- local HitAng = self:WorldToLocalAngles(util.QuickTrace(data.HitPos,data.HitPos + self:GetForward()*10,{self}).HitNormal:Angle())
 				local HitAng = self:WorldToLocalAngles(data.HitNormal:Angle())
 				local c = os.clock()
-				if (!self.Ricochet or self.Ricochet+0.1 >= c) and CanRicochet(HitAng) then
+				if (!self.Ricochet or self.Ricochet+0.1 >= c) and self:CanRicochet(HitAng) then
 					self.Ricochet = c
 					self.ImpactSpeed = 100
 					gred.CreateSound(data.HitPos,false,"impactsounds/Tank_shell_impact_ricochet_w_whizz_0"..math.random(1,5)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg")
@@ -177,6 +178,7 @@ function ENT:PhysicsCollide(data,physobj)
 				end
 			end
 		end
+		self.PhysObj = physobj
 		self.Exploded = true
 		self:Explode(data.HitPos)
 	end
@@ -244,9 +246,6 @@ function ENT:Think()
 		end
 		if self.Armed then
 		   phys:AddAngleVelocity(Vector(self.RotationalForce,0,0)) -- Rotational force
-		end
-		if self.Fired then
-			if self:WaterLevel() >= 1 then self:Explode() end
 		end
 	end
 	self:AddOnThink()

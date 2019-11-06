@@ -122,15 +122,15 @@ function ENT:AddOnInit()
 end
 
 function ENT:PhysicsUpdate(ph)
-	if not self.JDAM or not self.Armed then return end
+	if self.Armed and self:WaterLevel() >= 1 and ph:GetVelocity():Length() >= self.ImpactSpeed then
+		self.Exploded = true
+		self:Explode()
+		return
+	end
+	if not self.JDAM and not self.Armed then return end
 	local pos = self:GetPos()
 	local vel = self:WorldToLocal(pos+ph:GetVelocity())*0.4
 	vel.x = 0
-	ph:AddAngleVelocity(
-		ph:GetAngleVelocity()*-0.4
-		+ Vector(math.Rand(-1,1), math.Rand(-1,1), math.Rand(-1,1))*5
-		+ Vector(0, -vel.z, vel.y)
-	)
 	local target = self.target:LocalToWorld(self.targetOffset)
 	local dist = self:GetPos():Distance(target)
 	
@@ -139,7 +139,12 @@ function ENT:PhysicsUpdate(ph)
 	)):GetNormal()
 	v.y = math.Clamp(v.y*10,-1,1)*100
 	v.z = math.Clamp(v.z*10,-1,1)*100
-	ph:AddAngleVelocity(Vector(0,-v.z,v.y))
+	ph:AddAngleVelocity(
+		ph:GetAngleVelocity()*-0.4
+		+ Vector(math.Rand(-1,1), math.Rand(-1,1), math.Rand(-1,1))*5
+		+ Vector(0, -vel.z, vel.y)
+		+ Vector(0,-v.z,v.y)
+	)
 	ph:AddVelocity(self:GetForward() - self:LocalToWorld(vel*Vector(0.1, 1, 1))+pos)
 end
 
@@ -248,7 +253,7 @@ function ENT:Explode(pos)
 	net.Broadcast()
 	
 	gred.CreateSound(pos,self.RSound == 1,self.ExplosionSound,self.FarExplosionSound,self.DistExplosionSound)
-		
+	
 	timer.Simple(0,function() self:Remove() end)
 end
 
@@ -282,19 +287,17 @@ function ENT:OnTakeDamage(dmginfo)
 end
 
 function ENT:PhysicsCollide( data, physobj )
-	timer.Simple(0,function()
-		if !IsValid(self) or self.Exploded or self.Life <= 0 or data.Speed < self.ImpactSpeed then return end
-		
-		if gred.CVars["gred_sv_fragility"]:GetInt() >= 1 and data.Speed > self.ImpactSpeed and !self.Arming then
-			self:EmitSound(damagesound)
-			self:Arm()
-		end
-		
-		if self.ShouldExplodeOnImpact and self.Armed then
-			self.Exploded = true
-			self:Explode()
-		end
-	end)
+	if !self.Exploded or self.Life <= 0 or data.Speed < self.ImpactSpeed then return end
+	
+	if gred.CVars["gred_sv_fragility"]:GetInt() >= 1 and !self.Arming then
+		self:EmitSound(damagesound)
+		self:Arm()
+	end
+	
+	if self.ShouldExplodeOnImpact and self.Armed then
+		self.Exploded = true
+		self:Explode()
+	end
 end
 
 function ENT:Arm()
