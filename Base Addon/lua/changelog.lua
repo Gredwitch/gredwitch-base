@@ -1,8 +1,5 @@
---[[06/11/2019
-- AP Shells can now ricochet on water
-- Fixed bombs not destroying tanks
-- Fixed shells bouncing back to you when they hit water
-- Shells, rockets and bombs will now explode when they hit water
+--[[07/11/2019
+- Fixed the bombs
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -11,6 +8,12 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+06/11/2019
+- AP Shells can now ricochet on water
+- Fixed bombs not destroying tanks
+- Fixed shells bouncing back to you when they hit water
+- Shells, rockets and bombs will now explode when they hit water
 
 05/11/2019
 - Added a tank health multiplier

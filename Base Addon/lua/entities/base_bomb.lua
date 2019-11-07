@@ -127,7 +127,7 @@ function ENT:PhysicsUpdate(ph)
 		self:Explode()
 		return
 	end
-	if not self.JDAM and not self.Armed then return end
+	if not self.JDAM or not self.Armed then return end
 	local pos = self:GetPos()
 	local vel = self:WorldToLocal(pos+ph:GetVelocity())*0.4
 	vel.x = 0
