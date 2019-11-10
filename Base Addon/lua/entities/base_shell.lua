@@ -302,7 +302,6 @@ function ENT:AddOnExplode(pos)
 			local hitmat = util.GetSurfacePropName(tr.SurfaceProps)
 			local class
 			self.EffectAir = "AP_impact_wall"
-			self.ExplosionDamage = self.ExplosionDamage*math.abs(math.cos(tr.HitNormal:Angle().p))
 			for k,v in pairs(ents.FindInSphere(tr.HitPos,50)) do
 				class = v:GetClass()
 				if class == "gmod_sent_vehicle_fphysics_base" then--or class == "gmod_sent_vehicle_fphysics_wheel" then
@@ -314,10 +313,10 @@ function ENT:AddOnExplode(pos)
 					dmg:SetDamage(list.Get("simfphys_vehicles")[v:GetSpawn_List()].Members.ApplyDamage and self.ExplosionDamage*10 or self.ExplosionDamage)
 					dmg:SetDamageType(64) -- DMG_BLAST
 					v:TakeDamageInfo(dmg)
-					self.ExplosionDamage = 0
 					break
 				end
 			end
+			self.ExplosionDamage = 0
 			if materials[hitmat] == 1 then
 				self.Effect = "AP_impact_wall"
 				self.ExplosionSound = table.Random(APMetalSounds)

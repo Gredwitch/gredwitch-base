@@ -1933,65 +1933,54 @@ else
 		end
 	end
 	
+	local badclass = {
+		["gmod_sent_vehicle_fphysics_wheel"] = true,
+	}
+	
 	gred.CreateExplosion = function(pos,radius,damage,decal,trace,ply,bomb,DEFAULT_PHYSFORCE,DEFAULT_PHYSFORCE_PLYGROUND,DEFAULT_PHYSFORCE_PLYAIR)
 		local ConVar = gred.CVars["gred_sv_shockwave_unfreeze"]:GetInt() >= 1
+		
 		net.Start("gred_net_bombs_decals")
 			net.WriteString(decal and decal or "scorch_medium")
 			net.WriteVector(pos)
 			net.WriteVector(pos-Vector(0,0,trace))
 		net.Broadcast()
+		
 		debugoverlay.Sphere(pos,radius,3, Color( 255, 255, 255 ))
-		ply = IsValid(ply) and ply or bomb
-		util.BlastDamage(bomb,ply,pos,radius,damage)
+		
+		local bombvalid = IsValid(bomb)
+		ply = IsValid(ply) and ply or (bombvalid and bomb or Entity(0))
+		util.BlastDamage(!bombvalid and ply or bomb,ply,pos,radius,damage)
+		
+		local v_pos
+		local phys
+		local F_dir
+		local massmul
+		
 		for k,v in pairs(ents.FindInSphere(pos,radius)) do
-			local v_pos = v:GetPos()
+			v_pos = v:GetPos()
+			phys = v:GetPhysicsObject()
 			
-			local phys = v:GetPhysicsObject()
-			local F_dir
-			if IsValid(phys) then
-				if !v.IsOnPlane then
-					local F_ang = DEFAULT_PHYSFORCE
-					local dist = (pos - v_pos):Length()
-					local relation = math.Clamp((radius - dist) / radius, 0, 1)
-					if not DEFAULT_PHYSFORCE == nil then
-						F_dir = (v_pos - pos) * DEFAULT_PHYSFORCE
-					else
-						F_dir = (v_pos - pos) * 1
-					end
-					phys:AddAngleVelocity(Vector(F_ang, F_ang, F_ang) * relation)
-					phys:AddVelocity(F_dir)
-					if ConVar then
-						if !v.isWacAircraft and !v.LFS then
-							phys:Wake()
-							phys:EnableMotion(true)
-							constraint.RemoveAll(v)
-						end
-					end
-					-- local class = v:GetClass()
-					-- if class == "func_breakable" or class == "func_breakable_surf" or class == "func_physbox" then
-						-- v:Fire("Break", 0)
-					-- end
+			if !badclass[v:GetClass()] and !v.IsOnPlane and IsValid(phys) and !IsValid(v:GetParent()) then
+				massmul = 1/phys:GetMass()
+				
+				phys:AddAngleVelocity(Vector(DEFAULT_PHYSFORCE, DEFAULT_PHYSFORCE, DEFAULT_PHYSFORCE) * math.Clamp((radius - (pos - v_pos):Length()) / radius,0,1) * massmul)
+				phys:AddVelocity((DEFAULT_PHYSFORCE and (v_pos - pos) * DEFAULT_PHYSFORCE or (v_pos - pos))*massmul)
+				if ConVar and !v.isWacAircraft and !v.LFS then
+					phys:Wake()
+					phys:EnableMotion(true)
+					constraint.RemoveAll(v)
 				end
+				
+				-- local class = v:GetClass()
+				-- if class == "func_breakable" or class == "func_breakable_surf" or class == "func_physbox" then
+					-- v:Fire("Break", 0)
+				-- end
 			end
+			
 			if v:IsPlayer() then
-				if !v:IsOnGround() then
-					v:SetMoveType(MOVETYPE_WALK)
-					if not DEFAULT_PHYSFORCE_PLYAIR == nil then
-						F_dir = (v_pos - pos) * DEFAULT_PHYSFORCE_PLYAIR
-					else
-						F_dir = (v_pos - pos)
-					end
-					v:SetVelocity( F_dir )
-				else
-					v:SetMoveType( MOVETYPE_WALK )
-					local F_ang = DEFAULT_PHYSFORCE_PLYGROUND
-					if not DEFAULT_PHYSFORCE_PLYGROUND == nil then
-						F_dir = (v_pos - pos) * DEFAULT_PHYSFORCE_PLYGROUND
-					else
-						F_dir = (v_pos - pos)
-					end
-					v:SetVelocity( F_dir )
-				end
+				v:SetMoveType(MOVETYPE_WALK)
+				v:SetVelocity(v:IsOnGround() and DEFAULT_PHYSFORCE_PLYGROUND and (v_pos - pos) or (v_pos - pos) * DEFAULT_PHYSFORCE_PLYGROUND or DEFAULT_PHYSFORCE_PLYAIR and (v_pos - pos) or (v_pos - pos) * DEFAULT_PHYSFORCE_PLYAIR)
 			end
 		end
 	end
@@ -2593,7 +2582,8 @@ else
 			local gear = vehicle:GetGear()
 			-- local mul = (ShouldNotGearMul or gear <= 2) and 1 or math.abs(gear-2)*0.5
 			-- MaxTurn = MaxTurn * mul
-			if gear != 2 then
+				print(gear)
+			if gear > 3 then
 				phys:ApplyForceOffset(vehicle:GetRight()*(vehicle.TOQUECENTER_D > vehicle.TOQUECENTER_A and -vehicle.TOQUECENTER_D or vehicle.TOQUECENTER_A)*ForceMul,Vector(0,0,vehicle.ModelBounds.maxs.z*0.5))
 			end
 			if math.abs(vel.z) <= MaxTurn then

@@ -1,5 +1,9 @@
---[[07/11/2019
+--[[09/11/2019
+- Fixed the tanks flying away when they they get hit by an explosion
 - Fixed the bombs
+- Fixed an issue with the damage calculation for the AP shells
+- Tweaked the tank turn code
+- Optimised the CreateExplosion function
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.

@@ -287,16 +287,16 @@ function ENT:OnTakeDamage(dmginfo)
 end
 
 function ENT:PhysicsCollide( data, physobj )
-	if !self.Exploded or self.Life <= 0 or data.Speed < self.ImpactSpeed then return end
+	if self.Exploded or self.Life <= 0 or data.Speed < self.ImpactSpeed then return end
 	
-	if gred.CVars["gred_sv_fragility"]:GetInt() >= 1 and !self.Arming then
+	if gred.CVars["gred_sv_fragility"]:GetInt() >= 1 and !self.Arming and !self.Armed then
 		self:EmitSound(damagesound)
 		self:Arm()
 	end
 	
 	if self.ShouldExplodeOnImpact and self.Armed then
 		self.Exploded = true
-		self:Explode()
+		self:Explode(data.HitPos)
 	end
 end
 
@@ -325,7 +325,7 @@ function ENT:Arm()
 end	 
 
 function ENT:Use( activator, caller )
-	if self.Exploded or gred.CVars["gred_sv_easyuse"]:GetInt() < 1 or self.Armed or !self.Used then
+	if !self.Exploded and gred.CVars["gred_sv_easyuse"]:GetInt() >= 1 and !self.Armed and !self.Used then
 		self:EmitSound(self.ActivationSound)
 		self:Arm()
 	end
