@@ -430,19 +430,23 @@ if CLIENT then
 		local pos,fwd,v = self:GetPos(),self:GetForward(),self:GetVelocity()
 		local fwdv = v:Angle():Forward()
 		if self.TracerColor and !VectorEqual(v,vector_zero) then
-			for i = 1,10 do
-				particle = self.Emitter:Add(self.TracerColor,pos + fwdv*(i*-self.Caliber*0.1) )--+ ClampVector(fwdv*30,vector_zero,fwd*30))
-				if particle then
-					particle:SetVelocity(v)
-					particle:SetDieTime(0.05)
-					particle:SetAirResistance(0) 
-					particle:SetStartAlpha(255)
-					particle:SetStartSize(self.Caliber and self.Caliber*0.2 or 20)
-					particle:SetEndSize(0)
-					particle:SetRoll(math.Rand(-1,1))
-					particle:SetGravity(Vector(0,0,0))
-					particle:SetCollide(false)
+			if IsValid(self.Emitter) then
+				for i = 1,10 do
+					particle = self.Emitter:Add(self.TracerColor,pos + fwdv*(i*-self.Caliber*0.1) )--+ ClampVector(fwdv*30,vector_zero,fwd*30))
+					if particle then
+						particle:SetVelocity(v)
+						particle:SetDieTime(0.05)
+						particle:SetAirResistance(0) 
+						particle:SetStartAlpha(255)
+						particle:SetStartSize(self.Caliber and self.Caliber*0.2 or 20)
+						particle:SetEndSize(0)
+						particle:SetRoll(math.Rand(-1,1))
+						particle:SetGravity(Vector(0,0,0))
+						particle:SetCollide(false)
+					end
 				end
+			else
+				self.Emitter = ParticleEmitter(self:GetPos(),false)
 			end
 		end
 		if !IsValid(self.ply) then return end

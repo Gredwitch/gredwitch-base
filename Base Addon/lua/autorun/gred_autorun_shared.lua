@@ -709,6 +709,7 @@ if CLIENT then
 	local TAB_PRESS = {FCVAR_ARCHIVE,FCVAR_USERINFO}
 	CreateConVar("gred_cl_simfphys_key_changeshell"			, "21",TAB_PRESS)
 	CreateConVar("gred_cl_simfphys_key_togglesight"			, "22",TAB_PRESS)
+	CreateConVar("gred_cl_simfphys_key_togglegun"			, "23",TAB_PRESS)
 	
 	
 	-- Adding the spawnmenu options
@@ -965,6 +966,13 @@ if CLIENT then
 			GetConVar("gred_cl_simfphys_key_togglesight"):SetInt(key)
 		end
 		CPanel:AddItem(CPanel:Help("Toggle tank sight"),DBinder)
+		
+		local DBinder = vgui.Create("DBinder")
+		DBinder:SetValue(GetConVar("gred_cl_simfphys_key_togglegun"):GetInt())
+		DBinder.OnChange = function(DBinder,key)
+			GetConVar("gred_cl_simfphys_key_togglegun"):SetInt(key)
+		end
+		CPanel:AddItem(CPanel:Help("Toggle tank gun"),DBinder)
 		
 		local this = CPanel:NumSlider("Sensitivity in sight mode","gred_cl_simfphys_sightsensitivity",0,1,2);this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
 		this.OnValueChanged = function(this,val)
@@ -1230,7 +1238,7 @@ if CLIENT then
 		if not IsValid(ent) then return end
 		local tab = gred.simfphys[ent:GetSpawn_List()]
 		tableinsert(tab.entities,ent)
-		if tab.UpdateSuspension_CL then
+		if tab.UpdateSuspension_CL and ent:GetModel() != "models/error.mdl" then
 			local OldThink = ent.Think
 			ent.Think = function(ent)
 				OldThink(ent)
@@ -2582,7 +2590,6 @@ else
 			local gear = vehicle:GetGear()
 			-- local mul = (ShouldNotGearMul or gear <= 2) and 1 or math.abs(gear-2)*0.5
 			-- MaxTurn = MaxTurn * mul
-				print(gear)
 			if gear > 3 then
 				phys:ApplyForceOffset(vehicle:GetRight()*(vehicle.TOQUECENTER_D > vehicle.TOQUECENTER_A and -vehicle.TOQUECENTER_D or vehicle.TOQUECENTER_A)*ForceMul,Vector(0,0,vehicle.ModelBounds.maxs.z*0.5))
 			end
@@ -2729,6 +2736,10 @@ else
 		ent[key] = bool
 	end)
 	numpad.Register("k_gred_sight",function(ply,ent,key,bool)
+		if not IsValid(ply) or not IsValid(ent) then return false end
+		ent[key] = bool
+	end)
+	numpad.Register("k_gred_gun",function(ply,ent,key,bool)
 		if not IsValid(ply) or not IsValid(ent) then return false end
 		ent[key] = bool
 	end)
