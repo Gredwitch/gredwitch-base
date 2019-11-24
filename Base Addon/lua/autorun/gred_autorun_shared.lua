@@ -21,48 +21,51 @@ local CLIENT = CLIENT
 
 -- Adding particles
 gred.CVars = gred.CVars or {}
-gred.CVars["gred_sv_easyuse"] 						= CreateConVar("gred_sv_easyuse"					,  "1"  , GRED_SVAR) 
-gred.CVars["gred_sv_12mm_he_impact"] 				= CreateConVar("gred_sv_12mm_he_impact"				,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_7mm_he_impact"] 				= CreateConVar("gred_sv_7mm_he_impact"				,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_fragility"] 					= CreateConVar("gred_sv_fragility"					,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_shockwave_unfreeze"] 			= CreateConVar("gred_sv_shockwave_unfreeze"			,  "0"  , GRED_SVAR)
-gred.CVars["gred_sv_tracers"] 						= CreateConVar("gred_sv_tracers"					,  "5"  , GRED_SVAR)
-gred.CVars["gred_sv_oldrockets"] 					= CreateConVar("gred_sv_oldrockets"					,  "0"  , GRED_SVAR)
-gred.CVars["gred_jets_speed"] 						= CreateConVar("gred_jets_speed"					,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_healthslider"] 					= CreateConVar("gred_sv_healthslider"				, "100" , GRED_SVAR)
-gred.CVars["gred_sv_enablehealth"] 					= CreateConVar("gred_sv_enablehealth"				,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_enableenginehealth"] 			= CreateConVar("gred_sv_enableenginehealth"			,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_fire_effect"] 					= CreateConVar("gred_sv_fire_effect"				,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_multiple_fire_effects"] 		= CreateConVar("gred_sv_multiple_fire_effects"		,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_bullet_dmg"] 					= CreateConVar("gred_sv_bullet_dmg"					,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_bullet_radius"] 				= CreateConVar("gred_sv_bullet_radius"				,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_soundspeed_divider"] 			= CreateConVar("gred_sv_soundspeed_divider"			,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_arti_spawnaltitude"] 			= CreateConVar("gred_sv_arti_spawnaltitude"			, "1000", GRED_SVAR)
-gred.CVars["gred_sv_wac_radio"] 					= CreateConVar("gred_sv_wac_radio"					,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_spawnable_bombs"] 				= CreateConVar("gred_sv_spawnable_bombs"			,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_wac_bombs"] 					= CreateConVar("gred_sv_wac_bombs"					,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_shell_speed_multiplier"] 		= CreateConVar("gred_sv_shell_speed_multiplier"		,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_wac_explosion_water"] 			= CreateConVar("gred_sv_wac_explosion_water"		,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_default_wac_munitions"] 		= CreateConVar("gred_sv_default_wac_munitions"		,  "0"  , GRED_SVAR)
-gred.CVars["gred_sv_wac_explosion"] 				= CreateConVar("gred_sv_wac_explosion"				,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_wac_heli_spin"] 				= CreateConVar("gred_sv_wac_heli_spin"				,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_wac_heli_spin_chance"] 			= CreateConVar("gred_sv_wac_heli_spin_chance"		,  "0"  , GRED_SVAR)
-gred.CVars["gred_sv_lfs_healthmultiplier"] 			= CreateConVar("gred_sv_lfs_healthmultiplier"		,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_lfs_healthmultiplier_all"] 		= CreateConVar("gred_sv_lfs_healthmultiplier_all"	,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_wac_override"] 					= CreateConVar("gred_sv_wac_override"				,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_override_hab"] 					= CreateConVar("gred_sv_override_hab"				,  "0"  , GRED_SVAR)
-gred.CVars["gred_sv_lfs_godmode"] 					= CreateConVar("gred_sv_lfs_godmode"				,  "0"  , GRED_SVAR)
-gred.CVars["gred_sv_lfs_infinite_ammo"] 			= CreateConVar("gred_sv_lfs_infinite_ammo"			,  "0"  , GRED_SVAR)
-gred.CVars["gred_sv_minricochetangle"] 				= CreateConVar("gred_sv_minricochetangle"			, "70"  , GRED_SVAR)
-gred.CVars["gred_sv_shell_ap_damagemultiplier"]		= CreateConVar("gred_sv_shell_ap_damagemultiplier"	, "1"  , GRED_SVAR)
-gred.CVars["gred_sv_simfphys_arcade"] 				= CreateConVar("gred_sv_simfphys_arcade"			,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_simfphys_infinite_ammo"] 		= CreateConVar("gred_sv_simfphys_infinite_ammo"		,  "1"  , GRED_SVAR)
--- gred.CVars["gred_sv_simfphys_bullet_dmg_tanks"] 	= CreateConVar("gred_sv_simfphys_bullet_dmg_tanks"	,  "0"  , GRED_SVAR)
-gred.CVars["gred_sv_simfphys_spawnwithoutammo"] 	= CreateConVar("gred_sv_simfphys_spawnwithoutammo"	,  "0"  , GRED_SVAR)
-gred.CVars["gred_sv_simfphys_enablecrosshair"] 		= CreateConVar("gred_sv_simfphys_enablecrosshair"	,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_simfphys_lesswheels"] 			= CreateConVar("gred_sv_simfphys_lesswheels"		,  "0"  , GRED_SVAR)
-gred.CVars["gred_sv_simfphys_turnrate_multplier"] 	= CreateConVar("gred_sv_simfphys_turnrate_multplier",  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_simfphys_health_multplier"] 	= CreateConVar("gred_sv_simfphys_health_multplier"	,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_easyuse"] 								= CreateConVar("gred_sv_easyuse"								,  "1"  , GRED_SVAR) 
+gred.CVars["gred_sv_12mm_he_impact"] 						= CreateConVar("gred_sv_12mm_he_impact"							,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_7mm_he_impact"] 						= CreateConVar("gred_sv_7mm_he_impact"							,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_fragility"] 							= CreateConVar("gred_sv_fragility"								,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_shockwave_unfreeze"] 					= CreateConVar("gred_sv_shockwave_unfreeze"						,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_tracers"] 								= CreateConVar("gred_sv_tracers"								,  "5"  , GRED_SVAR)
+gred.CVars["gred_sv_oldrockets"] 							= CreateConVar("gred_sv_oldrockets"								,  "0"  , GRED_SVAR)
+gred.CVars["gred_jets_speed"] 								= CreateConVar("gred_jets_speed"								,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_healthslider"] 							= CreateConVar("gred_sv_healthslider"							, "100" , GRED_SVAR)
+gred.CVars["gred_sv_enablehealth"] 							= CreateConVar("gred_sv_enablehealth"							,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_enableenginehealth"] 					= CreateConVar("gred_sv_enableenginehealth"						,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_fire_effect"] 							= CreateConVar("gred_sv_fire_effect"							,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_multiple_fire_effects"] 				= CreateConVar("gred_sv_multiple_fire_effects"					,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_bullet_dmg"] 							= CreateConVar("gred_sv_bullet_dmg"								,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_bullet_radius"] 						= CreateConVar("gred_sv_bullet_radius"							,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_soundspeed_divider"] 					= CreateConVar("gred_sv_soundspeed_divider"						,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_arti_spawnaltitude"] 					= CreateConVar("gred_sv_arti_spawnaltitude"						, "1000", GRED_SVAR)
+gred.CVars["gred_sv_wac_radio"] 							= CreateConVar("gred_sv_wac_radio"								,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_spawnable_bombs"] 						= CreateConVar("gred_sv_spawnable_bombs"						,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_wac_bombs"] 							= CreateConVar("gred_sv_wac_bombs"								,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_shell_speed_multiplier"] 				= CreateConVar("gred_sv_shell_speed_multiplier"					,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_wac_explosion_water"] 					= CreateConVar("gred_sv_wac_explosion_water"					,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_default_wac_munitions"] 				= CreateConVar("gred_sv_default_wac_munitions"					,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_wac_explosion"] 						= CreateConVar("gred_sv_wac_explosion"							,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_wac_heli_spin"] 						= CreateConVar("gred_sv_wac_heli_spin"							,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_wac_heli_spin_chance"] 					= CreateConVar("gred_sv_wac_heli_spin_chance"					,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_lfs_healthmultiplier"] 					= CreateConVar("gred_sv_lfs_healthmultiplier"					,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_lfs_healthmultiplier_all"] 				= CreateConVar("gred_sv_lfs_healthmultiplier_all"				,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_wac_override"] 							= CreateConVar("gred_sv_wac_override"							,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_override_hab"] 							= CreateConVar("gred_sv_override_hab"							,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_lfs_godmode"] 							= CreateConVar("gred_sv_lfs_godmode"							,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_lfs_infinite_ammo"] 					= CreateConVar("gred_sv_lfs_infinite_ammo"						,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_minricochetangle"] 						= CreateConVar("gred_sv_minricochetangle"						, "70"  , GRED_SVAR)
+gred.CVars["gred_sv_shell_ap_damagemultiplier"]				= CreateConVar("gred_sv_shell_ap_damagemultiplier"				, "1"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_arcade"] 						= CreateConVar("gred_sv_simfphys_arcade"						,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_infinite_ammo"] 				= CreateConVar("gred_sv_simfphys_infinite_ammo"					,  "1"  , GRED_SVAR)
+-- gred.CVars["gred_sv_simfphys_bullet_dmg_tanks"] 			= CreateConVar("gred_sv_simfphys_bullet_dmg_tanks"				,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_spawnwithoutammo"] 			= CreateConVar("gred_sv_simfphys_spawnwithoutammo"				,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_enablecrosshair"] 				= CreateConVar("gred_sv_simfphys_enablecrosshair"				,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_lesswheels"] 					= CreateConVar("gred_sv_simfphys_lesswheels"					,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_turnrate_multplier"] 			= CreateConVar("gred_sv_simfphys_turnrate_multplier"			,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_health_multplier"] 			= CreateConVar("gred_sv_simfphys_health_multplier"				,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_shell_ap_lowpen_system"] 				= CreateConVar("gred_sv_shell_ap_lowpen_system"					,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_shell_ap_lowpen_shoulddecreasedamage"] 	= CreateConVar("gred_sv_shell_ap_lowpen_shoulddecreasedamage"	,  "1"  , GRED_SVAR)
+gred.CVars["gred_sv_shell_ap_lowpen_maxricochetchance"] 	= CreateConVar("gred_sv_shell_ap_lowpen_maxricochetchance"		,  "1"  , GRED_SVAR)
 
 gred = gred or {}
 gred.AllNPCs = {}
@@ -1080,6 +1083,24 @@ if CLIENT then
 				if this.ConVarChanging then return end
 				gred.CheckConCommand( "gred_sv_shell_ap_damagemultiplier",val)
 			end
+			local this = CPanel:NumSlider("Max non-penetration ricochet chance", "gred_sv_shell_ap_lowpen_maxricochetchance",0,1,2);
+			this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+			this.OnValueChanged = function(this,val)
+				if this.ConVarChanging then return end
+				gred.CheckConCommand( "gred_sv_shell_ap_lowpen_maxricochetchance",val)
+			end
+			
+			local this = CPanel:CheckBox("Should the non-penetration system decrease damage?","gred_sv_shell_ap_lowpen_shoulddecreasedamage");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				gred.CheckConCommand("gred_sv_shell_ap_lowpen_shoulddecreasedamage",val)
+			end
+			
+			local this = CPanel:CheckBox("Enable advanced non-penetration system?","gred_sv_shell_ap_lowpen_system");
+			this.OnChange = function(this,val)
+				val = val and 1 or 0
+				gred.CheckConCommand("gred_sv_shell_ap_lowpen_system",val)
+			end
 			
 			local this = CPanel:CheckBox("Should explosives be easily armed?","gred_sv_easyuse");
 			this.OnChange = function(this,val)
@@ -1988,7 +2009,7 @@ else
 			
 			if v:IsPlayer() then
 				v:SetMoveType(MOVETYPE_WALK)
-				v:SetVelocity(v:IsOnGround() and DEFAULT_PHYSFORCE_PLYGROUND and (v_pos - pos) or (v_pos - pos) * DEFAULT_PHYSFORCE_PLYGROUND or DEFAULT_PHYSFORCE_PLYAIR and (v_pos - pos) or (v_pos - pos) * DEFAULT_PHYSFORCE_PLYAIR)
+				v:SetVelocity(v:IsOnGround() and (DEFAULT_PHYSFORCE_PLYGROUND and (v_pos - pos) or (v_pos - pos) * DEFAULT_PHYSFORCE_PLYGROUND) or (DEFAULT_PHYSFORCE_PLYAIR and (v_pos - pos) or (v_pos - pos) * DEFAULT_PHYSFORCE_PLYAIR))
 			end
 		end
 	end

@@ -133,9 +133,9 @@ function ENT:PhysicsUpdate(ph)
 			local HitAng = vel:Angle()
 			HitAng:Normalize()
 			local c = os.clock()
-			if (!self.Ricochet or self.Ricochet+0.1 >= c) and self:CanRicochet(HitAng) then
+			if (!self.RICOCHET or self.RICOCHET+0.1 >= c) and self:CanRicochet(HitAng) then
 				local pos = ph:GetPos()
-				self.Ricochet = c
+				self.RICOCHET = c
 				self.ImpactSpeed = 100
 				gred.CreateSound(pos,false,"impactsounds/Tank_shell_impact_ricochet_w_whizz_0"..math.random(1,5)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg")
 				local effectdata = EffectData()
@@ -297,7 +297,7 @@ function ENT:AddOnExplode(pos)
 	end
 	if self:WaterLevel() < 1 then
 		if self.ShellType == "AP" then
-			local fwd = self:GetForward()
+			local fwd = self.LastVel:Angle():Forward()
 			local tr = util.QuickTrace(pos - fwd*2,fwd*(self.Penetration),self)
 			local hitmat = util.GetSurfacePropName(tr.SurfaceProps)
 			local class
@@ -305,12 +305,27 @@ function ENT:AddOnExplode(pos)
 			for k,v in pairs(ents.FindInSphere(tr.HitPos,50)) do
 				class = v:GetClass()
 				if class == "gmod_sent_vehicle_fphysics_base" then--or class == "gmod_sent_vehicle_fphysics_wheel" then
+					if v.GRED_ISTANK and gred.CVars.gred_sv_shell_ap_lowpen_system:GetInt() == 1 then
+						local fraction = v:GetMaxHealth()*0.01/self.Penetration
+						if fraction >= 1 then
+							if gred.CVars.gred_sv_shell_ap_lowpen_shoulddecreasedamage:GetInt() == 1 then 
+								self.ExplosionDamage = self.ExplosionDamage / (fraction*fraction)
+							end
+							local hitang = tr.HitNormal:Angle()
+							local CVar = gred.CVars.gred_sv_shell_ap_lowpen_maxricochetchance:GetFloat()
+							if math.Rand(0,CVar) > math.abs(math.cos(math.rad(hitang.y))) or math.Rand(0,CVar) > math.abs(math.cos(math.rad(hitang.p))) then
+								self.RICOCHET = os.clock()
+								self:Ricochet(pos,hitang)
+								return true
+							end
+						end
+					end
 					hitmat = "metal"
 					local dmg = DamageInfo()
 					dmg:SetAttacker(self.GBOWNER)
 					dmg:SetInflictor(self)
 					dmg:SetDamagePosition(pos)
-					dmg:SetDamage(list.Get("simfphys_vehicles")[v:GetSpawn_List()].Members.ApplyDamage and self.ExplosionDamage*10 or self.ExplosionDamage)
+					dmg:SetDamage(v.GRED_ISTANK and self.ExplosionDamage*10 or self.ExplosionDamage)
 					dmg:SetDamageType(64) -- DMG_BLAST
 					v:TakeDamageInfo(dmg)
 					break

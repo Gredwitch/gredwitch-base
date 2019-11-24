@@ -1,8 +1,9 @@
---[[14/11/2019
-- Added a toggle tank gun binder to like toggle between a 128mm and a 75mm cannon
-- Made it so tanks don't spam errors if the client doesn't have the model
-- Fixed the debug print
-- Fixed a rare shell error
+--[[24/11/2019
+- Added gred_sv_shell_ap_lowpen_system
+- Added gred_sv_shell_ap_lowpen_shoulddecreasedamage
+- Added gred_sv_shell_ap_lowpen_maxricochetchance
+- Added a new shell damage system ; Basically, when an AP shell hits a tank, the tank's average armor thickness will be calculated (Max tank's health divided by 100) and if the shell's penetration capability below it, then we will reduce the shell's damage depending on how big the difference between the armor thickness and the penetration capability is, and the shell will have a higher chance to ricochet depending at which angle you hit the tank
+- Fixed the ammo box glitching out
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -11,6 +12,12 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+14/11/2019
+- Added a toggle tank gun binder to like toggle between a 128mm and a 75mm cannon
+- Made it so tanks don't spam errors if the client doesn't have the model
+- Fixed the debug print
+- Fixed a rare shell error
 
 09/11/2019
 - Fixed the tanks flying away when they they get hit by an explosion

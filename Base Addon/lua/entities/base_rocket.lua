@@ -132,13 +132,25 @@ end
 
 local World = Entity(0)
 
-function ENT:CanRicochet(ang)
-	local ricochetang = gred.CVars.gred_sv_minricochetangle:GetFloat()
+function ENT:CanRicochet(ang,ang_sub)
+	local ricochetang = gred.CVars.gred_sv_minricochetangle:GetFloat() - ang_sub
 	local abs_p,abs_y = math.abs(ang.p),math.abs(ang.y)
 	if abs_p >= ricochetang or abs_y >= ricochetang then return true end
 	ricochetang = ricochetang - 20
 	if (abs_p >= ricochetang and math.abs(math.random(0,ricochetang-abs_p)) >= 5) or (abs_y >= ricochetang and math.abs(math.random(0,ricochetang-abs_y)) >= 5) then return true end
 	return false
+end
+
+function ENT:Ricochet(pos,ang)
+	self.ImpactSpeed = 0
+	gred.CreateSound(pos,false,"impactsounds/Tank_shell_impact_ricochet_w_whizz_0"..math.random(1,5)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg")
+	-- sound.Play("gredwitch/ricochet.wav",pos,120,100,1)
+	local effectdata = EffectData()
+	effectdata:SetOrigin(pos)
+	ang = self:LocalToWorldAngles(ang)
+	ang:RotateAroundAxis(ang:Right(),180)
+	effectdata:SetNormal(ang:Forward())
+	util.Effect("ManhackSparks",effectdata)
 end
 
 function ENT:PhysicsCollide(data,physobj)
@@ -163,18 +175,10 @@ function ENT:PhysicsCollide(data,physobj)
 				-- local HitAng = self:WorldToLocalAngles(util.QuickTrace(data.HitPos,data.HitPos + self:GetForward()*10,{self}).HitNormal:Angle())
 				local HitAng = self:WorldToLocalAngles(data.HitNormal:Angle())
 				local c = os.clock()
-				if (!self.Ricochet or self.Ricochet+0.1 >= c) and self:CanRicochet(HitAng) then
-					self.Ricochet = c
-					self.ImpactSpeed = 100
-					gred.CreateSound(data.HitPos,false,"impactsounds/Tank_shell_impact_ricochet_w_whizz_0"..math.random(1,5)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg")
-					-- sound.Play("gredwitch/ricochet.wav",data.HitPos,120,100,1)
-					local effectdata = EffectData()
-					effectdata:SetOrigin(data.HitPos)
-					HitAng = self:LocalToWorldAngles(HitAng)
-					HitAng:RotateAroundAxis(HitAng:Right(),180)
-					effectdata:SetNormal(HitAng:Forward())
-					util.Effect("ManhackSparks",effectdata)
-					return 
+				if (!self.RICOCHET or self.RICOCHET+0.1 >= c) and self:CanRicochet(HitAng,0) then
+					self.RICOCHET = c
+					self:Ricochet(data.HitPos,HitAng)
+					return
 				end
 			end
 		end
