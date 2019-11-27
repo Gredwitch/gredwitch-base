@@ -175,7 +175,9 @@ function ENT:PhysicsCollide(data,physobj)
 				-- local HitAng = self:WorldToLocalAngles(util.QuickTrace(data.HitPos,data.HitPos + self:GetForward()*10,{self}).HitNormal:Angle())
 				local HitAng = self:WorldToLocalAngles(data.HitNormal:Angle())
 				local c = os.clock()
-				if (!self.RICOCHET or self.RICOCHET+0.1 >= c) and self:CanRicochet(HitAng,0) then
+				self.RICOCHET_COUT = self.RICOCHET_COUT or 0
+				if self.RICOCHET_COUT <= 3 and (!self.RICOCHET or self.RICOCHET+0.1 >= c) and self:CanRicochet(HitAng,0) then
+					self.RICOCHET_COUT = self.RICOCHET_COUT + 1
 					self.RICOCHET = c
 					self:Ricochet(data.HitPos,HitAng)
 					return

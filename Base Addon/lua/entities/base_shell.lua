@@ -116,7 +116,6 @@ ENT.RSound							=	0
 ENT.ShellType						=	""
 ENT.EffectWater						=	"ins_water_explosion"
 
-
 function ENT:SetupDataTables()
 	self:NetworkVar("Bool",0,"Fired")
 	self:NetworkVar("String",0,"ShellType")
@@ -125,36 +124,38 @@ function ENT:SetupDataTables()
 end
 
 function ENT:PhysicsUpdate(ph)
-	if self.Fired and self:WaterLevel() >= 1 then
-		local vel = ph:GetVelocity()
-		if vel:Length() < self.ImpactSpeed then return end
-		if self.ShellType == "AP" then
-			self.LastVel = vel
-			local HitAng = vel:Angle()
-			HitAng:Normalize()
-			local c = os.clock()
-			if (!self.RICOCHET or self.RICOCHET+0.1 >= c) and self:CanRicochet(HitAng) then
-				local pos = ph:GetPos()
-				self.RICOCHET = c
-				self.ImpactSpeed = 100
-				gred.CreateSound(pos,false,"impactsounds/Tank_shell_impact_ricochet_w_whizz_0"..math.random(1,5)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg")
-				local effectdata = EffectData()
-				effectdata:SetOrigin(pos)
-				-- HitAng = self:LocalToWorldAngles(HitAng)
-				-- HitAng:RotateAroundAxis(HitAng:Right(),0)
-				HitAng.p = HitAng.p - 90
-				effectdata:SetNormal(HitAng:Forward())
-				util.Effect("ManhackSparks",effectdata)
-				-- vel.y = -vel.y
-				vel.z = -vel.z
-				ph:SetVelocityInstantaneous(vel)
-				return
+	if self.Fired then
+		if self:WaterLevel() >= 1 then
+			local vel = ph:GetVelocity()
+			if vel:Length() < self.ImpactSpeed then return end
+			if self.ShellType == "AP" then
+				self.LastVel = vel
+				local HitAng = vel:Angle()
+				HitAng:Normalize()
+				local c = os.clock()
+				if self:CanRicochet(HitAng) then
+					local pos = ph:GetPos()
+					self.RICOCHET = self.RICOCHET or c
+					self.ImpactSpeed = 100
+					gred.CreateSound(pos,false,"impactsounds/Tank_shell_impact_ricochet_w_whizz_0"..math.random(1,5)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg")
+					local effectdata = EffectData()
+					effectdata:SetOrigin(pos)
+					-- HitAng = self:LocalToWorldAngles(HitAng)
+					-- HitAng:RotateAroundAxis(HitAng:Right(),0)
+					HitAng.p = HitAng.p - 90
+					effectdata:SetNormal(HitAng:Forward())
+					util.Effect("ManhackSparks",effectdata)
+					-- vel.y = -vel.y
+					vel.z = -vel.z
+					ph:SetVelocityInstantaneous(vel)
+					return
+				end
+				self.PhysObj = ph
 			end
-			self.PhysObj = ph
+			self.Exploded = true
+			self:Explode()
+			return
 		end
-		self.Exploded = true
-		self:Explode()
-		return
 	end
 end
 
@@ -366,7 +367,7 @@ function ENT:OnRemove()
 	end
 	self:StopParticles()
 end
-
+ENT.shouldOwnerHearSnd = true
 if CLIENT then
 	-- local glow = Material("sprites/animglow02") 
 	local soundSpeed = 18005.25
@@ -410,6 +411,15 @@ if CLIENT then
 			-- CreateSound(self,"gredwitch/Shell_fly_loop_03.wav"),
 		}
 		-- self:SetNoDraw(true)
+		self:CallOnRemove("stopshellsnd",function(self)
+			if self.snd then 
+				for k,v in pairs (self.snd) do
+					v:ChangeVolume(0)
+					v:Stop()
+				end
+			end
+			if self.Emitter and IsValid(self.Emitter) then self.Emitter:Finish() end
+		end)
 		for k,v in pairs(self.snd) do v:ChangeVolume(80) end
 		
 		timer.Simple(0,function()
@@ -422,15 +432,6 @@ if CLIENT then
 				self.TracerColor = colors[self.TracerColor] and colors[self.TracerColor] or colors["white"]
 				self.Caliber = self:GetCaliber()
 				self.Inited = true
-				self:CallOnRemove("stopshellsnd",function(self)
-					if self.snd then 
-						for k,v in pairs (self.snd) do
-							v:ChangeVolume(0)
-							v:Stop()
-						end
-					end
-					if self.Emitter and IsValid(self.Emitter) then self.Emitter:Finish() end
-				end)
 			end
 		end)
 		self.Rate = 0.03
