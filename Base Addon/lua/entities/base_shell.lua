@@ -367,7 +367,7 @@ function ENT:OnRemove()
 	end
 	self:StopParticles()
 end
-ENT.shouldOwnerHearSnd = true
+-- ENT.shouldOwnerHearSnd = true
 if CLIENT then
 	-- local glow = Material("sprites/animglow02") 
 	local soundSpeed = 18005.25
