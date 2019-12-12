@@ -83,15 +83,18 @@ Luna:
 	Lol
 ]]
 function ENT:Initialize()
+
 	local tbl = physenv.GetPerformanceSettings()
 	tbl.MaxVelocity = 200000000
 	physenv.SetPerformanceSettings(tbl)
+	
 	if SERVER then
-		local spawnablebombs = gred.CVars["gred_sv_spawnable_bombs"]
-		if spawnablebombs:GetInt() == 0 and not self.IsOnPlane then
+		if gred.CVars["gred_sv_spawnable_bombs"]:GetInt() == 0 and not self.IsOnPlane then
 			self:Remove()
 			return
 		end
+		
+		self:DoPreInit()
 		
 		self:SetModel(self.Model)
 		self:PhysicsInit(SOLID_VPHYSICS)
@@ -103,6 +106,7 @@ function ENT:Initialize()
 		
 		if (phys:IsValid()) then
 			phys:SetMass(self.Mass)
+			self:InitPhysics(phys)
 			phys:Wake()
 		end
 		if (skincount > 0) then
@@ -115,6 +119,14 @@ function ENT:Initialize()
 		if self.GBOWNER == nil then self.GBOWNER = self.Owner else self.Owner = self.GBOWNER end
 		self:AddOnInit()
 	end
+end
+
+function ENT:DoPreInit()
+
+end
+
+function ENT:InitPhysics(phys)
+
 end
 
 function ENT:AddOnInit() 
@@ -186,72 +198,73 @@ function ENT:Explode(pos)
 	if not self.Smoke then
 		gred.CreateExplosion(pos,self.ExplosionRadius,self.ExplosionDamage,self.Decal,self.TraceLength,self.GBOWNER,self,self.DEFAULT_PHYSFORCE,self.DEFAULT_PHYSFORCE_PLYGROUND,self.DEFAULT_PHYSFORCE_PLYAIR)
 	end
-	net.Start("gred_net_createparticle")
-	if(self:WaterLevel() >= 1) then
-		local trdata   = {}
-		local trlength = Vector(0,0,9000)
+	if not self.NO_EFFECT then
+		net.Start("gred_net_createparticle")
+		if(self:WaterLevel() >= 1) then
+			local trdata   = {}
+			local trlength = Vector(0,0,9000)
 
-		trdata.start   = pos
-		trdata.endpos  = trdata.start + trlength
-		trdata.filter  = self
-		local tr = util.TraceLine(trdata) 
+			trdata.start   = pos
+			trdata.endpos  = trdata.start + trlength
+			trdata.filter  = self
+			local tr = util.TraceLine(trdata) 
 
-		local trdat2   = {}
-		trdat2.start   = tr.HitPos
-		trdat2.endpos  = trdata.start - trlength
-		trdat2.filter  = self
-		trdat2.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
-			 
-		local tr2 = util.TraceLine(trdat2)
-		
-		if tr2.Hit then
-			net.WriteString(self.EffectWater)
-			net.WriteVector(tr2.HitPos)
-			if self.EffectWater == "ins_water_explosion" then
-				net.WriteAngle(Angle(-90,0,0))
-			else
-				net.WriteAngle(Angle(0,0,0))
+			local trdat2   = {}
+			trdat2.start   = tr.HitPos
+			trdat2.endpos  = trdata.start - trlength
+			trdat2.filter  = self
+			trdat2.mask    = MASK_WATER + CONTENTS_TRANSLUCENT
+				 
+			local tr2 = util.TraceLine(trdat2)
+			
+			if tr2.Hit then
+				net.WriteString(self.EffectWater)
+				net.WriteVector(tr2.HitPos)
+				if self.EffectWater == "ins_water_explosion" then
+					net.WriteAngle(Angle(-90,0,0))
+				else
+					net.WriteAngle(Angle(0,0,0))
+				end
+				net.WriteBool(false)
 			end
-			net.WriteBool(false)
-		end
-		if !self.Smoke then
-			if self.WaterExplosionSound == nil then else 
-				self.ExplosionSound = self.WaterExplosionSound 
+			if !self.Smoke then
+				if self.WaterExplosionSound == nil then else 
+					self.ExplosionSound = self.WaterExplosionSound 
+				end
+				if self.WaterFarExplosionSound == nil then else  
+					self.FarExplosionSound = self.WaterFarExplosionSound 
+				end
 			end
-			if self.WaterFarExplosionSound == nil then else  
-				self.FarExplosionSound = self.WaterFarExplosionSound 
-			end
-		end
-	else
-		local tracedata    = {}
-		tracedata.start    = pos
-		tracedata.endpos   = tracedata.start - Vector(0, 0, self.TraceLength)
-		tracedata.filter   = self.Entity
-				
-		 local trace = util.TraceLine(tracedata)
-		
-		if trace.HitWorld then
-			net.WriteString(self.Effect)
-			net.WriteVector(pos)
-			if self.AngEffect then
-				net.WriteAngle(Angle(-90,0,0))
-			else
-				net.WriteAngle(Angle(0,0,0))
-			end
-			net.WriteBool(true)
 		else
-			net.WriteString(self.EffectAir)
-			net.WriteVector(pos)
-			if self.AngEffect then
-				net.WriteAngle(Angle(-90,0,0))
+			local tracedata    = {}
+			tracedata.start    = pos
+			tracedata.endpos   = tracedata.start - Vector(0, 0, self.TraceLength)
+			tracedata.filter   = self.Entity
+					
+			 local trace = util.TraceLine(tracedata)
+			
+			if trace.HitWorld then
+				net.WriteString(self.Effect)
+				net.WriteVector(pos)
+				if self.AngEffect then
+					net.WriteAngle(Angle(-90,0,0))
+				else
+					net.WriteAngle(Angle(0,0,0))
+				end
+				net.WriteBool(true)
 			else
-				net.WriteAngle(Angle(0,0,0))
+				net.WriteString(self.EffectAir)
+				net.WriteVector(pos)
+				if self.AngEffect then
+					net.WriteAngle(Angle(-90,0,0))
+				else
+					net.WriteAngle(Angle(0,0,0))
+				end
+				net.WriteBool(false)
 			end
-			net.WriteBool(false)
 		end
-    end
-	net.Broadcast()
-	
+		net.Broadcast()
+	end
 	gred.CreateSound(pos,self.RSound == 1,self.ExplosionSound,self.FarExplosionSound,self.DistExplosionSound)
 	
 	timer.Simple(0,function() self:Remove() end)

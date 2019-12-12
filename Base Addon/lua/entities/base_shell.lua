@@ -1,7 +1,7 @@
 AddCSLuaFile()
 DEFINE_BASECLASS( "base_rocket" )
 
-local materials = {
+local Materials = {
 	canister				=	1,
 	chain					=	1,
 	chainlink				=	1,
@@ -115,6 +115,16 @@ ENT.Caliber							=	0
 ENT.RSound							=	0
 ENT.ShellType						=	""
 ENT.EffectWater						=	"ins_water_explosion"
+ENT.Normalization					=	0
+ENT.IS_AP = {
+	["AP"] = true,
+	["APHE"] = true,
+	["APCR"] = true,
+	["APC"] = true,
+	["APBC"] = true,
+	["APCBC"] = true,
+	["APHEBC"] = true,
+}
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Bool",0,"Fired")
@@ -127,8 +137,8 @@ function ENT:PhysicsUpdate(ph)
 	if self.Fired then
 		if self:WaterLevel() >= 1 then
 			local vel = ph:GetVelocity()
-			if vel:Length() < self.ImpactSpeed then return end
-			if self.ShellType == "AP" then
+			-- if vel:Length() <= self.ImpactSpeed then return end
+			if self.IS_AP[self.ShellType] then
 				self.LastVel = vel
 				local HitAng = vel:Angle()
 				HitAng:Normalize()
@@ -215,7 +225,7 @@ function ENT:AddOnInit()
 		self.EffectAir = self.SmokeEffect
 		self.Effect = self.Caliber < 88 and "m203_smokegrenade" or "doi_smoke_artillery"
 	elseif self.ShellType == "HE" then
-		self.ExplosionDamage = 150 + self.Caliber
+		self.ExplosionDamage = 1500 + self.Caliber * 200
 		if self.Caliber < 50 then
 			self.ExplosionRadius = 350
 			self.Effect = "ins_m203_explosion"
@@ -253,30 +263,33 @@ function ENT:AddOnInit()
 			self.Effect = "doi_artillery_explosion_OLD"
 			self.AngEffect = true
 		end
+	elseif self.ShellType == "HEAT" then
+		self.ExplosionRadius = 200
+		self.Effect = "ap_impact_dirt"
+		self.ExplosionDamage = (!self.TNTEquivalent and (self.ExplosiveMass and (self.ExplosiveMass/self.Mass)*100 or 10) or self.TNTEquivalent) * 50 * self.Caliber
 	else
 		self.AngEffect = true
 		self.Effect = "gred_ap_impact"
-		self.EffectAir = "gred_ap_impact"
-		self.ExplosionRadius = 100
+		self.ExplosionRadius = 50
 		self.Decal = "scorch_small"
 	end
 	
-	self.EnginePower 			= ((self.MuzzleVelocity*gred.CVars["gred_sv_shell_speed_multiplier"]:GetFloat())/0.02540002032) -- m/s
+	self.EnginePower 			= (self.MuzzleVelocity*gred.CVars["gred_sv_shell_speed_multiplier"]:GetFloat())/0.01905 -- m/s
 	self.EffectAir 				= self.Effect
 	self.Smoke 					= self.ShellType == "Smoke"
-	
 	self:SetTracerColor(self.TracerColor)
 	self:SetCaliber(self.Caliber)
 	self:SetShellType(self.ShellType)
 	self:SetModelScale(self.Caliber / 75)
 	
+	self.Filter = {self}
 	for k,v in pairs(ents.FindByClass("gmod_sent_vehicle_fphysics_wheel")) do
 		constraint.NoCollide(self,v,0,0)
+		table.insert(self.Filter,v)
 	end
 	
 	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
 end
-
 local Baseclass = baseclass.Get("base_rocket")
 
 function ENT:Launch()
@@ -286,66 +299,157 @@ function ENT:Launch()
 end
 
 function ENT:AddOnThink()
-	-- print("VELOCITE = ",(self:GetPhysicsObject():GetVelocity():Length()*0.02540002032).."m/s")
 end
 
-function ENT:AddOnExplode(pos) 
-	if self.ShellType == "AP" then
-		local vel = (self.LastVel and self.LastVel:Length()*0.02540002032 or self.MuzzleVelocity)
-		self.Penetration = (((vel/gred.CVars["gred_sv_shell_speed_multiplier"]:GetFloat())*math.sqrt(self.Mass))/(2400*math.sqrt(self.Caliber)))*1000
-		self.ExplosionDamage = self.Penetration*vel*0.1*gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
-		-- print("TEMPS DE VOL = "..(CurTime()-self.LAUNCHTIME).."s  -  DISTANCE = "..(self.LAUNCHPOS:Distance(pos)*0.02540002032).."m  - VELOCITE PERDUE = "..(self.MuzzleVelocity-vel).."  -  DEGATS = "..(self.ExplosionDamage).."  -  PENETRATION = "..(self.Penetration).."mm  -  VELOCITE EN SORTIE DE CANNON = "..self.MuzzleVelocity.."m/s  -  MASSE = "..self.Mass.."kg  -  CALIBRE = "..self.Caliber.."mm")
+local kfbr = 1900^1.43
+local MATH_PI = math.pi
+local ONE_THIRD = 1/3
+local CONE_LENGTH = 102.384225 -- millimeters
+local CYLINDER_LENGTH = 107.866815 -- millimeters
+local CONE_AREA = (CONE_LENGTH * 70.31355) / 2 -- square millimeters
+local TO_METERS_PER_SEC = 1/3.6
+local kfbrAPCR = 3000^1.43
+local ShellRadius
+local FlowRate
+local mins,maxs = Vector(-5,-5,-5),Vector(5,5,5)
+local Math = {
+	pow = function(n,e) return n^e end
+}
+
+function ENT:InitPhysics(phys) -- IF YOU STEAL ANY OF THIS SHIT I'M GONNA DMCA YOU SO BAD. I SPENT 6 HOURS ON THIS.
+	ShellRadius = self.Caliber*0.5
+	ShellRadius = ShellRadius * ShellRadius
+	
+	FlowRate = (0.25 * MATH_PI * self.Caliber*self.Caliber * self.MuzzleVelocity) * 1000000 -- cubic millimeters/s
+	
+	self.DragCoefficient = (2 * -((FlowRate*TO_METERS_PER_SEC*0.001 * 4) / (MATH_PI * (self.Caliber*0.001)^2))) / ((self.Mass/((ONE_THIRD * MATH_PI * ShellRadius * CONE_LENGTH * 0.001) + (MATH_PI * ShellRadius * CYLINDER_LENGTH))) * (FlowRate*FlowRate) * CONE_AREA)  -- density = kg/cubic centimeters | volume = cone volume + cylinder volume
+	
+	phys:SetDragCoefficient(self.DragCoefficient)
+end
+
+function ENT:AddOnExplode(pos)
+	if self.ShellType == "Smoke" then return false end
+	
+	if self.IS_AP[self.ShellType] then
+		local vel = self.LastVel and self.LastVel:Length()*0.01905 or self.MuzzleVelocity
+		
+		if self.LinearPenetration then
+			self.Penetration = self.LinearPenetration
+		elseif self.ShellType != "APCR" and self.ShellType != "HVAP" then
+			local TNTEquivalent = !self.TNTEquivalent and (self.ExplosiveMass and (self.ExplosiveMass/self.Mass)*100 or 0) or self.TNTEquivalent
+			
+			self.Penetration = (((vel^1.43)*(self.Mass^0.71))/(kfbr*((self.Caliber*0.01)^1.07)))*100*(TNTEquivalent < 0.65 and 1 or (TNTEquivalent < 1.6 and 1 + (TNTEquivalent-0.65)*-0.07/0.95 or (TNTEquivalent < 2 and 0.93 + (TNTEquivalent-1.6) * -0.03 / 0.4 or (TNTEquivalent < 3 and 0.9+(TNTEquivalent-2)*-0.05 or TNTEquivalent < 4 and 0.85+(TNTEquivalent-3)*-0.1 or 0.75))))*(self.ShellType == "APCBC" and 1 or 0.9)
+		else
+			self.Penetration = ((vel^1.43)*((self.CoreMass + (((((self.CoreMass/self.Mass)*100) > 36.0) and 0.5 or 0.4) * (self.Mass - self.CoreMass)))^0.71))/(kfbrAPCR*((self.Caliber*0.0001)^1.07))
+		end
+		self.ExplosionDamage = self.Penetration*vel*0.03*gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
+		if self.ShellType == "APCR" then
+			self.ExplosionDamage = self.ExplosionDamage*0.07
+		end
+		
+	elseif self.LinearPenetration then
+		self.Penetration = self.LinearPenetration
 	end
+	
+	self.Penetration = self.Penetration or 0
+	
 	if self:WaterLevel() < 1 then
-		if self.ShellType == "AP" then
-			local fwd = self.LastVel:Angle():Forward()
-			local tr = util.QuickTrace(pos - fwd*2,fwd*(self.Penetration),self)
-			local hitmat = util.GetSurfacePropName(tr.SurfaceProps)
-			local class
-			self.EffectAir = "AP_impact_wall"
-			for k,v in pairs(ents.FindInSphere(tr.HitPos,50)) do
-				class = v:GetClass()
-				if class == "gmod_sent_vehicle_fphysics_base" then--or class == "gmod_sent_vehicle_fphysics_wheel" then
-					if v.GRED_ISTANK and gred.CVars.gred_sv_shell_ap_lowpen_system:GetInt() == 1 then
-						local fraction = v:GetMaxHealth()*0.01/self.Penetration
-						if fraction >= 1 then
-							if gred.CVars.gred_sv_shell_ap_lowpen_shoulddecreasedamage:GetInt() == 1 then 
-								self.ExplosionDamage = self.ExplosionDamage / (fraction*fraction)
-							end
-							local hitang = tr.HitNormal:Angle()
-							local CVar = gred.CVars.gred_sv_shell_ap_lowpen_maxricochetchance:GetFloat()
-							if math.Rand(0,CVar) > math.abs(math.cos(math.rad(hitang.y))) or math.Rand(0,CVar) > math.abs(math.cos(math.rad(hitang.p))) then
-								self.RICOCHET = os.clock()
-								self:Ricochet(pos,hitang)
-								return true
-							end
+		local fwd = self.LastVel:Angle():Forward()
+		local tr = util.QuickTrace(pos - fwd*2,fwd*(self.Penetration),self.Filter)
+		local HitMat = util.GetSurfacePropName(tr.SurfaceProps)
+		
+		self.EffectAir = self.IS_AP[self.ShellType] and "AP_impact_wall" or self.EffectAir
+		
+		if IsValid(tr.Entity) and tr.Entity.GetClass and tr.Entity:GetClass() == "gmod_sent_vehicle_fphysics_base" then
+			local Fraction
+			if tr.Entity.GRED_ISTANK then
+				
+				local HitAng = tr.HitNormal:Angle()
+				local WorldToLocalHitAng = self:WorldToLocalAngles(HitAng)
+				
+				local CosY = math.abs(math.cos(math.rad(math.abs(WorldToLocalHitAng.y) - 180)))
+				local CosP = math.abs(math.cos(math.rad(WorldToLocalHitAng.p + self.Normalization)))
+				
+				local HP = tr.Entity:GetMaxHealth()*0.01 / gred.CVars.gred_sv_simfphys_health_multplier:GetFloat()
+				HP = HP/CosY + HP - HP*CosP
+				Fraction = HP/self.Penetration
+				
+				self.Fraction = Fraction
+				if (Fraction >= 1 and gred.CVars.gred_sv_shell_ap_lowpen_system:GetInt() == 1) then
+					
+					if (self.ShellType == "HEAT" and gred.CVars.gred_sv_shell_ap_lowpen_heat_damage:GetInt() == 1) or (self.IS_AP[self.ShellType] and gred.CVars.gred_sv_shell_ap_lowpen_shoulddecreasedamage:GetInt() == 1) then
+						self.ExplosionDamage = self.ExplosionDamage / (Fraction*Fraction)
+					elseif (self.IS_AP[self.ShellType] and gred.CVars.gred_sv_shell_ap_lowpen_ap_damage:GetInt() == 1) or !self.IS_AP[self.ShellType] then
+						self.ExplosionDamage = 0
+					end
+					if self.IS_AP[self.ShellType] then
+						local CVar = gred.CVars.gred_sv_shell_ap_lowpen_maxricochetchance:GetFloat()
+						
+						if math.Rand(0,CVar) > CosY or math.Rand(0,CVar) > CosP then
+							local c = os.clock()
+							self:Ricochet(pos,HitAng,c)
+							self.RICOCHET = c
+							
+							return true
 						end
 					end
-					hitmat = "metal"
-					local dmg = DamageInfo()
-					dmg:SetAttacker(self.GBOWNER)
-					dmg:SetInflictor(self)
-					dmg:SetDamagePosition(pos)
-					dmg:SetDamage(v.GRED_ISTANK and self.ExplosionDamage*10 or self.ExplosionDamage)
-					dmg:SetDamageType(64) -- DMG_BLAST
-					v:TakeDamageInfo(dmg)
-					break
+				else
+					if self.ShellType == "APCR" then
+						-- local dmg = DamageInfo()
+						-- dmg:SetAttacker(self.GBOWNER)
+						-- dmg:SetInflictor(self)
+						-- dmg:SetDamage(self.ExplosionDamage)
+						-- dmg:SetDamageType(64) -- DMG_BLAST
+						
+						for k,v in pairs(ents.FindAlongRay(tr.HitPos,tr.HitPos + fwd * (-tr.Entity:GetModelBounds().x * 2),mins,maxs)) do
+							if v:IsPlayer() and v:GetSimfphys() == tr.Entity then v:TakeDamage(self.ExplosionDamage*0.15,self.GBOWNER,self) end
+						end
+					end
 				end
 			end
-			self.ExplosionDamage = 0
-			if materials[hitmat] == 1 then
+			
+			HitMat = "metal"
+			
+			local dmg = DamageInfo()
+			dmg:SetAttacker(self.GBOWNER)
+			dmg:SetInflictor(self)
+			dmg:SetDamagePosition(pos)
+			dmg:SetDamage(tr.Entity.GRED_ISTANK and ((Fraction and Fraction >= 1 and !self.IS_AP[self.ShellType]) and 0 or self.ExplosionDamage*10) or (self.ShellType == "APCR" and self.ExplosionDamage*10 or self.ExplosionDamage))
+			dmg:SetDamageType(64) -- DMG_BLAST
+			
+			tr.Entity:TakeDamageInfo(dmg)
+			
+			if self.ShellType == "HEAT" then
+				self.ExplosionRadius = 0
+			end
+			
+		end
+		
+		if self.ShellType != "HE" then
+			if Materials[HitMat] == 1 then
 				self.Effect = "AP_impact_wall"
+				self.EffectAir = "AP_impact_wall"
 				self.ExplosionSound = table.Random(APMetalSounds)
 				self.FarExplosionSound = table.Random(APMetalSounds)
 				pos = tr.HitPos+(fwd*2)
-			elseif materials[hitmat] == 2 then
+			elseif Materials[HitMat] == 2 and self.ShellType != "HEAT" then
 				self.ExplosionSound = table.Random(APWoodSounds)
 				self.FarExplosionSound = table.Random(APWoodSounds)
-			else
+			elseif self.ShellType != "HEAT" then
 				self.ExplosionSound = table.Random(APSounds)
 				self.FarExplosionSound = table.Random(APSounds)
 			end
 		end
+		
+		if self.NO_EFFECT then 
+			self.Effect = ""
+			self.EffectAir = ""
+			self.ExplosionSound = "physics/flesh/flesh_squishy_impact_hard".. math.random(1,4)..".wav"
+			self.FarExplosionSound = "extras/null.wav"
+			self.DistExplosionSound = "extras/null.wav"
+		end
+		
+		self.ExplosionDamage = self.ExplosionDamageOverride and self.ExplosionDamageOverride or self.ExplosionDamage
 	end
 end
 
@@ -357,13 +461,13 @@ function ENT:Use( activator, caller )
 	if self:IsPlayerHolding() then return end
 	activator:PickupObject(self)
 	activator:SetNWEntity("PickedUpObject",self)
-	self.PlyPickup = activator
+	self.Plypickup = activator
 	self.NextUse = ct + 0.1
 end
 
 function ENT:OnRemove()
-	if IsValid(self.PlyPickup) then
-		self.PlyPickup:DropObject()
+	if IsValid(self.Plypickup) then
+		self.Plypickup:DropObject()
 	end
 	self:StopParticles()
 end
@@ -371,7 +475,6 @@ end
 if CLIENT then
 	-- local glow = Material("sprites/animglow02") 
 	local soundSpeed = 18005.25
-	local particle
 	local vector_zero = Vector(0,0,0)
 	local colors = {
 		["red"] = CreateMaterial("gred_mat_shell_tracer_red","VertexLitGeneric",{
@@ -400,31 +503,37 @@ if CLIENT then
 		return v1.x == v2.x and v1.y == v1.y and v1.z == v2.z
 	end
 	
+	local function ClampVector(vec,min,max)
+		return Vector(math.Clamp(vec.x,min.x,max.x),math.Clamp(vec.y,min.y,max.y),math.Clamp(vec.z,min.z,max.z))
+	end
+	
+	function ENT:OnRemove()
+		if self.snd then
+			for k,v in pairs (self.snd) do
+				v:ChangeVolume(0)
+				v:ChangePitch(0)
+				v:Stop()
+			end
+		end
+	end
+	
 	function ENT:Initialize()
 		self.ply = LocalPlayer()
+		self.Rate = 0.03
+		self.DefaultF = math.random(110,190)
 		self.Emitter = ParticleEmitter(self:GetPos(),false)
 		self.shouldOwnerNotHearSnd = false
+		-- self:SetNoDraw(true)
 		
 		self.snd = self.snd or {
 			CreateSound(self,"bomb/tank_shellwhiz.wav"),
 			CreateSound(self,"bomb/shell_trail.wav"),
 			-- CreateSound(self,"gredwitch/Shell_fly_loop_03.wav"),
 		}
-		-- self:SetNoDraw(true)
-		self:CallOnRemove("stopshellsnd",function(self)
-			if self.snd then 
-				for k,v in pairs (self.snd) do
-					v:ChangeVolume(0)
-					v:Stop()
-				end
-			end
-			if self.Emitter and IsValid(self.Emitter) then self.Emitter:Finish() end
-		end)
-		for k,v in pairs(self.snd) do v:ChangeVolume(80) end
 		
 		timer.Simple(0,function()
-			if self.GetShellType then  -- sometimes the function just doesn't exist
-				if self:GetShellType() != "AP" and !self.snd["wiz_mortar"] then
+			if IsValid(self) and self.GetShellType then  -- sometimes the function just doesn't exist
+				if !self.IS_AP[self:GetShellType()] and !self.snd["wiz_mortar"] then
 					table.insert(self.snd,CreateSound(self,"bomb/shellwhiz_mortar_"..math.random(1,2)..".wav"))
 					self.snd[#self.snd]:SetSoundLevel(80)
 				end
@@ -434,21 +543,25 @@ if CLIENT then
 				self.Inited = true
 			end
 		end)
-		self.Rate = 0.03
-		self.DefaultF = math.random(110,190)
+		
+		for k,v in pairs(self.snd) do v:ChangeVolume(80) end
 	end
-	local function ClampVector(vec,min,max)
-		return Vector(math.Clamp(vec.x,min.x,max.x),math.Clamp(vec.y,min.y,max.y),math.Clamp(vec.z,min.z,max.z))
-	end
+	
 	function ENT:Think()
 		if !self.Inited then self:Initialize() end
 		if self.GetFired and !self:GetFired() then return end
+		
 		local pos,fwd,v = self:GetPos(),self:GetForward(),self:GetVelocity()
 		local fwdv = v:Angle():Forward()
+		pos = pos + fwd*30
+		
+		
 		if self.TracerColor and !VectorEqual(v,vector_zero) then
 			if IsValid(self.Emitter) then
+				local l = v:Length()*0.001
+				local particle
 				for i = 1,10 do
-					particle = self.Emitter:Add(self.TracerColor,pos + fwdv*(i*-self.Caliber*0.1) )--+ ClampVector(fwdv*30,vector_zero,fwd*30))
+					particle = self.Emitter:Add(self.TracerColor,pos + fwdv*(i*-self.Caliber*0.1 * math.Clamp(l,0,1))) --+ ClampVector(fwdv*30,vector_zero,fwd*30))
 					if particle then
 						particle:SetVelocity(v)
 						particle:SetDieTime(0.05)
@@ -465,9 +578,11 @@ if CLIENT then
 				self.Emitter = ParticleEmitter(self:GetPos(),false)
 			end
 		end
-		if !IsValid(self.ply) then return end
+		
+		if !IsValid(self.ply) then self:OnRemove() return end
 		
 		local ent = self.ply:GetViewEntity()
+		
 		if (ent != self.GBOWNER and ent != self.Owner) or self.shouldOwnerHearSnd then
 			local vs,vr = CalcLength(self,ent)
 			local f = (self.DefaultF or 100) * (soundSpeed + vr) / (soundSpeed + vs)
@@ -480,5 +595,7 @@ if CLIENT then
 				v:Stop()
 			end
 		end
+		
+		return true
 	end
 end

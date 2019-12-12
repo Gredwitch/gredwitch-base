@@ -1,5 +1,25 @@
---[[27/11/2019
-- Fixed the shells staying on the ground and raping your ears by adding a max ricochet number of 3
+--[[12/12/2019
+- Added a huge popup that tells people how to bind their walk key if they don't have it bound when they get in a simfphys vehicle
+- Added gred_sv_shell_ap_lowpen_ap_damage to remove damage from AP shells in case of a non penetration
+- Added gred_sv_shell_ap_lowpen_ap_damage to remove damage from HEAT shells in case of a non penetration
+- Added a more or less working stabilizer feature
+- Added a server side convar loader (this only works if the convars are changed from the spawnmenu)
+- Added HEAT shells ; basically a mix between HE and AP shells
+- Added APCR shells ; they don't do a lot of damage but they can hurt and kill crew members in case of a penetration
+- Added APCBC shells ; basically AP shells but better
+- Added even more tank shells but they're actually just AP shells
+- Added a better penetration calculation system ; switched from Krupp's formula to De Marre's formula
+- Added an impact angle calculation to the penetration system ; now you will have to aim
+- Added a simfphys tank health multiplier
+- Added a drag coefficient calculator ; shells will now fly realisticly through the air and won't loose speed as fast as before
+- Added a blood explosion effect to the AP shells when they hit players and NPCs
+- Added compatibility with VJ base tanks (hopefully)
+- Fixed the shells sometimes spamming the ricochet effects
+- Fixed the shells sometimes staying on the floor
+- Fixed the shells sometimes whisteling forever
+- Fixed the HUD of the tanks not showing on servers sometimes
+- Fixed an error occuring during some explosions
+- Optimised the shells
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -8,6 +28,9 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+27/11/2019
+- Fixed the shells staying on the ground and raping your ears by adding a max ricochet number of 3
 
 24/11/2019
 - Added gred_sv_shell_ap_lowpen_system

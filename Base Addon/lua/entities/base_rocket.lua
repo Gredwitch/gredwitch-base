@@ -141,24 +141,34 @@ function ENT:CanRicochet(ang,ang_sub)
 	return false
 end
 
-function ENT:Ricochet(pos,ang)
+function ENT:Ricochet(pos,ang,time)
+	if self.RICOCHET and time-self.RICOCHET < 0.05 then return end
 	self.ImpactSpeed = 0
 	gred.CreateSound(pos,false,"impactsounds/Tank_shell_impact_ricochet_w_whizz_0"..math.random(1,5)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg","impactsounds/Tank_shell_impact_ricochet_w_whizz_mid_0"..math.random(1,3)..".ogg")
-	-- sound.Play("gredwitch/ricochet.wav",pos,120,100,1)
 	local effectdata = EffectData()
 	effectdata:SetOrigin(pos)
 	ang = self:LocalToWorldAngles(ang)
 	ang:RotateAroundAxis(ang:Right(),180)
 	effectdata:SetNormal(ang:Forward())
 	util.Effect("ManhackSparks",effectdata)
+	self.Exploded = false
 end
+
+local badmats = {
+	MAT_ANTLION = true,
+	MAT_BLOODYFLESH = true,
+	MAT_FLESH = true,
+	MAT_ALIENFLESH = true,
+	[67] = true,
+}
 
 function ENT:PhysicsCollide(data,physobj)
 	self.LastVel = data.OurOldVelocity
 	
-	if self.Exploded or !IsValid(self) or self.Life <= 0 then return end
+	if self.Exploded then return end
+	
 	if gred.CVars["gred_sv_fragility"]:GetInt() >= 1 then
-		if (!self.Fired and !self.Burnt and !self.Arming and !self.Armed) and (data.Speed > self.ImpactSpeed * 5) then 
+		if (!self.Fired and !self.Burnt and !self.Arming and !self.Armed) and (data.Speed >= self.ImpactSpeed * 5) then 
 			if math.random(0,9) == 1 then
 				self:Launch()
 				self:EmitSound(damagesound)
@@ -168,19 +178,42 @@ function ENT:PhysicsCollide(data,physobj)
 			end
 		end
 	end
-	if (self.Fired or self.Armed) and data.Speed > self.ImpactSpeed then
+	
+	if (self.Fired or self.Armed) and data.Speed >= self.ImpactSpeed then
 		if self.ShellType then
 			self.LastVel = data.OurOldVelocity
-			if self.ShellType == "AP" then
-				-- local HitAng = self:WorldToLocalAngles(util.QuickTrace(data.HitPos,data.HitPos + self:GetForward()*10,{self}).HitNormal:Angle())
-				local HitAng = self:WorldToLocalAngles(data.HitNormal:Angle())
-				local c = os.clock()
-				self.RICOCHET_COUT = self.RICOCHET_COUT or 0
-				if self.RICOCHET_COUT <= 3 and (!self.RICOCHET or self.RICOCHET+0.1 >= c) and self:CanRicochet(HitAng,0) then
-					self.RICOCHET_COUT = self.RICOCHET_COUT + 1
-					self.RICOCHET = c
-					self:Ricochet(data.HitPos,HitAng)
-					return
+			if self.IS_AP[self.ShellType] then
+				if IsValid(data.HitEntity) and (data.HitEntity:IsPlayer() or data.HitEntity:IsNPC()) and badmats[data.HitEntity:GetMaterialType()] then
+					local dmg = DamageInfo()
+					dmg:SetAttacker(self.GBOWNER)
+					dmg:SetInflictor(self)
+					dmg:SetDamagePosition(data.HitPos)
+					dmg:SetDamage(self.Caliber*data.OurOldVelocity:Length())
+					dmg:SetDamageType(64) -- DMG_BLAST
+					data.HitEntity:TakeDamageInfo(dmg)
+					
+					local effectdata = EffectData()
+					effectdata:SetOrigin(data.HitPos)
+					effectdata:SetNormal(data.HitNormal)
+					effectdata:SetEntity(self)
+					effectdata:SetScale(data.HitEntity:GetModelRadius()/50)
+					effectdata:SetRadius(data.HitEntity:GetMaterialType())
+					effectdata:SetMagnitude(10)
+					
+					util.Effect("gred_particle_blood_explosion",effectdata)
+					self.NO_EFFECT = true
+				else
+					-- local HitAng = self:WorldToLocalAngles(util.QuickTrace(data.HitPos,data.HitPos + self:GetForward()*10,{self}).HitNormal:Angle())
+					local HitAng = self:WorldToLocalAngles(data.HitNormal:Angle())
+					local c = os.clock()
+					self.RicochetCount = self.RicochetCount or 0
+					if self.RicochetCount <= 10 and (!self.RICOCHET or self.RICOCHET+0.1 >= c) and self:CanRicochet(HitAng,0) then
+						self.RicochetCount = self.RicochetCount + 1
+						
+						self:Ricochet(data.HitPos,HitAng,c)
+						self.RICOCHET = c
+						return
+					end
 				end
 			end
 		end
