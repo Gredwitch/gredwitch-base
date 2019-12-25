@@ -1,4 +1,17 @@
---[[12/12/2019
+--[[25/12/2019
+- Added a way to translate the track textures from left to right or from up to down
+- Added APHE shells
+- Fixed a penetration issue with HE shells
+
+If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
+If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
+Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
+
+If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
+
+OLDER CHANGES
+
+12/12/2019
 - Added a huge popup that tells people how to bind their walk key if they don't have it bound when they get in a simfphys vehicle
 - Added gred_sv_shell_ap_lowpen_ap_damage to remove damage from AP shells in case of a non penetration
 - Added gred_sv_shell_ap_lowpen_ap_damage to remove damage from HEAT shells in case of a non penetration
@@ -20,14 +33,6 @@
 - Fixed the HUD of the tanks not showing on servers sometimes
 - Fixed an error occuring during some explosions
 - Optimised the shells
-
-If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
-If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
-Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
-
-If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
-
-OLDER CHANGES
 
 27/11/2019
 - Fixed the shells staying on the ground and raping your ears by adding a max ricochet number of 3

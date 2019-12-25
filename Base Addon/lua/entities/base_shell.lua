@@ -116,14 +116,31 @@ ENT.RSound							=	0
 ENT.ShellType						=	""
 ENT.EffectWater						=	"ins_water_explosion"
 ENT.Normalization					=	0
+
 ENT.IS_AP = {
 	["AP"] = true,
-	["APHE"] = true,
-	["APCR"] = true,
 	["APC"] = true,
 	["APBC"] = true,
 	["APCBC"] = true,
+	
+	["APHE"] = true,
 	["APHEBC"] = true,
+	["APHECBC"] = true,
+	
+	["APCR"] = true,
+	["APDS"] = true,
+	["APFSDS"] = true,
+}
+
+ENT.IS_APCR = {
+	["APCR"] = true,
+	["APDS"] = true,
+	["APFSDS"] = true,
+}
+
+ENT.IS_HEAT = {
+	["HEAT"] = true,
+	["HEATFS"] = true,
 }
 
 function ENT:SetupDataTables()
@@ -263,7 +280,7 @@ function ENT:AddOnInit()
 			self.Effect = "doi_artillery_explosion_OLD"
 			self.AngEffect = true
 		end
-	elseif self.ShellType == "HEAT" then
+	elseif self.IS_HEAT[self.ShellType] then
 		self.ExplosionRadius = 200
 		self.Effect = "ap_impact_dirt"
 		self.ExplosionDamage = (!self.TNTEquivalent and (self.ExplosiveMass and (self.ExplosiveMass/self.Mass)*100 or 10) or self.TNTEquivalent) * 50 * self.Caliber
@@ -290,6 +307,8 @@ function ENT:AddOnInit()
 	
 	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
 end
+
+
 local Baseclass = baseclass.Get("base_rocket")
 
 function ENT:Launch()
@@ -335,16 +354,22 @@ function ENT:AddOnExplode(pos)
 		
 		if self.LinearPenetration then
 			self.Penetration = self.LinearPenetration
-		elseif self.ShellType != "APCR" and self.ShellType != "HVAP" then
-			local TNTEquivalent = !self.TNTEquivalent and (self.ExplosiveMass and (self.ExplosiveMass/self.Mass)*100 or 0) or self.TNTEquivalent
+		elseif !self.IS_APCR[self.ShellType] then
+			self.TNTEquivalent = !self.TNTEquivalent and (self.ExplosiveMass and (self.ExplosiveMass/self.Mass)*100 or 0) or self.TNTEquivalent
 			
-			self.Penetration = (((vel^1.43)*(self.Mass^0.71))/(kfbr*((self.Caliber*0.01)^1.07)))*100*(TNTEquivalent < 0.65 and 1 or (TNTEquivalent < 1.6 and 1 + (TNTEquivalent-0.65)*-0.07/0.95 or (TNTEquivalent < 2 and 0.93 + (TNTEquivalent-1.6) * -0.03 / 0.4 or (TNTEquivalent < 3 and 0.9+(TNTEquivalent-2)*-0.05 or TNTEquivalent < 4 and 0.85+(TNTEquivalent-3)*-0.1 or 0.75))))*(self.ShellType == "APCBC" and 1 or 0.9)
+			self.Penetration = (((vel^1.43)*(self.Mass^0.71))/(kfbr*((self.Caliber*0.01)^1.07)))*100*(self.TNTEquivalent < 0.65 and 1 or (self.TNTEquivalent < 1.6 and 1 + (self.TNTEquivalent-0.65)*-0.07/0.95 or (self.TNTEquivalent < 2 and 0.93 + (self.TNTEquivalent-1.6) * -0.03 / 0.4 or (self.TNTEquivalent < 3 and 0.9+(self.TNTEquivalent-2)*-0.05 or self.TNTEquivalent < 4 and 0.85+(self.TNTEquivalent-3)*-0.1 or 0.75))))*((self.ShellType == "APCBC" or self.ShellType == "APHECBC") and 1 or 0.9)
+			
+			-- print("PENETRATION = "..self.Penetration.."mm - DISTANCE = "..((self.LAUNCHPOS-pos):Length()*0.01905).."m - IMPACT VELOCITY = "..vel.."m/s - MUZZLE VELOCITY = "..self.MuzzleVelocity.."m/s - VELOCITY DIFFERENCE = "..self.MuzzleVelocity-vel.." - DRAG COEFFICIENT = "..self.DragCoefficient.." - MASS = "..self.Mass.." - CALIBER = "..self.Caliber)
 		else
 			self.Penetration = ((vel^1.43)*((self.CoreMass + (((((self.CoreMass/self.Mass)*100) > 36.0) and 0.5 or 0.4) * (self.Mass - self.CoreMass)))^0.71))/(kfbrAPCR*((self.Caliber*0.0001)^1.07))
 		end
+		
 		self.ExplosionDamage = self.Penetration*vel*0.03*gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
-		if self.ShellType == "APCR" then
+		
+		if self.IS_APCR[self.ShellType] then
 			self.ExplosionDamage = self.ExplosionDamage*0.07
+		elseif self.ShellType == "APHE" then
+			self.ExplosionDamage = self.ExplosionDamage*((self.TNTEquivalent < 1 and math.sqrt(self.TNTEquivalent)*2 or self.TNTEquivalent) + (self.TNTEquivalent < 1 and 1 or 0))
 		end
 		
 	elseif self.LinearPenetration then
@@ -361,6 +386,8 @@ function ENT:AddOnExplode(pos)
 		self.EffectAir = self.IS_AP[self.ShellType] and "AP_impact_wall" or self.EffectAir
 		
 		if IsValid(tr.Entity) and tr.Entity.GetClass and tr.Entity:GetClass() == "gmod_sent_vehicle_fphysics_base" then
+			self.EntityHit = tr.Entity
+			
 			local Fraction
 			if tr.Entity.GRED_ISTANK then
 				
@@ -377,7 +404,7 @@ function ENT:AddOnExplode(pos)
 				self.Fraction = Fraction
 				if (Fraction >= 1 and gred.CVars.gred_sv_shell_ap_lowpen_system:GetInt() == 1) then
 					
-					if (self.ShellType == "HEAT" and gred.CVars.gred_sv_shell_ap_lowpen_heat_damage:GetInt() == 1) or (self.IS_AP[self.ShellType] and gred.CVars.gred_sv_shell_ap_lowpen_shoulddecreasedamage:GetInt() == 1) then
+					if (self.IS_HEAT[self.ShellType] and gred.CVars.gred_sv_shell_ap_lowpen_heat_damage:GetInt() == 1) or (self.IS_AP[self.ShellType] and gred.CVars.gred_sv_shell_ap_lowpen_shoulddecreasedamage:GetInt() == 1) then
 						self.ExplosionDamage = self.ExplosionDamage / (Fraction*Fraction)
 					elseif (self.IS_AP[self.ShellType] and gred.CVars.gred_sv_shell_ap_lowpen_ap_damage:GetInt() == 1) or !self.IS_AP[self.ShellType] then
 						self.ExplosionDamage = 0
@@ -394,7 +421,7 @@ function ENT:AddOnExplode(pos)
 						end
 					end
 				else
-					if self.ShellType == "APCR" then
+					if self.IS_APCR[self.ShellType] then
 						-- local dmg = DamageInfo()
 						-- dmg:SetAttacker(self.GBOWNER)
 						-- dmg:SetInflictor(self)
@@ -414,12 +441,12 @@ function ENT:AddOnExplode(pos)
 			dmg:SetAttacker(self.GBOWNER)
 			dmg:SetInflictor(self)
 			dmg:SetDamagePosition(pos)
-			dmg:SetDamage(tr.Entity.GRED_ISTANK and ((Fraction and Fraction >= 1 and !self.IS_AP[self.ShellType]) and 0 or self.ExplosionDamage*10) or (self.ShellType == "APCR" and self.ExplosionDamage*10 or self.ExplosionDamage))
+			dmg:SetDamage(tr.Entity.GRED_ISTANK and ((Fraction and Fraction >= 1 and !self.IS_AP[self.ShellType]) and 0 or self.ExplosionDamage*10) or (self.IS_APCR[self.ShellType] and self.ExplosionDamage*10 or self.ExplosionDamage))
 			dmg:SetDamageType(64) -- DMG_BLAST
 			
 			tr.Entity:TakeDamageInfo(dmg)
 			
-			if self.ShellType == "HEAT" then
+			if self.IS_HEAT[self.ShellType] then
 				self.ExplosionRadius = 0
 			end
 			
@@ -432,10 +459,10 @@ function ENT:AddOnExplode(pos)
 				self.ExplosionSound = table.Random(APMetalSounds)
 				self.FarExplosionSound = table.Random(APMetalSounds)
 				pos = tr.HitPos+(fwd*2)
-			elseif Materials[HitMat] == 2 and self.ShellType != "HEAT" then
+			elseif Materials[HitMat] == 2 and !self.IS_HEAT[self.ShellType] then
 				self.ExplosionSound = table.Random(APWoodSounds)
 				self.FarExplosionSound = table.Random(APWoodSounds)
-			elseif self.ShellType != "HEAT" then
+			elseif !self.IS_HEAT[self.ShellType] then
 				self.ExplosionSound = table.Random(APSounds)
 				self.FarExplosionSound = table.Random(APSounds)
 			end

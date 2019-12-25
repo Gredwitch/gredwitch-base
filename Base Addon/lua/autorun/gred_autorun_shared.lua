@@ -1236,9 +1236,16 @@ if CLIENT then
 								v.wheel_right_mat = CreateMaterial("gred_trackmat_"..class.."_"..v.GRED_INDEX.."_right","VertexLitGeneric",tab.trackTex)
 							end
 							local TrackPos = GetTrackPos(v,tab.div,tab.smoother)
-							
-							v.wheel_left_mat:SetVector("$translate",Vector(0,TrackPos.Left,0))
-							v.wheel_right_mat:SetVector("$translate",Vector(0,TrackPos.Right,0))
+							if tab.UpTranslate then
+								v.wheel_left_mat:SetVector("$translate",Vector(0,0,TrackPos.Left))
+								v.wheel_right_mat:SetVector("$translate",Vector(0,0,TrackPos.Right))
+							elseif tab.RightTranslate then
+								v.wheel_left_mat:SetVector("$translate",Vector(TrackPos.Left))
+								v.wheel_right_mat:SetVector("$translate",Vector(TrackPos.Right))
+							else
+								v.wheel_left_mat:SetVector("$translate",Vector(0,TrackPos.Left))
+								v.wheel_right_mat:SetVector("$translate",Vector(0,TrackPos.Right))
+							end
 							-- PrintTable(v:GetMaterials())
 							if tab.SeparateTracks then
 								if !IsValid(v.LeftTrack) then v.LeftTrack = v:GetNWEntity("LeftTrack") end
@@ -3589,7 +3596,7 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 						
 						inflictor = dmg:GetInflictor()
 						if ent.IsArmored and inflictor and IsValid(inflictor) and inflictor.GetClass and inflictor:GetClass() == "base_shell" then
-							DMG = (inflictor.ShellType == "HE" and (inflictor.fraction and inflictor.fraction >= 1) and !inflictor.ExplosionDamageOverride) and 0 or dmg:GetDamage()*(inflictor.ExplosionDamageOverride and 1 or 0.1)
+							DMG = ((inflictor.ShellType == "HE" and (inflictor.fraction and inflictor.fraction >= 1 or !inflictor.fraction) and !inflictor.ExplosionDamageOverride) or (inflictor.IS_HEAT[inflictor.ShellType] and inflictor.EntityHit != ent)) and 0 or dmg:GetDamage()*(inflictor.ExplosionDamageOverride and 1 or 0.1)
 							dmg:SetDamage(DMG)
 						end
 						
