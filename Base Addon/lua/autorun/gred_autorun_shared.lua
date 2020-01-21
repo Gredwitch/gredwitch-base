@@ -55,6 +55,7 @@ gred.CVars["gred_sv_lfs_godmode"] 							= CreateConVar("gred_sv_lfs_godmode"			
 gred.CVars["gred_sv_lfs_infinite_ammo"] 					= CreateConVar("gred_sv_lfs_infinite_ammo"						,  "0"  , GRED_SVAR)
 gred.CVars["gred_sv_minricochetangle"] 						= CreateConVar("gred_sv_minricochetangle"						, "70"  , GRED_SVAR)
 gred.CVars["gred_sv_shell_ap_damagemultiplier"]				= CreateConVar("gred_sv_shell_ap_damagemultiplier"				, "1"  , GRED_SVAR)
+gred.CVars["gred_sv_shell_he_damagemultiplier"]				= CreateConVar("gred_sv_shell_he_damagemultiplier"				, "1"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_arcade"] 						= CreateConVar("gred_sv_simfphys_arcade"						,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_infinite_ammo"] 				= CreateConVar("gred_sv_simfphys_infinite_ammo"					,  "1"  , GRED_SVAR)
 -- gred.CVars["gred_sv_simfphys_bullet_dmg_tanks"] 			= CreateConVar("gred_sv_simfphys_bullet_dmg_tanks"				,  "0"  , GRED_SVAR)
@@ -66,7 +67,6 @@ gred.CVars["gred_sv_simfphys_health_multplier"] 			= CreateConVar("gred_sv_simfp
 gred.CVars["gred_sv_shell_ap_lowpen_system"] 				= CreateConVar("gred_sv_shell_ap_lowpen_system"					,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_shell_ap_lowpen_shoulddecreasedamage"] 	= CreateConVar("gred_sv_shell_ap_lowpen_shoulddecreasedamage"	,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_shell_ap_lowpen_maxricochetchance"] 	= CreateConVar("gred_sv_shell_ap_lowpen_maxricochetchance"		,  "1"  , GRED_SVAR)
-gred.CVars["gred_sv_shell_ap_lowpen_heat_damage"] 			= CreateConVar("gred_sv_shell_ap_lowpen_heat_damage"			,  "0"  , GRED_SVAR)
 gred.CVars["gred_sv_shell_ap_lowpen_ap_damage"] 			= CreateConVar("gred_sv_shell_ap_lowpen_ap_damage"				,  "0"  , GRED_SVAR)
 
 gred = gred or {}
@@ -393,9 +393,7 @@ end
 
 gred.Precache()
 
-
 gred.AddonList = gred.AddonList or {}
-tableinsert(gred.AddonList,1582297878) -- Materials
 
 if CLIENT then
 	local ply = LocalPlayer()
@@ -848,7 +846,13 @@ if CLIENT then
 				if this.ConVarChanging then return end
 				gred.CheckConCommand( "gred_sv_minricochetangle",val)
 			end
-			local this = CPanel:NumSlider("AP Shell damage multiplier", "gred_sv_shell_ap_damagemultiplier",0,10,2);
+			local this = CPanel:NumSlider("HE Shells damage multiplier", "gred_sv_shell_he_damagemultiplier",0,10,2);
+			this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+			this.OnValueChanged = function(this,val)
+				if this.ConVarChanging then return end
+				gred.CheckConCommand( "gred_sv_shell_he_damagemultiplier",val)
+			end
+			local this = CPanel:NumSlider("Anti-Tank Shells damage multiplier", "gred_sv_shell_ap_damagemultiplier",0,10,2);
 			this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
 			this.OnValueChanged = function(this,val)
 				if this.ConVarChanging then return end
@@ -873,16 +877,10 @@ if CLIENT then
 				gred.CheckConCommand("gred_sv_shell_ap_lowpen_shoulddecreasedamage",val)
 			end
 			
-			local this = CPanel:CheckBox("Should the AP shells deal no damage at all in case of a non penetration?","gred_sv_shell_ap_lowpen_ap_damage");
+			local this = CPanel:CheckBox("Should the Anti-Tank shells deal no damage if there was no penetration?","gred_sv_shell_ap_lowpen_ap_damage");
 			this.OnChange = function(this,val)
 				val = val and 1 or 0
 				gred.CheckConCommand("gred_sv_shell_ap_lowpen_ap_damage",val)
-			end
-			
-			local this = CPanel:CheckBox("Should HEAT shells deal damage even if there was no penetration?","gred_sv_shell_ap_lowpen_heat_damage");
-			this.OnChange = function(this,val)
-				val = val and 1 or 0
-				gred.CheckConCommand("gred_sv_shell_ap_lowpen_heat_damage",val)
 			end
 			
 			local this = CPanel:CheckBox("Should explosives be easily armed?","gred_sv_easyuse");
@@ -946,7 +944,7 @@ if CLIENT then
 	end
 	
 	local function CheckDXDiag()
-		if GetConVar("mat_dxlevel"):GetInt() < 80 then
+		if GetConVar("mat_dxlevel"):GetInt() < 90 then
 			local DFrame = vgui.Create("DFrame")
 			DFrame:SetSize(ScrW()*0.9,ScrH()*0.9)
 			DFrame:SetTitle("DXDIAG ERROR")
@@ -1423,7 +1421,8 @@ if CLIENT then
 		local ScrW,ScrH = scrW or ScrW(),scrH or ScrH()
 		surface.SetDrawColor(255,255,255,255)
 		surface.SetTexture(surface.GetTextureID(vehicle:GetNWString("SightTexture")))
-		surface.DrawTexturedRect(0,-(ScrW-ScrH)*0.5,ScrW,ScrW)
+		local zoom = 1
+		surface.DrawTexturedRect((-(ScrW*zoom-ScrW)*0.5),(-(ScrW*zoom-ScrH)*0.5),ScrW*zoom,ScrW*zoom)
 		
 		if vehicle.shellTypes and vehicle.GRED_USE_SIGHT then
 			DrawAmmoLeft(vehicle,ScrW,ScrH)
@@ -1689,6 +1688,7 @@ else
 	}
 	local badclass = {
 		["gmod_sent_vehicle_fphysics_wheel"] = true,
+		["prop_vehicle_prisoner_pod"] = true,
 	}
 	
 	
@@ -1798,6 +1798,8 @@ else
 				bullet.Src = hitpos
 				bullet.IgnoreEntity = filter
 				ply:FireBullets(bullet,false)
+			else
+				radius = radius * 2
 			end
 			CreateExplosion(ply,hitpos,radius,dmg,cal)
 			-- util.BlastDamage(ply,ply,hitpos,radius,dmg)
@@ -2001,7 +2003,9 @@ else
 				if ConVar and !v.isWacAircraft and !v.LFS then
 					phys:Wake()
 					phys:EnableMotion(true)
-					constraint.RemoveAll(v)
+					if !(bomb.ShellType and simfphys and simfphys.IsCar(v)) then
+						constraint.RemoveAll(v)
+					end
 				end
 				
 				-- local class = v:GetClass()
@@ -2518,7 +2522,7 @@ else
 			- 5 = Short jet fire and boom and turret goes boom
 			- 6 = Turret and tank go boom
 		]]
-		
+		print(ent.DestructionType)
 		if ent.DestructionType and ent.DestructionType != 0 then
 			if ent.DestructionType == 1 then
 				CreateTurret(gib,ang,pitch,yaw)
@@ -2710,7 +2714,7 @@ else
 		if TABLE then
 			TABLE = util.JSONToTable(TABLE)
 			for k,v in pairs(TABLE) do
-				gred.CVars[k]:SetFloat(v)
+				if gred.CVars[k] then gred.CVars[k]:SetFloat(v) end
 			end
 		end
 	end)

@@ -269,6 +269,16 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 		AddShellMenu(56,self,ply,frame)
 	end]]
 	local SHELLS = {
+		["25"] = {
+			 ["HE"] = true,
+			 ["AP"] = true,
+			 ["APHE"] = true,
+			 ["APC"] = true,
+			 ["APCBC"] = true,
+			 ["APCR"] = true,
+			 ["HEAT"] = true,
+			 ["Smoke"] = true,
+		},
 		["37"] = {
 			 ["HE"] = true,
 			 ["AP"] = true,

@@ -1,8 +1,0 @@
-"VertexLitGeneric"
-{
-	"$color"				"[1 1 1]"
-	"$baseTexture"			"models/ukulele/props_v1_flying_bomb/v1_flying_bomb_color"
-	"$selfIllum"			0
-	"$translucent"			0
-	"$alpha"				1
-}

@@ -1,7 +1,21 @@
---[[25/12/2019
-- Added a way to translate the track textures from left to right or from up to down
-- Added APHE shells
-- Fixed a penetration issue with HE shells
+--[[21/01/2020
+- Added inertia calculation
+- Added an HE shell damage multiplier
+- Added missing sshelltypes
+- Decreased the mass of the ammobox
+- Fixed the shells whisteling forever in multiplayer
+- Fixed AP still doing damage on a non penetration while having the "damage on a non penetration" option disabled
+- Fixed the shells unwelding vehicles' wheels (aka disabling tracks)
+- Fixed explosives moving the seats
+- Fixed shells and rockets glitching with water
+- Fixed the shells whistleling forever sometimes
+- Fixed the DirectX check not working
+- Gave a reason to exist to air-burst shells by giving them a bigger blast radius
+- Made the rockets less sensitive as long as they are not armed
+- Made the anti-tank shell damage multiplayer work with HEAT rounds
+- Made the Hellfire deal more damage
+- Merged Gredwitch's Base (materials) and Gredwitch's Shared Tank Materials into Gredwitch's Base
+- Tweaked the drag coefficient calculation
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -10,6 +24,11 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+25/12/2019
+- Added a way to translate the track textures from left to right or from up to down
+- Added APHE shells
+- Fixed a penetration issue with HE shells
 
 12/12/2019
 - Added a huge popup that tells people how to bind their walk key if they don't have it bound when they get in a simfphys vehicle

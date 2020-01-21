@@ -59,6 +59,8 @@ ENT.SmartLaunch                      =  false
 ENT.EnginePower                      =  0
 ENT.FuelBurnoutTime                  =  0
 ENT.IgnitionDelay                    =  0
+ENT.SmartLaunch                      =  false
+ENT.ImpactSpeed                      =  200
 ENT.RotationalForce                  =  25
 ENT.ForceOrientation                 =  "NORMAL"
 
@@ -86,7 +88,7 @@ function ENT:TriggerInput(iname, value)
 			  self:Arm()
 		   end 
 	    end
-	end		
+	end
 	if (iname == "Launch") then 
 	    if (value >= 1) then
 		    if (!self.Exploded and !self.Burnt and !self.Ignition and !self.Fired) then
@@ -246,8 +248,8 @@ function ENT:Launch()
 end
 
 function ENT:InitLaunch(phys)
-	-- self.LAUNCHTIME = CurTime()
-	-- self.LAUNCHPOS = self:GetPos()
+	self.LAUNCHTIME = CurTime()
+	self.LAUNCHPOS = self:GetPos()
 	self.Ignition = true
 	self:Arm()
 	if self.StartSoundFollow then
@@ -300,6 +302,7 @@ function ENT:Arm()
 	    if !IsValid(self) then return end 
 	    self.Armed = true
 		self.Arming = false
+		self.ImpactSpeed = 100
 		self:EmitSound(self.ArmSound)
 		if self.Timed then
 		   timer.Simple(self.Timer,function()

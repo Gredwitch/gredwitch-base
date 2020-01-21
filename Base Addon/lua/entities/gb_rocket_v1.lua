@@ -45,7 +45,6 @@ ENT.MaxIgnitionTime                  =  0.5
 ENT.Life                             =  1
 ENT.MaxDelay                         =  0
 ENT.TraceLength                      =  1000
-ENT.ImpactSpeed                      =  100
 ENT.Mass                             =  2000
 ENT.EnginePower                      =  50
 ENT.FuelBurnoutTime                  =  3

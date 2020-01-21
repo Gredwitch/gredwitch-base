@@ -60,7 +60,7 @@ function ENT:Initialize()
 	local p = self:GetPhysicsObject()
 	if IsValid(p) then
 		p:Wake()
-		p:SetMass(1000)
+		p:SetMass(50)
 	end
 	self:SetPos(self:GetPos() + Vector(0,0,50))
 end

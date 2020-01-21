@@ -53,6 +53,7 @@ function ENT:Initialize()
 	self.DistExplosionSound				 =  table.Random(DistExploSnds)
 	self.WaterExplosionSound			 =  table.Random(CloseWaterExploSnds)
 	self.WaterFarExplosionSound			 =  table.Random(WaterExploSnds)
+	self.Damage = self.Damage * math.random(15,30)
 end
 
 function ENT:Explode(tr)
@@ -80,22 +81,11 @@ function ENT:Explode(tr)
 	local expl = ents.Create("env_physexplosion")
 	if !self.hellfire then
 		gred.CreateSound(pos,false,self.ExplosionSound,self.FarExplosionSound,self.DistExplosionSound)
-		util.BlastDamage(self,self.Owner,pos,self.Radius/2,self.Damage)
-		expl:SetKeyValue("magnitude", self.Damage)
-		expl:SetKeyValue("radius", self.Radius/2)
-		expl:SetKeyValue("spawnflags","19")
+		gred.CreateExplosion(pos,self.Radius * 0.5,self.Damage,"scorch_medium",100,self.Owner,self)
 	else
-		local e1 = "explosions/gbomb_4.mp3"
-		gred.CreateSound(pos,true,e1,e1,e1)
-		
-		util.BlastDamage(self,self.Owner,pos,self.Radius*2.5,self.Damage*2)
-		expl:SetKeyValue("magnitude", self.Damage*2)
-		expl:SetKeyValue("radius", self.Radius*2.5)
-		expl:SetKeyValue("spawnflags","19")
+		gred.CreateSound(pos,true,"explosions/gbomb_4.mp3","explosions/gbomb_4.mp3","explosions/gbomb_4.mp3")
+		gred.CreateExplosion(pos,self.Radius * 1.5,self.Damage * 2,"scorch_medium",100,self.Owner,self)
 	end
-	expl:SetPos(pos) 
-	expl:Spawn()
-	expl:Fire("Explode", 0, 0)
 	self:Remove()
 end
 
