@@ -1,4 +1,6 @@
---[[21/01/2020
+--[[b21/01/2020
+HOTFIX : Fixed missing textures on tanks
+
 - Added inertia calculation
 - Added an HE shell damage multiplier
 - Added missing sshelltypes
@@ -8,11 +10,10 @@
 - Fixed the shells unwelding vehicles' wheels (aka disabling tracks)
 - Fixed explosives moving the seats
 - Fixed shells and rockets glitching with water
-- Fixed the shells whistleling forever sometimes
 - Fixed the DirectX check not working
 - Gave a reason to exist to air-burst shells by giving them a bigger blast radius
 - Made the rockets less sensitive as long as they are not armed
-- Made the anti-tank shell damage multiplayer work with HEAT rounds
+- Made the anti-tank shell damage multiplier work with HEAT rounds
 - Made the Hellfire deal more damage
 - Merged Gredwitch's Base (materials) and Gredwitch's Shared Tank Materials into Gredwitch's Base
 - Tweaked the drag coefficient calculation
