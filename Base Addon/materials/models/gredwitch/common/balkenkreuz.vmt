@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	$basetexture	"models/gredwitch/common/balkenkreuz"
+	$alphatest		1
+    $phong 			1
+}
