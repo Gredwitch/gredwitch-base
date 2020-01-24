@@ -2,14 +2,6 @@
 hi
 # HOW TO PLAY
 
- - Step 1 : click on clone or download
- - Step 2 : unzip the file you downloaded
- - Step 3 : put the "Base Addon" folder in your gmod addons folder (C:\Program
-   Files (x86)\Steam\steamapps\common\GarrysMod\garrysmod\addons)
- - Step 4 : play
- 
- NOTE : It's better to disable the Workshop addon if you want to use this. I often update this, so it's a good idea to click the Watch button.
- 
-# HOW TO HELP
-
-[You can give me your money here.](https://www.paypal.me/gredwitch)
+- Step 1 : Do not fucking download this. I update my addons very often, and if you extract them you won't receive any updates, which will cause errors and eventually crashes
+- Step 2 : If you're a server owner, add this addon to your server collection : https://steamcommunity.com/workshop/filedetails/?id=1131455085
+           If you're not, just click on the green button
