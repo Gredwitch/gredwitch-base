@@ -1691,7 +1691,10 @@ else
 		["prop_vehicle_prisoner_pod"] = true,
 	}
 	
-	
+	local opcal = {
+		wac_base_30mm = true,
+		wac_base_40mm = true,
+	}
 	
 	local function CreateExplosion(ply,pos,radius,dmg,cal)
 		local sqrR = radius*radius
@@ -1699,9 +1702,10 @@ else
 		dmginfo:SetAttacker(ply)
 		dmginfo:SetDamagePosition(pos)
 		dmginfo:SetDamageType(CAL_TABLE[cal] > 3 and 64 or 2) -- DMG_BLAST or DMG_BULLET
+		
 		for k,v in pairs(ents.FindInSphere(pos,radius)) do
 			if !(v.InVehicle and v:InVehicle()) and !bad[v:GetClass()] and (!(v.IsOnPlane and !v.Armed) or !v.IsOnPlane) then
-				dmginfo:SetDamage(math.abs(1-math.Clamp(v:GetPos():DistToSqr(pos),0,sqrR)/sqrR)*(v.GRED_ISTANK and dmg*0.2 or dmg))
+				dmginfo:SetDamage(math.abs(1-math.Clamp(v:GetPos():DistToSqr(pos),0,sqrR)/sqrR)*(v.GRED_ISTANK and dmg * (opcal[cal] and 1 or 0.2) or dmg))
 				v:TakeDamageInfo(dmginfo)
 			end
 		end
@@ -2392,6 +2396,11 @@ else
 				print("[simfphys Armed Vehicle Pack] ERROR:TRACE FILTER IS INVALID. PLEASE UPDATE SIMFPHYS BASE") 
 				return
 			end
+			local tab = gred.simfphys[vehicle:GetSpawn_List()]
+			if tab.LeftTrackID != -1 and tab.RightTrackID != -1 then
+				vehicle.HandBrakePower = 30
+			end
+			
 			local health = math.ceil(vehicle:GetMaxHealth() * gred.CVars.gred_sv_simfphys_health_multplier:GetFloat())
 			vehicle.MaxHealth = health
 			vehicle:SetNWFloat("MaxHealth",health)
@@ -2445,7 +2454,7 @@ else
 			net.Start("gred_net_registertank")
 				net.WriteEntity(vehicle)
 			net.Broadcast()
-			local tab = gred.simfphys[vehicle:GetSpawn_List()]
+			
 			if tab and tab.UpdateSuspension_SV then
 				local OldThink = vehicle.Think
 				vehicle.Think = function(vehicle)
@@ -2469,6 +2478,8 @@ else
 			local gear = vehicle:GetGear()
 			-- local mul = (ShouldNotGearMul or gear <= 2) and 1 or math.abs(gear-2)*0.5
 			-- MaxTurn = MaxTurn * mul
+			if gear == 2 and vehicle.NoIdleTurning then return end
+			
 			if gear > 3 then
 				phys:ApplyForceOffset(vehicle:GetRight()*(vehicle.TOQUECENTER_D > vehicle.TOQUECENTER_A and -vehicle.TOQUECENTER_D or vehicle.TOQUECENTER_A)*ForceMul,Vector(0,0,vehicle.ModelBounds.maxs.z*0.5))
 			end
@@ -2522,7 +2533,7 @@ else
 			- 5 = Short jet fire and boom and turret goes boom
 			- 6 = Turret and tank go boom
 		]]
-		print(ent.DestructionType)
+		
 		if ent.DestructionType and ent.DestructionType != 0 then
 			if ent.DestructionType == 1 then
 				CreateTurret(gib,ang,pitch,yaw)
@@ -3601,6 +3612,15 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 						inflictor = dmg:GetInflictor()
 						if ent.IsArmored and inflictor and IsValid(inflictor) and inflictor.GetClass and inflictor:GetClass() == "base_shell" then
 							DMG = ((inflictor.ShellType == "HE" and (inflictor.fraction and inflictor.fraction >= 1 or !inflictor.fraction) and !inflictor.ExplosionDamageOverride) or (inflictor.IS_HEAT[inflictor.ShellType] and inflictor.EntityHit != ent)) and 0 or dmg:GetDamage()*(inflictor.ExplosionDamageOverride and 1 or 0.1)
+							local ply = dmg:GetAttacker()
+							if DMG == 0 and inflictor.ShellType == "HE" and IsValid(ply) and ply:GetSimfphys() != ent then
+								if ply.GRED_HE_WARN_ENTITY == ent then
+									ply.GRED_HE_WARN_ENTITY = nil
+									ply:PrintMessage(HUD_PRINTCENTER,"HE isn't meant to deal damage to tanks!")
+								else
+									ply.GRED_HE_WARN_ENTITY = ent
+								end
+							end
 							dmg:SetDamage(DMG)
 						end
 						

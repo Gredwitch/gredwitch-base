@@ -237,6 +237,21 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 		end)
 		d:Open()
 	end
+	local function Add20mmMenu(self,ply,frame)
+		local d = DermaMenu()
+		d:AddOption("20mm Flak 38 Mag",function()
+			net.Start("gred_net_ammobox_sv_createammo")
+				net.WriteString("models/gredwitch/flak38/flak38_mag.mdl")
+				net.WriteEntity(self)
+				net.WriteEntity(ply)
+				net.WriteString("gred_emp_flak38")
+				net.WriteInt(1,1)
+				net.WriteInt(1,1)
+			net.SendToServer()
+			frame:Close()
+		end)
+		d:Open()
+	end
 	
 	local self = net.ReadEntity()
 	local shell = nil

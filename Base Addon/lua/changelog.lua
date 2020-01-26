@@ -1,6 +1,20 @@
---[[b21/01/2020
-HOTFIX : Fixed missing textures on tanks
+--[[26/01/2019
+- Fixed a client side error with shells
+- Fixed instant handbraking with tanks
+- Fixed the bullet particles not having the correct speed
+- Improved the bullet particles so they get bigger depending on their caliber
+- Made it so a tip appears on your screen if you try to destroy a tank with HE rounds
+- Made 30mm and 40mm bullets more powerful against tanks
 
+If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
+If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
+Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
+
+If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
+
+OLDER CHANGES
+
+21/01/2020
 - Added inertia calculation
 - Added an HE shell damage multiplier
 - Added missing sshelltypes
@@ -17,14 +31,6 @@ HOTFIX : Fixed missing textures on tanks
 - Made the Hellfire deal more damage
 - Merged Gredwitch's Base (materials) and Gredwitch's Shared Tank Materials into Gredwitch's Base
 - Tweaked the drag coefficient calculation
-
-If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
-If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
-Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
-
-If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
-
-OLDER CHANGES
 
 25/12/2019
 - Added a way to translate the track textures from left to right or from up to down

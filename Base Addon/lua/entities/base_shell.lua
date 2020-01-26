@@ -422,7 +422,7 @@ function ENT:AddOnExplode(pos)
 					else
 						self.ExplosionDamage = 0
 					end
-					print(self.ExplosionDamage)
+					
 					if self.IS_AP[self.ShellType] then
 						local CVar = gred.CVars.gred_sv_shell_ap_lowpen_maxricochetchance:GetFloat()
 						
@@ -566,10 +566,12 @@ if CLIENT then
 	timer.Create("gred_fix_shell_whistle",1,0,function()
 		for k,v in pairs(gred.ActiveShells) do
 			if !IsValid(v) then
-				for K,V in pairs(gred.ActiveShellSounds[k]) do
-					V:ChangeVolume(0)
-					V:ChangePitch(0)
-					V:Stop()
+				if gred.ActiveShellSounds[k] then
+					for K,V in pairs(gred.ActiveShellSounds[k]) do
+						V:ChangeVolume(0)
+						V:ChangePitch(0)
+						V:Stop()
+					end
 				end
 				gred.ActiveShells[k] = nil
 				gred.ActiveShellSounds[k] = nil
