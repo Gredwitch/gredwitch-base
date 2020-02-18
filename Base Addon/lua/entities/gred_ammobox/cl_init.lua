@@ -366,6 +366,9 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 			 ["APHEBC"] = true,
 			 ["Smoke"] = true,
 		},
+		["77"] = {
+			 ["HE"] = true,
+		},
 		["81"] = {
 			 ["HE"] = true,
 			 ["WP"] = true,
@@ -404,7 +407,12 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 		["105"] = {
 			 ["HE"] = true,
 			 ["AP"] = true,
-			 ["WP"] = true,
+			 ["APHE"] = true,
+			 ["APC"] = true,
+			 ["APCBC"] = true,
+			 ["APCR"] = true,
+			 ["APHEBC"] = true,
+			 ["HEAT"] = true,
 			 ["Smoke"] = true,
 		},
 		["120"] = {
@@ -541,5 +549,13 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 	DButton:DockMargin( 0, 0, 0, 5 )
 	DButton.DoClick = function()
 		Add50calMenu(self,ply,frame)
+	end
+	
+	local DButton = DScrollPanel:Add("DButton")
+	DButton:SetText("20mm")
+	DButton:Dock( TOP )
+	DButton:DockMargin( 0, 0, 0, 5 )
+	DButton.DoClick = function()
+		Add20mmMenu(self,ply,frame)
 	end
 end)

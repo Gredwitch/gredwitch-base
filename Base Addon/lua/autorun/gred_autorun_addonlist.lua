@@ -1,5 +1,3 @@
-	
-AddCSLuaFile()
 
 gred = gred or {}
 gred.AddonList = gred.AddonList or {}

@@ -1,4 +1,22 @@
---[[26/01/2019
+--[[18/02/2020
+- Added a 77mm shell
+- Added missing 105mm shell types
+- Added missing Flak 38 mag
+- Fixed an issue that was making the shells whisteling forever
+- Fixed a small error that could happen sometimes
+- Fixed some clients timing out when joining a server
+- Fixed the shells coming from the ammo box being too sensitive
+- Fixed the HE shells not penetrating anything
+- Fixed an issue with the tank damage calculation
+- Made 20mm autocannons more powerful
+- Increased the damage of APCR shells
+- Optimised the huge shared autorun
+- Optimised network traffic on client connection
+- Optimised loading times
+- Removed resource caching by default (you can enable it manually in the options)
+- Removed the invalid bone spam to increase performance
+
+26/01/2019
 - Fixed a client side error with shells
 - Fixed instant handbraking with tanks
 - Fixed the bullet particles not having the correct speed

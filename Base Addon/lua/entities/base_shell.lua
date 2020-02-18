@@ -375,7 +375,7 @@ function ENT:AddOnExplode(pos)
 		self.ExplosionDamage = self.Penetration*vel*0.03*gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
 		
 		if self.IS_APCR[self.ShellType] then
-			self.ExplosionDamage = self.ExplosionDamage*0.07
+			self.ExplosionDamage = self.ExplosionDamage*0.3
 		elseif self.ShellType == "APHE" then
 			self.ExplosionDamage = self.ExplosionDamage*((self.TNTEquivalent < 1 and math.sqrt(self.TNTEquivalent)*2 or self.TNTEquivalent) + (self.TNTEquivalent < 1 and 1 or 0))
 		end
@@ -590,18 +590,23 @@ if CLIENT then
 		
 		table.insert(gred.ActiveShells,self)
 		self.ShellID = #gred.ActiveShells
-		gred.ActiveShellSounds[self.ShellID] = {
+		gred.ActiveShellSounds[self.ShellID] = {}
+		
+		self.snd = {
 			CreateSound(self,"bomb/tank_shellwhiz.wav"),
 			CreateSound(self,"bomb/shell_trail.wav"),
 			-- CreateSound(self,"gredwitch/Shell_fly_loop_03.wav"),
 		}
-		self.snd = gred.ActiveShellSounds[self.ShellID]
+		for k,v in pairs(self.snd) do
+			gred.ActiveShellSounds[self.ShellID][k] = v
+		end
 		
 		
 		timer.Simple(0,function()
 			if IsValid(self) and self.GetShellType then  -- sometimes the function just doesn't exist
 				if !self.IS_AP[self:GetShellType()] and !self.snd["wiz_mortar"] then
 					table.insert(self.snd,CreateSound(self,"bomb/shellwhiz_mortar_"..math.random(1,2)..".wav"))
+					table.insert(gred.ActiveShellSounds[self.ShellID],self.snd[#self.snd])
 					self.snd[#self.snd]:SetSoundLevel(80)
 				end
 				self.TracerColor = self:GetTracerColor()

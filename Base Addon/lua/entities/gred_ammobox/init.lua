@@ -32,7 +32,7 @@ end)
 net.Receive("gred_net_ammobox_sv_createshell",function()
 	local self = net.ReadEntity()
 	local ply = net.ReadEntity()
-	gred.CreateShell(self:GetPos() + Vector(0,0,70),
+	local shell = gred.CreateShell(self:GetPos() + Vector(0,0,70),
 					self:GetAngles(),
 					ply,
 					{self},
@@ -40,7 +40,9 @@ net.Receive("gred_net_ammobox_sv_createshell",function()
 					net.ReadString(),
 					500,
 					2
-	):Use(ply,ply,2,1)
+	)
+	shell.ImpactSpeed = 1000
+	shell:Use(ply,ply,2,1)
 end)
 
 net.Receive("gred_net_ammobox_sv_close",function()
