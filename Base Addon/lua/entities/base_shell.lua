@@ -132,6 +132,12 @@ ENT.IS_AP = {
 	["APFSDS"] = true,
 }
 
+ENT.IS_APHE = {
+	["APHE"] = true,
+	["APHEBC"] = true,
+	["APHECBC"] = true,
+}
+
 ENT.IS_APCR = {
 	["APCR"] = true,
 	["APDS"] = true,
@@ -283,7 +289,7 @@ function ENT:AddOnInit()
 	elseif self.IS_HEAT[self.ShellType] then
 		self.ExplosionRadius = 200
 		self.Effect = "ap_impact_dirt"
-		self.ExplosionDamage = ((!self.TNTEquivalent and (self.ExplosiveMass and (self.ExplosiveMass/self.Mass)*100 or 10) or self.TNTEquivalent) * 50 * self.Caliber) * gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
+		self.ExplosionDamage = ((!self.TNTEquivalent and (self.ExplosiveMass and (self.ExplosiveMass/self.Mass)*100 or 10) or self.TNTEquivalent) * 40 * self.Caliber) * gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
 	else
 		self.AngEffect = true
 		self.Effect = "gred_ap_impact"
@@ -375,9 +381,9 @@ function ENT:AddOnExplode(pos)
 		self.ExplosionDamage = self.Penetration*vel*0.03*gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
 		
 		if self.IS_APCR[self.ShellType] then
-			self.ExplosionDamage = self.ExplosionDamage*0.3
-		elseif self.ShellType == "APHE" then
-			self.ExplosionDamage = self.ExplosionDamage*((self.TNTEquivalent < 1 and math.sqrt(self.TNTEquivalent)*2 or self.TNTEquivalent) + (self.TNTEquivalent < 1 and 1 or 0))
+			self.ExplosionDamage = self.ExplosionDamage*0.15
+		elseif self.TNTEquivalent > 0 then
+			self.ExplosionDamage = self.ExplosionDamage * ((self.TNTEquivalent < 1 and 1/math.sqrt(math.sqrt(math.sqrt(self.TNTEquivalent))) or self.TNTEquivalent)) * (self.IS_APHE[self.ShellType] and 1.3 or 1)
 		end
 		
 	elseif self.LinearPenetration then
@@ -408,7 +414,8 @@ function ENT:AddOnExplode(pos)
 				local HP = tr.Entity:GetMaxHealth()*0.01 / gred.CVars.gred_sv_simfphys_health_multplier:GetFloat()
 				HP = HP/CosY + HP - HP*CosP
 				Fraction = HP/self.Penetration
-				
+				local radius = tr.Entity:BoundingRadius()*0.007
+				if radius < 1 then self.ExplosionDamage = (self.ExplosionDamage / (radius * (1/self.Caliber))) / math.sqrt(self.Caliber)*0.5 end
 				self.Fraction = Fraction
 				if (Fraction >= 1 and gred.CVars.gred_sv_shell_ap_lowpen_system:GetInt() == 1) then
 					if (self.IS_HEAT[self.ShellType] and self.IS_AP[self.ShellType]) then

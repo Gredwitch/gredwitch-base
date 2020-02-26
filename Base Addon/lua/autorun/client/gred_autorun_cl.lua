@@ -88,9 +88,10 @@ local function DrawAmmoLeft(vehicle,scrW,scrH)
 	local sizex = scrW * ((scrW / scrH) > (4/3) and 1 or 1.32)
 	local s_xpos = scrW * 0.5 - sizex * 0.115 - sizex * 0.032
 	local s_ypos = scrH - scrH * 0.092 - scrH * 0.02
-	local shelltype = vehicle:GetNWInt("ShellType",1)
-	draw.SimpleText("SHELLTYPE: "..vehicle.shellTypes[shelltype]..(vehicle:GetNWBool("Reloading",false) and " [RELOADING]" or ""),"simfphysfont", s_xpos + sizex * 0.185, s_ypos + scrH*0.012 ,SIMFPHYS_COLOR,0,1)
-	draw.SimpleText("AMMO: "..vehicle:GetNWInt("CurAmmo"..shelltype,0),"simfphysfont", s_xpos + sizex * 0.185, s_ypos + scrH*0.035 ,SIMFPHYS_COLOR,0,1)
+	local curgun = vehicle:GetNWInt("CurGun",1)
+	local shelltype = vehicle:GetNWInt(curgun.."ShellType",1)
+	draw.SimpleText("SHELLTYPE: "..vehicle.shellTypes[curgun][shelltype]..(vehicle:GetNWBool("Reloading",false) and " [RELOADING]" or ""),"simfphysfont", s_xpos + sizex * 0.185, s_ypos + scrH*0.012 ,SIMFPHYS_COLOR,0,1)
+	draw.SimpleText("AMMO: "..vehicle:GetNWInt(curgun.."CurAmmo"..shelltype,0),"simfphysfont", s_xpos + sizex * 0.185, s_ypos + scrH*0.035 ,SIMFPHYS_COLOR,0,1)
 end
 
 local function DrawWorldTip(text,pos,tipcol,font,offset)
@@ -1014,16 +1015,16 @@ hook.Add("HUDPaint","gred_simfphys_tanksighthud",function()
 					for a,seat in pairs(ent.Seats) do
 						if IsValid(seat) and seat:GetNWBool("HasCannon") then
 							seat.shellTypes = seat.shellTypes or util.JSONToTable(seat:GetNWString("ShellTypes"))
-							seat.maxAmmo = seat.maxAmmo or seat:GetNWInt("MaxAmmo",0)
+							seat.maxAmmo = seat.maxAmmo or seat:GetNWInt("1MaxAmmo",0)
 							local curammo = 0
 							local ammo
 							local str = ""
 							for A = 1,#seat.shellTypes do
-								ammo = seat:GetNWInt("CurAmmo"..A,0)
+								ammo = seat:GetNWInt("1CurAmmo"..A,0)
 								curammo = curammo + ammo
 								str = str..seat.shellTypes[A]..": "..ammo..(A == #seat.shellTypes and "" or "\n")
 							end
-							str = seat:GetNWInt("Caliber",0).."mm cannon\nCapacity: "..curammo.."/"..seat.maxAmmo.."\n"..str
+							str = seat:GetNWInt("1Caliber",0).."mm cannon\nCapacity: "..curammo.."/"..seat.maxAmmo.."\n"..str
 							DrawWorldTip(str,textpos,col,"GModWorldtip",150*i)
 							i = i + 1
 						end

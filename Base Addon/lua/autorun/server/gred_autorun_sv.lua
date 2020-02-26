@@ -65,6 +65,7 @@ local COL_TABLE = {
 }
 local bad = {
 	["prop_vehicle_prisoner_pod"] = true,
+	["gmod_dynamite"] = true,
 }
 local badclass = {
 	["gmod_sent_vehicle_fphysics_wheel"] = true,
@@ -759,8 +760,11 @@ gred.TankInit = function(self,vehicle)
 		for _,seat in pairs(tab) do
 			if seat:GetNWBool("HasCannon") then
 				shelltypes = {}
-				for k,v in pairs(seat.ShellTypes) do
-					table.insert(shelltypes,v.ShellType)
+				for K,V in pairs(seat.ShellTypes) do
+					shelltypes[K] = {}
+					for k,v in pairs(V) do
+						table.insert(shelltypes[K],v.ShellType)
+					end
 				end
 				seat:SetNWBool("simfphys_SpecialCam",true)
 				seat:SetNWString("ShellTypes",util.TableToJSON(shelltypes))

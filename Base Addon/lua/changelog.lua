@@ -1,4 +1,17 @@
---[[18/02/2020
+--[[26/02/2020
+- Fixed dynamites erroring when a bullet hits them
+- Improved the shell damage calculation : shells will now do more damage depending on how small the vehicle is
+- Made AP shells with a explosive filler more powerful
+
+If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
+If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
+Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
+
+If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
+
+OLDER CHANGES
+
+18/02/2020
 - Added a 77mm shell
 - Added missing 105mm shell types
 - Added missing Flak 38 mag
@@ -23,14 +36,6 @@
 - Improved the bullet particles so they get bigger depending on their caliber
 - Made it so a tip appears on your screen if you try to destroy a tank with HE rounds
 - Made 30mm and 40mm bullets more powerful against tanks
-
-If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
-If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
-Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
-
-If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
-
-OLDER CHANGES
 
 21/01/2020
 - Added inertia calculation
