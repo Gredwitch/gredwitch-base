@@ -1304,40 +1304,44 @@ hook.Add("OnEntityCreated","gred_ent_override",function(ent)
 							if !data.HitEntity.Fired then
 								local seat = ent:GetDriverSeat()
 								if seat:GetNWBool("HasCannon",false) then
-									local ammo = 0
-									if seat:GetNWInt("Caliber",0) == data.HitEntity.Caliber then
-										local ShellType
-										local Caliber
-										for k,v in pairs(seat.ShellTypes) do
-											ammo = ammo + seat:GetNWInt("CurAmmo"..k,0)
-											ShellType = ShellType and ShellType or (v.ShellType == data.HitEntity.ShellType and k or nil)
-										end
-										if ammo < seat:GetNWInt("MaxAmmo",0) then
-											local str = "CurAmmo"..ShellType
-											seat:SetNWInt(str,seat:GetNWInt(str,0) + 1)
-											data.HitEntity:Remove()
-											ent:EmitSound(seat.ReloadSound)
-										end
-										return
-									end
-								end
-								for k,seat in pairs(ent.pSeat) do
-									if seat:GetNWBool("HasCannon",false) then
+									for i = 1,#seat.ShellTypes do
 										local ammo = 0
-										if seat:GetNWInt("Caliber",0) == data.HitEntity.Caliber then
-											local HasShelltype
+										if seat:GetNWInt(i.."Caliber",0) == data.HitEntity.Caliber then
 											local ShellType
-											for k,v in pairs(seat.ShellTypes) do
-												ammo = ammo + seat:GetNWInt("CurAmmo"..k,0)
-												ShellType = ShellType or (v.ShellType == data.HitEntity.ShellType and k or nil)
+											local Caliber
+											for k,v in pairs(seat.ShellTypes[i]) do
+												ammo = ammo + seat:GetNWInt(i.."CurAmmo"..k,0)
+												ShellType = ShellType and ShellType or (v.ShellType == data.HitEntity.ShellType and k or nil)
 											end
-											if ammo < seat:GetNWInt("MaxAmmo",0) then
-												local str = "CurAmmo"..ShellType
+											if ammo < seat:GetNWInt(i.."MaxAmmo",0) then
+												local str = i.."CurAmmo"..ShellType
 												seat:SetNWInt(str,seat:GetNWInt(str,0) + 1)
 												data.HitEntity:Remove()
 												ent:EmitSound(seat.ReloadSound)
 											end
 											return
+										end
+									end
+								end
+								for k,seat in pairs(ent.pSeat) do
+									if seat:GetNWBool("HasCannon",false) then
+										for i = 1,#seat.ShellTypes do
+											local ammo = 0
+											if seat:GetNWInt(i.."Caliber",0) == data.HitEntity.Caliber then
+												local HasShelltype
+												local ShellType
+												for k,v in pairs(seat.ShellTypes[i]) do
+													ammo = ammo + seat:GetNWInt(i.."CurAmmo"..k,0)
+													ShellType = ShellType or (v.ShellType == data.HitEntity.ShellType and k or nil)
+												end
+												if ammo < seat:GetNWInt(i.."MaxAmmo",0) then
+													local str = i.."CurAmmo"..ShellType
+													seat:SetNWInt(str,seat:GetNWInt(str,0) + 1)
+													data.HitEntity:Remove()
+													ent:EmitSound(seat.ReloadSound)
+												end
+												return
+											end
 										end
 									end
 								end

@@ -37,9 +37,9 @@ gred.CVars["gred_cl_simfphys_sightsensitivity"] 			= CreateClientConVar("gred_cl
 gred.CVars["gred_cl_simfphys_maxsuspensioncalcdistance"] 	= CreateClientConVar("gred_cl_simfphys_maxsuspensioncalcdistance"	, "85000000" ,true,false)
 
 local TAB_PRESS = {FCVAR_ARCHIVE,FCVAR_USERINFO}
-CreateConVar("gred_cl_simfphys_key_changeshell"			, "21",TAB_PRESS)
-CreateConVar("gred_cl_simfphys_key_togglesight"			, "22",TAB_PRESS)
-CreateConVar("gred_cl_simfphys_key_togglegun"			, "23",TAB_PRESS)
+gred.CVars["gred_cl_simfphys_key_changeshell"]				= CreateConVar("gred_cl_simfphys_key_changeshell"			, "21",TAB_PRESS)
+gred.CVars["gred_cl_simfphys_key_togglesight"]				= CreateConVar("gred_cl_simfphys_key_togglesight"			, "22",TAB_PRESS)
+gred.CVars["gred_cl_simfphys_key_togglegun"]				= CreateConVar("gred_cl_simfphys_key_togglegun"				, "23",TAB_PRESS)
 
 hook.Add("Initialize","gred_init_precache_cl",function()
 	gred.Precache()
@@ -90,8 +90,10 @@ local function DrawAmmoLeft(vehicle,scrW,scrH)
 	local s_ypos = scrH - scrH * 0.092 - scrH * 0.02
 	local curgun = vehicle:GetNWInt("CurGun",1)
 	local shelltype = vehicle:GetNWInt(curgun.."ShellType",1)
+	local caliber = vehicle:GetNWInt(curgun.."Caliber",0)
 	draw.SimpleText("SHELLTYPE: "..vehicle.shellTypes[curgun][shelltype]..(vehicle:GetNWBool("Reloading",false) and " [RELOADING]" or ""),"simfphysfont", s_xpos + sizex * 0.185, s_ypos + scrH*0.012 ,SIMFPHYS_COLOR,0,1)
 	draw.SimpleText("AMMO: "..vehicle:GetNWInt(curgun.."CurAmmo"..shelltype,0),"simfphysfont", s_xpos + sizex * 0.185, s_ypos + scrH*0.035 ,SIMFPHYS_COLOR,0,1)
+	if caliber > 0 then draw.SimpleText(caliber.."MM GUN"..(#vehicle.shellTypes > 1 and " (Press "..input.GetKeyName(gred.CVars["gred_cl_simfphys_key_togglegun"]:GetInt()).." to toggle)" or ""),"simfphysfont", s_xpos + sizex * 0.185, s_ypos + scrH*0.058 ,SIMFPHYS_COLOR,0,1) end
 end
 
 local function DrawWorldTip(text,pos,tipcol,font,offset)
@@ -358,36 +360,36 @@ local function gred_settings_simfphys(CPanel)
 	-- end
 	
 	local DBinder = vgui.Create("DBinder")
-	DBinder:SetValue(GetConVar("gred_cl_simfphys_key_changeshell"):GetInt())
+	DBinder:SetValue(gred.CVars["gred_cl_simfphys_key_changeshell"]:GetInt())
 	DBinder.OnChange = function(DBinder,key)
-		GetConVar("gred_cl_simfphys_key_changeshell"):SetInt(key)
+		gred.CVars["gred_cl_simfphys_key_changeshell"]:SetInt(key)
 	end
 	CPanel:AddItem(CPanel:Help("Toggle shell types"),DBinder)
 	
 	local DBinder = vgui.Create("DBinder")
-	DBinder:SetValue(GetConVar("gred_cl_simfphys_key_togglesight"):GetInt())
+	DBinder:SetValue(gred.CVars["gred_cl_simfphys_key_togglesight"]:GetInt())
 	DBinder.OnChange = function(DBinder,key)
-		GetConVar("gred_cl_simfphys_key_togglesight"):SetInt(key)
+		gred.CVars["gred_cl_simfphys_key_togglesight"]:SetInt(key)
 	end
 	CPanel:AddItem(CPanel:Help("Toggle tank sight"),DBinder)
 	
 	local DBinder = vgui.Create("DBinder")
-	DBinder:SetValue(GetConVar("gred_cl_simfphys_key_togglegun"):GetInt())
+	DBinder:SetValue(gred.CVars["gred_cl_simfphys_key_togglegun"]:GetInt())
 	DBinder.OnChange = function(DBinder,key)
-		GetConVar("gred_cl_simfphys_key_togglegun"):SetInt(key)
+		gred.CVars["gred_cl_simfphys_key_togglegun"]:SetInt(key)
 	end
 	CPanel:AddItem(CPanel:Help("Toggle tank gun"),DBinder)
 	
 	local this = CPanel:NumSlider("Sensitivity in sight mode","gred_cl_simfphys_sightsensitivity",0,1,2);this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
 	this.OnValueChanged = function(this,val)
 		if this.ConVarChanging then return end
-		GetConVar("gred_cl_simfphys_sightsensitivity"):SetInt(val)
+		gred.CVars["gred_cl_simfphys_sightsensitivity"]:SetInt(val)
 	end
 	
 	local this = CPanel:NumSlider("Max suspension calculation distance","gred_cl_simfphys_maxsuspensioncalcdistance",0,300000000,0);this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
 	this.OnValueChanged = function(this,val)
 		if this.ConVarChanging then return end
-		GetConVar("gred_cl_simfphys_maxsuspensioncalcdistance"):SetInt(val)
+		gred.CVars["gred_cl_simfphys_maxsuspensioncalcdistance"]:SetInt(val)
 	end
 end
 
@@ -1015,17 +1017,19 @@ hook.Add("HUDPaint","gred_simfphys_tanksighthud",function()
 					for a,seat in pairs(ent.Seats) do
 						if IsValid(seat) and seat:GetNWBool("HasCannon") then
 							seat.shellTypes = seat.shellTypes or util.JSONToTable(seat:GetNWString("ShellTypes"))
-							seat.maxAmmo = seat.maxAmmo or seat:GetNWInt("1MaxAmmo",0)
-							local curammo = 0
-							local ammo
-							local str = ""
-							for A = 1,#seat.shellTypes do
-								ammo = seat:GetNWInt("1CurAmmo"..A,0)
-								curammo = curammo + ammo
-								str = str..seat.shellTypes[A]..": "..ammo..(A == #seat.shellTypes and "" or "\n")
+							for I = 1,#seat.shellTypes do
+								seat.maxAmmo = seat:GetNWInt(I.."MaxAmmo",0)
+								local curammo = 0
+								local ammo
+								local str = ""
+								for A = 1,#seat.shellTypes[I] do
+									ammo = seat:GetNWInt(I.."CurAmmo"..A,0)
+									curammo = curammo + ammo
+									str = str..seat.shellTypes[I][A]..": "..ammo..(A == #seat.shellTypes[I] and "" or "\n")
+								end
+								str = seat:GetNWInt(I.."Caliber",0).."mm cannon\nCapacity: "..curammo.."/"..seat.maxAmmo.."\n"..str
+								DrawWorldTip(str,textpos,col,"GModWorldtip",150*i)
 							end
-							str = seat:GetNWInt("1Caliber",0).."mm cannon\nCapacity: "..curammo.."/"..seat.maxAmmo.."\n"..str
-							DrawWorldTip(str,textpos,col,"GModWorldtip",150*i)
 							i = i + 1
 						end
 					end

@@ -1,7 +1,7 @@
---[[26/02/2020
-- Fixed dynamites erroring when a bullet hits them
-- Improved the shell damage calculation : shells will now do more damage depending on how small the vehicle is
-- Made AP shells with a explosive filler more powerful
+--[[01/03/2020
+- Fixed the manual reload system for tanks being broken
+- Made it so it says which gun you're currently using in the tank HUD
+- Optimised some stuff related to client side keys convars
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -10,6 +10,11 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+26/02/2020
+- Fixed dynamites erroring when a bullet hits them
+- Improved the shell damage calculation : shells will now do more damage depending on how small the vehicle is
+- Made AP shells with a explosive filler more powerful
 
 18/02/2020
 - Added a 77mm shell
