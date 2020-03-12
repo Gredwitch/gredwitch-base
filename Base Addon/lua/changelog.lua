@@ -1,7 +1,8 @@
---[[01/03/2020
-- Fixed the manual reload system for tanks being broken
-- Made it so it says which gun you're currently using in the tank HUD
-- Optimised some stuff related to client side keys convars
+--[[12/03/2020
+- Added a global server side suspension system to fix the issues with tanks flying around on displacements
+- Added a convar to use the broken suspension system that is actually more optimised and that works correctly on anything that isn't a displacement (basically on flat surfaces)
+- Added damage multipliers for HEAT and APCR shells
+- Removed useless debug code
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -10,6 +11,11 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+01/03/2020
+- Fixed the manual reload system for tanks being broken
+- Made it so it says which gun you're currently using in the tank HUD
+- Optimised some stuff related to client side keys convars
 
 26/02/2020
 - Fixed dynamites erroring when a bullet hits them

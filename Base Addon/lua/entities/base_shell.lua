@@ -289,7 +289,7 @@ function ENT:AddOnInit()
 	elseif self.IS_HEAT[self.ShellType] then
 		self.ExplosionRadius = 200
 		self.Effect = "ap_impact_dirt"
-		self.ExplosionDamage = ((!self.TNTEquivalent and (self.ExplosiveMass and (self.ExplosiveMass/self.Mass)*100 or 10) or self.TNTEquivalent) * 40 * self.Caliber) * gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
+		self.ExplosionDamage = ((!self.TNTEquivalent and (self.ExplosiveMass and (self.ExplosiveMass/self.Mass)*100 or 10) or self.TNTEquivalent) * 40 * self.Caliber) * gred.CVars["gred_sv_shell_heat_damagemultiplier"]:GetFloat()
 	else
 		self.AngEffect = true
 		self.Effect = "gred_ap_impact"
@@ -378,12 +378,15 @@ function ENT:AddOnExplode(pos)
 			self.Penetration = ((vel^1.43)*((self.CoreMass + (((((self.CoreMass/self.Mass)*100) > 36.0) and 0.5 or 0.4) * (self.Mass - self.CoreMass)))^0.71))/(kfbrAPCR*((self.Caliber*0.0001)^1.07))
 		end
 		
-		self.ExplosionDamage = self.Penetration*vel*0.03*gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
+		self.ExplosionDamage = self.Penetration*vel*0.03
 		
 		if self.IS_APCR[self.ShellType] then
-			self.ExplosionDamage = self.ExplosionDamage*0.15
-		elseif self.TNTEquivalent > 0 then
-			self.ExplosionDamage = self.ExplosionDamage * ((self.TNTEquivalent < 1 and 1/math.sqrt(math.sqrt(math.sqrt(self.TNTEquivalent))) or self.TNTEquivalent)) * (self.IS_APHE[self.ShellType] and 1.3 or 1)
+			self.ExplosionDamage = self.ExplosionDamage*0.15*gred.CVars["gred_sv_shell_apcr_damagemultiplier"]:GetFloat()
+		else
+			self.ExplosionDamage = self.ExplosionDamage * gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
+			if self.TNTEquivalent > 0 then
+				self.ExplosionDamage = self.ExplosionDamage * ((self.TNTEquivalent < 1 and 1/math.sqrt(math.sqrt(math.sqrt(self.TNTEquivalent))) or self.TNTEquivalent)) * (self.IS_APHE[self.ShellType] and 1.3 or 1)
+			end
 		end
 		
 	elseif self.LinearPenetration then

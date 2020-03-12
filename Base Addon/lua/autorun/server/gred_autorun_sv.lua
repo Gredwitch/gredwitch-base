@@ -366,7 +366,7 @@ gred.CreateExplosion = function(pos,radius,damage,decal,trace,ply,bomb,DEFAULT_P
 		net.WriteVector(pos-Vector(0,0,trace))
 	net.Broadcast()
 	
-	debugoverlay.Sphere(pos,radius,3, Color( 255, 255, 255 ))
+	-- debugoverlay.Sphere(pos,radius,3, Color( 255, 255, 255 ))
 	
 	local bombvalid = IsValid(bomb)
 	ply = IsValid(ply) and ply or (bombvalid and bomb or Entity(0))
@@ -774,6 +774,7 @@ gred.TankInit = function(self,vehicle)
 	
 	vehicle.TOQUECENTER_D = 0
 	vehicle.TOQUECENTER_A = 0
+	vehicle.TestSuspensions = gred.CVars["gred_sv_simfphys_testsuspensions"]:GetBool()
 	
 	timer.Simple(1,function()
 		if not IsValid(vehicle) then return end
@@ -781,6 +782,14 @@ gred.TankInit = function(self,vehicle)
 			print("[simfphys Armed Vehicle Pack] ERROR:TRACE FILTER IS INVALID. PLEASE UPDATE SIMFPHYS BASE") 
 			return
 		end
+	
+		vehicle.filterEntities = player.GetAll()
+		table.insert(vehicle.filterEntities,vehicle)
+		
+		for i, v in pairs(ents.FindByClass("gmod_sent_vehicle_fphysics_wheel")) do
+			table.insert(vehicle.filterEntities,v)
+		end
+		
 		local tab = gred.simfphys[vehicle:GetSpawn_List()]
 		if tab.LeftTrackID != -1 and tab.RightTrackID != -1 then
 			vehicle.HandBrakePower = 30
@@ -848,6 +857,94 @@ gred.TankInit = function(self,vehicle)
 			end
 		end
 	end)
+end
+
+local tr_table = {}
+local half = 0
+
+gred.TankUpdateSuspensionSV = function(vehicle,susTable,susHeight,vec)
+	if vehicle.TestSuspensions then
+		if not vehicle.SuspensionTables then
+			vehicle.SuspensionTables = {{},{}}
+			
+			local vehent = vehicle.LeftTrack and vehicle.LeftTrack or vehicle
+			
+			vehicle.SuspensionTables[1].SuspensionPos = vehicle:WorldToLocal(vehent:GetAttachment(vehent:LookupAttachment(susTable[1].attachment)).Pos)
+			vehicle.SuspensionTables[1].SuspensionMaxs = vehicle.SuspensionTables[1].SuspensionPos + vec
+			vehicle.SuspensionTables[1].SuspensionMins = vehicle:WorldToLocal(vehent:GetAttachment(vehent:LookupAttachment(susTable[#susTable*0.5].attachment)).Pos) - vec
+			
+			vehent = vehicle.RightTrack and vehicle.RightTrack or vehicle
+			
+			vehicle.SuspensionTables[2].SuspensionPos = vehicle:WorldToLocal(vehent:GetAttachment(vehent:LookupAttachment(susTable[#susTable*0.5+1].attachment)).Pos) + vec
+			vehicle.SuspensionTables[2].SuspensionMaxs = vehicle.SuspensionTables[2].SuspensionPos
+			vehicle.SuspensionTables[2].SuspensionMins = vehicle:WorldToLocal(vehent:GetAttachment(vehent:LookupAttachment(susTable[#susTable].attachment)).Pos) - vec
+			
+			for i = 1,2 do
+				vehicle.SuspensionTables[i].SuspensionStart = Vector(vehicle.SuspensionTables[i].SuspensionMins.x,0,vehicle.SuspensionTables[i].SuspensionMins.z)
+				vehicle.SuspensionTables[i].SuspensionEnd = Vector(vehicle.SuspensionTables[i].SuspensionMaxs.x,0,vehicle.SuspensionTables[i].SuspensionMaxs.z)
+				
+				vehicle.SuspensionTables[i].SuspensionMaxs.x = 0
+				vehicle.SuspensionTables[i].SuspensionMaxs.z = 0
+				
+				vehicle.SuspensionTables[i].SuspensionMins.x = 0
+				vehicle.SuspensionTables[i].SuspensionMins.z = susHeight
+			end
+		end
+		
+		local ang = vehicle:GetAngles()
+		for i = 1,2 do
+			tr_table.maxs = vehicle.SuspensionTables[i].SuspensionMaxs * 1
+			tr_table.maxs:Rotate(ang)
+			tr_table.mins = vehicle.SuspensionTables[i].SuspensionMins * 1
+			tr_table.mins:Rotate(ang)
+			tr_table.filter = vehicle.filterEntities
+			tr_table.start = vehicle:LocalToWorld(vehicle.SuspensionTables[i].SuspensionStart)
+			tr_table.endpos = vehicle:LocalToWorld(vehicle.SuspensionTables[i].SuspensionEnd)
+			
+			-- debugoverlay.SweptBox(tr_table.start,tr_table.endpos,tr_table.mins,tr_table.maxs,Angle(),0.1,color_white)
+			vehicle.susOnGround = util.TraceHull(tr_table).Hit
+			if vehicle.susOnGround then break end
+		end
+		
+		-- local tr = util.TraceHull(tr_table)
+		-- local str = ""
+		-- for k,v in pairs(tr) do
+			-- if isbool(v) then
+				-- str = str.." "..k.." "..tostring(v)
+			-- end
+		-- end
+		-- print(str)
+	else
+	
+		if not vehicle.SuspensionTable then
+			vehicle.SuspensionTable = {}
+			
+			local vehent = vehicle.LeftTrack and vehicle.LeftTrack or vehicle
+			
+			for i = 1,#susTable*0.5 do
+				vehicle.SuspensionTable[i] = vehicle:WorldToLocal(vehent:GetAttachment(vehent:LookupAttachment(susTable[i].attachment)).Pos)
+			end
+			
+			vehent = vehicle.RightTrack and vehicle.RightTrack or vehicle
+			
+			for i = 1 + #susTable*0.5,#susTable do
+				vehicle.SuspensionTable[i] = vehicle:WorldToLocal(vehent:GetAttachment(vehent:LookupAttachment(susTable[i].attachment)).Pos)
+			end
+		end
+		
+		tr_table.up = vehicle:GetUp() * susHeight
+		tr_table.maxs = vec
+		tr_table.mins = -vec
+		tr_table.filter = vehicle.filterEntities
+		
+		for k,v in pairs(vehicle.SuspensionTable) do
+			tr_table.start = vehicle:LocalToWorld(v)
+			tr_table.endpos = tr_table.start + tr_table.up
+			
+			vehicle.susOnGround = util.TraceHull(tr_table).Hit
+			if vehicle.susOnGround then break end
+		end
+	end
 end
 
 gred.TankTurn = function(vehicle,MaxTurn,TorqueCenter,TorqueCenterRate,ForceMul)

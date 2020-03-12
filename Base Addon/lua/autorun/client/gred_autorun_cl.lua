@@ -331,6 +331,13 @@ local function gred_settings_simfphys(CPanel)
 		gred.CheckConCommand("gred_sv_simfphys_lesswheels",val)
 	end
 	
+	local this = CPanel:CheckBox("Use the broken suspension system?","gred_sv_simfphys_testsuspensions");
+	local parent = this:GetParent()
+	this.OnChange = function(this,val)
+		val = val and 1 or 0
+		gred.CheckConCommand("gred_sv_simfphys_testsuspensions",val)
+	end
+	
 	local this = CPanel:CheckBox("Spawn without ammo","gred_sv_simfphys_spawnwithoutammo");
 	local parent = this:GetParent()
 	this.OnChange = function(this,val)
@@ -474,24 +481,42 @@ local function gred_settings_bombs(CPanel)
 			if this.ConVarChanging then return end
 			gred.CheckConCommand( "gred_sv_shell_speed_multiplier",val)
 		end
+		
 		local this = CPanel:NumSlider("Ricochet angle", "gred_sv_minricochetangle",50, 90, 1 );
 		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
 		this.OnValueChanged = function(this,val)
 			if this.ConVarChanging then return end
 			gred.CheckConCommand( "gred_sv_minricochetangle",val)
 		end
+		
 		local this = CPanel:NumSlider("HE Shells damage multiplier", "gred_sv_shell_he_damagemultiplier",0,10,2);
 		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
 		this.OnValueChanged = function(this,val)
 			if this.ConVarChanging then return end
 			gred.CheckConCommand( "gred_sv_shell_he_damagemultiplier",val)
 		end
-		local this = CPanel:NumSlider("Anti-Tank Shells damage multiplier", "gred_sv_shell_ap_damagemultiplier",0,10,2);
+		
+		local this = CPanel:NumSlider("AP Shells damage multiplier", "gred_sv_shell_ap_damagemultiplier",0,10,2);
 		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
 		this.OnValueChanged = function(this,val)
 			if this.ConVarChanging then return end
 			gred.CheckConCommand( "gred_sv_shell_ap_damagemultiplier",val)
 		end
+		
+		local this = CPanel:NumSlider("APCR Shells damage multiplier", "gred_sv_shell_apcr_damagemultiplier",0,10,2);
+		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+		this.OnValueChanged = function(this,val)
+			if this.ConVarChanging then return end
+			gred.CheckConCommand( "gred_sv_shell_apcr_damagemultiplier",val)
+		end
+		
+		local this = CPanel:NumSlider("HEAT Shells damage multiplier", "gred_sv_shell_heat_damagemultiplier",0,10,2);
+		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+		this.OnValueChanged = function(this,val)
+			if this.ConVarChanging then return end
+			gred.CheckConCommand( "gred_sv_shell_heat_damagemultiplier",val)
+		end
+		
 		local this = CPanel:NumSlider("Max non-penetration ricochet chance", "gred_sv_shell_ap_lowpen_maxricochetchance",0,1,2);
 		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
 		this.OnValueChanged = function(this,val)
