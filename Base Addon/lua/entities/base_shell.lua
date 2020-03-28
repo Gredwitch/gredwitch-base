@@ -248,7 +248,7 @@ function ENT:AddOnInit()
 		self.EffectAir = self.SmokeEffect
 		self.Effect = self.Caliber < 88 and "m203_smokegrenade" or "doi_smoke_artillery"
 	elseif self.ShellType == "HE" then
-		self.ExplosionDamage = (1500 + self.Caliber * 200) * gred.CVars["gred_sv_shell_he_damagemultiplier"]:GetFloat()
+		self.ExplosionDamage = (1500 + (gred.CVars.gred_sv_shell_he_damage:GetBool() and 0 or self.Caliber * 200)) * gred.CVars["gred_sv_shell_he_damagemultiplier"]:GetFloat()
 		if self.Caliber < 50 then
 			self.ExplosionRadius = 350
 			self.Effect = "ins_m203_explosion"
@@ -566,6 +566,7 @@ if CLIENT then
 				v:Stop()
 			end
 		end
+		self.StopThinking = true
 		gred.ActiveShells[self.ShellID] = nil
 		gred.ActiveShellSounds[self.ShellID] = nil
 	end
@@ -590,6 +591,7 @@ if CLIENT then
 	end)
 	
 	function ENT:Initialize()
+		self.Frames = 0
 		self.ply = LocalPlayer()
 		self.Rate = 0.03
 		self.DefaultF = math.random(110,190)
@@ -629,24 +631,23 @@ if CLIENT then
 		for k,v in pairs(self.snd) do v:ChangeVolume(80) end
 	end
 	
-	function ENT:PhysicsUpdate(phy)
-		if self.StopThinking then return end
-		
-		local pos = phy:GetPos()
-		if pos == self.OldPos then
-			self.StopThinking = true
-			self:OnRemove()
-			return
+	function ENT:Think()
+		if self.StopThinking then
+			self:NextThink(CurTime() + 9999999)
+			return true 
 		end
 		
-		self.OldPos = pos
-	end
-	
-	function ENT:Think()
-		if self.StopThinking then return end
 		if !self.Inited then self:Initialize() end
 		if self.GetFired and !self:GetFired() then return end
 		local pos,fwd,v = self:GetPos(),self:GetForward(),self:GetVelocity()
+		
+		if self.Frames > 10 and VectorEqual(pos,self.OldPos) then
+			self:OnRemove()
+			return
+		end
+		self.Frames = self.Frames + 1
+		
+		self.OldPos = pos
 		local fwdv = v:Angle():Forward()
 		pos = pos + fwd*30
 		

@@ -406,6 +406,7 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 		},
 		["105"] = {
 			 ["HE"] = true,
+			 ["WP"] = true,
 			 ["AP"] = true,
 			 ["APHE"] = true,
 			 ["APC"] = true,

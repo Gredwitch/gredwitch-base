@@ -196,7 +196,7 @@ function ENT:Explode(pos)
 	pos = pos or self:LocalToWorld(self:OBBCenter())
 	if self:AddOnExplode(pos) then self.Exploded = false return end
 	if not self.Smoke then
-		gred.CreateExplosion(pos,self.ExplosionRadius,self.ExplosionDamage,self.Decal,self.TraceLength,self.GBOWNER,self,self.DEFAULT_PHYSFORCE,self.DEFAULT_PHYSFORCE_PLYGROUND,self.DEFAULT_PHYSFORCE_PLYAIR)
+		gred.CreateExplosion(pos,self.ExplosionRadius,self.ExplosionDamage * gred.CVars.gred_sv_shell_gp_he_damagemultiplier:GetFloat(),self.Decal,self.TraceLength,self.GBOWNER,self,self.DEFAULT_PHYSFORCE,self.DEFAULT_PHYSFORCE_PLYGROUND,self.DEFAULT_PHYSFORCE_PLYAIR)
 	end
 	if not self.NO_EFFECT then
 		net.Start("gred_net_createparticle")

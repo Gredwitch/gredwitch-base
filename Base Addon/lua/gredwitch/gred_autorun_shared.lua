@@ -206,6 +206,8 @@ gred.CVars["gred_sv_shell_ap_lowpen_system"] 				= CreateConVar("gred_sv_shell_a
 gred.CVars["gred_sv_shell_ap_lowpen_shoulddecreasedamage"] 	= CreateConVar("gred_sv_shell_ap_lowpen_shoulddecreasedamage"	,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_shell_ap_lowpen_maxricochetchance"] 	= CreateConVar("gred_sv_shell_ap_lowpen_maxricochetchance"		,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_shell_ap_lowpen_ap_damage"] 			= CreateConVar("gred_sv_shell_ap_lowpen_ap_damage"				,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_shell_he_damage"] 						= CreateConVar("gred_sv_shell_he_damage"						,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_shell_gp_he_damagemultiplier"] 			= CreateConVar("gred_sv_shell_gp_he_damagemultiplier"			,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_testsuspensions"] 				= CreateConVar("gred_sv_simfphys_testsuspensions"				,  "0"  , GRED_SVAR)
 gred.Precache = function()
 	gameAddDecal( "scorch_small",		"decals/scorch_small" )

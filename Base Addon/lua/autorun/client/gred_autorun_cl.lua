@@ -489,6 +489,13 @@ local function gred_settings_bombs(CPanel)
 			gred.CheckConCommand( "gred_sv_minricochetangle",val)
 		end
 		
+		local this = CPanel:NumSlider("Global high explosives damage multiplier", "gred_sv_shell_gp_he_damagemultiplier",0,10,2);
+		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
+		this.OnValueChanged = function(this,val)
+			if this.ConVarChanging then return end
+			gred.CheckConCommand( "gred_sv_shell_gp_he_damagemultiplier",val)
+		end
+		
 		local this = CPanel:NumSlider("HE Shells damage multiplier", "gred_sv_shell_he_damagemultiplier",0,10,2);
 		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
 		this.OnValueChanged = function(this,val)
@@ -522,6 +529,12 @@ local function gred_settings_bombs(CPanel)
 		this.OnValueChanged = function(this,val)
 			if this.ConVarChanging then return end
 			gred.CheckConCommand( "gred_sv_shell_ap_lowpen_maxricochetchance",val)
+		end
+		
+		local this = CPanel:CheckBox("Should HE shells all do the same ammount of damage?","gred_sv_shell_he_damage");
+		this.OnChange = function(this,val)
+			val = val and 1 or 0
+			gred.CheckConCommand("gred_sv_shell_he_damage",val)
 		end
 		
 		local this = CPanel:CheckBox("Enable advanced non-penetration system?","gred_sv_shell_ap_lowpen_system");
