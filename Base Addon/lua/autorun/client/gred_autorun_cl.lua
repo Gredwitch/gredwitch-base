@@ -41,12 +41,10 @@ gred.CVars["gred_cl_simfphys_key_changeshell"]				= CreateConVar("gred_cl_simfph
 gred.CVars["gred_cl_simfphys_key_togglesight"]				= CreateConVar("gred_cl_simfphys_key_togglesight"			, "22",TAB_PRESS)
 gred.CVars["gred_cl_simfphys_key_togglegun"]				= CreateConVar("gred_cl_simfphys_key_togglegun"				, "23",TAB_PRESS)
 
-hook.Add("Initialize","gred_init_precache_cl",function()
-	gred.Precache()
-	if gred.CVars["gred_cl_resourceprecache"]:GetBool() then
-		gred.PrecacheResources()
-	end
-end)
+gred.Precache()
+if gred.CVars["gred_cl_resourceprecache"]:GetBool() then
+	gred.PrecacheResources()
+end
 
 local Created
 local NextThink = 0

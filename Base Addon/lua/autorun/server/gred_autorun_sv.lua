@@ -1186,20 +1186,18 @@ hook.Add("PlayerEnteredVehicle","gred_player_entervehicle_hint",function(ply,sea
 	end
 end)
 
-hook.Add("Initialize","gred_init_precache_sv",function()
-	gred.Precache()
-	if gred.CVars["gred_sv_resourceprecache"]:GetBool() then
-		gred.PrecacheResources()
+gred.Precache()
+if gred.CVars["gred_sv_resourceprecache"]:GetBool() then
+	gred.PrecacheResources()
+end
+
+local TABLE = file.Read("gredwitch_base_config_sv.txt","DATA")
+if TABLE then
+	TABLE = util.JSONToTable(TABLE)
+	for k,v in pairs(TABLE) do
+		if gred.CVars[k] then gred.CVars[k]:SetFloat(v) end
 	end
-	
-	local TABLE = file.Read("gredwitch_base_config_sv.txt","DATA")
-	if TABLE then
-		TABLE = util.JSONToTable(TABLE)
-		for k,v in pairs(TABLE) do
-			if gred.CVars[k] then gred.CVars[k]:SetFloat(v) end
-		end
-	end
-end)
+end
 
 net.Receive("gred_net_checkconcommand",function(len,ply)
 	local str = net.ReadString()

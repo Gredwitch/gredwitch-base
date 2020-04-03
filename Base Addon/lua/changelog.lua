@@ -1,6 +1,5 @@
---[[28/03/2020
-- Added more options about the damage of explosives
-- Fixed the shells whisteling on servers forever
+--[[03/04/2020
+- Removed the initialize hook since it's not being called in a lot of cases
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -9,6 +8,10 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+28/03/2020
+- Added more options about the damage of explosives
+- Fixed the shells whisteling on servers forever
 
 12/03/2020
 - Added a global server side suspension system to fix the issues with tanks flying around on displacements
