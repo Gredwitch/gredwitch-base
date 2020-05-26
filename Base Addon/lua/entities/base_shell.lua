@@ -616,7 +616,7 @@ if CLIENT then
 		
 		timer.Simple(0,function()
 			if IsValid(self) and self.GetShellType then  -- sometimes the function just doesn't exist
-				if !self.IS_AP[self:GetShellType()] and !self.snd["wiz_mortar"] then
+				if !self.IS_AP[self:GetShellType()] and !self.snd["wiz_mortar"] and gred.ActiveShellSounds[self.ShellID] then
 					table.insert(self.snd,CreateSound(self,"bomb/shellwhiz_mortar_"..math.random(1,2)..".wav"))
 					table.insert(gred.ActiveShellSounds[self.ShellID],self.snd[#self.snd])
 					self.snd[#self.snd]:SetSoundLevel(80)

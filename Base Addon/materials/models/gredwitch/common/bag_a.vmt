@@ -1,15 +1,10 @@
-"VertexLitGeneric"
+"patch"
 {
+	include "materials/models/gredwitch/common/base_wt.vmt"
+	insert
+	{
 $basetexture				"models/gredwitch/common/bag_a_c"
 $bumpmap					"models/gredwitch/common/bag_a_n"
 
-$envmap 					"env_cubemap"
-$normalmapalphaenvmapmask 	1
-$envmaptint 				"[0.20 0.20 0.20]"
-$phong 						1
-$phongfresnelranges 		"[0.25 0.58 8]"
-$phongtint 					"[1 0.99 0.79]"
-$phongexponent 				31
-$phongboost 				8
-$phongalbedoboost 			1
+}
 }

@@ -1,5 +1,8 @@
-"VertexLitGeneric"
+"patch"
 {
+	include "materials/models/gredwitch/common/base_wt.vmt"
+	insert
+	{
 $basetexture				"models/gredwitch/common/us_mg_mount_browning_1919a4_early_c"
 $bumpmap					"models/gredwitch/common/us_mg_mount_browning_1919a4_early_n"
 

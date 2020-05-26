@@ -7,49 +7,67 @@ util.AddNetworkString("gred_net_ammobox_sv_createshell")
 util.AddNetworkString("gred_net_ammobox_sv_createammo")
 util.AddNetworkString("gred_net_ammobox_sv_close")
 
-net.Receive("gred_net_ammobox_sv_createammo",function()
-	local shell = net.ReadString()
+local SpawnOffset = Vector(0,0,50)
+local AmmoSpawnOffset = Vector(0,0,70)
+
+net.Receive("gred_net_ammobox_sv_createammo",function(len,ply)
+	local ModelPath = net.ReadString()
 	local self = net.ReadEntity()
-	local ply = net.ReadEntity()
-	local gun = net.ReadString()
-	local body1 = net.ReadInt(1)
-	local body2 = net.ReadInt(1)
+	local GunClass = net.ReadString()
+	local BodygroupID = net.ReadUInt(1)
+	local BodygroupValue = net.ReadUInt(1)
+	
+	if !IsValid(self) then return end
+	if self:GetClass() != "gred_ammobox" then return end
 	
 	local ent = ents.Create("prop_physics")
-	ent:SetPos(self:GetPos() + Vector(0,0,70))
-	ent:SetModel(shell)
-	ent.gredGunEntity = gun
-	ent:SetBodygroup(body1,body2)
+	ent:SetPos(self:GetPos() + AmmoSpawnOffset)
+	ent:SetModel(ModelPath)
+	ent:SetBodygroup(BodygroupID,BodygroupValue)
+	ent.gredGunEntity = GunClass
 	ent:Spawn()
 	ent:Activate()
-	local p=ent:GetPhysicsObject()
+	
+	constraint.NoCollide(self,ent,0,0)
+	
+	local p = ent:GetPhysicsObject()
 	if IsValid(p) then
 		p:SetMass(35)
 	end
-	constraint.NoCollide(self,ent,0,0)
+	
 	ply:PickupObject(ent)
-end)
-net.Receive("gred_net_ammobox_sv_createshell",function()
-	local self = net.ReadEntity()
-	local ply = net.ReadEntity()
-	local shell = gred.CreateShell(self:GetPos() + Vector(0,0,70),
-					self:GetAngles(),
-					ply,
-					{self},
-					net.ReadInt(10),
-					net.ReadString(),
-					500,
-					2
-	)
-	shell.ImpactSpeed = 1000
-	shell:Use(ply,ply,2,1)
+	
+	self:ResetSequence("close")
 end)
 
-net.Receive("gred_net_ammobox_sv_close",function()
+net.Receive("gred_net_ammobox_sv_createshell",function(len,ply)
 	local self = net.ReadEntity()
+	
+	if !IsValid(self) then return end
+	if self:GetClass() != "gred_ammobox" then return end
+	
+	local Shell = gred.CreateShell(self:GetPos() + AmmoSpawnOffset,
+					self:GetAngles(),
+					ply,
+					self.FILTER,
+					net.ReadUInt(10),
+					net.ReadString(),
+					500,
+					10
+	)
+	
+	Shell.ImpactSpeed = 1000
+	timer.Simple(0.1,function()
+		if !IsValid(Shell) then return end
+		local phy = Shell:GetPhysicsObject()
+		if IsValid(phy) then
+			phy:EnableDrag(false)
+			phy:Wake()
+		end
+		
+		Shell:Use(ply,self,2,1)
+	end)
 	self:ResetSequence("close")
-	self.Opened = false
-	self.CantBeOpened = false
 end)
 
 function ENT:Initialize()
@@ -64,7 +82,7 @@ function ENT:Initialize()
 		p:Wake()
 		p:SetMass(50)
 	end
-	self:SetPos(self:GetPos() + Vector(0,0,50))
+	self:SetPos(self:GetPos() + SpawnOffset)
 end
 
 function ENT:Use(ply,cal)

@@ -1,5 +1,7 @@
---[[03/04/2020
-- Removed the initialize hook since it's not being called in a lot of cases
+--[[27/05/2020
+- Fixed possible exploits with the ammo box
+- Fixed a shell error
+- Replaced all the WT VMTs with patches
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
 If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
@@ -8,6 +10,9 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+03/04/2020
+- Removed the initialize hook since it's not being called in a lot of cases
 
 28/03/2020
 - Added more options about the damage of explosives
