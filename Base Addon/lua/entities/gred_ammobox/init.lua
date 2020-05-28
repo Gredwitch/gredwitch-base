@@ -82,6 +82,7 @@ function ENT:Initialize()
 		p:Wake()
 		p:SetMass(50)
 	end
+	self.FILTER = {}
 	self:SetPos(self:GetPos() + SpawnOffset)
 end
 
