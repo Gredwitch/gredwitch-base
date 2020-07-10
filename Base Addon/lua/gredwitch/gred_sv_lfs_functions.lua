@@ -1,3 +1,10 @@
+
+local startsWith = string.StartWith
+
+local function IsSmall(k)
+	return startsWith(k,"gear") or startsWith(k,"wheel") or startsWith(k,"airbrake")
+end
+
 gred.GunnersInit = function(self)
 	local ATT
 	local seat

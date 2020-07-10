@@ -48,6 +48,7 @@ local SetCollisionGroup = ENTITY.SetCollisionGroup
 local TakeDamageInfo = ENTITY.TakeDamageInfo
 local GetEyeAngles = ENTITY.EyeAngles
 local GetParent = ENTITY.GetParent
+local Ignite = ENTITY.Ignite
 
 local VECTOR = FindMetaTable("Vector")
 local LengthSqr = VECTOR.LengthSqr
@@ -133,6 +134,7 @@ local BadDamageTypes = {
 	[DMG_CRUSH] = true,
 	[DMG_BULLET] = true,
 	[DMG_SLASH] = true,
+	[DMG_BURN] = true,
 }
 local ShellClass = {
 	["base_shell"] = true,
@@ -851,7 +853,7 @@ gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatSlotTab,WeaponTab,Wep
 						for k = 1,#Ray do
 							v = Ray[k]
 							if v and !vehicle.FILTER_BYENT[v] and GetParent(v) != vehicle and ((v.InVehicle and !v:InVehicle()) or !v.InVehicle) and !SeatSlotTab.BadFlamethrowerClasses[GetClass(v)] then
-								v:Ignite(time)
+								Ignite(v,time)
 							end
 						end
 					end

@@ -37,6 +37,7 @@ SWEP.NextReload					= 0
 SWEP.DrawAmmo					= false
 SWEP.Text						= ""
 
+if true then return end
 
 	local COL_RED = Color(255,0,0,255)
 	local COL_GREEN = Color(0,255,0,255)

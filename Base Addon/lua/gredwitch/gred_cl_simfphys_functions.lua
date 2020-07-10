@@ -97,7 +97,7 @@ gred.InitializeSimfphys = function(vehicle,callback)
 	timer.Create("GRED_TANK_INIT_"..vehicle.EntityIndex,1,1,function()
 		if !IsValid(vehicle) then return end
 		
-		vehicle.CachedSpawnList = vehicle.CachedSpawnList or vehicle:GetSpawn_List()
+		vehicle.CachedSpawnList = vehicle.CachedSpawnList or (vehicle.GetSpawn_List and vehicle:GetSpawn_List())
 		
 		if !vehicle.CachedSpawnList then
 			vehicle.TankIsInitializing = false
@@ -289,6 +289,12 @@ gred.TankInitSuspensions = function(vehicle,SusDataTab,TracksTab)
 			v = SusDataTab[k]
 			if v then
 				ent = (TracksTab and TracksTab.SeparateTracks and (k > half and vehicle.RightTrack or vehicle.LeftTrack) or vehicle)
+				
+				if !IsValid(ent) then
+					vehicle.TracksInitialized = false
+					return
+				end
+				
 				vehicle.AttachmentIDs[k] = vehicle:WorldToLocal(ent:GetAttachment(ent:LookupAttachment(v.Attachment)).Pos)
 			end
 		end
@@ -344,12 +350,12 @@ gred.TankInitTracks = function(vehicle,TracksTab)
 		if TracksTab.SeparateTracks and (!IsValid(vehicle.LeftTrack) or !IsValid(vehicle.RightTrack)) then return end
 		
 		if IsValid(vehicle.LeftTrack) and IsValid(vehicle.RightTrack) then
-			vehicle.LeftTrackID = TracksTab.LeftTrackID or table.KeyFromValue(vehicle.LeftTrack:GetMaterials(),TracksTab.LeftTrackMat) - 1
-			vehicle.RightTrackID = TracksTab.RightTrackID or table.KeyFromValue(vehicle.RightTrack:GetMaterials(),TracksTab.RightTrackMat) - 1
+			vehicle.LeftTrackID = TracksTab.LeftTrackID or (table.KeyFromValue(vehicle.LeftTrack:GetMaterials(),TracksTab.LeftTrackMat) or 1) - 1
+			vehicle.RightTrackID = TracksTab.RightTrackID or (table.KeyFromValue(vehicle.RightTrack:GetMaterials(),TracksTab.RightTrackMat) or 1) - 1
 		else
 			local mat = vehicle:GetMaterials()
-			vehicle.LeftTrackID = TracksTab.LeftTrackID or table.KeyFromValue(mat,TracksTab.LeftTrackMat) - 1
-			vehicle.RightTrackID = TracksTab.RightTrackID or table.KeyFromValue(mat,TracksTab.RightTrackMat) - 1
+			vehicle.LeftTrackID = TracksTab.LeftTrackID or (table.KeyFromValue(mat,TracksTab.LeftTrackMat) or 1) - 1
+			vehicle.RightTrackID = TracksTab.RightTrackID or (table.KeyFromValue(mat,TracksTab.RightTrackMat) or 1) - 1
 		end
 		
 		vehicle.wheel_left_mat = CreateMaterial("gred_trackmat_"..vehicle.CachedSpawnList.."_"..vehicle.EntityIndex.."_left","VertexLitGeneric",TracksTab.TrackMat)
@@ -474,7 +480,7 @@ gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatID,SeatSlotTab,Weapon
 				seat:SetNWVarProxy(WepID.."NextShot",function(ent,name,oldval,newval)
 					oldval = oldval or 0
 					if oldval != newval and (newval - oldval) < 99999999 then
-						gred.PlayReloadSound(seat,SeatID,vehicle,WeaponTab,SeatSlotTab)
+						gred.PlayReloadSound(ent,SeatID,vehicle,WeaponTab,SeatSlotTab)
 					end
 				end)
 			end
@@ -651,6 +657,7 @@ gred.TankHandleSeats = function(vehicle,Mode,ply,VehicleSeatTab,ViewPortsTab)
 						hook.Remove( "CalcView","zz_simfphys_gunner_view")
 						hook.Add("CalcView","gred_simfphys_tank_CalcView",function(ply,pos,ang)
 							if !IsValid(vehicle) then return end
+							if !vehicle.LocalPlayerActiveSeat then return end
 							if !vehicle.LocalPlayerActiveSeatID then return end
 							
 							return gred.TankSightCalcView(vehicle,vehicle.LocalPlayerActiveSeat,vehicle.LocalPlayerActiveSeatID,SeatTab,Mode,ply,pos,ang)
@@ -659,6 +666,9 @@ gred.TankHandleSeats = function(vehicle,Mode,ply,VehicleSeatTab,ViewPortsTab)
 						local gred_cl_simfphys_sightsensitivity = gred.CVars.gred_cl_simfphys_sightsensitivity
 						
 						hook.Add("AdjustMouseSensitivity","gred_simfphys_tank_AdjustMouseSensitivity",function(val)
+							if !IsValid(vehicle) then return end
+							if !vehicle.LocalPlayerActiveSeat then return end
+							
 							return gred_cl_simfphys_sightsensitivity:GetFloat() * (vehicle.LocalPlayerActiveSeat.ZoomSensitivityFactor or 1)
 						end)
 					else
@@ -667,6 +677,7 @@ gred.TankHandleSeats = function(vehicle,Mode,ply,VehicleSeatTab,ViewPortsTab)
 						if SeatTab.ViewPort then
 							hook.Add("CalcView","gred_simfphys_tank_CalcView",function(ply,pos,ang)
 								if !IsValid(vehicle) then return end
+								if !vehicle.LocalPlayerActiveSeat then return end
 								if !vehicle.LocalPlayerActiveSeatID then return end
 								
 								return gred.TankViewPortCalcView(vehicle,vehicle.LocalPlayerActiveSeat,vehicle.LocalPlayerActiveSeatID,VehicleSeatTab[vehicle.LocalPlayerActiveSeatID][vehicle.Mode],Mode,VehicleSeatTab[vehicle.LocalPlayerActiveSeatID][vehicle.Mode].ViewPort,ply,pos,ang)
@@ -1083,7 +1094,7 @@ gred.TankSightCalcView = function(vehicle,seat,SeatID,SeatTab,Mode,ply,pos,ang)
 	
 	view.fov = SeatTab.Sight.SightFOV - vehicle.LocalPlayerActiveSeat.ZoomVal*SeatTab.Sight.SightFOVZoom
 	
-	seat.ZoomSensitivityFactor = math.min(view.fov / 75,1)
+	seat.ZoomSensitivityFactor = math.min(view.fov / 30,1)
 	
 	return view
 end
@@ -1130,14 +1141,17 @@ gred.TankShootCannon = function(seat,SeatID,vehicle,IsPrimary)
 		v = SeatSlotTab.Muzzles[k]
 		if v then
 			local att = vehicle:GetAttachment(v)
-			-- att.Pos = WeaponTab.MuzzlePosOffset and vehicle:LocalToWorld(vehicle:WorldToLocal(att.Pos) + WeaponTab.MuzzlePosOffset) or att.Pos
-			-- att.Ang = WeaponTab.MuzzleAngOffset and att.Ang + WeaponTab.MuzzleAngOffset or att.Ang
 			
-			effectdata:SetFlags(table.KeyFromValue(gred.Particles,WeaponTab.MuzzleFlash))
-			effectdata:SetOrigin(att.Pos)
-			effectdata:SetAngles(att.Ang)
-			effectdata:SetSurfaceProp(0)
-			Effect("gred_particle_simple",effectdata)
+			if att then
+				-- att.Pos = WeaponTab.MuzzlePosOffset and vehicle:LocalToWorld(vehicle:WorldToLocal(att.Pos) + WeaponTab.MuzzlePosOffset) or att.Pos
+				-- att.Ang = WeaponTab.MuzzleAngOffset and att.Ang + WeaponTab.MuzzleAngOffset or att.Ang
+				
+				effectdata:SetFlags(table.KeyFromValue(gred.Particles,WeaponTab.MuzzleFlash))
+				effectdata:SetOrigin(att.Pos)
+				effectdata:SetAngles(att.Ang)
+				effectdata:SetSurfaceProp(0)
+				Effect("gred_particle_simple",effectdata)
+			end
 			
 			effectdata:SetFlags(table.KeyFromValue(gred.Particles,"gred_mortar_explosion_smoke_ground"))
 			effectdata:SetOrigin(vehicle:GetPos())
@@ -1164,28 +1178,35 @@ gred.TankShootMG = function(seat,SeatID,vehicle,IsPrimary,SequentialID)
 	
 	if WeaponTab.Sequential then
 		local att = vehicle:GetAttachment(vehicle:LookupAttachment(WeaponTab.Muzzles[SequentialID]))
-		att.Pos = (WeaponTab.MuzzlePosOffset and vehicle:LocalToWorld(vehicle:WorldToLocal(att.Pos) + WeaponTab.MuzzlePosOffset) or att.Pos) + add
-		att.Ang = WeaponTab.MuzzleAngOffset and att.Ang + WeaponTab.MuzzleAngOffset or att.Ang
 		
-		effectdata:SetFlags(table.KeyFromValue(gred.Particles,WeaponTab.MuzzleFlash))
-		effectdata:SetOrigin(att.Pos)
-		effectdata:SetAngles(att.Ang)
-		effectdata:SetSurfaceProp(0)
-		Effect("gred_particle_simple",effectdata)
+		if att then
+			att.Pos = (WeaponTab.MuzzlePosOffset and vehicle:LocalToWorld(vehicle:WorldToLocal(att.Pos) + WeaponTab.MuzzlePosOffset) or att.Pos) + add
+			att.Ang = WeaponTab.MuzzleAngOffset and att.Ang + WeaponTab.MuzzleAngOffset or att.Ang
+			
+			effectdata:SetFlags(table.KeyFromValue(gred.Particles,WeaponTab.MuzzleFlash))
+			effectdata:SetOrigin(att.Pos)
+			effectdata:SetAngles(att.Ang)
+			effectdata:SetSurfaceProp(0)
+			Effect("gred_particle_simple",effectdata)
+		end
+		
 	elseif WeaponTab.Muzzles then
 		local v
 		for k = 1,#WeaponTab.Muzzles do
 			v = WeaponTab.Muzzles[k]
 			if v then
 				local att = vehicle:GetAttachment(vehicle:LookupAttachment(v))
-				att.Pos = (WeaponTab.MuzzlePosOffset and vehicle:LocalToWorld(vehicle:WorldToLocal(att.Pos) + WeaponTab.MuzzlePosOffset) or att.Pos) + add
-				att.Ang = WeaponTab.MuzzleAngOffset and att.Ang + WeaponTab.MuzzleAngOffset or att.Ang
 				
-				effectdata:SetFlags(table.KeyFromValue(gred.Particles,WeaponTab.MuzzleFlash))
-				effectdata:SetOrigin(att.Pos)
-				effectdata:SetAngles(att.Ang)
-				effectdata:SetSurfaceProp(0)
-				Effect("gred_particle_simple",effectdata)
+				if att then
+					att.Pos = (WeaponTab.MuzzlePosOffset and vehicle:LocalToWorld(vehicle:WorldToLocal(att.Pos) + WeaponTab.MuzzlePosOffset) or att.Pos) + add
+					att.Ang = WeaponTab.MuzzleAngOffset and att.Ang + WeaponTab.MuzzleAngOffset or att.Ang
+					
+					effectdata:SetFlags(table.KeyFromValue(gred.Particles,WeaponTab.MuzzleFlash))
+					effectdata:SetOrigin(att.Pos)
+					effectdata:SetAngles(att.Ang)
+					effectdata:SetSurfaceProp(0)
+					Effect("gred_particle_simple",effectdata)
+				end
 			end
 		end
 	end
@@ -1551,9 +1572,9 @@ net.Receive("gred_net_simfphys_shoot_secondary_machinegun_sequential",function(l
 	local vehicle = seat:GetParent()
 	if !IsValid(vehicle) then return end
 	
-	if !gred.TankSafetyCheck(vehicle) then return end
-	
-	gred.TankShootMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,false,SequentialID)
+	gred.TankSafetyCheck(vehicle,function()
+		gred.TankShootMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,false,SequentialID)
+	end)
 end)
 
 net.Receive("gred_net_simfphys_shoot_primary_machinegun_sequential",function(len)
@@ -1564,9 +1585,9 @@ net.Receive("gred_net_simfphys_shoot_primary_machinegun_sequential",function(len
 	local vehicle = seat:GetParent()
 	if !IsValid(vehicle) then return end
 		
-	if !gred.TankSafetyCheck(vehicle) then return end
-	
-	gred.TankShootMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,true,SequentialID)
+	gred.TankSafetyCheck(vehicle,function()
+		gred.TankShootMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,true,SequentialID)
+	end)
 end)
 
 net.Receive("gred_net_simfphys_playerenteredseat_broadcast",function(len)
@@ -1600,9 +1621,9 @@ net.Receive("gred_net_simfphys_shoot_secondary_machinegun",function(len)
 	local vehicle = seat:GetParent()
 	if !IsValid(vehicle) then return end
 	
-	if !gred.TankSafetyCheck(vehicle) then return end
-	
-	gred.TankShootMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,false)
+	gred.TankSafetyCheck(vehicle,function()
+		gred.TankShootMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,false)
+	end)
 end)
 
 net.Receive("gred_net_simfphys_shoot_secondary_tankCannon",function(len)
@@ -1612,9 +1633,9 @@ net.Receive("gred_net_simfphys_shoot_secondary_tankCannon",function(len)
 	local vehicle = seat:GetParent()
 	if !IsValid(vehicle) then return end
 	
-	if !gred.TankSafetyCheck(vehicle) then return end
-	
-	gred.TankShootCannon(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,false)
+	gred.TankSafetyCheck(vehicle,function()
+		gred.TankShootCannon(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,false)
+	end)
 end)
 
 net.Receive("gred_net_simfphys_stop_secondary_machinegun",function(len)
@@ -1624,9 +1645,9 @@ net.Receive("gred_net_simfphys_stop_secondary_machinegun",function(len)
 	local vehicle = seat:GetParent()
 	if !IsValid(vehicle) then return end
 	
-	if !gred.TankSafetyCheck(vehicle) then return end
-	
-	gred.TankStopMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,false)
+	gred.TankSafetyCheck(vehicle,function()
+		gred.TankStopMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,false)
+	end)
 end)
 
 net.Receive("gred_net_simfphys_shoot_primary_machinegun",function(len)
@@ -1636,9 +1657,9 @@ net.Receive("gred_net_simfphys_shoot_primary_machinegun",function(len)
 	local vehicle = seat:GetParent()
 	if !IsValid(vehicle) then return end
 	
-	if !gred.TankSafetyCheck(vehicle) then return end
-	
-	gred.TankShootMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,true)
+	gred.TankSafetyCheck(vehicle,function()
+		gred.TankShootMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,true)
+	end)
 end)
 
 net.Receive("gred_net_simfphys_shoot_primary_tankCannon",function(len)
@@ -1648,9 +1669,9 @@ net.Receive("gred_net_simfphys_shoot_primary_tankCannon",function(len)
 	local vehicle = seat:GetParent()
 	if !IsValid(vehicle) then return end
 	
-	if !gred.TankSafetyCheck(vehicle) then return end
-	
-	gred.TankShootCannon(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,true)
+	gred.TankSafetyCheck(vehicle,function()
+		gred.TankShootCannon(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,true)
+	end)
 end)
 
 net.Receive("gred_net_simfphys_stop_primary_machinegun",function(len)
@@ -1660,9 +1681,9 @@ net.Receive("gred_net_simfphys_stop_primary_machinegun",function(len)
 	local vehicle = seat:GetParent()
 	if !IsValid(vehicle) then return end
 	
-	if !gred.TankSafetyCheck(vehicle) then return end
-	
-	gred.TankStopMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,true)
+	gred.TankSafetyCheck(vehicle,function() 
+		gred.TankStopMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,true)
+	end)
 end)
 
 net.Receive("gred_net_simfphys_clearbonemanipulations",function(len)

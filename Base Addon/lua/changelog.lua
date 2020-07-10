@@ -1,4 +1,10 @@
---[[10/07/2020
+--[[B10/07/2020
+[HOTFIX]
+-Fixed a lot of errors
+-Fixed destructible planes being broken
+-Fixed some flamethrower issues
+-Increased mouse sensitivity in sight mode
+
 - Fixed the Eye Angles resetting when you get in a tank
 - Removed Press WALK to activate the turret
 - Walk is now the freeview key
