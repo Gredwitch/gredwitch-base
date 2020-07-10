@@ -296,6 +296,8 @@ gred.TankInitVars = function(vehicle,VehicleTab,TracksTab,VehicleSeatTab) -- doe
 	vehicle.gred_sv_simfphys_suspension_rate = gred.CVars.gred_sv_simfphys_suspension_rate:GetFloat()
 	vehicle.gred_sv_simfphys_manualreloadsystem = gred.CVars.gred_sv_simfphys_manualreloadsystem:GetBool()
 	vehicle.gred_sv_simfphys_infinite_ammo = gred.CVars.gred_sv_simfphys_infinite_ammo:GetBool()
+	vehicle.gred_sv_simfphys_disable_viewmodels = gred.CVars.gred_sv_simfphys_disable_viewmodels:GetBool()
+	vehicle.gred_sv_simfphys_infinite_mg_ammo = gred.CVars.gred_sv_simfphys_infinite_mg_ammo:GetBool()
 	vehicle.gred_sv_simfphys_smokereloadtime = gred.CVars.gred_sv_simfphys_smokereloadtime:GetFloat()
 	vehicle.gred_sv_simfphys_forcesynchronouselevation = gred.CVars.gred_sv_simfphys_forcesynchronouselevation:GetBool()
 	vehicle.gred_sv_simfphys_traverse_speed_multiplier = gred.CVars.gred_sv_simfphys_traverse_speed_multiplier:GetFloat()
@@ -1375,7 +1377,9 @@ gred.TankShootMG = function(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlo
 		gred.CreateBullet(ply,att.Pos,att.Ang + Angle(Rand(WeaponTab.Spread,-WeaponTab.Spread),Rand(WeaponTab.Spread,-WeaponTab.Spread),Rand(WeaponTab.Spread,-WeaponTab.Spread)),WeaponTab.Caliber,vehicle.FILTER,nil,nil,SeatSlotTab.UpdateTracers[SeatSlotTab.CurrentMuzzle]())
 		SeatSlotTab.CurrentMuzzle = SeatSlotTab.CurrentMuzzle + 1
 		
-		SeatSlotTab.Ammo = SeatSlotTab.Ammo - 1
+		if not vehicle.gred_sv_simfphys_infinite_mg_ammo then
+			SeatSlotTab.Ammo = SeatSlotTab.Ammo - 1
+		end
 		
 		if WeaponTab.OnShoot then
 			WeaponTab.OnShoot(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID,SeatSlotTab.CurrentMuzzle)
@@ -1410,7 +1414,9 @@ gred.TankShootMG = function(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlo
 				att = GetAttachment(vehicle,SeatSlotTab.Muzzles[k])
 				gred.CreateBullet(ply,att.Pos,att.Ang + Angle(Rand(WeaponTab.Spread,-WeaponTab.Spread),Rand(WeaponTab.Spread,-WeaponTab.Spread),Rand(WeaponTab.Spread,-WeaponTab.Spread)),WeaponTab.Caliber,vehicle.FILTER,nil,nil,SeatSlotTab.UpdateTracers[k]())
 				
-				SeatSlotTab.Ammo = SeatSlotTab.Ammo - 1
+				if not vehicle.gred_sv_simfphys_infinite_mg_ammo then
+					SeatSlotTab.Ammo = SeatSlotTab.Ammo - 1
+				end
 				
 				if WeaponTab.OnShoot then
 					WeaponTab.OnShoot(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID,k)

@@ -1,4 +1,8 @@
---[[C10/07/2020
+--[[D10/07/2020
+[FEATURE REQUEST]
+- Added an option to have unlimited machinegun ammo
+- Added an option to disable the firstperson viewmodels (the goggles)
+
 [HOTFIX #2]
 - Fixed LFS planes using NoCollide constraints being broken
 - Fixed tank resupplying not working

@@ -236,6 +236,7 @@ gred.TankInitVars = function(vehicle,VehicleTab)
 	
 	vehicle.gred_cl_simfphys_viewport_fovnodraw_vertical = gred.CVars.gred_cl_simfphys_viewport_fovnodraw_vertical:GetFloat()
 	vehicle.gred_cl_simfphys_maxsuspensioncalcdistance = gred.CVars.gred_cl_simfphys_maxsuspensioncalcdistance:GetFloat()
+	vehicle.gred_sv_simfphys_disable_viewmodels = gred.CVars.gred_sv_simfphys_disable_viewmodels:GetBool()
 	vehicle.gred_sv_simfphys_manualreloadsystem = gred.CVars.gred_sv_simfphys_manualreloadsystem:GetBool()
 	vehicle.gred_cl_simfphys_viewport_fovnodraw = gred.CVars.gred_cl_simfphys_viewport_fovnodraw:GetInt()
 	vehicle.gred_sv_simfphys_forcefirstperson = gred.CVars.gred_sv_simfphys_forcefirstperson:GetBool()
@@ -1354,10 +1355,10 @@ gred.TankViewPortCalcView = function(vehicle,seat,SeatID,SeatTab,Mode,ViewPortTa
 		Pos,Ang = ViewPortTab.Pos,ViewPortTab.Ang
 	end
 	
-	if ViewPortTab.MinAng and ViewPortTab.MaxAng and ((ViewPortTab.FreeView and (!seat:GetNWBool("TurretDisabled") or !ply:KeyDown(IN_WALK))) or (!ViewPortTab.FreeView and (seat:GetNWBool("TurretDisabled") or ply:KeyDown(IN_WALK)))) then
+	if ((ViewPortTab.MinAng and ViewPortTab.MaxAng) or vehicle.gred_sv_simfphys_disable_viewmodels) and ((ViewPortTab.FreeView and (!seat:GetNWBool("TurretDisabled") or !ply:KeyDown(IN_WALK))) or (!ViewPortTab.FreeView and (seat:GetNWBool("TurretDisabled") or ply:KeyDown(IN_WALK)))) then
 		ang = vehicle:WorldToLocalAngles(ang)
-		ang.p = math.Clamp(ang.p,ViewPortTab.MinAng.p,ViewPortTab.MaxAng.p)
-		ang.y = math.Clamp(ang.y,ViewPortTab.MinAng.y,ViewPortTab.MaxAng.y)
+		ang.p = math.Clamp(ang.p,vehicle.gred_sv_simfphys_disable_viewmodels and -180 or ViewPortTab.MinAng.p,vehicle.gred_sv_simfphys_disable_viewmodels and 180 or ViewPortTab.MaxAng.p)
+		ang.y = math.Clamp(ang.y,vehicle.gred_sv_simfphys_disable_viewmodels and -180 or ViewPortTab.MinAng.y,vehicle.gred_sv_simfphys_disable_viewmodels and 180 or ViewPortTab.MaxAng.y)
 		Ang = Ang + ang
 	end
 	
@@ -1470,7 +1471,7 @@ gred.PlayerEnteredSeat = function(vehicle,seat,SeatID,ply)
 	if SeatTab and SeatTab.ViewPort then
 		local ViewPortTab = SeatTab.ViewPort
 		
-		if ViewPortTab.Model then
+		if ViewPortTab.Model and !vehicle.gred_sv_simfphys_disable_viewmodels then
 			local Pos,Ang
 			-- if ViewPortTab.Attachment then
 				-- local att = vehicle:GetAttachment(vehicle:LookupAttachment(ViewPortTab.Attachment))

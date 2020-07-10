@@ -973,6 +973,12 @@ hook.Add("GredOptionsAddLateralMenuOption","AddSimfphys",function(DFrame,DPanel,
 					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_infinite_ammo","Infinite ammo","Toggles infinite ammo for anything that isn't a machinegun",true,true)
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
+					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_infinite_mg_ammo","Infinite machinegun ammo","Toggles infinite ammo for anything that is a machinegun / autocannon",true,true)
+				end,
+				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
+					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_disable_viewmodels","Disable 1st person viewport models","Toggles the view goggles / viewports in 1st person for tanks that have them",true,true)
+				end,
+				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_spawnwithoutammo","Spawn without ammo","Spawns vehicles with 0 munitions",false,true)
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
