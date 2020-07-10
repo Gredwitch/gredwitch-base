@@ -1,4 +1,52 @@
---[[28/05/2020
+--[[10/07/2020
+- Fixed the Eye Angles resetting when you get in a tank
+- Removed Press WALK to activate the turret
+- Walk is now the freeview key
+- Fixed the machineguns' muzzleflashes being behind tanks’ turrets while they move
+- Made a new HUD for the tanks
+- Added a viewport system
+- New tank base system : tanks are now made with a table
+- Added a new track sound system
+- Made the tracks sound louder
+- Reworked the way tanks turn
+- Optimized the tanks a lot
+- Added a loader system for every tanks
+- Fixed player damage not working in vehicles
+- Fixed shells glitching in the water
+- Added a new elevation system (with new turret traverse and elevation sounds)
+- Made a new options menu
+- Added a hatch system - you can now open the hatches with the O key
+- Fixed the keybinds triggering functions on all the seats
+- Added a realistic normalisation system for the shells
+- Made it so shells do not ricochet in mud, sand and snow
+- Added a better War Thunder style ricochet system
+- Added a new whistling system for the shells
+- Shells will not whistle if they were shot way too close from you anymore
+- Fixed the shell tracers emitters not being removed correctly
+- Made it so the shells can have different tracer colours
+- Fixed only one type of tank explosion triggering all the time
+- Reduced the damage of the HEAT shells
+- Fixed high velocity shells making tanks fly away
+- Fixed “Clamping ApplyAbsVelocityImpulse on player”
+- Removed screen shakes when explosives blow up in vehicles
+- Vehicles now perform way better during lags
+- Fixed shells crashing the server when hitting water
+- Made it so you can zoom in sight mode (W)
+- Re-coded the ammo box
+- Several people can now use the ammo box at the same time
+- Fixed shells not having correct bodygroups
+- Recoded the way shells are loaded into the tank
+- Fixed a major issues with the shells’ ballistics that was screwing drag coefficients and inertia up (The Tiger I E’s Panzergranate 39 was penetrating 96mm at 100m, it now pens 162mm at 100m)
+- Added working smoke launchers to tanks (smoke projectile model by William)
+- Shells now gets the tanks’ velocity added to their base velocity
+- Optimized the physical bullets
+- Added bullet impacts
+- Improved the ricochet impact effects
+- New armour system with realistic armour plate simulation
+- When a shell hits a tank, the person who fired the shell will get a War Thunder style windows that shows if the shell went through or not
+- Added double tap WALK to disable the turret
+- Add traverse rate and elevation rate multipliers
+- Mouse sensitivity in sight mode is now reduced based on the zoom of the sight
 - Fixed the ammo box
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
@@ -13,7 +61,6 @@ OLDER CHANGES
 - Fixed possible exploits with the ammo box
 - Fixed a shell error
 - Replaced all the WT VMTs with patches
-
 
 03/04/2020
 - Removed the initialize hook since it's not being called in a lot of cases

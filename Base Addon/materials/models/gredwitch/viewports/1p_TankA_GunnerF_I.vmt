@@ -1,0 +1,18 @@
+"VertexLitGeneric"
+{
+	"$basetexture" 					"models/gredwitch/viewports/1p_TankA_GunnerF_I"
+	"$lightwarptexture"		 		"models/gredwitch/common/lightwarp"
+	"$bumpmap"						"models/gredwitch/viewports/normal/1p_TankA_GunnerF_I"
+	
+	// "$envmap" 						"env_cubemap"
+	"$normalmapalphaenvmapmask" 	1
+	"$envmaptint" 					"[0.20 0.20 0.20]"
+	"$phong" 						1
+	"$phongfresnelranges" 			"[0.25 0.58 8]"
+	"$phongtint" 					"[1 0.99 0.79]"
+	"$phongexponent" 				31
+	"$phongboost" 					0
+	"$phongalbedoboost" 			1
+	"$alphatest" 					1
+	// $nocull 1
+}

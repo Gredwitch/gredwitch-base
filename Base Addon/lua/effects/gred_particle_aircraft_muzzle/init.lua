@@ -2,7 +2,7 @@ function EFFECT:Init(data)
 	local pos = data:GetOrigin()
 	local ang = data:GetAngles()
 	local ent = data:GetEntity()
-	if GetConVar("gred_cl_altmuzzleeffect"):GetInt() == 1 then
+	if gred.CVars["gred_cl_altmuzzleeffect"]:GetBool() then
 		ParticleEffect("muzzleflash_sparks_variant_6",pos,ang,nil)
 		ParticleEffect("muzzleflash_1p_glow",pos,ang,nil)
 		ParticleEffect("muzzleflash_m590_1p_core",pos,ang,nil)

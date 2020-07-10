@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/hts/smoke_shell/shell_d"
+	"$bumpmap" "models/hts/smoke_shell/shell_nm"
+}

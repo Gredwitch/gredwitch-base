@@ -22,10 +22,10 @@ ENT.FarExplosionSound 				=	"explosions/cache_explode_distant.wav"
 ENT.DistExplosionSound 				=	"explosions/cache_explode_far_distant.wav"
 ENT.AdminOnly						=	true
 ENT.Editable						=	true
-ENT.AutomaticFrameAdvance			= 	true
-ENT.DEFAULT_PHYSFORCE               = 50
-ENT.DEFAULT_PHYSFORCE_PLYAIR        = 500
-ENT.DEFAULT_PHYSFORCE_PLYGROUND     = 5000
+ENT.AutomaticFrameAdvance 			= 	true
+ENT.DEFAULT_PHYSFORCE               = 	50
+ENT.DEFAULT_PHYSFORCE_PLYAIR        = 	500
+ENT.DEFAULT_PHYSFORCE_PLYGROUND     = 	5000
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Bool",0,"Invincible", {KeyName = "Invincible", Edit = { type = "Boolean", category = "Logistic"}})

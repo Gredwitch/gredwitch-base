@@ -1,6 +1,6 @@
 include("gredwitch/gred_autorun_shared.lua")
 
-local util = util
+local util = util 
 local pairs = pairs
 local table = table
 local istable = istable
@@ -33,86 +33,38 @@ gred.CVars["gred_cl_altmuzzleeffect"] 						= CreateClientConVar("gred_cl_altmuz
 gred.CVars["gred_cl_wac_explosions"] 						= CreateClientConVar("gred_cl_wac_explosions" 						, "1" ,true,false)
 gred.CVars["gred_cl_enable_popups"] 						= CreateClientConVar("gred_cl_enable_popups"	 					, "1" ,true,false)
 gred.CVars["gred_cl_firstload"] 							= CreateClientConVar("gred_cl_firstload"							, "1" ,true,false)
+gred.CVars["gred_cl_simfphys_enablecrosshair"]				= CreateClientConVar("gred_cl_simfphys_enablecrosshair"				, "1" ,true,false)
 gred.CVars["gred_cl_simfphys_sightsensitivity"] 			= CreateClientConVar("gred_cl_simfphys_sightsensitivity"			,"0.25",true,false)
 gred.CVars["gred_cl_simfphys_maxsuspensioncalcdistance"] 	= CreateClientConVar("gred_cl_simfphys_maxsuspensioncalcdistance"	, "85000000" ,true,false)
+gred.CVars["gred_cl_simfphys_viewport_fovnodraw"] 			= CreateClientConVar("gred_cl_simfphys_viewport_fovnodraw"			,"15",true,false)
+gred.CVars["gred_cl_simfphys_viewport_fovnodraw_vertical"] 	= CreateClientConVar("gred_cl_simfphys_viewport_fovnodraw_vertical"	,"0.75",true,false)
+gred.CVars["gred_cl_simfphys_viewport_hq"] 					= CreateClientConVar("gred_cl_simfphys_viewport_hq"					,"0",true,false)
+gred.CVars["gred_cl_simfphys_suspensions"] 					= CreateClientConVar("gred_cl_simfphys_suspensions"					, "1" ,true,false)
+gred.CVars["gred_cl_simfphys_testviewports"] 				= CreateClientConVar("gred_cl_simfphys_testviewports"				, "0" ,true,false)
+gred.CVars["gred_cl_favouritetab"] 							= CreateClientConVar("gred_cl_favouritetab"							, "HOME" ,true,false)
+gred.CVars["gred_cl_shell_blur"] 							= CreateClientConVar("gred_cl_shell_blur"							, "1" ,true,false)
+gred.CVars["gred_cl_shell_blur_invehicles"] 				= CreateClientConVar("gred_cl_shell_blur_invehicles"				, "1" ,true,false)
+gred.CVars["gred_cl_shell_enable_killcam"] 					= CreateClientConVar("gred_cl_shell_enable_killcam"					, "1" ,true,false)
 
 local TAB_PRESS = {FCVAR_ARCHIVE,FCVAR_USERINFO}
 gred.CVars["gred_cl_simfphys_key_changeshell"]				= CreateConVar("gred_cl_simfphys_key_changeshell"			, "21",TAB_PRESS)
 gred.CVars["gred_cl_simfphys_key_togglesight"]				= CreateConVar("gred_cl_simfphys_key_togglesight"			, "22",TAB_PRESS)
 gred.CVars["gred_cl_simfphys_key_togglegun"]				= CreateConVar("gred_cl_simfphys_key_togglegun"				, "23",TAB_PRESS)
+gred.CVars["gred_cl_simfphys_key_togglehatch"]				= CreateConVar("gred_cl_simfphys_key_togglehatch"			, "25",TAB_PRESS)
+gred.CVars["gred_cl_simfphys_key_togglezoom"]				= CreateConVar("gred_cl_simfphys_key_togglezoom"			, "79",TAB_PRESS)
+gred.CVars["gred_cl_simfphys_key_throwsmoke"]				= CreateConVar("gred_cl_simfphys_key_throwsmoke"			, "17",TAB_PRESS)
 
 gred.Precache()
 if gred.CVars["gred_cl_resourceprecache"]:GetBool() then
 	gred.PrecacheResources()
 end
 
+
 local Created
 local NextThink = 0
 local NextFind = 0
 local id = 0
 local SIMFPHYS_COLOR = Color(255,235,0)
-
-local function GetTrackPos(ent,div,smoother) -- taken from simfphys (by Luna)
-	local FT =  FrameTime()
-	local spin_left = ent.trackspin_l and (-ent.trackspin_l / div) or 0
-	local spin_right = ent.trackspin_r and (-ent.trackspin_r / div) or 0
-	
-	ent.sm_TrackDelta_L = ent.sm_TrackDelta_L and (ent.sm_TrackDelta_L + (spin_left - ent.sm_TrackDelta_L) * smoother) or 0
-	ent.sm_TrackDelta_R = ent.sm_TrackDelta_R and (ent.sm_TrackDelta_R + (spin_right- ent.sm_TrackDelta_R) * smoother) or 0
-
-	return {Left = ent.sm_TrackDelta_L,Right = ent.sm_TrackDelta_R}
-end
-
-local function GetAllTanks()
-	local class
-	for k,v in pairs(gred.simfphys) do
-		v.entities = {}
-	end
-	for k,v in pairs(ents.FindByClass("gmod_sent_vehicle_fphysics_base")) do
-		class = v:GetSpawn_List()
-		if gred.simfphys[class] then
-			tableinsert(gred.simfphys[class].entities,v)
-		end
-	end
-end
-
-local function RoundAngle(ang,decimals)
-	ang.p = math.Round(ang.p,decimals)
-	ang.r = math.Round(ang.r,decimals)
-	return ang
-end
-
-local function DrawAmmoLeft(vehicle,scrW,scrH)
-	local sizex = scrW * ((scrW / scrH) > (4/3) and 1 or 1.32)
-	local s_xpos = scrW * 0.5 - sizex * 0.115 - sizex * 0.032
-	local s_ypos = scrH - scrH * 0.092 - scrH * 0.02
-	local curgun = vehicle:GetNWInt("CurGun",1)
-	local shelltype = vehicle:GetNWInt(curgun.."ShellType",1)
-	local caliber = vehicle:GetNWInt(curgun.."Caliber",0)
-	draw.SimpleText("SHELLTYPE: "..vehicle.shellTypes[curgun][shelltype]..(vehicle:GetNWBool("Reloading",false) and " [RELOADING]" or ""),"simfphysfont", s_xpos + sizex * 0.185, s_ypos + scrH*0.012 ,SIMFPHYS_COLOR,0,1)
-	draw.SimpleText("AMMO: "..vehicle:GetNWInt(curgun.."CurAmmo"..shelltype,0),"simfphysfont", s_xpos + sizex * 0.185, s_ypos + scrH*0.035 ,SIMFPHYS_COLOR,0,1)
-	if caliber > 0 then draw.SimpleText(caliber.."MM GUN"..(#vehicle.shellTypes > 1 and " (Press "..input.GetKeyName(gred.CVars["gred_cl_simfphys_key_togglegun"]:GetInt()).." to toggle)" or ""),"simfphysfont", s_xpos + sizex * 0.185, s_ypos + scrH*0.058 ,SIMFPHYS_COLOR,0,1) end
-end
-
-local function DrawWorldTip(text,pos,tipcol,font,offset)
-	pos = pos:ToScreen()
-	local black = Color(0,0,0,tipcol.a)
-	
-	local x = 0
-	local y = 0
-	local padding = 10
-	
-	surface.SetFont(font)
-	local w,h = surface.GetTextSize(text)
-	
-	x = pos.x - w*0.5
-	y = pos.y - h*0.5 - offset
-	
-	draw.RoundedBox(8, x-padding-2, y-padding-2, w+padding*2+4, h+padding*2+4, black)
-	draw.RoundedBox( 8, x-padding, y-padding, w+padding*2, h+padding*2, tipcol )
-	draw.DrawText(text,font,x+w/2,y,black,TEXT_ALIGN_CENTER)
-
-end
 
 local function DrawCircle( X, Y, radius ) -- copyright LunasFlightSchool™
 	local segmentdist = 360 / ( 2 * math.pi * radius / 2 )
@@ -122,459 +74,17 @@ local function DrawCircle( X, Y, radius ) -- copyright LunasFlightSchool™
 	end
 end
 
-local function gred_settings_bullets(CPanel)
+local function gred_settings(CPanel)
 	CPanel:ClearControls()
 	
-	-- if notdedicated then
-		local this = CPanel:CheckBox("Should 12mm MGs have a radius?","gred_sv_12mm_he_impact" );
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_12mm_he_impact",val)
-		end
-				
-		local this = CPanel:CheckBox("Should 7mm MGs have a radius?","gred_sv_7mm_he_impact" );
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_7mm_he_impact",val)
-		end
-		
-		local this = CPanel:NumSlider( "Bullet damage multiplier","gred_sv_bullet_dmg",0,10,2 );this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand("gred_sv_bullet_dmg",val)
-		end
-		
-		local this = CPanel:NumSlider( "Bullet radius multiplier","gred_sv_bullet_radius",0,10,2 );this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand("gred_sv_bullet_radius",val)
-		end
-		
-		local this = CPanel:NumSlider( "Tracer ammo apparition", "gred_sv_tracers", 0, 20, 0 );this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand("gred_sv_tracers",val)
-		end
-		
-		if hab and hab.Module.PhysBullet then
-			local this = CPanel:CheckBox("Override Havok's physical bullets?","gred_sv_override_hab" );
-			this.OnChange = function(this,val)
-				val = val and 1 or 0
-				gred.CheckConCommand("gred_sv_override_hab",val)
-			end
-		end
-	-- end
-	
-	CPanel:CheckBox("Use Insurgency impact effects for 7mm MGs?","gred_cl_insparticles" );
-	
-	CPanel:CheckBox("Disable impact effects for 7mm MGs?","gred_cl_noparticles_7mm" );
-	
-	CPanel:CheckBox("Disable impact effects for 12mm MGs?","gred_cl_noparticles_12mm" );
-	
-	CPanel:CheckBox("Disable impact effects for 20mm cannons?","gred_cl_noparticles_20mm" );
-	
-	CPanel:CheckBox("Disable impact effects for 30mm cannons?","gred_cl_noparticles_30mm" );
-	
-	CPanel:CheckBox("Disable impact effects for 40mm cannons?","gred_cl_noparticles_40mm" );
-	
-	CPanel:CheckBox("Disable water impact effects?","gred_cl_nowaterimpacts" );
+	local DButton = vgui.Create("DButton")
+	DButton:SetText("Options..")
+	DButton.DoClick = function(DButton)
+		gred.OpenOptions()
+	end
+	CPanel:AddItem(DButton)
 end
 
-local function gred_settings_wac(CPanel)
-	CPanel:ClearControls()
-	
-	CPanel:AddPanel( plane );
-	-- if notdedicated then
-	
-		local this = CPanel:CheckBox("Override the WAC base?","gred_sv_wac_override");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_wac_override",val)
-		end
-		
-		local this = CPanel:CheckBox("Use old rockets?","gred_sv_oldrockets");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_oldrockets",val)
-		end
-		
-		local this = CPanel:CheckBox("Enable bombs in aircrafts?","gred_sv_wac_bombs");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_wac_bombs",val)
-		end
-		
-		local this = CPanel:CheckBox("Enable radio sounds?","gred_sv_wac_radio");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_wac_radio",val)
-		end
-		
-		local this = CPanel:CheckBox("Should jets be very fast?","gred_jets_speed");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_jets_speed",val)
-		end
-		
-		local this = CPanel:CheckBox("Should aircrafts crash underwater?","gred_sv_wac_explosion_water");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_wac_explosion_water",val)
-		end
-		
-		local this = CPanel:CheckBox("Should aircrafts crash?","gred_sv_wac_explosion");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_wac_explosion",val)
-		end
-		
-		local this = CPanel:CheckBox("Use the default WAC munitions?","gred_sv_default_wac_munitions");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_default_wac_munitions",val)
-		end
-	
-		local this = CPanel:CheckBox("Should helicopters spin when their health is low?","gred_sv_wac_heli_spin");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_wac_heli_spin",val)
-		end
-		
-		local this = CPanel:CheckBox("Use a custom health system?","gred_sv_enablehealth");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_enablehealth",val)
-		end
-		
-		local this = CPanel:CheckBox("Use a health per engine system?","gred_sv_enableenginehealth");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_enableenginehealth",val)
-		end
-		
-		local this = CPanel:NumSlider( "Default engine health", "gred_sv_healthslider", 1, 1000, 0 );this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand("gred_sv_healthslider",val)
-		end
-		
-		local this = CPanel:NumSlider( "Helicopter spin chance", "gred_sv_wac_heli_spin_chance", 1, 10, 0 );this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand("gred_sv_wac_heli_spin_chance",val)
-		end
-		
-		local this = CPanel:CheckBox("Use alternative fire particles?","gred_sv_fire_effect");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_fire_effect",val)
-		end
-			
-		local this = CPanel:CheckBox("Use multiple fire particles?","gred_sv_multiple_fire_effects");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_multiple_fire_effects",val)
-		end
-	-- end
-	
-	CPanel:CheckBox("Enable explosion particles?","gred_cl_wac_explosions");
-	
-end
-
-local function gred_settings_misc(CPanel)
-	CPanel:ClearControls()
-	
-	Created = true;
-	
-	CPanel:CheckBox("Use an alternative muzzleflash?","gred_cl_altmuzzleeffect");
-	CPanel:CheckBox("Enable pop ups about missing content?","gred_cl_enable_popups");
-	CPanel:CheckBox("Auto-precache resources? (increases loading times & timeouts)","gred_cl_resourceprecache");
-	local this = CPanel:CheckBox("(SERVER) Auto-precache resources? (increases server boot time)","gred_sv_resourceprecache");
-	this.OnChange = function(this,val)
-		val = val and 1 or 0
-		gred.CheckConCommand("gred_sv_resourceprecache",val)
-	end
-end
-
-local function gred_settings_simfphys(CPanel)
-	CPanel:ClearControls()
-	
-	Created = true;
-	
-	local this = CPanel:CheckBox("Arcade mode","gred_sv_simfphys_arcade");
-	local parent = this:GetParent()
-	this.OnChange = function(this,val)
-		val = val and 1 or 0
-		gred.CheckConCommand("gred_sv_simfphys_arcade",val)
-	end
-	
-	local this = CPanel:CheckBox("Infinite ammo","gred_sv_simfphys_infinite_ammo");
-	local parent = this:GetParent()
-	this.OnChange = function(this,val)
-		val = val and 1 or 0
-		gred.CheckConCommand("gred_sv_simfphys_infinite_ammo",val)
-	end
-	
-	local this = CPanel:CheckBox("Enable 3rd person crosshair?","gred_sv_simfphys_enablecrosshair");
-	local parent = this:GetParent()
-	this.OnChange = function(this,val)
-		val = val and 1 or 0
-		gred.CheckConCommand("gred_sv_simfphys_enablecrosshair",val)
-	end
-	
-	local this = CPanel:CheckBox("Use 4 wheels instead of 6 for tanks?","gred_sv_simfphys_lesswheels");
-	local parent = this:GetParent()
-	this.OnChange = function(this,val)
-		val = val and 1 or 0
-		gred.CheckConCommand("gred_sv_simfphys_lesswheels",val)
-	end
-	
-	local this = CPanel:CheckBox("Use the broken suspension system?","gred_sv_simfphys_testsuspensions");
-	local parent = this:GetParent()
-	this.OnChange = function(this,val)
-		val = val and 1 or 0
-		gred.CheckConCommand("gred_sv_simfphys_testsuspensions",val)
-	end
-	
-	local this = CPanel:CheckBox("Spawn without ammo","gred_sv_simfphys_spawnwithoutammo");
-	local parent = this:GetParent()
-	this.OnChange = function(this,val)
-		val = val and 1 or 0
-		gred.CheckConCommand("gred_sv_simfphys_spawnwithoutammo",val)
-	end
-	
-	local this = CPanel:NumSlider("Turn rate multipler", "gred_sv_simfphys_turnrate_multplier",0,3,2);
-	this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-	this.OnValueChanged = function(this,val)
-		if this.ConVarChanging then return end
-		gred.CheckConCommand( "gred_sv_simfphys_turnrate_multplier",val)
-	end
-	
-	local this = CPanel:NumSlider("Health multipler", "gred_sv_simfphys_health_multplier",1,3,2);
-	this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-	this.OnValueChanged = function(this,val)
-		if this.ConVarChanging then return end
-		gred.CheckConCommand( "gred_sv_simfphys_health_multplier",val)
-	end
-	
-	-- local this = CPanel:CheckBox("Should bullets damage tanks?","gred_sv_simfphys_bullet_dmg_tanks");
-	-- local parent = this:GetParent()
-	-- this.OnChange = function(this,val)
-		-- val = val and 1 or 0
-		-- gred.CheckConCommand("gred_sv_simfphys_bullet_dmg_tanks",val)
-	-- end
-	
-	local DBinder = vgui.Create("DBinder")
-	DBinder:SetValue(gred.CVars["gred_cl_simfphys_key_changeshell"]:GetInt())
-	DBinder.OnChange = function(DBinder,key)
-		gred.CVars["gred_cl_simfphys_key_changeshell"]:SetInt(key)
-	end
-	CPanel:AddItem(CPanel:Help("Toggle shell types"),DBinder)
-	
-	local DBinder = vgui.Create("DBinder")
-	DBinder:SetValue(gred.CVars["gred_cl_simfphys_key_togglesight"]:GetInt())
-	DBinder.OnChange = function(DBinder,key)
-		gred.CVars["gred_cl_simfphys_key_togglesight"]:SetInt(key)
-	end
-	CPanel:AddItem(CPanel:Help("Toggle tank sight"),DBinder)
-	
-	local DBinder = vgui.Create("DBinder")
-	DBinder:SetValue(gred.CVars["gred_cl_simfphys_key_togglegun"]:GetInt())
-	DBinder.OnChange = function(DBinder,key)
-		gred.CVars["gred_cl_simfphys_key_togglegun"]:SetInt(key)
-	end
-	CPanel:AddItem(CPanel:Help("Toggle tank gun"),DBinder)
-	
-	local this = CPanel:NumSlider("Sensitivity in sight mode","gred_cl_simfphys_sightsensitivity",0,1,2);this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-	this.OnValueChanged = function(this,val)
-		if this.ConVarChanging then return end
-		gred.CVars["gred_cl_simfphys_sightsensitivity"]:SetInt(val)
-	end
-	
-	local this = CPanel:NumSlider("Max suspension calculation distance","gred_cl_simfphys_maxsuspensioncalcdistance",0,300000000,0);this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-	this.OnValueChanged = function(this,val)
-		if this.ConVarChanging then return end
-		gred.CVars["gred_cl_simfphys_maxsuspensioncalcdistance"]:SetInt(val)
-	end
-end
-
-local function gred_settings_lfs(CPanel)
-	CPanel:ClearControls()
-	
-	-- local msounds={}
-	-- msounds[1]="extras/american/outgoingstraferun1.ogg"
-	Created = true;
-	
-	-- local plane = vgui.Create( "DImageButton" );
-	-- plane:SetImage( "hud/planes_settings.png" );
-	-- plane:SetSize( 200, 80 );
-	-- plane.DoClick = function()
-		-- local psnd = Sound( table.Random(psounds) );
-		-- surface.PlaySound( psnd );
-	-- end
-	-- CPanel:AddPanel( plane );
-	-- if notdedicated then
-	
-		local this = CPanel:NumSlider( "Aircraft health multiplier", "gred_sv_lfs_healthmultiplier", 1, 10, 2 );this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand("gred_sv_lfs_healthmultiplier",val)
-		end
-		
-		local this = CPanel:CheckBox("Should the health multiplier only apply to Gredwitch's LFS aircrafts?","gred_sv_lfs_healthmultiplier_all");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_lfs_healthmultiplier_all",val)
-		end
-		
-		local this = CPanel:CheckBox("Should LFS aircrafts be invincible?","gred_sv_lfs_godmode");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_lfs_godmode",val)
-		end
-		
-		local this = CPanel:CheckBox("Should LFS aircrafts have infinite ammo?","gred_sv_lfs_infinite_ammo");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_lfs_infinite_ammo",val)
-		end
-		
-	-- end
-end
-
-local function gred_settings_bombs(CPanel)
-	CPanel:ClearControls()
-	--[[local sound = "extras/terrorist/allahu.mp3"
-	
-	Created = true;
-	
-	local logo = vgui.Create( "DImageButton" );
-	logo:SetImage( "hud/bombs_settings.png" );
-	logo:SetSize( 250, 250 );
-	logo.DoClick = function()
-		local snd = Sound( sound );
-		surface.PlaySound( snd );
-	end
-	CPanel:AddPanel( logo );--]]
-	
-	CPanel:CheckBox("Should there be sound shake when something explodes?","gred_cl_sound_shake");
-	
-	-- if notdedicated then
-		local this = CPanel:CheckBox("Should explosions unweld and unfreeze?","gred_sv_shockwave_unfreeze");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_shockwave_unfreeze",val)
-		end
-		
-		local this = CPanel:NumSlider( "Sound muffling divider", "gred_sv_soundspeed_divider", 1, 3, 0 );
-		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand( "gred_sv_soundspeed_divider",val)
-		end
-	
-		local this = CPanel:NumSlider( "Shell speed multiplier", "gred_sv_shell_speed_multiplier", 0.01, 1, 2 );
-		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand( "gred_sv_shell_speed_multiplier",val)
-		end
-		
-		local this = CPanel:NumSlider("Ricochet angle", "gred_sv_minricochetangle",50, 90, 1 );
-		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand( "gred_sv_minricochetangle",val)
-		end
-		
-		local this = CPanel:NumSlider("Global high explosives damage multiplier", "gred_sv_shell_gp_he_damagemultiplier",0,10,2);
-		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand( "gred_sv_shell_gp_he_damagemultiplier",val)
-		end
-		
-		local this = CPanel:NumSlider("HE Shells damage multiplier", "gred_sv_shell_he_damagemultiplier",0,10,2);
-		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand( "gred_sv_shell_he_damagemultiplier",val)
-		end
-		
-		local this = CPanel:NumSlider("AP Shells damage multiplier", "gred_sv_shell_ap_damagemultiplier",0,10,2);
-		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand( "gred_sv_shell_ap_damagemultiplier",val)
-		end
-		
-		local this = CPanel:NumSlider("APCR Shells damage multiplier", "gred_sv_shell_apcr_damagemultiplier",0,10,2);
-		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand( "gred_sv_shell_apcr_damagemultiplier",val)
-		end
-		
-		local this = CPanel:NumSlider("HEAT Shells damage multiplier", "gred_sv_shell_heat_damagemultiplier",0,10,2);
-		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand( "gred_sv_shell_heat_damagemultiplier",val)
-		end
-		
-		local this = CPanel:NumSlider("Max non-penetration ricochet chance", "gred_sv_shell_ap_lowpen_maxricochetchance",0,1,2);
-		this.Scratch.OnValueChanged = function() this.ConVarChanging = true this:ValueChanged(this.Scratch:GetFloatValue()) this.ConVarChanging = false end
-		this.OnValueChanged = function(this,val)
-			if this.ConVarChanging then return end
-			gred.CheckConCommand( "gred_sv_shell_ap_lowpen_maxricochetchance",val)
-		end
-		
-		local this = CPanel:CheckBox("Should HE shells all do the same ammount of damage?","gred_sv_shell_he_damage");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_shell_he_damage",val)
-		end
-		
-		local this = CPanel:CheckBox("Enable advanced non-penetration system?","gred_sv_shell_ap_lowpen_system");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_shell_ap_lowpen_system",val)
-		end
-		
-		local this = CPanel:CheckBox("Should the non-penetration system decrease damage?","gred_sv_shell_ap_lowpen_shoulddecreasedamage");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_shell_ap_lowpen_shoulddecreasedamage",val)
-		end
-		
-		local this = CPanel:CheckBox("Should the Anti-Tank shells deal no damage if there was no penetration?","gred_sv_shell_ap_lowpen_ap_damage");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_shell_ap_lowpen_ap_damage",val)
-		end
-		
-		local this = CPanel:CheckBox("Should explosives be easily armed?","gred_sv_easyuse");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_easyuse",val)
-		end
-		
-		local this = CPanel:CheckBox("Should explosives be spawnable?","gred_sv_spawnable_bombs");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_spawnable_bombs",val)
-		end
-		
-		local this = CPanel:CheckBox("Should explosives arm when hit or dropped?","gred_sv_fragility");
-		this.OnChange = function(this,val)
-			val = val and 1 or 0
-			gred.CheckConCommand("gred_sv_fragility",val)
-		end
-	-- end
-		
-	CPanel:CheckBox("Should explosives leave decals behind?","gred_cl_decals");
-	
-end
 
 local function CheckForUpdates()
 	local CURRENT_VERSION = ""
@@ -630,6 +140,7 @@ end
 
 
 gred.CheckConCommand = function(cmd,val)
+	if !val or !cmd then return end
 	net.Start("gred_net_checkconcommand")
 		net.WriteString(cmd)
 		net.WriteFloat(val)
@@ -876,281 +387,77 @@ gred.GunnersHUDPaint = function(self,ply)
 end
 
 
-
-hook.Add("Think","gred_simfphys_managetanks",function()
-	local ct = CurTime()
-	if ct > NextThink then
-		NextThink = ct + 0.02
-		if ct > NextFind then
-			NextFind = ct + 30
-			GetAllTanks()
-		end
-		ply = IsValid(ply) and ply or LocalPlayer()
-		local pos = ply:GetPos()
-		local var = gred.CVars["gred_cl_simfphys_maxsuspensioncalcdistance"]:GetInt()
-		for class,tab in pairs(gred.simfphys) do
-			for k,v in pairs(tab.entities) do
-				if IsValid(v) then
-					if pos:DistToSqr(v:GetPos()) < var then
-						if !v.GRED_INDEX then
-							id = id + 1
-							v.GRED_INDEX = id
-						end
-						if not v.wheel_left_mat then
-							v.wheel_left_mat = CreateMaterial("gred_trackmat_"..class.."_"..v.GRED_INDEX.."_left","VertexLitGeneric",tab.trackTex)
-						end
-
-						if not v.wheel_right_mat then
-							v.wheel_right_mat = CreateMaterial("gred_trackmat_"..class.."_"..v.GRED_INDEX.."_right","VertexLitGeneric",tab.trackTex)
-						end
-						local TrackPos = GetTrackPos(v,tab.div,tab.smoother)
-						if tab.UpTranslate then
-							v.wheel_left_mat:SetVector("$translate",Vector(0,0,TrackPos.Left))
-							v.wheel_right_mat:SetVector("$translate",Vector(0,0,TrackPos.Right))
-						elseif tab.RightTranslate then
-							v.wheel_left_mat:SetVector("$translate",Vector(TrackPos.Left))
-							v.wheel_right_mat:SetVector("$translate",Vector(TrackPos.Right))
-						else
-							v.wheel_left_mat:SetVector("$translate",Vector(0,TrackPos.Left))
-							v.wheel_right_mat:SetVector("$translate",Vector(0,TrackPos.Right))
-						end
-						-- PrintTable(v:GetMaterials())
-						if tab.SeparateTracks then
-							if !IsValid(v.LeftTrack) then v.LeftTrack = v:GetNWEntity("LeftTrack") end
-							if !IsValid(v.RightTrack) then v.RightTrack = v:GetNWEntity("RightTrack") end
-							if !IsValid(v.RightTrack) or !IsValid(v.LeftTrack) then return end -- one last check just to be safe
-							v.LeftTrack:SetSubMaterial(tab.LeftTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_left") 
-							v.RightTrack:SetSubMaterial(tab.RightTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_right")
-						else
-							v:SetSubMaterial(tab.LeftTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_left") 
-							v:SetSubMaterial(tab.RightTrackID,"!gred_trackmat_"..class.."_"..v.GRED_INDEX.."_right")
-						end
-					end
-				else
-					table.remove(tab.entities,k)
-				end
-			end
-		end
-	end
+hook.Add("PopulateToolMenu","gred_menu",function()
+	spawnmenu.AddToolMenuOption("Options",
+								"Gredwitch's Stuff",
+								"gred_settings",
+								"Options",
+								"",
+								"",
+								gred_settings
+	)
 end)
 
-hook.Add( "PopulateToolMenu", "gred_menu", function()
-	spawnmenu.AddToolMenuOption("Options",					-- Tab
-								"Gredwitch's Stuff",		-- Sub-tab
-								"gred_settings_bullets",	-- Identifier
-								"Bullets",					-- Name of the sub-sub-tab
-								"",							-- Command
-								"",							-- Config (deprecated)
-								gred_settings_bullets		-- Function
-	)
-	spawnmenu.AddToolMenuOption("Options",
-								"Gredwitch's Stuff",
-								"gred_settings_wac",
-								"WAC",
-								"",
-								"",
-								gred_settings_wac
-	)
-	spawnmenu.AddToolMenuOption("Options",
-								"Gredwitch's Stuff",
-								"gred_settings_lfs",
-								"LFS",
-								"",
-								"",
-								gred_settings_lfs
-	)
-	spawnmenu.AddToolMenuOption("Options",
-								"Gredwitch's Stuff",
-								"gred_settings_bombs",
-								"Explosives",
-								"",
-								"",
-								gred_settings_bombs
-	)
-	spawnmenu.AddToolMenuOption("Options",
-								"Gredwitch's Stuff",
-								"gred_settings_misc",
-								"Misc",
-								"",
-								"",
-								gred_settings_misc
-	)
-	spawnmenu.AddToolMenuOption("Options",
-								"Gredwitch's Stuff",
-								"gred_settings_simfphys",
-								"Simfphys",
-								"",
-								"",
-								gred_settings_simfphys
-	)
-end );
+local BulletID = 0
 
-hook.Add("CalcView","gred_simfphys_tanksightview",function(ply,ang,pos)
-	if !IsValid(ply) or !ply:Alive() or !ply:InVehicle() or ply:GetViewEntity() != ply then return end
-	local vehicle = ply:GetVehicle()
-	if not IsValid(vehicle) then return end
-	local Base = ply.GetSimfphys and ply:GetSimfphys() or vehicle.vehiclebase
-	if not IsValid(Base) then return end
-	if !vehicle.GetThirdPersonMode or ply:GetViewEntity() ~= ply then return end
-	if vehicle.GRED_USE_SIGHT and vehicle:GetThirdPersonMode() then 
-		vehicle:SetThirdPersonMode(false)
-	end
-	if vehicle:GetNWBool("simfphys_SpecialCam") or not vehicle.GRED_USE_SIGHT or vehicle.GRED_SIGHT_ATT == 0 then return end
+local CAL_TABLE = {
+	[1] = "7mm",
+	[2] = "12mm",
+	[3] = "20mm",
+	[4] = "30mm",
+	[5] = "40mm",
+}
+local COL_TABLE = {
+	[1] = "red",
+	[2] = "green",
+	[3] = "white",
+	[4] = "yellow",
+	-- [5] = "blue",
+}
+
+net.Receive("gred_net_createbullet",function()
+	local pos = net.ReadVector()
+	local ang = net.ReadAngle()
+	local cal = net.ReadUInt(3)
+	local tracer = net.ReadUInt(3)
+	local caliber = CAL_TABLE[cal]
+	local Tracer = COL_TABLE[tracer]
+	local fusetime = net.ReadUInt(7) * 0.01
 	
-	local view = {
-		origin = pos,
-		drawviewer = false,
-	}
-	ply.simfphys_smooth_out = 0
-	local attachment = Base:GetAttachment(vehicle.GRED_SIGHT_ATT)
-	attachment.Ang = vehicle:GetNWBool("HasStabilizer") and RoundAngle(attachment.Ang,2) or attachment.Ang
-	view.angles = attachment.Ang + vehicle.GRED_SIGHT_OFFSET_ANG
-	view.origin = attachment.Pos + attachment.Ang:Forward() * vehicle.GRED_SIGHT_OFFSET.x  + attachment.Ang:Right() * vehicle.GRED_SIGHT_OFFSET.y  + attachment.Ang:Up() *  vehicle.GRED_SIGHT_OFFSET.z
-	view.fov = vehicle:GetNWFloat("SightZoom",40)
-	return view
-end)
-
-hook.Add("AdjustMouseSensitivity","gred_tank_sight",function(val)
-	local ply = LocalPlayer()
-	if not IsValid(ply) or not ply:Alive() then return end
-	local vehicle = ply:GetVehicle()
-	if not IsValid(vehicle) then return end
-	if not vehicle.GRED_USE_SIGHT or vehicle.GRED_SIGHT_ATT == 0 then return end
-	if !vehicle.GetThirdPersonMode then return end
-	if vehicle:GetThirdPersonMode() then return end
+	local expltime = fusetime > 0 and fusetime and CurTime() + fusetime
 	
-	return gred.CVars.gred_cl_simfphys_sightsensitivity:GetFloat()
-end)
-
-hook.Add("HUDPaint","gred_simfphys_tanksighthud",function()
-	local ply = LocalPlayer()
-	if not IsValid(ply) or not ply:Alive() then return end
-	if not ply:InVehicle() or ply:GetViewEntity() ~= ply then
-		local obj = ply:GetNWEntity("PickedUpObject",nil)
-		if !IsValid(obj) or obj.ClassName != "base_shell" then return end
-		local pos = ply:GetPos()
-		local sqr = 350*350
-		for k,ent in pairs(ents.FindInSphere(pos,350)) do
-			if ent.ClassName == "gmod_sent_vehicle_fphysics_base" then
-				if ent.GRED_ISTANK == nil then 
-					timer.Simple(0.4,function()
-						if IsValid(ent) and ent.GRED_ISTANK == nil then
-							ent.GRED_ISTANK = ent:GetNWBool("GRED_ISTANK")
-						end
-					end)
-				end
-				if ent.Seats == nil then
-					ent.Seats = ent.pSeat and table.Copy(ent.pSeat) or {}
-					table.insert(ent.Seats,ent:GetDriverSeat())
-				end
-				if ent.GRED_ISTANK and istable(ent.Seats) then
-					local _,maxs = ent:GetModelBounds()
-					maxs.x = 0
-					maxs.y = 0
-					local textpos = ent:LocalToWorld(maxs)
-					local col = Color(100,100,100,math.Clamp((1 - pos:DistToSqr(textpos) / sqr) * 1200,0,255))
-					local i = 0
-					for a,seat in pairs(ent.Seats) do
-						if IsValid(seat) and seat:GetNWBool("HasCannon") then
-							seat.shellTypes = seat.shellTypes or util.JSONToTable(seat:GetNWString("ShellTypes"))
-							for I = 1,#seat.shellTypes do
-								seat.maxAmmo = seat:GetNWInt(I.."MaxAmmo",0)
-								local curammo = 0
-								local ammo
-								local str = ""
-								for A = 1,#seat.shellTypes[I] do
-									ammo = seat:GetNWInt(I.."CurAmmo"..A,0)
-									curammo = curammo + ammo
-									str = str..seat.shellTypes[I][A]..": "..ammo..(A == #seat.shellTypes[I] and "" or "\n")
-								end
-								str = seat:GetNWInt(I.."Caliber",0).."mm cannon\nCapacity: "..curammo.."/"..seat.maxAmmo.."\n"..str
-								DrawWorldTip(str,textpos,col,"GModWorldtip",150*i)
-							end
-							i = i + 1
-						end
-					end
-				end
-			end
-		end
-		return
+	local caltab = gred.CalTable[caliber]
+	local speed = caltab.Speed
+	local fwd = ang:Forward()
+	local oldpos = pos - fwd * speed
+	local explodable = caltab.Explodeable
+	local dif = Vector()
+	local BulletTrTab = {}
+	
+	if Tracer then
+		local effect = EffectData()
+		effect:SetOrigin(pos)
+		effect:SetFlags(cal)
+		effect:SetMaterialIndex(tracer)
+		effect:SetStart(util.QuickTrace(pos + fwd * 10,expltime and fwd*(fusetime*speed) or fwd*99999999999999,filter).HitPos)
 	end
 	
-	local vehicle = ply:GetVehicle()
-	if not IsValid(vehicle) then return end
-	local Base = ply.GetSimfphys and ply:GetSimfphys() or vehicle.vehiclebase
-	if not IsValid(Base) then return end
+	Effect("gred_particle_tracer",effect)
 	
-	vehicle.shellTypes = vehicle.shellTypes or util.JSONToTable(vehicle:GetNWString("ShellTypes"))
-	local scrW,scrH
-	if vehicle.shellTypes and !vehicle.GRED_USE_SIGHT then
-		scrW,scrH = ScrW(),ScrH()
-		DrawAmmoLeft(vehicle,scrW,scrH)
-	end
-	if vehicle:GetNWBool("simfphys_SpecialCam") or not vehicle.GRED_USE_SIGHT or vehicle.GRED_SIGHT_ATT == 0 then return end
-	if !vehicle.GetThirdPersonMode or ply:GetViewEntity() ~= ply then return end
-	if vehicle:GetThirdPersonMode() then return end
+	timer.Create("gred_bullet_"..BulletID,0,0,function()
+		dif.x = pos.x + pos.x - oldpos.x
+		dif.y = pos.y + pos.y - oldpos.y
+		dif.z = pos.z + pos.z - oldpos.z
+		
+		BulletTrTab.start = pos
+		BulletTrTab.endpos = dif
+		BulletTrTab.filter = filter
+		BulletTrTab.mask = MASK_ALL
+		
+		local tr = TraceLine(BulletTrTab)
+	end)
 	
-	local ScrW,ScrH = scrW or ScrW(),scrH or ScrH()
-	surface.SetDrawColor(255,255,255,255)
-	surface.SetTexture(surface.GetTextureID(vehicle:GetNWString("SightTexture")))
-	local zoom = 1
-	surface.DrawTexturedRect((-(ScrW*zoom-ScrW)*0.5),(-(ScrW*zoom-ScrH)*0.5),ScrW*zoom,ScrW*zoom)
-	
-	if vehicle.shellTypes and vehicle.GRED_USE_SIGHT then
-		DrawAmmoLeft(vehicle,ScrW,ScrH)
-	end
-	
-	Base.GRED_FILTER_ENTS = Base.GRED_FILTER_ENTS or {
-		Base,
-	}
-	local startpos = Base:GetAttachment(vehicle.GRED_SIGHT_ATT).Pos
-	local scr = TraceLine({
-		start = startpos,
-		endpos = (startpos + ply:EyeAngles():Forward() * 50000),
-		-- mask = MASK_WATER,
-		filter = Base.GRED_FILTER_ENTS,
-	}).HitPos:ToScreen()
-	
-	scr.x = scr.x > ScrW and ScrW or (scr.x < 0 and 0 or scr.x)
-	scr.y = scr.y > ScrH and ScrH or (scr.y < 0 and 0 or scr.y)
-	
-	surface.SetDrawColor(255,255,255)
-	DrawCircle(scr.x,scr.y,19)
-	surface.SetDrawColor(0,0,0)
-	DrawCircle(scr.x,scr.y,20)
-	
-	local scrW,scrH = ScrW*0.5,ScrH*0.518
-	
-	surface.SetDrawColor( 240, 200, 0, 255 ) 
-	local Yaw = Base:GetPoseParameter( "turret_yaw" ) * 360 - 90
-	
-	local dX = math.cos( math.rad( -Yaw ) )
-	local dY = math.sin( math.rad( -Yaw ) )
-	local len = scrH * 0.04
-	
-	DrawCircle( scrW, scrH * 1.85, len )
-	surface.DrawLine( scrW + dX * len, scrH * 1.85 + dY * len, scrW + dX * len * 3, scrH * 1.85 + dY * len * 3 )
-	
-	surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW - len * 1.25, scrH * 1.85 + len * 2 )
-	surface.DrawLine( scrW + len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
-	surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 - len * 2 )
-	surface.DrawLine( scrW - len * 1.25, scrH * 1.85 + len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
-end)
-
-
-
-net.Receive("gred_net_tank_setsight",function()
-	local ply = LocalPlayer()
-	local pod = ply:GetVehicle()
-	local offset = net.ReadVector()
-	local att = net.ReadString()
-	local angoffset = net.ReadAngle()
-	if !IsValid(pod) then return end
-	
-	pod.GRED_SIGHT_OFFSET_ANG 	= angoffset
-	pod.GRED_SIGHT_OFFSET 		= offset
-	pod.GRED_SIGHT_ATT 			= ply:GetSimfphys():LookupAttachment(att)
-	pod.GRED_USE_SIGHT 			= !pod.GRED_USE_SIGHT
+	BulletID = BulletID + 1
 end)
 
 net.Receive("gred_lfs_setparts",function()
@@ -1172,21 +479,6 @@ net.Receive("gred_lfs_remparts",function()
 	end
 	if self.Parts then
 		self.Parts[k] = nil
-	end
-end)
-
-net.Receive("gred_net_registertank",function(length)
-	local ent = net.ReadEntity()
-	if not IsValid(ent) or !ent.GetSpawn_List then return end
-	
-	local tab = gred.simfphys[ent:GetSpawn_List()]
-	tableinsert(tab.entities,ent)
-	if tab.UpdateSuspension_CL and ent:GetModel() != "models/error.mdl" then
-		local OldThink = ent.Think
-		ent.Think = function(ent)
-			OldThink(ent)
-			tab.UpdateSuspension_CL(ent)
-		end
 	end
 end)
 
@@ -1260,28 +552,31 @@ end)
 net.Receive("gred_net_createtracer",function()
 	local effect = EffectData()
 	effect:SetOrigin(net.ReadVector())
-	effect:SetFlags(net.ReadInt(4))
-	effect:SetMaterialIndex(net.ReadInt(4))
+	effect:SetFlags(net.ReadUInt(3))
+	effect:SetMaterialIndex(net.ReadUInt(3))
 	effect:SetStart(net.ReadVector())
 	Effect("gred_particle_tracer",effect)
 end)
 
 net.Receive("gred_net_createimpact",function()
-	-- local tab = util.JSONToTable(net.ReadString())
-	-- local effectdata = EffectData()
-	-- effectdata:SetOrigin(tab[1])
-	-- effectdata:SetAngles(tab[2])
-	-- effectdata:SetSurfaceProp(tab[3])
-	-- effectdata:SetMaterialIndex(tab[4])
-	-- effectdata:SetFlags(tab[5])
-	-- Effect("gred_particle_impact",effectdata)
-	
 	local effectdata = EffectData()
 	effectdata:SetOrigin(net.ReadVector())
 	effectdata:SetAngles(net.ReadAngle())
-	effectdata:SetSurfaceProp(net.ReadInt(4))
-	effectdata:SetMaterialIndex(net.ReadInt(4))
-	effectdata:SetFlags(net.ReadInt(4))
+	effectdata:SetSurfaceProp(net.ReadUInt(5))
+	effectdata:SetMaterialIndex(1)
+	effectdata:SetFlags(net.ReadUInt(4))
+	Effect("gred_particle_impact",effectdata)
+end)
+
+local angle_zero = Angle()
+
+net.Receive("gred_net_createwaterimpact",function()
+	local effectdata = EffectData()
+	effectdata:SetOrigin(net.ReadVector())
+	effectdata:SetAngles(angle_zero)
+	effectdata:SetSurfaceProp(0)
+	effectdata:SetMaterialIndex(0)
+	effectdata:SetFlags(net.ReadUInt(3))
 	Effect("gred_particle_impact",effectdata)
 end)
 
@@ -1293,7 +588,31 @@ net.Receive("gred_net_createparticle",function()
 	effectdata:SetSurfaceProp(net.ReadBool() and 1 or 0)
 	Effect("gred_particle_simple",effectdata)
 end)
-		
+
+net.Receive("gred_net_applyboolonsimfphys_cl",function()
+	local str = net.ReadString()
+	local cvar = gred.CVars[str]
+	if !cvar then return end
+	
+	local bool = cvar:GetBool()
+	
+	for k,v in pairs(gred.ActiveSimfphysVehicles) do
+		v[str] = bool
+	end
+end)
+
+net.Receive("gred_net_applyfloatonsimfphys_cl",function()
+	local str = net.ReadString()
+	local cvar = gred.CVars[str]
+	if !cvar then return end
+	
+	local val = cvar:GetFloat()
+	
+	for k,v in pairs(gred.ActiveSimfphysVehicles) do
+		v[str] = val
+	end
+end)
+
 timer.Simple(5,function()
 	local singleplayerIPs = {
 		["loopback"] = true,
@@ -1305,3 +624,6 @@ timer.Simple(5,function()
 	end
 	CheckDXDiag()
 end)
+
+include("gredwitch/gred_cl_simfphys_functions.lua")
+include("gredwitch/gred_cl_menu.lua")

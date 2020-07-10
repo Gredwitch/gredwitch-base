@@ -70,6 +70,14 @@ net.Receive("gred_net_ammobox_sv_createshell",function(len,ply)
 	self:ResetSequence("close")
 end)
 
+net.Receive("gred_net_ammobox_sv_close",function()
+	local self = net.ReadEntity()
+	if !IsValid(self) then return end
+	if self:GetClass() != "gred_ammobox" then return end
+	
+	self:ResetSequence("close")
+end)
+
 function ENT:Initialize()
 	self:SetModel(self.Model)
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
@@ -77,28 +85,25 @@ function ENT:Initialize()
 	self.Entity:SetSolid(SOLID_VPHYSICS)
 	self.Entity:SetCollisionGroup(COLLISION_GROUP_NONE)
 	self:SetUseType(SIMPLE_USE)
+	
 	local p = self:GetPhysicsObject()
 	if IsValid(p) then
 		p:Wake()
 		p:SetMass(50)
 	end
-	self.FILTER = {}
+	
 	self:SetPos(self:GetPos() + SpawnOffset)
+	
+	self.FILTER = {self}
 end
 
 function ENT:Use(ply,cal)
-	if self.NextUse >= CurTime() or self.CantBeOpened then return end
-	if self.Opened then
-		self.Opened = false
-		self:ResetSequence("close")
-	else
-		self.Opened = true
-		self:ResetSequence("open")
-	end
+	if self.NextUse >= CurTime() then return end
+	self:ResetSequence("open")
 	net.Start("gred_net_ammobox_cl_gui")
 			net.WriteEntity(self)
 	net.Send(ply)
-	self.CantBeOpened = true
+	
 	self.NextUse = CurTime()+0.5
 end
 

@@ -1,3 +1,5 @@
+local ParticleEffect = ParticleEffect
+
 function EFFECT:Init(data)
 	local pos = data:GetOrigin()
 	local ang = data:GetAngles()
