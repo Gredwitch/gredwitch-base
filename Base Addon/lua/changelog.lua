@@ -1,9 +1,13 @@
---[[B10/07/2020
+--[[C10/07/2020
+[HOTFIX #2]
+- Fixed LFS planes using NoCollide constraints being broken
+- Fixed tank resupplying not working
+
 [HOTFIX]
--Fixed a lot of errors
--Fixed destructible planes being broken
--Fixed some flamethrower issues
--Increased mouse sensitivity in sight mode
+- Fixed a lot of errors
+- Fixed destructible planes being broken
+- Fixed some flamethrower issues
+- Increased mouse sensitivity in sight mode
 
 - Fixed the Eye Angles resetting when you get in a tank
 - Removed Press WALK to activate the turret

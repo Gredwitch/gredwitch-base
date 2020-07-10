@@ -1,5 +1,6 @@
 
 local startsWith = string.StartWith
+local NoCollide = constraint.NoCollide
 
 local function IsSmall(k)
 	return startsWith(k,"gear") or startsWith(k,"wheel") or startsWith(k,"airbrake")
@@ -296,7 +297,10 @@ gred.PartThink = function(self,skin)
 					v:EmitSound("LFS_PART_DESTROYED_0"..math.random(1,3))
 				end
 				v:SetParent(nil)
-				v:SetVelocity(self:GetVelocity())
+				local phys = v:GetPhysicsObject()
+				if IsValid(phys) then
+					phys:AddVelocity(self:GetVelocity())
+				end
 				v.Destroyed = true
 				self.Parts[k] = nil
 				self.GibModels[k] = nil

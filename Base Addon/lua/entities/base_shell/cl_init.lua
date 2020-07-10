@@ -258,6 +258,7 @@ local function HUDPaint(ply,ent)
 		RemoveHUDPaint(ply)
 		return
 	end
+	
 	if ent != ply:GetNWEntity("PickedUpObject") then
 		RemoveHUDPaint(ply)
 		return
@@ -266,24 +267,29 @@ local function HUDPaint(ply,ent)
 	local pos = ply:GetPos()
 	local EntityTable = ents.FindInSphere(pos,ShellHUDDist)
 	local vehicle
+	
 	for k = 1,#EntityTable do
 		vehicle = EntityTable[k]
 		if vehicle and vehicle.CachedSpawnList and vehicle.ModelBounds and gred.simfphys[vehicle.CachedSpawnList] and gred.simfphys[vehicle.CachedSpawnList].Seats then
+		
 			VehicleVector.z = vehicle.ModelBounds.maxs.z
 			
 			ShellHUDColor.a = math.Clamp((1 - pos:DistToSqr(vehicle:LocalToWorld(VehicleVector)) / ShellHUDDistSqr) * 1200,0,255)
 			
 			local seat
 			local v
-			for SeatID = 1,#gred.simfphys[vehicle.CachedSpawnList].Seats do
+			for SeatID = 0,#gred.simfphys[vehicle.CachedSpawnList].Seats do
 				v = gred.simfphys[vehicle.CachedSpawnList].Seats[SeatID]
 				seat = SeatID == 0 and vehicle:GetDriverSeat() or (vehicle.pSeat and vehicle.pSeat[SeatID] or nil)
+				
 				if v and IsValid(seat) and v[vehicle.Mode] and v[vehicle.Mode].Primary then
 					local i = 0
 					local TextPos = VehicleVector + seat:GetPos()
 					local WeaponTab
+					
 					for SlotID = 1,#v[vehicle.Mode].Primary do
 						WeaponTab = v[vehicle.Mode].Primary[SlotID]
+						
 						if WeaponTab and WeaponTab.Type == "Cannon" then
 							local TotalAmmo = 0
 							local Ammo

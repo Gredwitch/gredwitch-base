@@ -278,7 +278,7 @@ gred.InitializeSimfphys = function(vehicle)
 	end)
 end
 
-gred.TankInitVars = function(vehicle,VehicleTab,TracksTab) -- doesn't need to be optimized
+gred.TankInitVars = function(vehicle,VehicleTab,TracksTab,VehicleSeatTab) -- doesn't need to be optimized
 	local OldThink = vehicle.Think
 	local mins,maxs = vehicle:GetModelBounds()
 	local LengthVal = (maxs + mins):Length() * 0.5
@@ -353,25 +353,32 @@ gred.TankInitVars = function(vehicle,VehicleTab,TracksTab) -- doesn't need to be
 			if data.HitEntity.GetClass and data.HitEntity:GetClass() == "base_shell" and VehicleSeatTab then
 				local seat
 				local v
-				for SeatID = 1,#VehicleSeatTab do
+				
+				for SeatID = 0,#VehicleSeatTab do
 					v = VehicleSeatTab[SeatID]
 					seat = SeatID == 0 and ent:GetDriverSeat() or (ent.pSeat and ent.pSeat[SeatID] or nil)
+					
 					if v and IsValid(seat) and v[ent.Mode] and v[ent.Mode].Primary then
 						local WeaponTab
+						
 						for SlotID = 1,#v[ent.Mode].Primary do
 							WeaponTab = v[ent.Mode].Primary[SlotID]
+							
 							if WeaponTab and WeaponTab.Type == "Cannon" and data.HitEntity.Caliber == WeaponTab.ShellTypes[1].Caliber then
 								local Ammo
 								local TotalAmmo = 0
-								local CanContinue = flase
+								local ShellTypeID = false
+								
 								for ShellID = 1,#WeaponTab.ShellTypes do
 									Ammo = GetNWInt(seat,SlotID.."CurAmmo"..ShellID,0)
 									TotalAmmo = TotalAmmo + Ammo
-									CanContinue = data.HitEntity.ShellType == WeaponTab.ShellTypes[ShellID].ShellType and ShellID or CanContinue
+									ShellTypeID = data.HitEntity.ShellType == WeaponTab.ShellTypes[ShellID].ShellType and ShellID or ShellTypeID
 								end
-								if CanContinue and TotalAmmo < WeaponTab.MaxAmmo then
-									local NetworkVarName = SlotID.."CurAmmo"..CanContinue
+								
+								if ShellTypeID and TotalAmmo < WeaponTab.MaxAmmo then
+									local NetworkVarName = SlotID.."CurAmmo"..ShellTypeID
 									SetNWInt(seat,NetworkVarName,GetNWInt(seat,NetworkVarName,0) + 1)
+									seat.Primary[SlotID].ShellTypes[ShellTypeID] = seat.Primary[SlotID].ShellTypes[ShellTypeID] + 1
 									-- ent:EmitSound(seat.ReloadSound)
 									data.HitEntity:Remove()
 									
