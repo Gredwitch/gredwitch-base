@@ -236,6 +236,7 @@ gred.CVars["gred_sv_simfphys_traverse_speed_multiplier"] 	= CreateConVar("gred_s
 gred.CVars["gred_sv_simfphys_elevation_speed_multiplier"] 	= CreateConVar("gred_sv_simfphys_elevation_speed_multiplier"	,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_infinite_mg_ammo"] 			= CreateConVar("gred_sv_simfphys_infinite_mg_ammo"				,  "0"  , GRED_SVAR)
 gred.CVars["gred_sv_simfphys_disable_viewmodels"] 			= CreateConVar("gred_sv_simfphys_disable_viewmodels"			,  "0"  , GRED_SVAR)
+gred.CVars["gred_sv_simfphys_vfire_thrower"] 				= CreateConVar("gred_sv_simfphys_vfire_thrower"					,  "1"  , GRED_SVAR)
 
 gred.CVars["gred_jets_speed"] 								= CreateConVar("gred_jets_speed"								,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_oldrockets"] 							= CreateConVar("gred_sv_oldrockets"								,  "0"  , GRED_SVAR)

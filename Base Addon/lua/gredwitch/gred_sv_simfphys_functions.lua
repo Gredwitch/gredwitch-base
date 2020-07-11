@@ -853,7 +853,7 @@ gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatSlotTab,WeaponTab,Wep
 				if gred.CVars.gred_sv_simfphys_vfire_thrower:GetBool() then
 					SeatSlotTab.ShouldNotFlamesBounce = true
 					SeatSlotTab.ThrowFlames = function(SeatSlotTab,pos1,pos2,mins,maxs,time,dmg,DMG,shootOrigin,sqrdist,tr,ang)
-						CreateVFireBall(time,100,shootOrigin,Forward(ang)*random(2400,2700),GetAttacker(dmg))
+						CreateVFireBall(time,100,shootOrigin,Forward(ang)*random(2400,2700),dmg:GetAttacker())
 					end
 				else
 					SeatSlotTab.ThrowFlames = function(SeatSlotTab,pos1,pos2,mins,maxs,time,dmg,DMG,shootOrigin,sqrdist)

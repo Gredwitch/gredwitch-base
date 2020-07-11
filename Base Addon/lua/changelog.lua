@@ -1,4 +1,10 @@
---[[D10/07/2020
+--[[E10/07/2020
+[HOTFIX #3]
+- Removed Ram Ranch ( :( )
+- Fixed an error when shells hit an unarmored vehicle
+- Fixed an error with flame tanks when vFire is enabled
+- Added an option to toggle VFire flame tanks in the options when vFire is enabled
+
 [FEATURE REQUEST]
 - Added an option to have unlimited machinegun ammo
 - Added an option to disable the firstperson viewmodels (the goggles)

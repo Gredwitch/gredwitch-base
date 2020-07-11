@@ -400,7 +400,7 @@ function ENT:AddOnExplode(pos)
 			
 			tr = gred.GetImpactInfo(tr,tr.Entity)
 			
-			if tr.Entity.GRED_TANK then
+			if tr.Entity.GRED_TANK and tr.Entity.CachedSpawnList and gred.simfphys[tr.Entity.CachedSpawnList] and gred.simfphys[tr.Entity.CachedSpawnList].Armour then
 				local AbsImpactAng = math.abs(tr.HitNormalAngle.p)
 				
 				if AbsImpactAng > 10 and self.SLOPE_MULTIPLIERS[self.ShellType] then

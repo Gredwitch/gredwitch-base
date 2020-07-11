@@ -967,8 +967,11 @@ hook.Add("GredOptionsAddLateralMenuOption","AddSimfphys",function(DFrame,DPanel,
 			},
 			["SERVER"] = {
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
-					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_arcade","Arcade mode","Arcade mode gives the ability to the driver to operate the main gun and makes reload times and turret turn times faster.",false,true)
+					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_arcade","Turret driver control","Gives the ability to the drive to operate the main gun by himself.",false,true)
 				end,
+				vFireIsVFireEnt and function(DFrame,DPanel,DScrollPanel,Panel,x,y)
+					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_vfire_thrower","vFire flame tanks","Gives the ability to tanks to throw vFire if vFire is installed and enabled.",false,true)
+				end or nil,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_infinite_ammo","Infinite ammo","Toggles infinite ammo for anything that isn't a machinegun",true,true)
 				end,
@@ -976,7 +979,7 @@ hook.Add("GredOptionsAddLateralMenuOption","AddSimfphys",function(DFrame,DPanel,
 					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_infinite_mg_ammo","Infinite machinegun ammo","Toggles infinite ammo for anything that is a machinegun / autocannon",true,true)
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
-					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_disable_viewmodels","Disable 1st person viewport models","Toggles the view goggles / viewports in 1st person for tanks that have them",true,true)
+					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_disable_viewmodels","Disable 1st person viewport models","Toggles the view goggles / viewports in 1st person for tanks that have them",false,true)
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_spawnwithoutammo","Spawn without ammo","Spawns vehicles with 0 munitions",false,true)

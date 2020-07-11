@@ -31,47 +31,6 @@ SWEP.Secondary					= SWEP.Primary
 SWEP.NextReload					= 0
 SWEP.DrawAmmo					= false
 SWEP.Text						= ""
-SWEP.Line						= 1
-SWEP.LineTable 					= {
-	"Eighteen naked cowboys in the showers at Ram Ranch",
-	"Big hard throbbing cocks wanting to be sucked",
-	"Eighteen naked cowboys wanting to be fucked",
-	"Cowboys in the showers at Ram Ranch",
-	"On their knees wanting to suck cowboy cocks",
-	"Ram Ranch really rocks",
-	"Hot hard buff cowboys, their cocks throbbing hard",
-	"Eighteen more wild cowboys out in the yard",
-	"Big bulging cocks ever so hard",
-	"Orgy in the showers at Ram Ranch",
-	"Big hard throbbing cocks ramming cowboy butt",
-	"Like a breeding ram wanting to rut",
-	"Big hard throbbing cocks getting sucked real deep",
-	"Cowboys even getting fucked in their sleep",
-	"Ram Ranch, it rocks",
-	"Cowboys love big hard throbbing cocks",
-	"Eighteen naked cowboys in the showers at Ram Ranch",
-	"Big hard throbbing cocks wanting to be sucked",
-	"Eighteen naked cowboys wanting to be fucked",
-	"Cowboys in the showers at Ram Ranch",
-	"On their knees wanting to suck cowboy cocks",
-	"Ram Ranch really rocks",
-	"Hot hard buff cowboys, their cocks throbbing hard",
-	"Eighteen more wild cowboys out in the yard",
-	"Big bulging cocks ever so hard",
-	"Orgy in the showers at Ram Ranch",
-	"Big hard throbbing cocks ramming cowboy butt",
-	"Like a breeding ram wanting to rut",
-	"Eighteen naked cowboys in the showers at Ram Ranch",
-	"Big hard throbbing cocks wanting to be sucked",
-	"Eighteen naked cowboys wanting to be fucked",
-	"Cowboys in the showers at Ram Ranch",
-	"On their knees wanting to suck cowboy cocks",
-	"Ram Ranch really rocks",
-	"Big hard throbbing cocks, getting sucked real deep",
-	"Cowboys even getting fucked in their sleep",
-	"Ram Ranch, it rocks",
-	"Cowboys love big hard throbbing cocks",
-}
 
 local COL_RED = Color(255,0,0,255)
 local COL_GREEN = Color(0,255,0,255)
@@ -184,17 +143,6 @@ end
 
 
 function SWEP:PrimaryAttack()
-	if SERVER then
-		local ct = CurTime()
-		if self.Primary.NextShot > ct then return end
-		
-		self.Owner:Say((DarkRP and "/ooc " or "")..self.LineTable[self.Line])
-		
-		self.Line = self.Line + 1
-		self.Line = self.Line > #self.LineTable and 1 or self.Line
-		
-		self.Primary.NextShot = ct + self.Primary.FireRate
-	end
 end
 
 function SWEP:SecondaryAttack()
