@@ -1,9 +1,16 @@
---[[E10/07/2020
+--[[11/07/2020 - 10/07/2020
+
+[HOTFIX #4]
+- Added gred_sv_shockwave_unfreeze to the explosive options
+- Fixed the missing 88mm gun sound
+- Removed fire_01.pcf
+- Replaced the 'Connect' button in the menu with 'Copy IP to clipboard'
+
 [HOTFIX #3]
-- Removed Ram Ranch ( :( )
+- Removed Ram Ranch
 - Fixed an error when shells hit an unarmored vehicle
 - Fixed an error with flame tanks when vFire is enabled
-- Added an option to toggle VFire flame tanks in the options when vFire is enabled
+- Added an option to toggle vFire flame tanks in the options when vFire is enabled
 
 [FEATURE REQUEST]
 - Added an option to have unlimited machinegun ammo

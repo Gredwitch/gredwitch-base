@@ -517,10 +517,10 @@ gred.AddHome = function(DFrame,DPanel,DScrollPanel,X,Y,X_DPanel,y_DPanel)
 				local DButton = vgui.Create("DButton",DScrollPanelServerInfo)
 				DButton:Dock(TOP)
 				DButton:SetHeight(50)
-				DButton:SetText("Connect!")
+				DButton:SetText("Copy IP to clipboard")
 				DButton.DoClick = function(DButton)
 					surface.PlaySound("garrysmod/ui_click.wav")
-					LocalPlayer():ConCommand("connect "..IP)
+					SetClipboardText(IP)
 				end 
 				if Data.Discord then
 					local DButton = vgui.Create("DButton",DScrollPanelServerInfo)
@@ -1226,6 +1226,9 @@ hook.Add("GredOptionsAddLateralMenuOption","AddExplosives",function(DFrame,DPane
 					CreateCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_easyuse","Explosives easy-use mode","Allows you to arm explosives by pressing the USE key on them",true)
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
+					CreateCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_shockwave_unfreeze","Explosives unweld and unfreeze","",true)
+				end,
+				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_fragility","Explosives arm when hit or dropped","",true)
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
@@ -1238,7 +1241,7 @@ hook.Add("GredOptionsAddLateralMenuOption","AddExplosives",function(DFrame,DPane
 					CreateCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_shell_he_damage","HE shells all deal the same ammount of damage","",true)
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
-					CreateCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_shell_ap_lowpen_system","Arcade non-penetration system","Deals a very low ammouny of damage on a non penetration instead of dealing no damage at all[NOTE : Only works when the custom module system is disabled]",true)
+					CreateCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_shell_ap_lowpen_system","Arcade non-penetration system","Deals a very low ammouny of damage on a non penetration instead of dealing no damage at all",true) -- [NOTE : Only works when the custom module system is disabled]
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateSliderPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_shell_ap_damagemultiplier","AP shells damage multiplier","",0,10,2,true)
