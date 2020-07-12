@@ -85,6 +85,22 @@ local function gred_settings(CPanel)
 	CPanel:AddItem(DButton)
 end
 
+local function CheckForConflicts()
+	if steamworks.ShouldMountAddon("2083101470") then
+		local DFrame = vgui.Create("DFrame")
+		DFrame:SetSize(ScrW()*0.5,ScrH()*0.5)
+		DFrame:SetTitle("Gredwitch's Base : CONFLICTING ADDON FOUND!! PLEASE REMOVE IT IF YOU WANT TO USE MY TANKS")
+		DFrame:Center()
+		DFrame:MakePopup()
+		
+		local DButton = vgui.Create("DButton",DFrame)
+		DButton:Dock(FILL)
+		DButton:SetText("UH OH, YOU HAVE '[simfphys] Trailers Reborn' INSTALLED!\nTHIS WILL CAUSE MAJOR ISSUES WITH GREDWITCH'S SIMFPHYS VEHICLES AND / OR OTHER SIMFPHYS VEHICLES! CLICK HERE TO OPEN THE ADDON PAGE AND REMOVE IT!")
+		DButton.DoClick = function()
+			gui.OpenURL("https://steamcommunity.com/sharedfiles/filedetails/?id=2083101470")
+		end
+	end
+end
 
 local function CheckForUpdates()
 	local CURRENT_VERSION = ""
@@ -621,7 +637,9 @@ timer.Simple(5,function()
 	}
 	if singleplayerIPs[game.GetIPAddress()] then
 		CheckForUpdates()
+		CheckForConflicts()
 	end
+	
 	CheckDXDiag()
 end)
 

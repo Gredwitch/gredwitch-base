@@ -435,6 +435,7 @@ gred.TankInitVars = function(vehicle,VehicleTab,TracksTab,VehicleSeatTab) -- doe
 			local D = Damage * 0.01
 			SetNWInt(vehicle,"ModuleHealth_RightTrack_0",GetNWInt(vehicle,"ModuleHealth_RightTrack_0",100) - Round((Damage / abs(DamagePos:Length() + LengthVal)) * D))
 			SetNWInt(vehicle,"ModuleHealth_LeftTrack_0",GetNWInt(vehicle,"ModuleHealth_LeftTrack_0",100) - Round((Damage / abs(DamagePos:Length())) * D))
+			
 			if inflictor.Base == "base_bomb" then
 				dmg:SetDamage((Damage or dmg:GetDamage()) * 0.1)
 			else
@@ -448,12 +449,12 @@ gred.TankInitVars = function(vehicle,VehicleTab,TracksTab,VehicleSeatTab) -- doe
 			-- end
 		else
 			if ent.IsArmored and BadDamageTypes[dmg:GetDamageType()] then return end
+			
 			local inflictor = dmg:GetInflictor()
 			local DMG = 0
 			if ent.IsArmored and IsValid(inflictor) and inflictor.GetClass and ShellClass[inflictor:GetClass()] then
-				-- print(dmg:GetDamage())
 				DMG = ((inflictor.ShellType == "HE" and (inflictor.Fraction and inflictor.Fraction >= 1 or !inflictor.Fraction) and !inflictor.ExplosionDamageOverride) or (inflictor.IS_HEAT[inflictor.ShellType] and inflictor.EntityHit != ent)) and 0 or dmg:GetDamage()
-				-- print(DMG)
+				
 				local ply = dmg:GetAttacker()
 				if DMG == 0 and inflictor.ShellType == "HE" and IsValid(ply) and ply:GetSimfphys() != ent then
 					if ply.GRED_HE_WARN_ENTITY == ent then
@@ -463,9 +464,10 @@ gred.TankInitVars = function(vehicle,VehicleTab,TracksTab,VehicleSeatTab) -- doe
 						ply.GRED_HE_WARN_ENTITY = ent
 					end
 				end
+				
 				SetDamage(dmg,DMG)
 			end
-			-- print(DMG)
+			print(dmg:GetDamage(),dmg:GetDamageType(),inflictor)
 			ent.Gred_OldHP 	= ent:GetCurHealth()
 			ent.DMGDelt		= DMG
 		end

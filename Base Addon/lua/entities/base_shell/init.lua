@@ -510,10 +510,11 @@ function ENT:AddOnExplode(pos)
 				end
 			else
 				local dmg = DamageInfo()
+				local DamageToDeal = tr.Entity.GRED_TANK and ((Fraction and Fraction >= 1 and !self.IS_AP[self.ShellType]) and 0 or self.ExplosionDamage) or (self.IS_APCR[self.ShellType] and self.ExplosionDamag or self.ExplosionDamage) -- need to localize it otherwise it fucks up
 				dmg:SetAttacker(self.GBOWNER)
 				dmg:SetInflictor(self)
 				dmg:SetDamagePosition(tr.HitPos)
-				dmg:SetDamage(tr.Entity.GRED_TANK and ((Fraction and Fraction >= 1 and !self.IS_AP[self.ShellType]) and 0 or self.ExplosionDamage) or (self.IS_APCR[self.ShellType] and self.ExplosionDamag or self.ExplosionDamage))
+				dmg:SetDamage(DamageToDeal)
 				dmg:SetDamageType(64) -- DMG_BLAST
 				tr.Entity:TakeDamageInfo(dmg)
 				
@@ -529,7 +530,7 @@ function ENT:AddOnExplode(pos)
 			end
 			
 			if self.IS_HEAT[self.ShellType] or self.IS_AP[self.ShellType] then
-				-- self.ExplosionDamage = 0
+				self.ExplosionDamage = 0
 				self.ExplosionRadius = 0
 			end
 		end

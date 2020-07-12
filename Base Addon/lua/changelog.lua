@@ -1,4 +1,9 @@
---[[11/07/2020 - 10/07/2020
+--[[12/07/2020 - 10/07/2020
+
+[HOTFIX #5]
+- Added a warning that tells people that use the poorly coded trailer base that conflicts with the tanks to remove it
+- Fixed shells dealing damage to tanks twice
+- Fixed missing smoke particles
 
 [HOTFIX #4]
 - Added gred_sv_shockwave_unfreeze to the explosive options
