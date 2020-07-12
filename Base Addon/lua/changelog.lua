@@ -1,4 +1,10 @@
---[[B12/07/2020 - 10/07/2020
+--[[D12/07/2020 - 10/07/2020
+
+[HOTFIX #8]
+- Fixed a conflict with old shitty addons
+
+[HOTFIX #7]
+- Added an option to rebind the Launch Smoke Grenade key
 
 [HOTFIX #6]
 - Added the simfphys hud font just in case

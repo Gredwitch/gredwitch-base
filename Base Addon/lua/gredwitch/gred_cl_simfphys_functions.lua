@@ -176,6 +176,7 @@ gred.TankInitHookHacks = function(vehicle)
 		local HookTab = hook.GetTable()
 		
 		if !gred.SimfphysCalcViewHack and HookTab.CalcView and HookTab.CalcView.zz_simfphys_gunner_view then
+			hook.Remove("CalcView","simfphys_gunner_view")
 			gred.SimfphysCalcViewHack = HookTab.CalcView.zz_simfphys_gunner_view
 		end
 		

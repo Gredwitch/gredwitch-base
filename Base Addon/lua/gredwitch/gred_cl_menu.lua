@@ -962,6 +962,9 @@ hook.Add("GredOptionsAddLateralMenuOption","AddSimfphys",function(DFrame,DPanel,
 					CreateBindPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_cl_simfphys_key_togglehatch","Toggle hatch")
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
+					CreateBindPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_cl_simfphys_key_throwsmoke","Launch smoke grenade")
+				end,
+				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateBindPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_cl_simfphys_key_togglezoom","Toggle Zoom")
 				end,
 			},
