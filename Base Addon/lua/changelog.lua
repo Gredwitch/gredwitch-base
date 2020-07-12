@@ -1,7 +1,9 @@
---[[12/07/2020 - 10/07/2020
+--[[B12/07/2020 - 10/07/2020
 
 [HOTFIX #6]
+- Added the simfphys hud font just in case
 - Fix the conflicting addon warning always appearing
+- Slightly optimized the code of the tracks
 
 [HOTFIX #5]
 - Added a warning that tells people that use the poorly coded trailer base that conflicts with the tanks to remove it

@@ -66,6 +66,24 @@ local NextFind = 0
 local id = 0
 local SIMFPHYS_COLOR = Color(255,235,0)
 
+surface.CreateFont( "SIMFPHYS_ARMED_HUDFONT", {
+	font = "Verdana",
+	extended = false,
+	size = 20,
+	weight = 2000,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = true,
+	additive = false,
+	outline = false,
+})
+
 local function DrawCircle( X, Y, radius ) -- copyright LunasFlightSchool™
 	local segmentdist = 360 / ( 2 * math.pi * radius / 2 )
 	

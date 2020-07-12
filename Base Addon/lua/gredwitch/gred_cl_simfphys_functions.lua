@@ -350,18 +350,23 @@ gred.TankInitTracks = function(vehicle,TracksTab)
 		
 		if TracksTab.SeparateTracks and (!IsValid(vehicle.LeftTrack) or !IsValid(vehicle.RightTrack)) then return end
 		
-		if IsValid(vehicle.LeftTrack) and IsValid(vehicle.RightTrack) then
+		vehicle.wheel_left_mat = CreateMaterial("gred_trackmat_"..vehicle.CachedSpawnList.."_"..vehicle.EntityIndex.."_left","VertexLitGeneric",TracksTab.TrackMat)
+		vehicle.wheel_right_mat = CreateMaterial("gred_trackmat_"..vehicle.CachedSpawnList.."_"..vehicle.EntityIndex.."_right","VertexLitGeneric",TracksTab.TrackMat)
+		
+		if TracksTab.SeparateTracks then
 			vehicle.LeftTrackID = TracksTab.LeftTrackID or (table.KeyFromValue(vehicle.LeftTrack:GetMaterials(),TracksTab.LeftTrackMat) or 1) - 1
 			vehicle.RightTrackID = TracksTab.RightTrackID or (table.KeyFromValue(vehicle.RightTrack:GetMaterials(),TracksTab.RightTrackMat) or 1) - 1
+			
+			vehicle.LeftTrack:SetSubMaterial(vehicle.LeftTrackID,"!gred_trackmat_"..vehicle.CachedSpawnList.."_"..vehicle.EntityIndex.."_left") 
+			vehicle.RightTrack:SetSubMaterial(vehicle.RightTrackID,"!gred_trackmat_"..vehicle.CachedSpawnList.."_"..vehicle.EntityIndex.."_right")
 		else
 			local mat = vehicle:GetMaterials()
 			vehicle.LeftTrackID = TracksTab.LeftTrackID or (table.KeyFromValue(mat,TracksTab.LeftTrackMat) or 1) - 1
 			vehicle.RightTrackID = TracksTab.RightTrackID or (table.KeyFromValue(mat,TracksTab.RightTrackMat) or 1) - 1
+			
+			vehicle:SetSubMaterial(vehicle.LeftTrackID,"!gred_trackmat_"..vehicle.CachedSpawnList.."_"..vehicle.EntityIndex.."_left") 
+			vehicle:SetSubMaterial(vehicle.RightTrackID,"!gred_trackmat_"..vehicle.CachedSpawnList.."_"..vehicle.EntityIndex.."_right")
 		end
-		
-		vehicle.wheel_left_mat = CreateMaterial("gred_trackmat_"..vehicle.CachedSpawnList.."_"..vehicle.EntityIndex.."_left","VertexLitGeneric",TracksTab.TrackMat)
-		vehicle.wheel_right_mat = CreateMaterial("gred_trackmat_"..vehicle.CachedSpawnList.."_"..vehicle.EntityIndex.."_right","VertexLitGeneric",TracksTab.TrackMat)
-		
 	
 		vehicle.LowTrackSound = TracksTab.LowTrackSound and CreateSound(vehicle,TracksTab.LowTrackSound) or nil
 		vehicle.MedTrackSound = TracksTab.MedTrackSound and CreateSound(vehicle,TracksTab.MedTrackSound) or nil
@@ -525,25 +530,6 @@ gred.TankHandleTracks = function(vehicle,TrackVector,TracksTab,SusDataTab)
 					vehicle.wheel_left_mat:SetVector("$translate",TrackVector)
 					TrackVector.y = vehicle.sm_TrackDelta_R
 					vehicle.wheel_right_mat:SetVector("$translate",TrackVector)
-				end
-				
-				if TracksTab.SeparateTracks then
-					if IsValid(vehicle.RightTrack) and IsValid(vehicle.LeftTrack) then
-						if !vehicle.LeftTrack.MaterialSet then
-							vehicle.LeftTrack:SetSubMaterial(vehicle.LeftTrackID,"!gred_trackmat_"..vehicle.CachedSpawnList.."_"..vehicle.EntityIndex.."_left") 
-							vehicle.LeftTrack.MaterialSet = true
-						end
-						if !vehicle.RightTrack.MaterialSet then
-							vehicle.RightTrack:SetSubMaterial(vehicle.RightTrackID,"!gred_trackmat_"..vehicle.CachedSpawnList.."_"..vehicle.EntityIndex.."_right")
-							vehicle.RightTrack.MaterialSet = true
-						end
-					end
-				else
-					if !vehicle.MaterialSet then
-						vehicle:SetSubMaterial(vehicle.LeftTrackID,"!gred_trackmat_"..vehicle.CachedSpawnList.."_"..vehicle.EntityIndex.."_left") 
-						vehicle:SetSubMaterial(vehicle.RightTrackID,"!gred_trackmat_"..vehicle.CachedSpawnList.."_"..vehicle.EntityIndex.."_right")
-						vehicle.MaterialSet = true
-					end
 				end
 			end
 		end
