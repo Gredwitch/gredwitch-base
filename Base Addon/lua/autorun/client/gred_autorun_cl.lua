@@ -86,7 +86,7 @@ local function gred_settings(CPanel)
 end
 
 local function CheckForConflicts()
-	if steamworks.ShouldMountAddon("2083101470") then
+	if steamworks.IsSubscribed("2083101470") and steamworks.ShouldMountAddon("2083101470") then
 		local DFrame = vgui.Create("DFrame")
 		DFrame:SetSize(ScrW()*0.5,ScrH()*0.5)
 		DFrame:SetTitle("Gredwitch's Base : CONFLICTING ADDON FOUND!! PLEASE REMOVE IT IF YOU WANT TO USE MY TANKS")
