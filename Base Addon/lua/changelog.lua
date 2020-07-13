@@ -1,4 +1,26 @@
---[[D12/07/2020 - 10/07/2020
+--[[13/07/2020
+- Added missing shelltypes and calibers to the ammo box
+- Fixed an error related to hatches
+- Fixed an error related to bombs that could cause server crashes
+- Fixed the player driving animations being overridden on all simfphys vehicles
+- Fixed a client side error related to reload sounds
+- Fixed client side shell entities from the killcam staying at the origin of the map
+- Fixed shells not having the correct shell type model in the killcam
+- Removed the debug prints
+- Removed the warning about trailers reborn
+- You can no longer change shell types if you only have 1
+
+
+If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
+If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
+Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
+
+If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
+
+OLDER CHANGES
+
+
+12/07/2020 - 10/07/2020
 
 [HOTFIX #8]
 - Fixed a conflict with old shitty addons
@@ -91,14 +113,6 @@
 - Add traverse rate and elevation rate multipliers
 - Mouse sensitivity in sight mode is now reduced based on the zoom of the sight
 - Fixed the ammo box
-
-If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
-If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
-Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
-
-If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
-
-OLDER CHANGES
 
 27/05/2020
 - Fixed possible exploits with the ammo box

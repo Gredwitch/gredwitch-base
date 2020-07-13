@@ -483,7 +483,8 @@ function ENT:AddOnExplode(pos)
 					[11] = math.Round(ArmourThickness),
 					[12] = self.ShrapnelPen,
 					[13] = self.ShrapnelBoom,
-					[14] = HasTNT and tr.ShellExplodePos or nil -- let the client calculate that
+					[14] = HasTNT and tr.ShellExplodePos or nil, -- let the client calculate that
+					[15] = self.IS_AP[self.ShellType] and 0 or 1, -- let the client calculate that
 				},
 			}
 			

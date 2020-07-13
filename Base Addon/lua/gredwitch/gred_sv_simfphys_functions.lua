@@ -467,7 +467,7 @@ gred.TankInitVars = function(vehicle,VehicleTab,TracksTab,VehicleSeatTab) -- doe
 				
 				SetDamage(dmg,DMG)
 			end
-			print(dmg:GetDamage(),dmg:GetDamageType(),inflictor)
+			
 			ent.Gred_OldHP 	= ent:GetCurHealth()
 			ent.DMGDelt		= DMG
 		end
@@ -487,9 +487,7 @@ gred.TankInitVars = function(vehicle,VehicleTab,TracksTab,VehicleSeatTab) -- doe
 			hook.Add("CalcMainActivity","simfphysSeatActivityOverride",function(ply)
 				CalcIdeal,CalcSeqOverride = simfphysSeatActivityOverride(ply)
 				
-				if !CalcIdeal or !CalcSeqOverride then return end
-				
-				if !ply:GetVehicle():GetNWInt("HatchID",0) != 0 then
+				if ply:GetVehicle():GetNWInt("HatchID",0) != 0 and CalcIdeal and CalcSeqOverride then
 					ply.CalcSeqOverride = -1
 					
 					if ply:GetAllowWeaponsInVehicle() and IsValid(ply:GetActiveWeapon()) then
@@ -509,6 +507,8 @@ gred.TankInitVars = function(vehicle,VehicleTab,TracksTab,VehicleSeatTab) -- doe
 					
 					return ply.CalcIdeal,ply.CalcSeqOverride
 				end
+				
+				return CalcIdeal,CalcSeqOverrid
 			end)
 		end
 	end
@@ -1080,7 +1080,7 @@ gred.HandleSeats = function(vehicle,Mode,VehicleSeatTab,gredTankGetDriverLocalAn
 						local LoadingPrimaryTab = VehicleSeatTab[SeatTab.IsLoader][Mode].Primary[SeatSlotID]
 						
 						if LoadingPrimaryTab then
-							if seat.OldCannonShell and !seat.CannonShell then
+							if seat.OldCannonShell and !seat.CannonShell and LoadingPrimaryTab.ShellTypes and #LoadingPrimaryTab.ShellTypes > 1 then
 								local Shell = GetNWFloat(Seat,SeatSlotID.."ShellType",1) + 1
 								
 								if Shell > #LoadingPrimaryTab.ShellTypes then
@@ -1132,7 +1132,7 @@ gred.HandleSeats = function(vehicle,Mode,VehicleSeatTab,gredTankGetDriverLocalAn
 					
 					if PrimaryTab then
 						if !vehicle.gred_sv_simfphys_manualreloadsystem or PrimaryTab.AutoLoader then
-							if seat.OldCannonShell and !seat.CannonShell and PrimaryTab.ShellTypes then
+							if seat.OldCannonShell and !seat.CannonShell and PrimaryTab.ShellTypes and #PrimaryTab.ShellTypes > 1 then
 								local SeatSlotTab = SlotID and seat.Primary[SlotID] or seat.Secondary
 								local Shell = GetNWFloat(seat,SlotID.."ShellType",1) + 1
 								
@@ -2128,7 +2128,10 @@ gred.TankRemovePlayerHooks = function(vehicle,seat,SeatID,ply,Mode,SteamID,SeatT
 	hook.Remove("PlayerButtonUp","gred_simfphys_PlayerButtonUp_"..SteamID)
 	
 	seat.Driver = nil
-	gred.TankResetHatch(vehicle,seat,SeatID,vehicle,SeatTab)
+	
+	if IsValid(vehicle) then
+		gred.TankResetHatch(vehicle,seat,SeatID,vehicle,SeatTab)
+	end
 	
 	if IsValid(ply) then
 		-- ply:SetDSP(0)

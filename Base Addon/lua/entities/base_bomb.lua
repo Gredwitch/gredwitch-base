@@ -83,12 +83,11 @@ Luna:
 	Lol
 ]]
 function ENT:Initialize()
-
-	local tbl = physenv.GetPerformanceSettings()
-	tbl.MaxVelocity = 200000000
-	physenv.SetPerformanceSettings(tbl)
 	
 	if SERVER then
+		local tbl = physenv.GetPerformanceSettings()
+		tbl.MaxVelocity = 200000000
+		physenv.SetPerformanceSettings(tbl)
 		if gred.CVars["gred_sv_spawnable_bombs"]:GetInt() == 0 and not self.IsOnPlane then
 			self:Remove()
 			return
@@ -191,18 +190,29 @@ function ENT:Think()
 	self:AddOnThink()
 end
 
+local trlength = Vector(0,0,9000)
+local angle_zero = Angle()
+local angle_1 = Angle(-90,0,0)
+
 function ENT:Explode(pos)
 	if !self.Exploded then return end
+	
 	pos = pos or self:LocalToWorld(self:OBBCenter())
-	if self:AddOnExplode(pos) then self.Exploded = false return end
+	
+	if self:AddOnExplode(pos) then
+		self.Exploded = false 
+		return 
+	end
+	
 	if not self.Smoke then
 		gred.CreateExplosion(pos,self.ExplosionRadius,self.ExplosionDamage * gred.CVars.gred_sv_shell_gp_he_damagemultiplier:GetFloat(),self.Decal,self.TraceLength,self.GBOWNER,self,self.DEFAULT_PHYSFORCE,self.DEFAULT_PHYSFORCE_PLYGROUND,self.DEFAULT_PHYSFORCE_PLYAIR)
 	end
+	
 	if not self.NO_EFFECT then
 		net.Start("gred_net_createparticle")
-		if(self:WaterLevel() >= 1) then
+		
+		if self:WaterLevel() >= 1 then
 			local trdata   = {}
-			local trlength = Vector(0,0,9000)
 
 			trdata.start   = pos
 			trdata.endpos  = trdata.start + trlength
@@ -246,28 +256,36 @@ function ENT:Explode(pos)
 			if trace.HitWorld then
 				net.WriteString(self.Effect)
 				net.WriteVector(pos)
+				
 				if self.AngEffect then
-					net.WriteAngle(Angle(-90,0,0))
+					net.WriteAngle()
 				else
-					net.WriteAngle(Angle(0,0,0))
+					net.WriteAngle(angle_zero)
 				end
+				
 				net.WriteBool(true)
 			else
 				net.WriteString(self.EffectAir)
 				net.WriteVector(pos)
+				
 				if self.AngEffect then
-					net.WriteAngle(Angle(-90,0,0))
+					net.WriteAngle(angle_1)
 				else
-					net.WriteAngle(Angle(0,0,0))
+					net.WriteAngle(angle_zero)
 				end
+				
 				net.WriteBool(false)
 			end
 		end
 		net.Broadcast()
 	end
+	
 	gred.CreateSound(pos,self.RSound == 1,self.ExplosionSound,self.FarExplosionSound,self.DistExplosionSound)
 	
-	timer.Simple(0,function() self:Remove() end)
+	timer.Simple(0,function()
+		if !IsValid(self) then return end
+		self:Remove()
+	end)
 end
 
 function ENT:OnTakeDamage(dmginfo)

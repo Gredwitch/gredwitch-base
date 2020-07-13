@@ -4,7 +4,7 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 	local ply = LocalPlayer()
 	local function AddShellMenu(caliber,self,ply,frame,shelltypes)
 		local d = DermaMenu()
-		for k,v in pairs(shelltypes) do
+		for k,v in SortedPairs(shelltypes) do
 			d:AddOption(k,function()
 				net.Start("gred_net_ammobox_sv_createshell")
 					net.WriteEntity(self)
@@ -316,6 +316,16 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 			 ["HEAT"] = true,
 			 ["Smoke"] = true,
 		},
+		["56"] = {
+			 ["HE"] = true,
+			 ["AP"] = true,
+			 ["APHE"] = true,
+			 ["APC"] = true,
+			 ["APCBC"] = true,
+			 ["APCR"] = true,
+			 ["HEAT"] = true,
+			 ["Smoke"] = true,
+		},
 		["57"] = {
 			 ["HE"] = true,
 			 ["AP"] = true,
@@ -360,6 +370,16 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 			 ["AP"] = true,
 			 ["Smoke"] = true,
 		},
+		["85"] = {
+			 ["HE"] = true,
+			 ["AP"] = true,
+			 ["APHE"] = true,
+			 ["APC"] = true,
+			 ["APCBC"] = true,
+			 ["APCR"] = true,
+			 ["HEAT"] = true,
+			 ["Smoke"] = true,
+		},
 		["88"] = {
 			 ["HE"] = true,
 			 ["AP"] = true,
@@ -402,6 +422,11 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 			 ["AP"] = true,
 			 ["Smoke"] = true,
 		},
+		["122"] = {
+			 ["HE"] = true,
+			 ["AP"] = true,
+			 ["Smoke"] = true,
+		},
 		["128"] = {
 			 ["HE"] = true,
 			 ["AP"] = true,
@@ -436,6 +461,22 @@ net.Receive("gred_net_ammobox_cl_gui",function()
 	]]
 	local DButton
 	for k,v in SortedPairs(SHELLS) do
+		v = {
+			["AP"] = true,
+			["APBC"] = true,
+			["APC"] = true,
+			["APCBC"] = true,
+			["APCR"] = true,
+			["APDS"] = true,
+			["APFSDS"] = true,
+			["APHE"] = true,
+			["APHEBC"] = true,
+			["APHECBC"] = true,
+			["HE"] = true,
+			["HEAT"] = true,
+			["HEATFS"] = true,
+			["Smoke"] = true,
+		}
 		DButton = DScrollPanel:Add("DButton")
 		DButton:SetText(k.."mm shell")
 		DButton:Dock(TOP)

@@ -190,9 +190,7 @@ gred.TankInitHookHacks = function(vehicle)
 			hook.Add("CalcMainActivity","simfphysSeatActivityOverride",function(ply)
 				CalcIdeal,CalcSeqOverride = simfphysSeatActivityOverride(ply)
 				
-				if !CalcIdeal or !CalcSeqOverride then return end
-				
-				if !ply:GetVehicle():GetNWInt("HatchID",0) != 0 then
+				if ply:GetVehicle():GetNWInt("HatchID",0) != 0 and CalcIdeal and CalcSeqOverride then
 					ply.CalcSeqOverride = -1
 					
 					if ply:GetAllowWeaponsInVehicle() and IsValid(ply:GetActiveWeapon()) then
@@ -212,6 +210,8 @@ gred.TankInitHookHacks = function(vehicle)
 					
 					return ply.CalcIdeal,ply.CalcSeqOverride
 				end
+				
+				return CalcIdeal,CalcSeqOverride
 			end)
 		end
 	end
@@ -486,7 +486,7 @@ gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatID,SeatSlotTab,Weapon
 			if WeaponTab.Sounds and WeaponTab.Sounds.Reload then
 				seat:SetNWVarProxy(WepID.."NextShot",function(ent,name,oldval,newval)
 					oldval = oldval or 0
-					if oldval != newval and (newval - oldval) < 99999999 then
+					if oldval != newval and (newval - oldval) < 99999999 and IsValid(ent) then
 						gred.PlayReloadSound(ent,SeatID,vehicle,WeaponTab,SeatSlotTab)
 					end
 				end)

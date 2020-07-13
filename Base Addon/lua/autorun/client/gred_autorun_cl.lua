@@ -655,7 +655,7 @@ timer.Simple(5,function()
 	}
 	if singleplayerIPs[game.GetIPAddress()] then
 		CheckForUpdates()
-		CheckForConflicts()
+		-- CheckForConflicts()
 	end
 	
 	CheckDXDiag()
