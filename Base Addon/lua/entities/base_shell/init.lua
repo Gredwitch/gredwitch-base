@@ -287,7 +287,7 @@ function ENT:AddOnInit()
 		self.Decal = "scorch_small"
 	end
 	
-	self.EnginePower 			= self:ConvertMetersToUnits(self.MuzzleVelocity*gred.CVars["gred_sv_shell_speed_multiplier"]:GetFloat()) -- m/s
+	self.EnginePower 			= self:ConvertMetersToUnits(self.MuzzleVelocity) -- m/s
 	self.EffectAir 				= self.Effect
 	self.Smoke 					= self.ShellType == "Smoke"
 	self:SetTracerColor(self.TRACERCOLOR_TO_INT[self.TracerColor] or 0)

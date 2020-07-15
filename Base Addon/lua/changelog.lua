@@ -1,14 +1,8 @@
---[[13/07/2020
-- Added missing shelltypes and calibers to the ammo box
-- Fixed an error related to hatches
-- Fixed an error related to bombs that could cause server crashes
-- Fixed the player driving animations being overridden on all simfphys vehicles
-- Fixed a client side error related to reload sounds
-- Fixed client side shell entities from the killcam staying at the origin of the map
-- Fixed shells not having the correct shell type model in the killcam
-- Removed the debug prints
-- Removed the warning about trailers reborn
-- You can no longer change shell types if you only have 1
+--[[15/07/2020
+Replaced "double tab walk to toggle the gun" with "hold walk to enter freeview"
+Fixed eyeangles not facing the correct direction when you enter a seat
+Fixed spawning on a slope breaking the camera
+Fixed errors related to timers
 
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
@@ -19,6 +13,17 @@ If you want to play with other people with exclusive addons I made, you can join
 
 OLDER CHANGES
 
+13/07/2020
+- Added missing shelltypes and calibers to the ammo box
+- Fixed an error related to hatches
+- Fixed an error related to bombs that could cause server crashes
+- Fixed the player driving animations being overridden on all simfphys vehicles
+- Fixed a client side error related to reload sounds
+- Fixed client side shell entities from the killcam staying at the origin of the map
+- Fixed shells not having the correct shell type model in the killcam
+- Removed the debug prints
+- Removed the warning about trailers reborn
+- You can no longer change shell types if you only have 1
 
 12/07/2020 - 10/07/2020
 

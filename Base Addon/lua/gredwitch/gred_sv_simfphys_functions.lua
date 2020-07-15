@@ -1018,13 +1018,13 @@ gred.HandleSeats = function(vehicle,Mode,VehicleSeatTab,gredTankGetDriverLocalAn
 						
 						seat.PressingWalk = WalkDown
 						
-						if seat.PressingWalk and seat.PressingWalk != seat.OldPressingWalk then
-							if seat.LastWalkPress + 0.17 + Ping(ply)*0.001 > ct then
-								SetNWBool(seat,"TurretDisabled",!GetNWBool(seat,"TurretDisabled"))
-							end
+						-- if seat.PressingWalk and seat.PressingWalk != seat.OldPressingWalk then
+							-- if seat.LastWalkPress + 0.17 + Ping(ply)*0.001 > ct then
+								-- SetNWBool(seat,"TurretDisabled",!GetNWBool(seat,"TurretDisabled"))
+							-- end
 							
-							seat.LastWalkPress = ct
-						end
+							-- seat.LastWalkPress = ct
+						-- end
 						
 						if !GetNWBool(seat,"TurretDisabled") and !WalkDown then
 							Angles = gred.TankGetDriverLocalAngles(vehicle,seat,SeatTab,ply,HatchID,PoseParamTab)
@@ -1319,8 +1319,10 @@ gred.TankShootCannon = function(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,Sea
 		if v then
 			local att = GetAttachment(vehicle,v)
 			
-			vehicle:ResetSequence(WeaponTab.ShootAnimation)
-			
+			if WeaponTab.ShootAnimation then
+				vehicle:ResetSequence(WeaponTab.ShootAnimation)
+			end
+
 			if WeaponTab.PreFire then
 				WeaponTab.PreFire(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID,k,v,att)
 			end
@@ -2179,6 +2181,16 @@ gred.TankAddPlayerHooks = function(vehicle,seat,SeatID,ply,Mode,SteamID,SeatTab)
 	end)
 end
 
+gred.TankGetDirectionPoseParamName = function(DirectionPoseParamTab)
+	for k,v in pairs(DirectionPoseParamTab) do
+		if !v.Mul or v.Mul == 1 then
+			return k
+		end
+	end
+	
+	return next(DirectionPoseParamTab)
+end
+
 gred.TankPlayerEnteredSeat = function(vehicle,seat,SeatID,ply,Mode)
 	local SeatTab = gred.simfphys[vehicle.CachedSpawnList].Seats and gred.simfphys[vehicle.CachedSpawnList].Seats[SeatID] and gred.simfphys[vehicle.CachedSpawnList].Seats[SeatID][Mode]
 	
@@ -2205,7 +2217,7 @@ gred.TankPlayerEnteredSeat = function(vehicle,seat,SeatID,ply,Mode)
 		local Angles = Angle()
 		
 		if SeatTab.PoseParameters.Pitch then
-			local Tab = next(SeatTab.PoseParameters.Pitch)
+			local Tab = gred.TankGetDirectionPoseParamName(SeatTab.PoseParameters.Pitch)
 			Angles.p = GetPoseParameter(vehicle,Tab)
 			Angles.p = (SeatTab.PoseParameters.Pitch[Tab].Invert and -Angles.p or Angles.p) - SeatTab.PoseParameters.Pitch[Tab].Offset
 		else
@@ -2213,7 +2225,7 @@ gred.TankPlayerEnteredSeat = function(vehicle,seat,SeatID,ply,Mode)
 		end
 		
 		if SeatTab.PoseParameters.Yaw then
-			local Tab = next(SeatTab.PoseParameters.Yaw)
+			local Tab = gred.TankGetDirectionPoseParamName(SeatTab.PoseParameters.Yaw)
 			Angles.y = GetPoseParameter(vehicle,Tab)
 			Angles.y = (SeatTab.PoseParameters.Yaw[Tab].Invert and -Angles.y or Angles.y) - SeatTab.PoseParameters.Yaw[Tab].Offset
 		else
@@ -2245,9 +2257,16 @@ gred.TankPlayerEnteredSeat = function(vehicle,seat,SeatID,ply,Mode)
 			-- end
 		-- end
 		
+		
+		
 		timer.Simple(FrameTime()*3,function()
 			if IsValid(ply) then
-				SetEyeAngles(ply,LocalToWorldAngles(vehicle,Angles))
+				if seat.LocalView then
+					SetEyeAngles(ply,LocalToWorldAngles(vehicle,Angles))
+				else
+					Angles:Sub(WorldToLocalAngles(vehicle,GetAngles(seat)))
+					SetEyeAngles(ply,Angles)
+				end
 			end
 		end)
 	else

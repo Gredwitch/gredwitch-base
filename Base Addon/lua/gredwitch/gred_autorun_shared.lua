@@ -206,7 +206,7 @@ gred.CVars["gred_sv_arti_spawnaltitude"] 					= CreateConVar("gred_sv_arti_spawn
 gred.CVars["gred_sv_spawnable_bombs"] 						= CreateConVar("gred_sv_spawnable_bombs"						,  "1"  , GRED_SVAR)
 
 gred.CVars["gred_sv_minricochetangle"] 						= CreateConVar("gred_sv_minricochetangle"						, "70"  , GRED_SVAR)
-gred.CVars["gred_sv_shell_speed_multiplier"] 				= CreateConVar("gred_sv_shell_speed_multiplier"					,  "1"  , GRED_SVAR)
+-- gred.CVars["gred_sv_shell_speed_multiplier"] 				= CreateConVar("gred_sv_shell_speed_multiplier"					,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_shell_ap_damagemultiplier"]				= CreateConVar("gred_sv_shell_ap_damagemultiplier"				,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_shell_apcr_damagemultiplier"]			= CreateConVar("gred_sv_shell_apcr_damagemultiplier"			,  "1"  , GRED_SVAR)
 gred.CVars["gred_sv_shell_heat_damagemultiplier"]			= CreateConVar("gred_sv_shell_heat_damagemultiplier"			,  "1"  , GRED_SVAR)
@@ -263,6 +263,7 @@ gred.CVars["gred_sv_isdedicated"] 							= CreateConVar("gred_sv_isdedicated"			
 gred.CVars["gred_sv_resourceprecache"] 						= CreateConVar("gred_sv_resourceprecache"						,  "0"  , GRED_SVAR)
 
 gred.ActiveSimfphysVehicles = gred.ActiveSimfphysVehicles or {}
+gred.simfphys = gred.simfphys or {}
 
 gred.CalTable = {
 	["wac_base_7mm"] = {

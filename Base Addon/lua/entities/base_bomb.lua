@@ -231,9 +231,9 @@ function ENT:Explode(pos)
 				net.WriteString(self.EffectWater)
 				net.WriteVector(tr2.HitPos)
 				if self.EffectWater == "ins_water_explosion" then
-					net.WriteAngle(Angle(-90,0,0))
+					net.WriteAngle(angle_1)
 				else
-					net.WriteAngle(Angle(0,0,0))
+					net.WriteAngle(angle_zero)
 				end
 				net.WriteBool(false)
 			end
@@ -258,7 +258,7 @@ function ENT:Explode(pos)
 				net.WriteVector(pos)
 				
 				if self.AngEffect then
-					net.WriteAngle()
+					net.WriteAngle(angle_1)
 				else
 					net.WriteAngle(angle_zero)
 				end

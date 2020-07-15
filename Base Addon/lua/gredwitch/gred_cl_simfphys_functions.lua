@@ -1040,7 +1040,8 @@ gred.TankDrawHUD = function(vehicle,seat,SeatID,SeatTab,Mode,ply,ScrW,ScrH,Loadi
 			end
 			
 			local H = ScrH * (Height + HeightAdd*2)
-			draw.SimpleText("DOUBLE PRESS "..(input.LookupBinding("+walk") or "[WALK - Unbound!]").." TO TOGGLE THE TURRET","SIMFPHYS_ARMED_HUDFONT",7,H,SIMFPHYS_COLOR,0,1)
+			-- draw.SimpleText("DOUBLE PRESS "..(input.LookupBinding("+walk") or "[WALK - Unbound!]").." TO TOGGLE THE TURRET","SIMFPHYS_ARMED_HUDFONT",7,H,SIMFPHYS_COLOR,0,1)
+			draw.SimpleText("HOLD "..(input.LookupBinding("+walk") or "[WALK - Unbound!]").." TO ENTER FREEVIEW","SIMFPHYS_ARMED_HUDFONT",7,H,SIMFPHYS_COLOR,0,1)
 			Height = Height + HeightAdd*2
 			HeightCalc = ScrH*Height
 		end
@@ -1561,6 +1562,7 @@ net.Receive("gred_net_simfphys_shoot_secondary_machinegun_sequential",function(l
 	if !IsValid(vehicle) then return end
 	
 	gred.TankSafetyCheck(vehicle,function()
+		if !IsValid(seat) then return end
 		gred.TankShootMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,false,SequentialID)
 	end)
 end)
@@ -1574,6 +1576,7 @@ net.Receive("gred_net_simfphys_shoot_primary_machinegun_sequential",function(len
 	if !IsValid(vehicle) then return end
 		
 	gred.TankSafetyCheck(vehicle,function()
+		if !IsValid(seat) then return end
 		gred.TankShootMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,true,SequentialID)
 	end)
 end)
@@ -1610,6 +1613,7 @@ net.Receive("gred_net_simfphys_shoot_secondary_machinegun",function(len)
 	if !IsValid(vehicle) then return end
 	
 	gred.TankSafetyCheck(vehicle,function()
+		if !IsValid(seat) then return end
 		gred.TankShootMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,false)
 	end)
 end)
@@ -1622,6 +1626,7 @@ net.Receive("gred_net_simfphys_shoot_secondary_tankCannon",function(len)
 	if !IsValid(vehicle) then return end
 	
 	gred.TankSafetyCheck(vehicle,function()
+		if !IsValid(seat) then return end
 		gred.TankShootCannon(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,false)
 	end)
 end)
@@ -1634,6 +1639,7 @@ net.Receive("gred_net_simfphys_stop_secondary_machinegun",function(len)
 	if !IsValid(vehicle) then return end
 	
 	gred.TankSafetyCheck(vehicle,function()
+		if !IsValid(seat) then return end
 		gred.TankStopMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,false)
 	end)
 end)
@@ -1646,6 +1652,7 @@ net.Receive("gred_net_simfphys_shoot_primary_machinegun",function(len)
 	if !IsValid(vehicle) then return end
 	
 	gred.TankSafetyCheck(vehicle,function()
+		if !IsValid(seat) then return end
 		gred.TankShootMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,true)
 	end)
 end)
@@ -1658,6 +1665,7 @@ net.Receive("gred_net_simfphys_shoot_primary_tankCannon",function(len)
 	if !IsValid(vehicle) then return end
 	
 	gred.TankSafetyCheck(vehicle,function()
+		if !IsValid(seat) then return end
 		gred.TankShootCannon(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,true)
 	end)
 end)
@@ -1670,6 +1678,7 @@ net.Receive("gred_net_simfphys_stop_primary_machinegun",function(len)
 	if !IsValid(vehicle) then return end
 	
 	gred.TankSafetyCheck(vehicle,function() 
+		if !IsValid(seat) then return end
 		gred.TankStopMG(seat,table.KeyFromValue(vehicle.pSeat,seat),vehicle,true)
 	end)
 end)
