@@ -1,8 +1,7 @@
---[[15/07/2020
-Replaced "double tab walk to toggle the gun" with "hold walk to enter freeview"
-Fixed eyeangles not facing the correct direction when you enter a seat
-Fixed spawning on a slope breaking the camera
-Fixed errors related to timers
+--[[B15/07/2020
+- Fixed a small error
+- Fixed the latest news panel images not being 16/9
+- Fixed the reload circle not being in the middle of the screen with some vehicles
 
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
@@ -12,6 +11,12 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+15/07/2020
+- Fixed eyeangles not facing the correct direction when you enter a seat
+- Fixed spawning on a slope breaking the camera
+- Fixed errors related to timers
+- Replaced "double tab walk to toggle the gun" with "hold walk to enter freeview"
 
 13/07/2020
 - Added missing shelltypes and calibers to the ammo box

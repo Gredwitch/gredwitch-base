@@ -592,8 +592,8 @@ gred.AddHome = function(DFrame,DPanel,DScrollPanel,X,Y,X_DPanel,y_DPanel)
 		end
 		
 		local DPanelNewsMain = vgui.Create("DPanel",DPanel)
-		DPanelNewsMain:SetSize(DPanelNews_X,DPanelNews_Y)
-		DPanelNewsMain:SetPos(X - DPanelNews_X - 10,24)
+		DPanelNewsMain:SetSize(X*0.32,Y*0.32)
+		DPanelNewsMain:SetPos(X - X*0.32 - 10,24)
 		DPanelNewsMain.Paint = function() end
 		DPanelNewsMain.SubPanels = {}
 		

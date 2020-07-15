@@ -559,7 +559,7 @@ gred.TankInitSeats = function(vehicle,Mode,VehicleSeatTab) -- doesn't need to be
 					-- })
 					seat.NextSetPos = 0
 					seat.LastWalkPress = 0
-					seat.LocalView = SeatTab.LocalView != nil and SeatTab or ((SeatTab.ViewAttachment or SeatTab.Attachment) and true or false)
+					seat.LocalView = SeatTab.LocalView != nil and SeatTab.LocalView or ((SeatTab.ViewAttachment or SeatTab.Attachment) and true or false)
 					simfphys.RegisterCamera(seat,SeatTab.FirstPersonViewPos,SeatTab.ThirdPersonViewPos,seat.LocalView,SeatTab.ViewAttachment)
 					
 					if SeatTab.Hatches then

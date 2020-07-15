@@ -224,7 +224,7 @@ gred.CreateExplosion = function(pos,radius,damage,decal,trace,ply,bomb,DEFAULT_P
 			if ConVar and !v.isWacAircraft and !v.LFS then
 				phys:Wake()
 				phys:EnableMotion(true)
-				if !(bomb.ShellType and simfphys and simfphys.IsCar(v)) then
+				if !(bomb.ShellType and simfphys and simfphys.IsCar and simfphys.IsCar(v)) then
 					constraint.RemoveAll(v)
 				end
 			end

@@ -409,6 +409,7 @@ gred.TankInitSeats = function(vehicle,Mode,VehicleSeatTab,LocalPly)
 					end
 					
 					seat.FirstPersonViewPosIsInside = SeatTab.FirstPersonViewPosIsInside
+					seat.LocalView = SeatTab.LocalView != nil and SeatTab.LocalView or ((SeatTab.ViewAttachment or SeatTab.Attachment) and true or false)
 					
 					if SeatTab.Hatches then
 						local HatchesTab = SeatTab.Hatches
@@ -875,7 +876,7 @@ gred.TankDrawHUD = function(vehicle,seat,SeatID,SeatTab,Mode,ply,ScrW,ScrH,Loadi
 			local EyeAng
 			
 			if vehicle.LocalPlayerActiveSeat.SightToggle then
-				EyeAng = ply:EyeAngles()
+				EyeAng = seat.LocalView and ply:EyeAngles() or (seat.LocalView and ply:EyeAngles() or seat:LocalToWorldAngles(ply:EyeAngles()))
 				surface.SetDrawColor(255,255,255,255)
 				surface.SetTexture(surface.GetTextureID(SeatTab.Sight.SightMaterial))
 				local Ang = EyeAng - att.Ang
@@ -903,7 +904,7 @@ gred.TankDrawHUD = function(vehicle,seat,SeatID,SeatTab,Mode,ply,ScrW,ScrH,Loadi
 			end
 			
 			if vehicle.Crosshair or vehicle.LocalPlayerActiveSeat.SightToggle then
-				EyeAng = EyeAng or ply:EyeAngles()
+				EyeAng = EyeAng or (seat.LocalView and ply:EyeAngles() or seat:LocalToWorldAngles(ply:EyeAngles()))
 				trtab.start = att.Pos
 				trtab.endpos = (att.Pos + EyeAng:Forward() * 100000)
 				trtab.filter = vehicle.filterEntities
