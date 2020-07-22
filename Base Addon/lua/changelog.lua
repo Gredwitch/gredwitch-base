@@ -1,7 +1,9 @@
---[[B15/07/2020
-- Fixed a small error
-- Fixed the latest news panel images not being 16/9
-- Fixed the reload circle not being in the middle of the screen with some vehicles
+--[[23/07/2020
+- Bone manipulation is now done serverside to fix hitbox related issues
+- Fixed a few errors
+- Fixed bullets' trace filter hitting the crew
+- Fixed the radius on WP shells
+- Fixed turning off the armor system for the tanks not actually turning off the armor system
 
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
@@ -13,6 +15,9 @@ If you want to play with other people with exclusive addons I made, you can join
 OLDER CHANGES
 
 15/07/2020
+- Fixed a small error
+- Fixed the latest news panel images not being 16/9
+- Fixed the reload circle not being in the middle of the screen with some vehicles
 - Fixed eyeangles not facing the correct direction when you enter a seat
 - Fixed spawning on a slope breaking the camera
 - Fixed errors related to timers
