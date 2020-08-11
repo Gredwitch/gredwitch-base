@@ -347,6 +347,7 @@ gred.TankInitVars = function(vehicle,VehicleTab,TracksTab,VehicleSeatTab) -- doe
 	vehicle.GearsBackup = table.Copy(vehicle.Gears)
 	vehicle.filterEntities = player.GetAll()
 	table.Add(vehicle.filterEntities,vehicle.FILTER)
+	-- PrintTable(vehicle.FILTER)
 	
 	vehicle.PhysicsCollide = function(ent,data,phy)
 		if !(IsValid(data.HitEntity) and ShellClass[GetClass(data.HitEntity)]) then
@@ -1802,7 +1803,7 @@ gred.TankToggleHatch = function(seat,SeatID,vehicle,ply,HatchID,OldHatch,SeatTab
 	if HatchID == 0 then
 		seat:ResetHatch(SeatID,vehicle)
 	else
-		ply.TankManipulatedBones = true
+		-- ply.TankManipulatedBones = true
 		
 		local HatchTab = SeatTab.Hatches[HatchID]
 		
@@ -1826,6 +1827,8 @@ gred.TankToggleHatch = function(seat,SeatID,vehicle,ply,HatchID,OldHatch,SeatTab
 			SetNWBool(seat,"SpecialCam_LocalAngles",seat.LocalView)
 		end
 		
+		SetCollisionGroup(ply,HatchTab.Inside and 10 or 5)
+		
 		if SeatID == 0 then
 			local View = vehicle:SetupView()
 			SetAngles(seat,View.ViewAng + HatchTab.AngOffset)
@@ -1841,6 +1844,11 @@ gred.TankToggleHatch = function(seat,SeatID,vehicle,ply,HatchID,OldHatch,SeatTab
 				SetPos(seat,vehicle.PassengerSeats[SeatID].pos + HatchTab.PosOffset)
 				SetAngles(seat,LocalToWorldAngles(vehicle,vehicle.PassengerSeats[SeatID].ang + HatchTab.AngOffset))
 			end
+		end
+		
+		if HatchTab.PlayerBoneManipulation then
+			gred.ClearBoneManipulations(ply)
+			gred.DoBoneManipulation(vehicle,seat,SeatID,ply,HatchTab.PlayerBoneManipulation,SeatTab)
 		end
 		
 		if HatchTab.ViewPosOffset then
@@ -1955,6 +1963,15 @@ end
 
 gred.TankResetHatch = function(vehicle,seat,SeatID,vehicle,SeatTab)
 	if !SeatTab then return end
+	
+	local ply = seat:GetDriver()
+	
+	if IsValid(ply) then
+		SetCollisionGroup(ply,SeatTab.Outside and 5 or 10)
+		gred.ClearBoneManipulations(ply)
+		gred.DoBoneManipulation(vehicle,seat,SeatID,ply,nil,SeatTab)
+	end
+	
 	SetParent(seat,vehicle,SeatTab.Attachment and vehicle.Attachments[SeatTab.Attachment] or nil)
 	
 	local HatchTab = SeatTab.Hatches and SeatTab.Hatches[GetNWInt(seat,"HatchID",0)]
@@ -1978,9 +1995,12 @@ gred.TankResetHatch = function(vehicle,seat,SeatID,vehicle,SeatTab)
 			
 			if HatchTab and HatchTab.SeatAttachment then
 				local att = GetAttachment(vehicle,vehicle.Attachments[HatchTab.SeatAttachment])
-				att.LPos,att.LAng = EnityWorldToLocal(vehicle,att.Pos),WorldToLocalAngles(vehicle,att.Ang)
-				PosH,AngH = WorldToLocal(vector_zero,angle_zero,att.LPos + HatchTab.PosOffset,att.LAng)
-				AngH = LocalToWorldAngles(vehicle,vehicle.PassengerSeats[SeatID].ang - att.LAng)
+				
+				if att then
+					att.LPos,att.LAng = EnityWorldToLocal(vehicle,att.Pos),WorldToLocalAngles(vehicle,att.Ang)
+					PosH,AngH = WorldToLocal(vector_zero,angle_zero,att.LPos + HatchTab.PosOffset,att.LAng)
+					AngH = LocalToWorldAngles(vehicle,vehicle.PassengerSeats[SeatID].ang - att.LAng)
+				end
 			end
 			
 			SetPos(seat,PosH or vehicle.PassengerSeats[SeatID].pos)
@@ -2133,15 +2153,21 @@ gred.TankRemovePlayerHooks = function(vehicle,seat,SeatID,ply,Mode,SteamID,SeatT
 	
 	if IsValid(vehicle) then
 		gred.TankResetHatch(vehicle,seat,SeatID,vehicle,SeatTab)
+		
+		table.remove(vehicle.FILTER,seat.LastPlayerFilterID)
+		
+		seat.LastPlayerFilterID = nil
 	end
 	
 	if IsValid(ply) then
 		-- ply:SetDSP(0)
 		if ply.TankManipulatedBones then
-			netStart("gred_net_simfphys_clearbonemanipulations")
-				netWriteEntity(ply)
-			netBroadcast()
+			-- netStart("gred_net_simfphys_clearbonemanipulations")
+				-- netWriteEntity(ply)
+			-- netBroadcast()
+			gred.ClearBoneManipulations(ply)
 		end
+		
 		netStart("gred_net_simfphys_playerexitedseat")
 		netSend(ply)
 	end
@@ -2157,10 +2183,12 @@ gred.TankAddPlayerHooks = function(vehicle,seat,SeatID,ply,Mode,SteamID,SeatTab)
 			else
 				timer.Remove("CHANGESEATS_"..SteamID)
 				gred.TankRemovePlayerHooks(vehicle,seat,SeatID,ply,Mode,SteamID,SeatTab)
+				
 				if veh == vehicle.DriverSeat then
 					gred.TankPlayerEnteredSeat(vehicle,veh,0,ply,Mode)
 				else
 					local seatID = table.KeyFromValue(vehicle.pSeat,veh)
+					
 					if seatID then
 						gred.TankPlayerEnteredSeat(vehicle,veh,seatID,ply,Mode)
 					end
@@ -2168,6 +2196,7 @@ gred.TankAddPlayerHooks = function(vehicle,seat,SeatID,ply,Mode,SteamID,SeatTab)
 			end
 		end
 	end)
+	
 	hook.Add("PlayerLeaveVehicle","gred_simfphys_PlayerLeaveVehicle_"..SteamID,function(ply1,veh)
 		if !IsValid(ply) then
 			gred.TankRemovePlayerHooks(vehicle,seat,SeatID,ply,Mode,SteamID,SeatTab)
@@ -2194,19 +2223,28 @@ end
 gred.TankPlayerEnteredSeat = function(vehicle,seat,SeatID,ply,Mode)
 	local SeatTab = gred.simfphys[vehicle.CachedSpawnList].Seats and gred.simfphys[vehicle.CachedSpawnList].Seats[SeatID] and gred.simfphys[vehicle.CachedSpawnList].Seats[SeatID][Mode]
 	
+	-- if SeatTab and SeatTab.PlayerBoneManipulation then
+		-- netStart("gred_net_simfphys_playerenteredseat_broadcast")
+			-- netWriteEntity(ply)
+		-- netBroadcast()
+		
+		-- ply.TankManipulatedBones = SeatTab.PlayerBoneManipulation and true or false
+	-- else
 	if SeatTab and SeatTab.PlayerBoneManipulation then
-		netStart("gred_net_simfphys_playerenteredseat_broadcast")
-			netWriteEntity(ply)
-		netBroadcast()
-		ply.TankManipulatedBones = SeatTab.PlayerBoneManipulation and true or false
-	else
-		netStart("gred_net_simfphys_playerenteredseat")
-		netSend(ply)
+		gred.ClearBoneManipulations(ply)
+		gred.DoBoneManipulation(vehicle,seat,SeatID,ply,nil,SeatTab)
 	end
+	
+	netStart("gred_net_simfphys_playerenteredseat")
+	netSend(ply)
+	-- end
 	
 	local SteamID = GetSteamID(ply)
 	
-	SetCollisionGroup(ply,5)
+	SetCollisionGroup(ply,SeatTab and SeatTab.Outside and 5 or 10)
+	
+	seat.LastPlayerFilterID = table.insert(vehicle.FILTER,ply)
+	
 	gred.TankAddPlayerHooks(vehicle,seat,SeatID,ply,Mode,SteamID,SeatTab)
 	
 	CallOnRemove(vehicle,"RemoveHooks"..SteamID,function(vehicle)
@@ -2333,6 +2371,32 @@ gred.TankSetPassenger = function(self,ply,Mode) -- doesn't really need to be opt
 	end
 end
 
+
+
+gred.ClearBoneManipulations = function(ply)
+	if !ply.TankManipulatedBones then return end
+	-- PrintBones(ply)
+	for k,v in pairs(ply.TankManipulatedBones) do
+		ply:ManipulateBoneAngles(v,angle_zero)
+	end
+	
+	ply.TankManipulatedBones = nil
+end
+
+gred.DoBoneManipulation = function(vehicle,seat,SeatID,ply,BoneTab,SeatTab)
+	if SeatTab.PlayerBoneManipulation or BoneTab then
+		local Bone
+		ply.TankManipulatedBones = ply.TankManipulatedBones or {}
+		
+		for k,v in pairs(BoneTab or SeatTab.PlayerBoneManipulation) do
+			Bone = ply:LookupBone(k)
+			if Bone then
+				ply.TankManipulatedBones[k] = Bone
+				ply:ManipulateBoneAngles(Bone,v)
+			end
+		end
+	end
+end
 
 hook.Add("PlayerDeath","gred_ply_extinguish_PlayerDeath",function(ply,ent)
 	if IsValid(ent) and (ent.GetClass and ent:GetClass() or ent.ClassName) == "entityflame" then

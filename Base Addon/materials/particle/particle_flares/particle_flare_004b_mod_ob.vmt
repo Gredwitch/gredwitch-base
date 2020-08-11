@@ -1,6 +1,6 @@
 spritecard
 {
-$basetexture "particle\particle_flares\particle_flare_004b_mod"
+$basetexture "models\mm1\box"
 $mod2x 1
 
 

@@ -42,7 +42,7 @@ sound.Add({
 	channel = CHAN_AUTO,
 	volume = 1.0,
 	level = 80,
-	sound = "gredwitch/common/reload_dt.ogg"
+	sound = "mg/reload_dt.ogg"
 })
 
 ----------------------------- M693 -----------------------------
@@ -66,7 +66,7 @@ sound.Add({
 	channel = CHAN_AUTO,
 	volume = 1.0,
 	level = 80,
-	sound = "gredwitch/common/reload_20mm.ogg"
+	sound = "mg/reload_20mm.ogg"
 })
 
 ----------------------------- M1919A4 -----------------------------
@@ -210,10 +210,10 @@ sound.Add({
 	channel = CHAN_AUTO,
 	volume = 1.0,
 	level = 80,
-	sound = "gredwitch/common/reload_mg34.ogg"
+	sound = "mg/reload_mg34.ogg"
 })
 
------------------------------- MG 34 ------------------------------
+------------------------------ DT ------------------------------
 
 sound.Add({
 	name = "GRED_DT_SHOOT",
@@ -259,7 +259,7 @@ sound.Add({
 	channel = CHAN_AUTO,
 	volume = 1.0,
 	level = 80,
-	sound = "gredwitch/common/reload_mg34.ogg"
+	sound = "mg/reload_mg34.ogg"
 })
 
 for i = 1,3 do

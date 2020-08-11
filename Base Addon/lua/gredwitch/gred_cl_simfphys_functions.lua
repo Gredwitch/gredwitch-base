@@ -1116,6 +1116,8 @@ gred.TankStopMG = function(seat,SeatID,vehicle,IsPrimary)
 end
 
 gred.TankShootCannon = function(seat,SeatID,vehicle,IsPrimary)
+	if !SeatID then return end
+	
 	local SlotID = seat:GetNWInt("SlotID",1)
 	local WeaponTab = gred.simfphys[vehicle.CachedSpawnList].Seats[SeatID][vehicle.ArcadeMode and "ArcadeMode" or "NormalMode"][IsPrimary and "Primary" or "Secondary"]
 	local SeatSlotTab = seat[IsPrimary and "Primary" or "Secondary"]
@@ -1389,17 +1391,17 @@ gred.HandleHatch = function(vehicle,seat,SeatID,newval,oldval,SeatTab,HatchesTab
 	
 	local ply = seat:GetDriver()
 	
-	if newval != oldval and IsValid(ply) then
-		if newval != 0 then
-			if HatchesTab[newval].PlayerBoneManipulation then
-				gred.ClearBoneManipulations(ply)
-				gred.DoBoneManipulation(vehicle,seat,SeatID,ply,HatchesTab[newval].PlayerBoneManipulation)
-			end
-		else
-			gred.ClearBoneManipulations(ply)
-			gred.DoBoneManipulation(vehicle,seat,SeatID,ply)
-		end
-	end
+	-- if newval != oldval and IsValid(ply) then
+		-- if newval != 0 then
+			-- if HatchesTab[newval].PlayerBoneManipulation then
+				-- gred.ClearBoneManipulations(ply)
+				-- gred.DoBoneManipulation(vehicle,seat,SeatID,ply,HatchesTab[newval].PlayerBoneManipulation)
+			-- end
+		-- else
+			-- gred.ClearBoneManipulations(ply)
+			-- gred.DoBoneManipulation(vehicle,seat,SeatID,ply)
+		-- end
+	-- end
 end
 
 gred.HandleSmokeGrenades = function(vehicle,seat,SeatID,oldval,newval,LocalPly,SeatTab,SmokeLaunchersTab)
@@ -1597,7 +1599,7 @@ net.Receive("gred_net_simfphys_playerenteredseat_broadcast",function(len)
 			if seat != ply:GetVehicle() or !IsValid(seat) then return end
 			
 			local SeatID = table.KeyFromValue(vehicle.pSeat,seat)
-			gred.DoBoneManipulation(vehicle,seat,SeatID,ply)
+			-- gred.DoBoneManipulation(vehicle,seat,SeatID,ply)
 			
 			if ply == LocalPlayer() then
 				gred.PlayerEnteredSeat(vehicle,seat,SeatID,ply)

@@ -667,6 +667,7 @@ gred.AddOthers = function(DFrame,DPanel,DScrollPanel,X,Y,X_DPanel,y_DPanel)
 	DButton:Dock(TOP)
 	DButton:DockMargin(0,0,0,10) 
 	DButton:SetSize(X_DPanel,y_DPanel*0.15)
+	
 	DButton.Paint = function(DButton,w,h)
 		local col = DButton:IsHovered() and COL_BLUE_HIGHLIGHT or COL_WHITE
 		surface.SetDrawColor(col.r,col.g,col.b,col.a)
@@ -677,6 +678,7 @@ gred.AddOthers = function(DFrame,DPanel,DScrollPanel,X,Y,X_DPanel,y_DPanel)
 		
 		draw.DrawText("OTHER OPTIONS","Trebuchet24",w*0.5,h-24,col,TEXT_ALIGN_CENTER)
 	end
+	
 	DButton.DoClick = function()
 		DFrame:SelectLateralMenuOption("OTHER OPTIONS")
 		DPanel.ToggleButton:DoClick(true)

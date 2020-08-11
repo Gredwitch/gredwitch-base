@@ -15,8 +15,10 @@ ENT.Lifetime						 = 44
 ENT.Damage							 = 1,4
 ENT.Rate							 = 0.5
 
-function ENT:Initialize()
-	if (SERVER) then
+hook.Remove("OnEntityCreated", "vFireRemoveDefaultFires")
+
+if SERVER then
+	function ENT:Initialize()
 		self:SetModel("models/mm1/box.mdl")
 		self:SetSolid( SOLID_NONE )
 		self:SetMoveType( MOVETYPE_NONE )
@@ -24,28 +26,34 @@ function ENT:Initialize()
 		self.Bursts = 0
 		self.GBOWNER = self:GetVar("GBOWNER")
 	end
-end
-
-hook.Remove("OnEntityCreated", "vFireRemoveDefaultFires")
-function ENT:Think()
-    if (SERVER) then
-		if !self:IsValid() then return end
+	
+	function ENT:Think()
+		local pos = self:GetPos()
+		pos.z = pos.z + self.Radius*0.5 -- don't want to create 2 vectors so
 		
-		for k, v in pairs(ents.FindInSphere(self:GetPos(),self.Radius)) do
-				if v:IsPlayer() or v:IsNPC() then
+		debugoverlay.Sphere(pos,self.Radius,self.Rate)
+		
+		for k,v in pairs(ents.FindInSphere(pos,self.Radius)) do
+			if v:IsPlayer() or v:IsNPC() then
+				v:Ignite(10,10)
+			else
+				local phys = self:GetPhysicsObject()
+				
+				if phys:IsValid() then
 					v:Ignite(10,10)
-				else
-					local phys = self:GetPhysicsObject()
-					if phys:IsValid() then
-						v:Ignite(10,10)
-					end
 				end
+			end
 		end
+		
 		self.Bursts = self.Bursts + 1
+		
 		if (self.Bursts >= self.Lifetime) then
 			self:Remove()
+			return
 		end
+		
 		self:NextThink(CurTime() + self.Rate)
+		
 		return true
 	end
 end

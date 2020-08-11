@@ -1,6 +1,8 @@
 {
-"title" : "Gredwitch's Base",
-"type" : "vehicle",
-"tags" : ["fun","realism"],
-"ignore" : ["*.psd", "*.ini", "*.svn*"]
+	"title": "Gredwitch's Base",
+	"type": "vehicle",
+	"tags": [
+		"fun",
+		"realism"
+	]
 }

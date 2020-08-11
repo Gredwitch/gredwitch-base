@@ -182,7 +182,14 @@ gred.GetImpactInfo = function(tr,vehicle)
 			and GRED_TANK_BOTTOM 
 			or GRED_TANK_NONE)
 	-- if tr.PitchSideDetection != GRED_TANK_NONE then math.abs(tr.HitNormalAngleLocal.p != 
-	return (tr.Entity.CachedSpawnList and gred.simfphys[tr.Entity.CachedSpawnList] and gred.simfphys[tr.Entity.CachedSpawnList].Armour and gred.simfphys[tr.Entity.CachedSpawnList].Armour.GetArmourThickness and gred.simfphys[tr.Entity.CachedSpawnList].Armour.GetArmourThickness(vehicle,tr)) or tr
+	tr = (tr.Entity.CachedSpawnList and gred.simfphys[tr.Entity.CachedSpawnList] and gred.simfphys[tr.Entity.CachedSpawnList].Armour and gred.simfphys[tr.Entity.CachedSpawnList].Armour.GetArmourThickness and gred.simfphys[tr.Entity.CachedSpawnList].Armour.GetArmourThickness(vehicle,tr)) or tr
+	
+	if not gred.CVars.gred_sv_simfphys_realisticarmour:GetBool() then
+		tr.ArmourThicknessKE = tr.Entity:GetMaxHealth()*0.01
+		tr.ArmourThicknessCHEMICAL = tr.ArmourThicknessKE
+	end
+	
+	return tr
 end
 
 local function HitModule(StartPos,Dir,pos,ang,mins,maxs,HitModules,Name,ID,WithinRayPos,WithinRayNormal,WithinRayFraction,FractionMul)

@@ -1,9 +1,8 @@
---[[23/07/2020
-- Bone manipulation is now done serverside to fix hitbox related issues
+--[[12/08/2020
+- Fixed an issue with the realistic armor convar
 - Fixed a few errors
-- Fixed bullets' trace filter hitting the crew
-- Fixed the radius on WP shells
-- Fixed turning off the armor system for the tanks not actually turning off the armor system
+- Fixed mising machinegun sounds
+- Updated some materials
 
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
@@ -13,6 +12,13 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+23/07/2020
+- Bone manipulation is now done serverside to fix hitbox related issues
+- Fixed a few errors
+- Fixed bullets' trace filter hitting the crew
+- Fixed the radius on WP shells
+- Fixed turning off the armor system for the tanks not actually turning off the armor system
 
 15/07/2020
 - Fixed a small error

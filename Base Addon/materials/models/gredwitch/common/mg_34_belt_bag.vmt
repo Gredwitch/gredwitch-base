@@ -6,6 +6,7 @@
     $basetexture 				"models/gredwitch/common/mg_34_belt_bag_c"
     $bumpmap 					"models/gredwitch/common/mg_34_belt_bag_n"
 	
-	$alphatest					1
-	$nocull						1}
+	// $alphatest					1
+	// $nocull						1
+	}
 }

@@ -45,7 +45,7 @@ local function CreateKillCamWindow(ShrapnelTab)
 	local HitPos,HitAng,EndLength,NoPen = ShrapnelTab[0][1],ShrapnelTab[0][4],ShrapnelTab[0][2],ShrapnelTab[0][6]
 	local ModelPath,ModelSkin,DamageDealt,Penetration,ArmourThickness = ShrapnelTab[0][7],ShrapnelTab[0][8],ShrapnelTab[0][9],ShrapnelTab[0][10],ShrapnelTab[0][11]
 	local Caliber = ShrapnelTab[0][5]
-	local ShellTypeBodygroup = ShrapnelTab[0][15]
+	local ShellTypeBodygroup = ShrapnelTab[0][15] or 0
 	
 	local ScrW,ScrH = ScrW(),ScrH()
 	local X,Y = ScrW*0.3,ScrH*0.3
