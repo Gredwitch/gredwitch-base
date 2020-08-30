@@ -1,8 +1,10 @@
---[[12/08/2020
-- Fixed an issue with the realistic armor convar
-- Fixed a few errors
-- Fixed mising machinegun sounds
-- Updated some materials
+--[[31/08/2020
+- Added a "Custom" weapon type for tanks so you can make your own weapon types
+- Added a "RocketLauncher" weapon type for tanks
+- Added compatibility with the tanks for the default WAC rockets
+- Fixed entering a vehicle on a slope screwing up the view on tanks
+- Reworked the base bombs
+- Reworked the rockets so they're more realistic and deal damage to tanks
 
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
@@ -12,6 +14,12 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+12/08/2020
+- Fixed an issue with the realistic armor convar
+- Fixed a few errors
+- Fixed mising machinegun sounds
+- Updated some materials
 
 23/07/2020
 - Bone manipulation is now done serverside to fix hitbox related issues

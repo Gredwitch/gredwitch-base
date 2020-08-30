@@ -202,7 +202,7 @@ gred.CreateExplosion = function(pos,radius,damage,decal,trace,ply,bomb,DEFAULT_P
 		net.WriteVector(pos-Vector(0,0,trace))
 	net.Broadcast()
 	
-	-- debugoverlay.Sphere(pos,radius,3, Color( 255, 255, 255 ))
+	debugoverlay.Sphere(pos,radius,3,color_white)
 	
 	local bombvalid = IsValid(bomb)
 	ply = IsValid(ply) and ply or (bombvalid and bomb or Entity(0))
@@ -272,13 +272,13 @@ gred.CreateSound = function(pos,rsound,e1,e2,e3)
 					util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
 				end
 				net.Start("gred_net_sound_lowsh")
-					net.WriteString(!rsound and e2 or e1)
+					net.WriteString(e2 and e2 or e1)
 				net.Send(v)
 			end)
 		elseif distance <= curRange_max then
 			timer.Simple(distance/soundSpeed,function()
 				net.Start("gred_net_sound_lowsh")
-					net.WriteString(!rsound and e3 or e1)
+					net.WriteString(e3 and e3 or (e2 and e2 or e1))
 				net.Send(v)
 			end)
 		end
@@ -498,12 +498,26 @@ hook.Add("PlayerEnteredVehicle","gred_player_entervehicle_hint",function(ply,sea
 	end
 end)
 
+hook.Add("InitPostEntity","gred_InitPostEntity_bomb",function()
+	timer.Simple(5,function()
+		local tbl = physenv.GetPerformanceSettings()
+		
+		tbl.MaxVelocity = 200000000
+		
+		physenv.SetPerformanceSettings(tbl)
+		
+	end)
+end)
+
+
 gred.Precache()
+
 if gred.CVars["gred_sv_resourceprecache"]:GetBool() then
 	gred.PrecacheResources()
 end
 
 local TABLE = file.Read("gredwitch_base_config_sv.txt","DATA")
+
 if TABLE then
 	TABLE = util.JSONToTable(TABLE)
 	for k,v in pairs(TABLE) do

@@ -413,6 +413,7 @@ gred.TankInitSeats = function(vehicle,Mode,VehicleSeatTab,LocalPly)
 					
 					if SeatTab.Hatches then
 						local HatchesTab = SeatTab.Hatches
+						
 						seat:SetNWVarProxy("HatchID",function(ent,name,oldval,newval)
 							gred.HandleHatch(vehicle,ent,k,newval,oldval,SeatTab,HatchesTab)
 						end)
@@ -439,8 +440,10 @@ gred.TankInitSeats = function(vehicle,Mode,VehicleSeatTab,LocalPly)
 					if SeatTab.Primary then
 						seat.Primary = {}
 						local WepTab
+						
 						for WepID = 1,#SeatTab.Primary do
 							WepTab = SeatTab.Primary[WepID]
+							
 							if WepTab then
 								seat.Primary[WepID] = {}
 								gred.TankInitMuzzleAttachments(vehicle,seat,k,seat.Primary[WepID],WepTab,WepID)
@@ -463,35 +466,55 @@ end
 gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatID,SeatSlotTab,WeaponTab,WepID)
 	if WeaponTab.Sounds then
 		SeatSlotTab.Sounds = {}
+		
 		seat:CallOnRemove("RemoveEnts"..vehicle.CachedSpawnList..tostring(seat),function(seat)
 			for k,v in pairs(SeatSlotTab.Sounds) do
 				v:Stop()
 			end
 		end)
-		for k,v in pairs(WeaponTab.Sounds) do
+		
+		-- for k,v in pairs(WeaponTab.Sounds) do
 			-- SeatSlotTab.Sounds[k] = CreateSound(seat,Sound(v))
 			-- SeatSlotTab.Sounds[k]:Stop()
-		end
+		-- end
 	end
 	
 	if WeaponTab.Muzzles then
 		SeatSlotTab.Muzzles = {}
 		local v
+		
 		for k = 1,#WeaponTab.Muzzles do
 			v = WeaponTab.Muzzles[k]
+			
 			if v then
 				SeatSlotTab.Muzzles[k] = vehicle:LookupAttachment(v)
 			end
 		end
+		
 		if WeaponTab.Type == "Cannon" and WepID then
 			if WeaponTab.Sounds and WeaponTab.Sounds.Reload then
 				seat:SetNWVarProxy(WepID.."NextShot",function(ent,name,oldval,newval)
 					oldval = oldval or 0
+					
 					if oldval != newval and (newval - oldval) < 99999999 and IsValid(ent) then
 						gred.PlayReloadSound(ent,SeatID,vehicle,WeaponTab,SeatSlotTab)
 					end
 				end)
 			end
+		elseif WeaponTab.Type == "RocketLauncher" then
+			SeatSlotTab.NextShot = 0
+			
+			seat:SetNWVarProxy(WepID and WepID.."CurAmmo" or "SecondaryAmmo",function(ent,name,oldval,newval)
+				oldval = oldval or 0
+				
+				if oldval != newval and newval <= 0 and IsValid(ent) then
+					SeatSlotTab.NextShot = CurTime() + WeaponTab.ReloadTime
+					
+					if WeaponTab.Sounds and WeaponTab.Sounds.Reload then
+						gred.PlayReloadSound(ent,SeatID,vehicle,WeaponTab,SeatSlotTab)
+					end
+				end
+			end)
 		end
 	end
 end
@@ -923,6 +946,25 @@ gred.TankDrawHUD = function(vehicle,seat,SeatID,SeatTab,Mode,ply,ScrW,ScrH,Loadi
 							local Ammo = seat:GetNWInt(SlotID.."CurAmmo"..seat:GetNWInt(SlotID.."ShellType",1))
 							local val = Ammo == 0 and 1 or math.max(seat:GetNWFloat(SlotID.."NextShot") - CurTime(),0) / SeatTab.Primary[SlotID].ReloadTime
 							
+							if val == 0 and Ammo != 0 then
+								DrawCircle(scr.x,scr.y,29)
+							else
+								DrawCircleThing(scr.x,scr.y,29,val)
+							end
+						elseif (SeatTab.Primary[SlotID] and SeatTab.Primary[SlotID].Type == "RocketLauncher") or (SeatTab.Secondary and SeatTab.Secondary.Type == "RocketLauncher") then
+							local IsPrimary = (SeatTab.Primary[SlotID] and SeatTab.Primary[SlotID].Type == "RocketLauncher")
+							local SeatSlotTab = seat[IsPrimary and "Primary" or "Secondary"]
+							local WeaponTab
+							
+							if IsPrimary then
+								SeatSlotTab = SeatSlotTab[SlotID]
+								WeaponTab = SeatTab.Primary[SlotID]
+							else
+								WeaponTab = SeatTab.Secondary.ReloadTime
+							end
+							
+							local Ammo = seat:GetNWInt(IsPrimary and SlotID.."CurAmmo" or "SecondaryAmmo")
+							local val = Ammo == 0 and (SeatSlotTab.NextShot - CurTime()) / WeaponTab.ReloadTime or 0
 							if val == 0 and Ammo != 0 then
 								DrawCircle(scr.x,scr.y,29)
 							else

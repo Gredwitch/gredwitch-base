@@ -3,6 +3,10 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 
+ENT.Penetration = 1100
+ENT.Caliber = 180
+ENT.ShellType	= "HEAT"
+
 local ExploSnds = {}
 ExploSnds[1]                         =  "explosions/doi_ty_01.wav"
 ExploSnds[2]                         =  "explosions/doi_ty_02.wav"
@@ -83,9 +87,100 @@ function ENT:Explode(tr)
 		gred.CreateSound(pos,false,self.ExplosionSound,self.FarExplosionSound,self.DistExplosionSound)
 		gred.CreateExplosion(pos,self.Radius * 0.5,self.Damage,"scorch_medium",100,self.Owner,self)
 	else
+		self.Damage = self.Damage * 2
 		gred.CreateSound(pos,true,"explosions/gbomb_4.mp3","explosions/gbomb_4.mp3","explosions/gbomb_4.mp3")
-		gred.CreateExplosion(pos,self.Radius * 1.5,self.Damage * 2,"scorch_medium",100,self.Owner,self)
+		gred.CreateExplosion(pos,self.Radius * 1.5,self.Damage,"scorch_medium",100,self.Owner,self)
 	end
+	
+	if IsValid(tr.Entity) and tr.Entity.GRED_TANK and tr.Entity.CachedSpawnList and gred.simfphys[tr.Entity.CachedSpawnList] and gred.simfphys[tr.Entity.CachedSpawnList].Armour then
+		tr = gred.GetImpactInfo(tr,tr.Entity)
+		local ArmourThickness = 0
+		local AbsImpactAng = math.abs(tr.HitNormalAngle.p)
+		
+		if AbsImpactAng > 10 and gred.SLOPE_MULTIPLIERS[self.ShellType] then
+			local prev
+			
+			for k,v in SortedPairs(gred.SLOPE_MULTIPLIERS[self.ShellType]) do
+				if k > AbsImpactAng then
+					prev = prev + 2.5 < AbsImpactAng and k or prev -- if we're closer to k than prev, we make k prev so we can use it as a var
+					break
+				else
+					prev = k
+				end
+			end
+			
+			local Slope = gred.SLOPE_MULTIPLIERS[self.ShellType][prev]["a"] * (tr.ArmourThicknessKE / self.Caliber)^gred.SLOPE_MULTIPLIERS[self.ShellType][prev]["b"]
+			local Normalization = math.deg(math.acos(1/Slope)) - AbsImpactAng
+			
+			tr.HitNormalAngle.p = tr.HitNormalAngle.p + Normalization
+			tr.NormalNormalizedAngle = Angle(tr.NormalAngle.p + Normalization,tr.NormalAngle.y,tr.NormalAngle.r)
+			tr.NormalNormalized = tr.NormalNormalizedAngle:Forward()
+		else
+			tr.NormalNormalizedAngle = tr.NormalAngle
+			tr.NormalNormalized = tr.Normal
+		end
+		
+		tr = gred.CalculateArmourThickness(tr,tr.Entity,0)
+		local HP
+		
+		if gred.CVars.gred_sv_simfphys_realisticarmour:GetBool() then
+			ArmourThickness = gred.IS_HEAT[self.ShellType] and tr.EffectiveArmourThicknessCHEMICAL or tr.EffectiveArmourThicknessKE
+		else
+			HP = tr.Entity:GetMaxHealth()*0.01 / gred.CVars.gred_sv_simfphys_health_multplier:GetFloat()
+			ArmourThickness = HP / tr.CalculatedImpactCos
+		end
+		
+		Fraction = ArmourThickness / self.Penetration
+		self.Fraction = Fraction
+		
+		tr.ShellLastVel = self:GetVelocity():Length()
+		tr.ShellPenTraceLength = tr.ShellLastVel
+		tr.ShellExplodePos = tr.HitPos + tr.NormalNormalized * tr.ShellPenTraceLength
+		tr.Caliber = 180
+		
+		local ShrapnelTab = {
+			[0] = { -- HEADER
+				[1] = tr.LocalHitPos, -- ShellHitPos
+				[2] = tr.ShellPenTraceLength, -- ShellPenLength
+				[3] = tr.Entity.ModelSizeLength, -- ModelSizeLength -- the client should do that on his side tbh
+				[4] = tr.Entity:WorldToLocalAngles(tr.NormalNormalizedAngle), -- NormalNormalized
+				[5] = self.Caliber, -- Caliber
+				[6] = self.Fraction >= 1,
+				[7] = tr.Entity:GetModel(),
+				[8] = tr.Entity:GetSkin(),
+				[9] = self.Damage,
+				[10] = math.Round(self.Penetration),
+				[11] = math.Round(ArmourThickness),
+				[12] = self.ShrapnelPen,
+				[13] = self.ShrapnelBoom,
+				[14] = nil, -- let the client calculate that
+				[15] = 1, -- let the client calculate that
+			},
+		}
+		self.EntityHit = tr.Entity
+		if Fraction < 1 then
+			local dmg = DamageInfo()
+			dmg:SetAttacker(self.Owner)
+			dmg:SetInflictor(self)
+			dmg:SetDamagePosition(tr.HitPos)
+			dmg:SetDamage(self.Damage * 2)
+			dmg:SetDamageType(64) -- DMG_BLAST
+			dmg:SetDamageCustom(self:EntIndex())
+			tr.Entity:TakeDamageInfo(dmg)
+		end
+		
+		
+		if IsValid(self.Owner) and self.Owner:IsPlayer() and gred.CVars.gred_sv_shell_enable_killcam:GetBool() then
+			local CompressedTab = util.Compress(util.TableToJSON(ShrapnelTab))
+			local len = CompressedTab:len()
+			
+			net.Start("gred_net_shell_shrapnel_windows_send")
+				net.WriteUInt(len,14)
+				net.WriteData(CompressedTab,len)
+			net.Send(self.Owner)
+		end
+	end
+	
 	self:Remove()
 end
 

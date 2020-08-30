@@ -137,7 +137,9 @@ local BadDamageTypes = {
 	[DMG_BURN] = true,
 }
 local ShellClass = {
+	["wac_base_grocket"] = true,
 	["base_shell"] = true,
+	["base_rocket"] = true,
 	["hvap_swep_rocket_barrage_he"] = true,
 	["hvap_swep_rocket_barrage_smoke"] = true,
 	["hvap_swep_rocket_bazooka_he"] = true,
@@ -453,8 +455,16 @@ gred.TankInitVars = function(vehicle,VehicleTab,TracksTab,VehicleSeatTab) -- doe
 			
 			local inflictor = dmg:GetInflictor()
 			local DMG = 0
-			if ent.IsArmored and IsValid(inflictor) and inflictor.GetClass and ShellClass[inflictor:GetClass()] then
-				DMG = ((inflictor.ShellType == "HE" and (inflictor.Fraction and inflictor.Fraction >= 1 or !inflictor.Fraction) and !inflictor.ExplosionDamageOverride) or (inflictor.IS_HEAT[inflictor.ShellType] and inflictor.EntityHit != ent)) and 0 or dmg:GetDamage()
+			if ent.IsArmored and IsValid(inflictor) and (inflictor.GetClass and ShellClass[inflictor:GetClass()]) or ShellClass[inflictor.Base] then
+				DMG = (
+					(
+						inflictor.ShellType == "HE" and 
+						(inflictor.Fraction and inflictor.Fraction >= 1 or !inflictor.Fraction) and 
+						!inflictor.ExplosionDamageOverride
+					) or (
+						gred.IS_HEAT[inflictor.ShellType] and inflictor.EntityHit != ent
+					) 
+					or dmg:GetDamageCustom() != inflictor:EntIndex()) and ((ShellClass[inflictor.Base] and not inflictor.IsShell) and dmg:GetDamage()*0.25 or  0) or dmg:GetDamage()
 				
 				local ply = dmg:GetAttacker()
 				if DMG == 0 and inflictor.ShellType == "HE" and IsValid(ply) and ply:GetSimfphys() != ent then
@@ -786,6 +796,10 @@ gred.TankInitModules = function(vehicle,VehicleTab) -- doesn't need to be optimi
 end
 
 gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatSlotTab,WeaponTab,WepID) -- doesn't need to be optimized
+	if WeaponTab.Type == "Custom" and WeaponTab.InitSV then
+		if WeaponTab.InitSV(vehicle,seat,SeatSlotTab,WeaponTab,WepID) then return end
+	end
+	
 	if WeaponTab.Muzzles then
 		SeatSlotTab.Muzzles = {}
 		SeatSlotTab.NextShot = 0
@@ -811,7 +825,7 @@ gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatSlotTab,WeaponTab,Wep
 			end
 		end
 		
-		if WeaponTab.Type == "MG" then
+		if WeaponTab.Type == "MG" or WeaponTab.Type == "RocketLauncher" then
 			SeatSlotTab.FireRate = (60 / WeaponTab.FireRate) / (WeaponTab.Sequential and #WeaponTab.Muzzles or 1)
 			SeatSlotTab.Ammo = WeaponTab.Ammo
 			if !WepID then
@@ -1280,10 +1294,12 @@ gred.TankCanShoot = function(vehicle,seat,ply,ct,SeatTab,WeaponTab,SlotID,HatchI
 	
 	if WeaponTab.Type == "Cannon" then
 		return gred.TankCanShootCannon(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID,HatchID)
-	elseif WeaponTab.Type == "MG" then
+	elseif WeaponTab.Type == "MG" or WeaponTab.Type == "RocketLauncher"  then
 		return gred.TankCanShootMG(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID,HatchID)
 	elseif WeaponTab.Type == "Flamethrower" then
 		return gred.TankCanShootFlamethrower(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID,HatchID)
+	elseif WeaponTab.Type == "Custom" then
+		return WeaponTab.CanShoot(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID,HatchID)
 	end
 end
 
@@ -1293,8 +1309,12 @@ gred.TankStartShooting = function(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,S
 		gred.TankShootCannon(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID)
 	elseif WeaponTab.Type == "MG" then
 		gred.TankShootMG(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID)
+	elseif WeaponTab.Type == "RocketLauncher"  then
+		gred.TankShootRocketLauncher(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID)
 	elseif WeaponTab.Type == "Flamethrower" then
 		gred.TankShootFlamethrower(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID)
+	elseif WeaponTab.Type == "Custom" then
+		WeaponTab.Shoot(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID)
 	end
 end
 
@@ -1307,6 +1327,8 @@ gred.TankStopShooting = function(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,Sl
 		gred.TankStopMG(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID)
 	elseif WeaponTab.Type == "Flamethrower" then
 		gred.TankStopFlamethrower(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID)
+	elseif WeaponTab.Type == "Custom" then
+		WeaponTab.Stop(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID)
 	end
 end
 
@@ -1441,6 +1463,133 @@ gred.TankShootMG = function(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlo
 						SeatSlotTab.IsReloading = false
 						SeatSlotTab.Ammo = WeaponTab.Ammo
 						SetNWInt(seat,SlotID and SlotID.."CurAmmo" or "SecondaryAmmo",SeatSlotTab.Ammo)
+					end)
+					
+					break
+				end
+			end
+		end
+	end
+	
+	SetNWInt(seat,SlotID and SlotID.."CurAmmo" or "SecondaryAmmo",SeatSlotTab.Ammo)
+	
+	SeatSlotTab.NextShot = ct + SeatSlotTab.FireRate
+end
+
+gred.TankShootRocketLauncher = function(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID)
+	if WeaponTab.Sequential then
+		SeatSlotTab.CurrentMuzzle = (SlotID and seat.Primary[SlotID] or seat.Secondary).CurrentMuzzle and (SlotID and seat.Primary[SlotID] or seat.Secondary).CurrentMuzzle or 1
+		SeatSlotTab.CurrentMuzzle = SeatSlotTab.CurrentMuzzle > #WeaponTab.Muzzles and 1 or SeatSlotTab.CurrentMuzzle
+		
+		netStart("gred_net_simfphys_shoot_"..(SlotID and "primary" or "secondary").."_machinegun_sequential")
+			netWriteEntity(seat)
+			netWriteUInt(SeatSlotTab.CurrentMuzzle,5)
+		netBroadcast()
+		
+		local att = GetAttachment(vehicle,SeatSlotTab.Muzzles[SeatSlotTab.CurrentMuzzle])
+		local ent = ents.Create(WeaponTab.Rocket)
+		ent:SetPos(att.Pos)
+		ent:SetAngles(att.Ang + Angle(math.random(-WeaponTab.Spread,WeaponTab.Spread),math.random(-WeaponTab.Spread,WeaponTab.Spread)))
+		ent.Owner = ply
+		ent:Spawn()
+		ent:Activate()
+		ent.StartSound = WeaponTab.SilenceRocket and "" or ent.StartSound
+		ent:Launch()
+		
+		local phys = ent:GetPhysicsObject()
+		
+		if IsValid(phys) then
+			phys:AddVelocity(vehicle:GetVelocity() + ent:GetForward() * ent.EnginePower * 0.1)
+		end
+		
+		for k,v in pairs(vehicle.FILTER) do
+			constraint.NoCollide(ent,v,0,0)
+		end
+		
+		SeatSlotTab.CurrentMuzzle = SeatSlotTab.CurrentMuzzle + 1
+		
+		SeatSlotTab.Ammo = SeatSlotTab.Ammo - 1
+		
+		if WeaponTab.OnShoot then
+			WeaponTab.OnShoot(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID,SeatSlotTab.CurrentMuzzle,att,ent)
+		end
+		
+		if SeatSlotTab.Ammo < 1 then
+			if WeaponTab.Sounds.Reload then
+				seat:EmitSound(WeaponTab.Sounds.Reload[random(#WeaponTab.Sounds.Reload)])
+			end
+			
+			SeatSlotTab.IsReloading = true
+			
+			timer.Simple(WeaponTab.ReloadTime,function()
+				if !IsValid(vehicle) then return end
+				if !IsValid(seat) then return end
+				
+				SeatSlotTab.IsReloading = false
+				SeatSlotTab.Ammo = WeaponTab.Ammo
+				SetNWInt(seat,SlotID and SlotID.."CurAmmo" or "SecondaryAmmo",SeatSlotTab.Ammo)
+				
+				if WeaponTab.OnReload then
+					WeaponTab.OnReload(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID)
+				end
+			end)
+		end
+	else
+		netStart("gred_net_simfphys_shoot_"..(SlotID and "primary" or "secondary").."_machinegun")
+			netWriteEntity(seat)
+		netBroadcast()
+		
+		local phys
+		local att
+		local ent
+		local v
+		for k = 1,#WeaponTab.Muzzles do
+			v = WeaponTab.Muzzles[k]
+			if v then
+				att = GetAttachment(vehicle,SeatSlotTab.Muzzles[k])
+				ent = ents.Create(WeaponTab.Rocket)
+				ent:SetPos(att.Pos)
+				ent:SetAngles(att.Ang + Angle(0,math.random(-WeaponTab.Spread,WeaponTab.Spread)))
+				ent:Spawn()
+				ent:Activate()
+				ent.Owner = ply
+				ent.StartSound = WeaponTab.SilenceRocket and "" or ent.StartSound
+				ent:Launch()
+				
+				phys = ent:GetPhysicsObject()
+				
+				if IsValid(phys) then
+					phys:AddVelocity(vehicle:GetVelocity() + ent:GetForward() * ent.EnginePower * 0.1)
+				end
+				
+				for k,v in pairs(vehicle.FILTER) do
+					constraint.NoCollide(ent,v,0,0)
+				end
+				
+				SeatSlotTab.Ammo = SeatSlotTab.Ammo - 1
+				
+				if WeaponTab.OnShoot then
+					WeaponTab.OnShoot(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID,k,att,ent)
+				end
+				
+				if SeatSlotTab.Ammo < 1 then
+					if WeaponTab.Sounds.Reload then 
+						seat:EmitSound(WeaponTab.Sounds.Reload[random(#WeaponTab.Sounds.Reload)])
+					end
+					
+					SeatSlotTab.IsReloading = true
+					
+					timer.Simple(WeaponTab.ReloadTime,function()
+						if !IsValid(vehicle) then return end
+						if !IsValid(seat) then return end
+						
+						SeatSlotTab.IsReloading = false
+						SeatSlotTab.Ammo = WeaponTab.Ammo
+						SetNWInt(seat,SlotID and SlotID.."CurAmmo" or "SecondaryAmmo",SeatSlotTab.Ammo)
+						
+						if WeaponTab.OnReload then
+							WeaponTab.OnReload(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID)
+						end
 					end)
 					
 					break
@@ -1833,7 +1982,7 @@ gred.TankToggleHatch = function(seat,SeatID,vehicle,ply,HatchID,OldHatch,SeatTab
 			local View = vehicle:SetupView()
 			SetAngles(seat,View.ViewAng + HatchTab.AngOffset)
 			SetPos(seat,EnityWorldToLocal(vehicle,GetPos(vehicle) + GetUp(seat) * (-34 + vehicle.SeatOffset.z) + GetRight(seat) * (vehicle.SeatOffset.y) + GetForward(seat) * (-6 + vehicle.SeatOffset.x)) + SeatTab.Hatches[1].PosOffset)
-		else	
+		else
 			if SeatTab.Attachment then
 				local att = GetAttachment(vehicle,vehicle.Attachments[SeatTab.Attachment])
 				att.LPos,att.LAng = EnityWorldToLocal(vehicle,att.Pos),WorldToLocalAngles(vehicle,att.Ang)
@@ -2300,9 +2449,12 @@ gred.TankPlayerEnteredSeat = function(vehicle,seat,SeatID,ply,Mode)
 		timer.Simple(FrameTime()*3,function()
 			if IsValid(ply) then
 				if seat.LocalView then
-					SetEyeAngles(ply,LocalToWorldAngles(vehicle,Angles))
+					Angles = LocalToWorldAngles(vehicle,Angles)
+					Angles.r = 0
+					SetEyeAngles(ply,Angles)
 				else
 					Angles:Sub(WorldToLocalAngles(vehicle,GetAngles(seat)))
+					Angles.r = 0
 					SetEyeAngles(ply,Angles)
 				end
 			end

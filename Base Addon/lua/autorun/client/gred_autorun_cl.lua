@@ -29,7 +29,7 @@ gred.CVars["gred_cl_noparticles_20mm"] 						= CreateClientConVar("gred_cl_nopar
 gred.CVars["gred_cl_noparticles_30mm"] 						= CreateClientConVar("gred_cl_noparticles_30mm"						, "0" ,true,false)
 gred.CVars["gred_cl_noparticles_40mm"] 						= CreateClientConVar("gred_cl_noparticles_40mm"						, "0" ,true,false)
 gred.CVars["gred_cl_decals"] 								= CreateClientConVar("gred_cl_decals"								, "1" ,true,false)
-gred.CVars["gred_cl_altmuzzleeffect"] 						= CreateClientConVar("gred_cl_altmuzzleeffect"						, "0" ,true,false)
+gred.CVars["gred_cl_altmuzzleeffect"] 						= CreateClientConVar("gred_cl_altmuzzleeffect"						, "1" ,true,false)
 gred.CVars["gred_cl_wac_explosions"] 						= CreateClientConVar("gred_cl_wac_explosions" 						, "1" ,true,false)
 gred.CVars["gred_cl_enable_popups"] 						= CreateClientConVar("gred_cl_enable_popups"	 					, "1" ,true,false)
 gred.CVars["gred_cl_firstload"] 							= CreateClientConVar("gred_cl_firstload"							, "1" ,true,false)
@@ -45,6 +45,7 @@ gred.CVars["gred_cl_favouritetab"] 							= CreateClientConVar("gred_cl_favourit
 gred.CVars["gred_cl_shell_blur"] 							= CreateClientConVar("gred_cl_shell_blur"							, "1" ,true,false)
 gred.CVars["gred_cl_shell_blur_invehicles"] 				= CreateClientConVar("gred_cl_shell_blur_invehicles"				, "1" ,true,false)
 gred.CVars["gred_cl_shell_enable_killcam"] 					= CreateClientConVar("gred_cl_shell_enable_killcam"					, "1" ,true,false)
+gred.CVars["gred_cl_altmuzzleeffect"]:SetInt(1)
 
 local TAB_PRESS = {FCVAR_ARCHIVE,FCVAR_USERINFO}
 gred.CVars["gred_cl_simfphys_key_changeshell"]				= CreateConVar("gred_cl_simfphys_key_changeshell"			, "21",TAB_PRESS)

@@ -424,8 +424,11 @@ function ENT:Think()
 		
 		
 		self.OldPos = pos
-		local fwdv = v:Angle():Forward()
+		local vang = v:Angle()
+		local fwdv = vang:Forward()
 		pos = pos + fwd*30
+		
+		self:SetAngles(vang)
 		
 		if IsValid(self.Emitter) then
 			local particle

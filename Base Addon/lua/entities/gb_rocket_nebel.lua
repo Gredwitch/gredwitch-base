@@ -32,74 +32,65 @@ CloseWaterExploSnds[2]                         =  "explosions/doi_generic_02_clo
 CloseWaterExploSnds[3]                         =  "explosions/doi_generic_03_closewater.wav"
 CloseWaterExploSnds[4]                         =  "explosions/doi_generic_04_closewater.wav"
 
-ENT.Spawnable		            	 =  true         
-ENT.AdminSpawnable		             =  true 
+ENT.Spawnable		        =  true         
+ENT.AdminSpawnable		    =  true 
 
-ENT.PrintName		                 =  "[ROCKETS]Nebelwerfer Rocket"
-ENT.Author			                 =  ""
-ENT.Contact			                 =  ""
-ENT.Category                         =  "Gredwitch's Stuff"
+ENT.PrintName		        =  "[ROCKETS]Nebelwerfer Rocket"
+ENT.Author			        =  ""
+ENT.Contact			        =  ""
+ENT.Category                =  "Gredwitch's Stuff"
 
-ENT.Model                            =  "models/gbombs/nebelwerfer_rocket.mdl"
-ENT.RocketTrail                      =  "rockettrail"
-ENT.RocketBurnoutTrail               =  "grenadetrail"
-ENT.Effect                           =  "gred_highcal_rocket_explosion"
-ENT.EffectAir                        =  "gred_highcal_rocket_explosion"
-ENT.EffectWater                      =  "ins_water_explosion"
-ENT.AngEffect						 =	true
+ENT.Model                	=  "models/gbombs/nebelwerfer_rocket.mdl"
+ENT.RocketTrail          	=  "rockettrail"
+ENT.RocketBurnoutTrail   	=  "grenadetrail"
+ENT.Effect               	=  "gred_highcal_rocket_explosion"
+ENT.EffectAir            	=  "gred_highcal_rocket_explosion"
+ENT.EffectWater          	=  "ins_water_explosion"
+ENT.AngEffect			 	=   true
 
-ENT.ExplosionSound                   =  table.Random(CloseExploSnds)
-ENT.FarExplosionSound				 =  table.Random(ExploSnds)
-ENT.DistExplosionSound				 =  table.Random(DistExploSnds)
-ENT.WaterExplosionSound				 =  table.Random(CloseWaterExploSnds)
-ENT.WaterFarExplosionSound			 =  table.Random(WaterExploSnds)
+ENT.ExplosionSound          =  table.Random(CloseExploSnds)
+ENT.FarExplosionSound		=  table.Random(ExploSnds)
+ENT.DistExplosionSound		=  table.Random(DistExploSnds)
+ENT.WaterExplosionSound		=  table.Random(CloseWaterExploSnds)
+ENT.WaterFarExplosionSound	=  table.Random(WaterExploSnds)
 
-ENT.RSound							 =	0
+ENT.RSound					=	0
 
-ENT.StartSound                       =  "Nebelwerfer_Fire"
-ENT.ArmSound                         =  ""
-ENT.ActivationSound                  =  ""
-ENT.EngineSound                      =  "RP3_Engine"
+ENT.StartSound              =  "Nebelwerfer_Fire"
+ENT.ArmSound                =  ""
+ENT.ActivationSound         =  ""
+ENT.EngineSound             =  "RP3_Engine"
+ENT.StartSoundFollow		=	true
 
-ENT.ShouldUnweld                     =  true          
-ENT.ShouldIgnite                     =  false         
-ENT.UseRandomSounds                  =  true                  
-ENT.SmartLaunch                      =  true  
-ENT.Timed                            =  false 
-
-ENT.ExplosionDamage                  =  1000
-ENT.ExplosionRadius                  =  600
-ENT.PhysForce                        =  300
-ENT.SpecialRadius                    =  500
-ENT.MaxIgnitionTime                  =  0
-ENT.Life                             =  1            
-ENT.MaxDelay                         =  0
-ENT.TraceLength                      =  1000
-ENT.Mass                             =  30
-ENT.EnginePower                      =  150
-ENT.FuelBurnoutTime                  =  2
-ENT.IgnitionDelay                    =  0.1           
-ENT.ArmDelay                         =  0
-ENT.RotationalForce                  =  500
-ENT.ForceOrientation                 =  "NORMAL"
-ENT.Timer                            =  0
-
-ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
+ENT.ExplosionDamage			=	15000
+ENT.ExplosionRadius			=	500
+ENT.Mass           			=	31.8
+ENT.EnginePower    			=	10875
+ENT.TNTEquivalent			=	2.5
+ENT.FuelBurnoutTime			=	5
+ENT.LinearPenetration		=	42
+ENT.MaxVelocity				=	342
+ENT.Caliber					=	158
+ENT.Decal					=	"scorch_big"
+-- ENT.RotationalForce			=	500
 
 function ENT:SpawnFunction( ply, tr )
-    if ( !tr.Hit ) then return end
-	self.GBOWNER = ply
-    local ent = ents.Create( self.ClassName )
+    if (!tr.Hit) then return end
+	
+    local ent = ents.Create(self.ClassName)
 	ent:SetPhysicsAttacker(ply)
-    ent:SetPos( tr.HitPos + tr.HitNormal * 16 ) 
+	ent.Owner = ply
+    ent:SetPos(tr.HitPos + tr.HitNormal * 16) 
     ent:Spawn()
     ent:Activate()
 	
-	ent.ExplosionSound	= table.Random(CloseExploSnds)
-	ent.FarExplosionSound	= table.Random(ExploSnds)
-	ent.DistExplosionSound	= table.Random(DistExploSnds)
-	ent.WaterExplosionSound	= table.Random(CloseWaterExploSnds)
-	ent.WaterFarExplosionSound	= table.Random(WaterExploSnds)
-
     return ent
+end
+
+function ENT:DoPreInit()
+	self.ExplosionSound	= CloseExploSnds[math.random(#CloseExploSnds)]
+	self.FarExplosionSound	= ExploSnds[math.random(#ExploSnds)]
+	self.DistExplosionSound	= DistExploSnds[math.random(#DistExploSnds)]
+	self.WaterExplosionSound	= CloseWaterExploSnds[math.random(#CloseWaterExploSnds)]
+	self.WaterFarExplosionSound	= WaterExploSnds[math.random(#WaterExploSnds)]
 end
