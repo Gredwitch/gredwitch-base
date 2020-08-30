@@ -8,7 +8,7 @@ ENT.AdminSpawnable		             =  true
 
 ENT.PrintName		                 =  "[BOMBS]GBU-12 Paveway II"
 ENT.Author			                 =  "Gredwitch"
-ENT.Contact		                     =  "qhamitouche@gmail.com"
+ENT.Contact		                     =  "contact.gredwitch@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 
 ENT.Model                            =  "models/gbombs/bomb_gbu12.mdl"

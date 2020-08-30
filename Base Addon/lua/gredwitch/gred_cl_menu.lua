@@ -1024,6 +1024,9 @@ hook.Add("GredOptionsAddLateralMenuOption","AddSimfphys",function(DFrame,DPanel,
 					CreateSimfphysSliderPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_traverse_speed_multiplier","Turret traverse speed multiplier","",0.1,10,1,false,true)
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
+					CreateSimfphysSliderPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_reload_speed_multiplier","Cannon reload speed multiplier","",0.1,10,1,false,true)
+				end,
+				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateSimfphysSliderPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_elevation_speed_multiplier","Turret elevation speed multiplier","",0.1,10,1,false,true)
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)

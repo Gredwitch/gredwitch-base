@@ -1,10 +1,10 @@
-ENT.Spawnable		            	=  false
-ENT.AdminSpawnable		            =  false
+ENT.Spawnable		            	=	false
+ENT.AdminSpawnable		            =	false
 
-ENT.PrintName		                =  "Gredwitch's Shell base"
-ENT.Author			                =  "Gredwitch"
-ENT.Contact			                =  "qhamitouche@gmail.com"
-ENT.Category                        =  "Gredwitch's Stuff"
+ENT.PrintName		                =	"Gredwitch's Shell base"
+ENT.Author			                =	"Gredwitch"
+ENT.Contact			                =	"contact.gredwitch@gmail.com"
+ENT.Category                        =	"Gredwitch's Stuff"
 ENT.Base							=	"base_rocket"
 
 ENT.Model							=	"models/gredwitch/bombs/75mm_shell.mdl"

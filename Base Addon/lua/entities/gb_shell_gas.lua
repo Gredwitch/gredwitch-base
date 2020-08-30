@@ -19,7 +19,7 @@ ENT.AdminSpawnable		             =  false
 
 ENT.PrintName		                 =  "[SHELLS]Gas Shell"
 ENT.Author			                 =  "Gredwitch"
-ENT.Contact			                 =  "qhamitouche@gmail.com"
+ENT.Contact			                 =  "contact.gredwitch@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 ENT.Model                            =  "models/gredwitch/bombs/75mm_shell.mdl"
 ENT.Mass                             =  105

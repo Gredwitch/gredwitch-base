@@ -492,6 +492,8 @@ gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatID,SeatSlotTab,Weapon
 		end
 		
 		if WeaponTab.Type == "Cannon" and WepID then
+			SeatSlotTab.ReloadTime = WeaponTab.ReloadTime * gred.CVars.gred_sv_simfphys_reload_speed_multiplier:GetFloat()
+			
 			if WeaponTab.Sounds and WeaponTab.Sounds.Reload then
 				seat:SetNWVarProxy(WepID.."NextShot",function(ent,name,oldval,newval)
 					oldval = oldval or 0
@@ -503,12 +505,13 @@ gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatID,SeatSlotTab,Weapon
 			end
 		elseif WeaponTab.Type == "RocketLauncher" then
 			SeatSlotTab.NextShot = 0
+			SeatSlotTab.ReloadTime = WeaponTab.ReloadTime * gred.CVars.gred_sv_simfphys_reload_speed_multiplier:GetFloat()
 			
 			seat:SetNWVarProxy(WepID and WepID.."CurAmmo" or "SecondaryAmmo",function(ent,name,oldval,newval)
 				oldval = oldval or 0
 				
 				if oldval != newval and newval <= 0 and IsValid(ent) then
-					SeatSlotTab.NextShot = CurTime() + WeaponTab.ReloadTime
+					SeatSlotTab.NextShot = CurTime() + SeatSlotTab.ReloadTime
 					
 					if WeaponTab.Sounds and WeaponTab.Sounds.Reload then
 						gred.PlayReloadSound(ent,SeatID,vehicle,WeaponTab,SeatSlotTab)
@@ -873,7 +876,7 @@ gred.TankDrawHUD = function(vehicle,seat,SeatID,SeatTab,Mode,ply,ScrW,ScrH,Loadi
 						
 						surface.SetDrawColor(255,255,255,150)
 						local Ammo = LoadingSeat:GetNWInt(SlotID.."CurAmmo"..LoadingSeat:GetNWInt(SlotID.."ShellType",1))
-						local val = Ammo == 0 and 1 or math.max(LoadingSeat:GetNWFloat(SlotID.."NextShot") - CurTime(),0) / LoadingPrimaryTab.ReloadTime
+						local val = Ammo == 0 and 1 or math.max(LoadingSeat:GetNWFloat(SlotID.."NextShot") - CurTime(),0) / LoadingSeat.Primary[SlotID].ReloadTime
 						
 						if val == 0 and Ammo != 0 then
 							DrawCircle(ScrW * 0.5,ScrH * 0.5,29)
@@ -944,7 +947,7 @@ gred.TankDrawHUD = function(vehicle,seat,SeatID,SeatTab,Mode,ply,ScrW,ScrH,Loadi
 						
 						if SeatTab.Primary[SlotID] and SeatTab.Primary[SlotID].Type == "Cannon" then
 							local Ammo = seat:GetNWInt(SlotID.."CurAmmo"..seat:GetNWInt(SlotID.."ShellType",1))
-							local val = Ammo == 0 and 1 or math.max(seat:GetNWFloat(SlotID.."NextShot") - CurTime(),0) / SeatTab.Primary[SlotID].ReloadTime
+							local val = Ammo == 0 and 1 or math.max(seat:GetNWFloat(SlotID.."NextShot") - CurTime(),0) / seat.Primary[SlotID].ReloadTime
 							
 							if val == 0 and Ammo != 0 then
 								DrawCircle(scr.x,scr.y,29)
@@ -954,17 +957,13 @@ gred.TankDrawHUD = function(vehicle,seat,SeatID,SeatTab,Mode,ply,ScrW,ScrH,Loadi
 						elseif (SeatTab.Primary[SlotID] and SeatTab.Primary[SlotID].Type == "RocketLauncher") or (SeatTab.Secondary and SeatTab.Secondary.Type == "RocketLauncher") then
 							local IsPrimary = (SeatTab.Primary[SlotID] and SeatTab.Primary[SlotID].Type == "RocketLauncher")
 							local SeatSlotTab = seat[IsPrimary and "Primary" or "Secondary"]
-							local WeaponTab
 							
 							if IsPrimary then
 								SeatSlotTab = SeatSlotTab[SlotID]
-								WeaponTab = SeatTab.Primary[SlotID]
-							else
-								WeaponTab = SeatTab.Secondary.ReloadTime
 							end
 							
 							local Ammo = seat:GetNWInt(IsPrimary and SlotID.."CurAmmo" or "SecondaryAmmo")
-							local val = Ammo == 0 and (SeatSlotTab.NextShot - CurTime()) / WeaponTab.ReloadTime or 0
+							local val = Ammo == 0 and (SeatSlotTab.NextShot - CurTime()) / SeatSlotTab.ReloadTime or 0
 							if val == 0 and Ammo != 0 then
 								DrawCircle(scr.x,scr.y,29)
 							else

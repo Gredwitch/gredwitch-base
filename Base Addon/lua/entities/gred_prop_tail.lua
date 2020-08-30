@@ -5,7 +5,7 @@ ENT.AdminSpawnable		            =	false
 
 ENT.PrintName		                =	"[EMP]Base shield"
 ENT.Author			                =	"Gredwitch"
-ENT.Contact			                =	"qhamitouche@gmail.com"
+ENT.Contact			                =	"contact.gredwitch@gmail.com"
 ENT.Category                        =	"Gredwitch's Stuff"
 ENT.Model                         	=	""
 ENT.NextUse							=	0

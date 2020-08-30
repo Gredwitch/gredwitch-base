@@ -37,7 +37,7 @@ ENT.AdminSpawnable		             =  true
 
 ENT.PrintName		                 =  "[BOMBS]GP 250Lb"
 ENT.Author			                 =  "Gredwitch"
-ENT.Contact		                     =  "qhamitouche@gmail.com"
+ENT.Contact		                     =  "contact.gredwitch@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 
 ENT.Model                            =  "models/gbombs/250lbgp.mdl"

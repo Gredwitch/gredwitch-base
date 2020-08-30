@@ -7,7 +7,7 @@ ENT.AdminSpawnable		             =  false
 
 ENT.PrintName		                 =  "[BOMBS]CBU-52U Bomblet"
 ENT.Author			                 =  ""
-ENT.Contact		                     =  "qhamitouche@gmail.com"
+ENT.Contact		                     =  "contact.gredwitch@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 
 ENT.Model                            =  "models/mm1/box.mdl"                      

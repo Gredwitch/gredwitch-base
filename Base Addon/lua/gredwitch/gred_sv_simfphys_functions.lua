@@ -828,6 +828,11 @@ gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatSlotTab,WeaponTab,Wep
 		if WeaponTab.Type == "MG" or WeaponTab.Type == "RocketLauncher" then
 			SeatSlotTab.FireRate = (60 / WeaponTab.FireRate) / (WeaponTab.Sequential and #WeaponTab.Muzzles or 1)
 			SeatSlotTab.Ammo = WeaponTab.Ammo
+			
+			if WeaponTab.Type == "RocketLauncher" then
+				SeatSlotTab.ReloadTime = WeaponTab.ReloadTime * gred.CVars.gred_sv_simfphys_reload_speed_multiplier:GetFloat()
+			end
+			
 			if !WepID then
 				SetNWInt(seat,"SecondaryAmmo",SeatSlotTab.Ammo)
 			else
@@ -907,6 +912,8 @@ gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatSlotTab,WeaponTab,Wep
 			SeatSlotTab.AmmoPerShell = floor(WeaponTab.MaxAmmo / #WeaponTab.ShellTypes)
 			SeatSlotTab.ExtraAmmo = WeaponTab.MaxAmmo % #WeaponTab.ShellTypes
 			SeatSlotTab.IsLoaded = true
+			SeatSlotTab.ReloadTime = WeaponTab.ReloadTime * gred.CVars.gred_sv_simfphys_reload_speed_multiplier:GetFloat()
+			
 			if gred.CVars.gred_sv_simfphys_spawnwithoutammo:GetBool() then
 				for k = 1,#WeaponTab.ShellTypes do
 					SeatSlotTab.ShellTypes[k] = 0
@@ -1102,7 +1109,7 @@ gred.HandleSeats = function(vehicle,Mode,VehicleSeatTab,gredTankGetDriverLocalAn
 									Shell = 1
 								end
 								
-								Seat.Primary[SeatSlotID].NextShot = ct + LoadingPrimaryTab.ReloadTime
+								Seat.Primary[SeatSlotID].NextShot = ct + Seat.Primary[SeatSlotID].ReloadTime
 								Seat.Primary[SeatSlotID].CurShellID = Shell
 								SetNWInt(Seat,SeatSlotID.."ShellType",Seat.Primary[SeatSlotID].CurShellID)
 								SetNWFloat(Seat,SeatSlotID.."NextShot",Seat.Primary[SeatSlotID].NextShot)
@@ -1121,7 +1128,7 @@ gred.HandleSeats = function(vehicle,Mode,VehicleSeatTab,gredTankGetDriverLocalAn
 							seat.Reload = KeyDown(ply,IN_RELOAD)
 							
 							if seat.OldReload and !seat.Reload then
-								Seat.Primary[SeatSlotID].NextShot = ct + LoadingPrimaryTab.ReloadTime
+								Seat.Primary[SeatSlotID].NextShot = ct + Seat.Primary[SeatSlotID].ReloadTime
 								SetNWFloat(Seat,SeatSlotID.."NextShot",Seat.Primary[SeatSlotID].NextShot)
 								
 								if LoadingPrimaryTab.OnReload then
@@ -1155,7 +1162,7 @@ gred.HandleSeats = function(vehicle,Mode,VehicleSeatTab,gredTankGetDriverLocalAn
 									Shell = 1
 								end
 								
-								SeatSlotTab.NextShot = ct + PrimaryTab.ReloadTime
+								SeatSlotTab.NextShot = ct + SeatSlotTab.ReloadTime
 								SeatSlotTab.CurShellID = Shell
 								
 								SetNWInt(seat,SlotID.."ShellType",SeatSlotTab.CurShellID)
@@ -1374,7 +1381,7 @@ gred.TankShootCannon = function(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,Sea
 		end
 	end
 	if SeatSlotTab.ShellTypes[SeatSlotTab.CurShellID] > 0 then
-		SeatSlotTab.NextShot = ct + ((vehicle.gred_sv_simfphys_manualreloadsystem and !WeaponTab.AutoLoader) and 99999999 or WeaponTab.ReloadTime)
+		SeatSlotTab.NextShot = ct + ((vehicle.gred_sv_simfphys_manualreloadsystem and !WeaponTab.AutoLoader) and 99999999 or SeatSlotTab.ReloadTime)
 		-- SeatSlotTab.NextShot = ct + WeaponTab.ReloadTime
 		SetNWFloat(seat,SlotID.."NextShot",SeatSlotTab.NextShot)
 	end
@@ -1521,7 +1528,7 @@ gred.TankShootRocketLauncher = function(vehicle,seat,ply,ct,SeatTab,WeaponTab,Se
 			
 			SeatSlotTab.IsReloading = true
 			
-			timer.Simple(WeaponTab.ReloadTime,function()
+			timer.Simple(SeatSlotTab.ReloadTime,function()
 				if !IsValid(vehicle) then return end
 				if !IsValid(seat) then return end
 				
@@ -1579,7 +1586,7 @@ gred.TankShootRocketLauncher = function(vehicle,seat,ply,ct,SeatTab,WeaponTab,Se
 					
 					SeatSlotTab.IsReloading = true
 					
-					timer.Simple(WeaponTab.ReloadTime,function()
+					timer.Simple(SeatSlotTab.ReloadTime,function()
 						if !IsValid(vehicle) then return end
 						if !IsValid(seat) then return end
 						

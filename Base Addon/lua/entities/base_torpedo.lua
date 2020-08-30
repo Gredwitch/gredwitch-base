@@ -12,7 +12,7 @@ ENT.AdminSpawnable		             =  false
 
 ENT.PrintName		                 =  "Gredwitch's Torpedo base"
 ENT.Author			                 =  "Gredwitch"
-ENT.Contact			                 =  "qhamitouche@gmail.com"
+ENT.Contact			                 =  "contact.gredwitch@gmail.com"
 ENT.Category                         =  "Explosives"
 
 ENT.Model                            =  ""

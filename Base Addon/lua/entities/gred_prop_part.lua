@@ -5,7 +5,7 @@ ENT.AdminSpawnable		            =	false
 
 ENT.PrintName		                =	"[OTHERS]Plane part"
 ENT.Author			                =	"Gredwitch"
-ENT.Contact			                =	"qhamitouche@gmail.com"
+ENT.Contact			                =	"contact.gredwitch@gmail.com"
 ENT.Category                        =	"Gredwitch's Stuff"
 ENT.Model                         	=	""
 ENT.BaseEntity						=	nil
