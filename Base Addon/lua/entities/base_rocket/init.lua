@@ -321,6 +321,7 @@ function ENT:PhysicsCollide(data,physobj)
 					return
 					-- self.NO_EFFECT = true
 				else
+					data.TheirSurfaceProps = data.TheirSurfaceProps or 0
 					local surfaceprop = util.GetSurfacePropName(data.TheirSurfaceProps)
 					
 					if surfaceprop and gred.Mats[surfaceprop] and gred.MatsStr[gred.Mats[surfaceprop]] and not NO_RICOCHET[gred.MatsStr[gred.Mats[surfaceprop]]] then

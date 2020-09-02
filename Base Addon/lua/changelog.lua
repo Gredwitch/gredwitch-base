@@ -1,10 +1,5 @@
---[[31/08/2020
-- Added a "Custom" weapon type for tanks so you can make your own weapon types
-- Added a "RocketLauncher" weapon type for tanks
-- Added compatibility with the tanks for the default WAC rockets
-- Fixed entering a vehicle on a slope screwing up the view on tanks
-- Reworked the base bombs
-- Reworked the rockets so they're more realistic and deal damage to tanks
+--[[02/09/2020
+- Fixed an error for entities that may not have a surfaceprop with rockets
 
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
@@ -14,6 +9,14 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+31/08/2020
+- Added a "Custom" weapon type for tanks so you can make your own weapon types
+- Added a "RocketLauncher" weapon type for tanks
+- Added compatibility with the tanks for the default WAC rockets
+- Fixed entering a vehicle on a slope screwing up the view on tanks
+- Reworked the base bombs
+- Reworked the rockets so they're more realistic and deal damage to tanks
 
 12/08/2020
 - Fixed an issue with the realistic armor convar
