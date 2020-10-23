@@ -40,7 +40,7 @@ ENT.FuelBurnoutTime			=	5
 ENT.LinearPenetration		=	200
 ENT.MaxVelocity				=	300
 ENT.Caliber					=	127
--- ENT.RotationalForce			=	500
+ENT.RotationalForce			=	0
 ENT.Decal					=	"scorch_big"
 
 function ENT:SpawnFunction( ply, tr )

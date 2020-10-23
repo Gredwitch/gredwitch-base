@@ -1,5 +1,25 @@
---[[02/09/2020
-- Fixed an error for entities that may not have a surfaceprop with rockets
+--[[ 23/10/2020
+- Added a hook so GChem stops overrding the explosion function
+- Added a button to reset all the convars to their default value in the other options tab
+- Added the "Camera from tank gunner sight" option
+- Allowed gravity gun pickup on explosives
+- Cleaned up the LFS code
+- Fixed some destructible LFS planes having their parts offset
+- Fixed APCR not having slope multipliers
+- Fixed HE shells not ricochetting
+- Fixed shooting for 1 millisecond cutting the shoot sound with looped sounds on tanks
+- Fixed machinegun sounds in vehicles sometimes looping forever on multiplayer servers
+- Fixed shells not having their correct velocity
+- Fixed impact angles being miscalculated leading to inaccurate effective armor thickness (basically fixed effective armor thickness being 63635mm when hitting the roof of a tank)
+- Fixed the bomb and the rocket base entities not networking their clientside init file
+- Fixed HE shells' penetration being affected by the angle of attack
+- Fixed shells being able to ricochet off certain materials
+- Optimized the shells by removing the nocollide constraints on the shells and using GM:ShouldCollide()
+- Optimized the shell pickup
+- Optimized the networking of the emplacements a lot : the guns should feel way more responsive in multiplayer
+- Optimized the bullets : made them shared so they feel more responsive in multiplayer
+- Updated the base War Thunder material so tanks look better
+- Recoded the shell damage
 
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
@@ -9,6 +29,9 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+02/09/2020
+- Fixed an error for entities that may not have a surfaceprop with rockets
 
 31/08/2020
 - Added a "Custom" weapon type for tanks so you can make your own weapon types

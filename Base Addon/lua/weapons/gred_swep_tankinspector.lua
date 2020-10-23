@@ -165,8 +165,10 @@ gred.GetImpactInfo = function(tr,vehicle)
 	tr.NormalAngle = tr.Normal:Angle()
 	tr.LocalNormalAngle = vehicle:WorldToLocalAngles(tr.NormalAngle)
 	tr.LocalNormal = tr.LocalNormalAngle:Forward()
-	tr.HitNormalAngle = vehicle:WorldToLocalAngles(tr.NormalAngle + tr.HitNormalAngleLocal - ang)
+	-- tr.HitNormalAngle = vehicle:WorldToLocalAngles(tr.NormalAngle + tr.HitNormalAngleLocal - ang)
 	tr.LocalHitPos = vehicle:WorldToLocal(tr.HitPos)
+	_,tr.HitNormalAngle = WorldToLocal(tr.HitPos,tr.NormalAngle,tr.LocalHitPos,tr.HitNormal:Angle())
+	tr.HitNormalAngle:RotateAroundAxis(tr.HitNormalAngle:Up(),180)
 	
 	tr.YawSideDetection = (tr.HitNormalAngleLocal.y <= -45 and tr.HitNormalAngleLocal.y >= -145)
 		and GRED_TANK_RIGHT

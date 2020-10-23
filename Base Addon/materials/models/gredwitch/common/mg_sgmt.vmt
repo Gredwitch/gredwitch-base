@@ -1,0 +1,12 @@
+"patch"
+{
+include "materials/models/gredwitch/common/base_wt.vmt"
+insert
+{
+$basetexture				"models/gredwitch/common/mg_sgmt_c"
+$bumpmap				"models/gredwitch/common/mg_sgmt_n"
+
+// $detail                     "models/gredwitch/common/TEST_camo"
+// $detailscale                1.5
+}
+}

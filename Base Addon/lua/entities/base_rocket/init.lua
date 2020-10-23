@@ -1,5 +1,5 @@
 AddCSLuaFile("shared.lua")
-AddCSLuaFile("init.lua")
+AddCSLuaFile("cl_init.lua")
 include("shared.lua")
 
 local Materials = {
@@ -162,9 +162,42 @@ local mins,maxs = Vector(-5,-5,-5),Vector(5,5,5)
 -- I didn't make the WireMod code
 
 function ENT:AddOnInit()
-	self.Filter = {self}
-	self.MaxVelocityUnitsSquared = self.MaxVelocity and self:ConvertMetersToUnits(self.MaxVelocity * self.MaxVelocity) or nil
-	if not (WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
+	self:InitCollisionFilter()
+	
+	self.MaxVelocityUnitsSquared = self.MaxVelocity and self:ConvertMetersToUnits(self.MaxVelocity^2) or nil -- should have squared the whole thing but i'm too lazy to make custom drag code
+	
+	if WireAddon then 
+		self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) 
+	end
+end
+
+function ENT:InitCollisionFilter()
+	if self.Filter then
+		local filter = {}
+		
+		for k,v in pairs(self.Filter) do
+			if isentity(k) then
+				table.insert(filter,k)
+			elseif isentity(v) then
+				table.insert(filter,v)
+			end
+		end
+		
+		table.Add(self.Filter,filter)
+	else
+		self.Filter = {}
+	end
+	
+	table.insert(self.Filter,self)
+	self.Filter[self] = true
+	
+	self:SetCustomCollisionCheck(true)
+	
+	-- for k,v in pairs(ents.FindByClass("gmod_sent_vehicle_fphysics_wheel")) do
+		-- constraint.NoCollide(self,v,0,0)
+		
+		-- table.insert(self.Filter,v)
+	-- end
 end
 
 function ENT:TriggerInput(iname, value)
@@ -298,47 +331,51 @@ function ENT:PhysicsCollide(data,physobj)
 			self.LastVel = data.OurOldVelocity
 			self.PostHitVel = data.OurNewVelocity
 			
-			if self.IS_AP[self.ShellType] then
-				if IsValid(data.HitEntity) and (data.HitEntity:IsPlayer() or data.HitEntity:IsNPC()) and badmats[data.HitEntity:GetMaterialType()] then
-					local dmg = DamageInfo()
-					dmg:SetAttacker(self.Owner)
-					dmg:SetInflictor(self)
-					dmg:SetDamagePosition(data.HitPos)
-					dmg:SetDamage(self.Caliber*data.OurOldVelocity:Length())
-					dmg:SetDamageType(64) -- DMG_BLAST
-					data.HitEntity:TakeDamageInfo(dmg)
+			if self.IS_AP[self.ShellType] and IsValid(data.HitEntity) and (data.HitEntity:IsPlayer() or data.HitEntity:IsNPC()) and badmats[data.HitEntity:GetMaterialType()] then
+				local dmg = DamageInfo()
+				dmg:SetAttacker(self.Owner)
+				dmg:SetInflictor(self)
+				dmg:SetDamagePosition(data.HitPos)
+				dmg:SetDamage(self.Caliber*data.OurOldVelocity:Length())
+				dmg:SetDamageType(64) -- DMG_BLAST
+				data.HitEntity:TakeDamageInfo(dmg)
+				
+				local effectdata = EffectData()
+				effectdata:SetOrigin(data.HitPos)
+				effectdata:SetNormal(data.HitNormal)
+				effectdata:SetEntity(self)
+				effectdata:SetScale(data.HitEntity:GetModelRadius()/50)
+				effectdata:SetRadius(data.HitEntity:GetMaterialType())
+				effectdata:SetMagnitude(10)
+				
+				util.Effect("gred_particle_blood_explosion",effectdata)
+				physobj:SetVelocityInstantaneous(data.OurOldVelocity)
+				return
+				-- self.NO_EFFECT = true
+			else
+				data.TheirSurfaceProps = data.TheirSurfaceProps or 0
+				local surfaceprop = util.GetSurfacePropName(data.TheirSurfaceProps)
+				
+				if surfaceprop and gred.Mats[surfaceprop] and gred.MatsStr[gred.Mats[surfaceprop]] and not NO_RICOCHET[gred.MatsStr[gred.Mats[surfaceprop]]] and (self.IS_HE[self.ShellType] and simfphys and simfphys.IsCar(data.HitEntity)) then
+					local HitAng = self:WorldToLocalAngles(data.HitNormal:Angle())
+					local c = os.clock()
+					self.RicochetCount = self.RicochetCount or 0
 					
-					local effectdata = EffectData()
-					effectdata:SetOrigin(data.HitPos)
-					effectdata:SetNormal(data.HitNormal)
-					effectdata:SetEntity(self)
-					effectdata:SetScale(data.HitEntity:GetModelRadius()/50)
-					effectdata:SetRadius(data.HitEntity:GetMaterialType())
-					effectdata:SetMagnitude(10)
-					
-					util.Effect("gred_particle_blood_explosion",effectdata)
-					physobj:SetVelocityInstantaneous(data.OurOldVelocity)
-					return
-					-- self.NO_EFFECT = true
-				else
-					data.TheirSurfaceProps = data.TheirSurfaceProps or 0
-					local surfaceprop = util.GetSurfacePropName(data.TheirSurfaceProps)
-					
-					if surfaceprop and gred.Mats[surfaceprop] and gred.MatsStr[gred.Mats[surfaceprop]] and not NO_RICOCHET[gred.MatsStr[gred.Mats[surfaceprop]]] then
-						local HitAng = self:WorldToLocalAngles(data.HitNormal:Angle())
-						local c = os.clock()
-						self.RicochetCount = self.RicochetCount or 0
+					if self.RicochetCount <= 10 and (not self.RICOCHET or self.RICOCHET+0.1 >= c) and self:CanRicochet(HitAng) then
+						self.RicochetCount = self.RicochetCount + 1
 						
-						if self.RicochetCount <= 10 and (not self.RICOCHET or self.RICOCHET+0.1 >= c) and self:CanRicochet(HitAng) then
-							self.RicochetCount = self.RicochetCount + 1
-							
-							self:Ricochet(data.HitPos,HitAng,c,data)
-							self.RICOCHET = c
-							return
-						end
+						self:Ricochet(data.HitPos,HitAng,c,data)
+						self.RICOCHET = c
+						return
 					end
 				end
 			end
+			
+		end
+		
+		if IsValid(data.HitEntity) and data.HitEntity.CachedSpawnList then
+			data.HitObject:SetVelocityInstantaneous(data.TheirOldVelocity)
+			data.HitObject:AddAngleVelocity(-data.HitObject :GetAngleVelocity() + data.TheirOldAngularVelocity)
 		end
 		
 		self.PhysObj = physobj
@@ -346,6 +383,7 @@ function ENT:PhysicsCollide(data,physobj)
 		self:Explode(data.HitPos)
 	end
 end
+
 
 --
 
@@ -476,15 +514,20 @@ end
 
 function ENT:AddOnExplode(pos)
 	if self.ShellType == "Smoke" then return false end
-	local vel
+	local vel = self.LastVel and self:ConvertUnitsToMeters(self.LastVelLength or self.LastVel:Length()) or self.MuzzleVelocity
+	local shelllength = self.ShellLength
+	
+	if not shelllength then
+		local mins,maxs = self:GetModelBounds()
+		shelllength = maxs.x - mins.x
+	end
+	
 	self.LastVelLength = self.LastVel and self.LastVel:Length() or self:ConvertMetersToUnits(self.MuzzleVelocity)
 	
 	self.ExplosiveMass = (!self.ExplosiveMass and self.TNTEquivalent) and (self.TNTEquivalent * self.Mass) * 0.01 or 0
 	self.TNTEquivalent = !self.TNTEquivalent and (self.ExplosiveMass and (self.ExplosiveMass/self.Mass)*100 or 0) or self.TNTEquivalent
 	
 	if self.IS_AP[self.ShellType] then
-		vel = self.LastVel and self:ConvertUnitsToMeters(self.LastVelLength) or self.MuzzleVelocity
-		
 		if self.LinearPenetration then
 			self.Penetration = self.LinearPenetration
 		elseif !self.IS_APCR[self.ShellType] then
@@ -494,22 +537,27 @@ function ENT:AddOnExplode(pos)
 			self.Penetration = ((vel^1.43)*((self.CoreMass + (((((self.CoreMass/self.Mass)*100) > 36.0) and 0.5 or 0.4) * (self.Mass - self.CoreMass)))^0.71))/(kfbrAPCR*((self.Caliber*0.0001)^1.07))
 		end
 		
-		self.ExplosionDamage = self.Penetration*vel*0.03
-		
-		if self.IS_APCR[self.ShellType] then
-			self.ExplosionDamage = self.ExplosionDamage*0.15*gred.CVars["gred_sv_shell_apcr_damagemultiplier"]:GetFloat()
-		else
-			if self.TNTEquivalent > 0 then
-				self.ExplosionDamage = self.ExplosionDamage * ((self.TNTEquivalent < 1 and 1/math.sqrt(math.sqrt(math.sqrt(self.TNTEquivalent))) or self.TNTEquivalent)) * (self.IS_APHE[self.ShellType] and 1.3 or 1)
-			end
-			self.ExplosionDamage = self.ExplosionDamage * gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
-		end
-		
 	elseif self.LinearPenetration then
 		self.Penetration = self.LinearPenetration
 	end
 	
 	self.Penetration = self.Penetration or 0
+	
+	-- maybe not the best way to calculate the damage, but good imo
+	
+	local BaseDamage = (0.5 * self.Mass * vel*vel) / (self.Caliber^1.75) + self.Caliber + self.Mass
+	local SubCaliberAP = ((self.IS_APCR[self.ShellType] and self.ShellType != "APCR") and self.CoreMass or 0 / self.Mass) * (self.ShellType == "APFSDS" and 10 or 1) * self.Caliber * 0.3
+	local TNTDamage = self.TNTEquivalent * self.Mass * 1400
+	local CapBonus = self.IS_CAPPED[self.ShellType] and shelllength^1.5 or 0
+	local TotalDamage = BaseDamage + SubCaliberAP + CapBonus + TNTDamage + self.DamageAdd
+	
+	self.ExplosionDamage = TotalDamage
+	
+	if self.IS_APCR[self.ShellType] then
+		self.ExplosionDamage = self.ExplosionDamage * gred.CVars["gred_sv_shell_apcr_damagemultiplier"]:GetFloat()
+	else
+		self.ExplosionDamage = self.ExplosionDamage * gred.CVars["gred_sv_shell_ap_damagemultiplier"]:GetFloat()
+	end
 	
 	if self:WaterLevel() < 1 then
 		local fwd = self.LastVel:Angle():Forward()
@@ -527,7 +575,6 @@ function ENT:AddOnExplode(pos)
 			local HasTNT = (self.TNTEquivalent and self.TNTEquivalent > 0)
 			self.ShrapnelPen = math.ceil(self.Caliber * 0.15)
 			self.ShrapnelBoom = HasTNT and math.floor(self.Caliber^1.05) or 0
-			-- self.ExplosionDamage = self.ShellType != "HE" and (self.ShrapnelPen * (self.IS_AP[self.ShellType] and 1.5 or 1.1) * (HasTNT and self.ShrapnelBoom * 1.5 or self.Caliber^0.6)) or self.ExplosionDamage
 			
 			tr = gred.GetImpactInfo(tr,tr.Entity)
 			
@@ -549,6 +596,7 @@ function ENT:AddOnExplode(pos)
 					local Slope = self.SLOPE_MULTIPLIERS[self.ShellType][prev]["a"] * (tr.ArmourThicknessKE / self.Caliber)^self.SLOPE_MULTIPLIERS[self.ShellType][prev]["b"]
 					local Normalization = math.deg(math.acos(1/Slope)) - AbsImpactAng
 					
+					
 					tr.HitNormalAngle.p = tr.HitNormalAngle.p + Normalization
 					tr.NormalNormalizedAngle = Angle(tr.NormalAngle.p + Normalization,tr.NormalAngle.y,tr.NormalAngle.r)
 					tr.NormalNormalized = tr.NormalNormalizedAngle:Forward()
@@ -561,7 +609,7 @@ function ENT:AddOnExplode(pos)
 				local HP
 				
 				if gred.CVars.gred_sv_simfphys_realisticarmour:GetBool() then
-					ArmourThickness = self.IS_HEAT[self.ShellType] and tr.EffectiveArmourThicknessCHEMICAL or tr.EffectiveArmourThicknessKE
+					ArmourThickness = self.IS_HE[self.ShellType] and tr.ArmourThicknessCHEMICAL or (self.IS_HEAT[self.ShellType] and tr.EffectiveArmourThicknessCHEMICAL or tr.EffectiveArmourThicknessKE)
 				else
 					HP = tr.Entity:GetMaxHealth()*0.01 / gred.CVars.gred_sv_simfphys_health_multplier:GetFloat()
 					ArmourThickness = HP / tr.CalculatedImpactCos
@@ -570,13 +618,24 @@ function ENT:AddOnExplode(pos)
 				Fraction = ArmourThickness / self.Penetration
 				self.Fraction = Fraction
 				
+				
+				local mins,maxs = tr.Entity:GetModelBounds()
+				local vol = maxs - mins
+				-- vol = vol.x * vol.y * vol.z * 0.5
+				-- vol = (vol.x * vol.y)
+				-- PrintTable(tr)
+				
+				-- print(self.ExplosionDamage,(((CapBonus + SubCaliberAP + BaseDamage)^1.9 + (4/3 * math.pi * (65 * self.TNTEquivalent^(1/3))^3))),vol)
+				-- print(self.ExplosionDamage,vol)
+				
+				if not self.IS_HE[self.ShellType] then
+					self.ExplosionDamage = self.ExplosionDamage * math.Clamp((self.Penetration - self.Caliber * 0.15) / ArmourThickness,0.8,1)^1.5
+				end
+				
+				
 				if Fraction >= 1 and self.IsShell then
 					if !ModuleDamage then
-						-- if (self.IS_HEAT[self.ShellType] or self.IS_AP[self.ShellType]) and gred.CVars.gred_sv_shell_ap_lowpen_system:GetBool() then
-							-- self.ExplosionDamage = self.ExplosionDamage / (Fraction*Fraction)
-						-- else
-							self.ExplosionDamage = 0
-						-- end
+						self.ExplosionDamage = 0
 					end
 				else
 					if self.IS_APCR[self.ShellType] then
@@ -641,7 +700,7 @@ function ENT:AddOnExplode(pos)
 				end
 			else
 				local dmg = DamageInfo()
-				local DamageToDeal = (tr.Entity.GRED_TANK and ((Fraction and Fraction >= 1 and !self.IS_AP[self.ShellType]) and 0 or self.ExplosionDamage) or (self.IS_APCR[self.ShellType] and self.ExplosionDamag or self.ExplosionDamage)) -- need to localize it otherwise it fucks up
+				local DamageToDeal = (tr.Entity.GRED_TANK and ((Fraction and Fraction >= 1 and !self.IS_AP[self.ShellType]) and 0 or self.ExplosionDamage) or (self.IS_APCR[self.ShellType] and self.ExplosionDamage or self.ExplosionDamage)) -- need to localize it otherwise it fucks up
 				dmg:SetAttacker(self.Owner)
 				dmg:SetInflictor(self)
 				dmg:SetDamagePosition(tr.HitPos)

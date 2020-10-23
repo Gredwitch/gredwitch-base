@@ -19,6 +19,11 @@ gred = gred or {}
 gred.simfphys = gred.simfphys or {}
 gred.CVars = gred.CVars or {}
 
+timer.Simple(2,function()
+	gred.AddonList = {}
+	gred.RequiredAddons = {}
+end)
+
 gred.CVars["gred_cl_resourceprecache"] 						= CreateClientConVar("gred_cl_resourceprecache"						, "0" ,true,false)
 gred.CVars["gred_cl_sound_shake"] 							= CreateClientConVar("gred_cl_sound_shake"							, "1" ,true,false)
 gred.CVars["gred_cl_nowaterimpacts"] 						= CreateClientConVar("gred_cl_nowaterimpacts"						, "0" ,true,false)
@@ -45,7 +50,7 @@ gred.CVars["gred_cl_favouritetab"] 							= CreateClientConVar("gred_cl_favourit
 gred.CVars["gred_cl_shell_blur"] 							= CreateClientConVar("gred_cl_shell_blur"							, "1" ,true,false)
 gred.CVars["gred_cl_shell_blur_invehicles"] 				= CreateClientConVar("gred_cl_shell_blur_invehicles"				, "1" ,true,false)
 gred.CVars["gred_cl_shell_enable_killcam"] 					= CreateClientConVar("gred_cl_shell_enable_killcam"					, "1" ,true,false)
-gred.CVars["gred_cl_altmuzzleeffect"]:SetInt(1)
+gred.CVars["gred_cl_simfphys_camera_tankgunnersight"] 		= CreateClientConVar("gred_cl_simfphys_camera_tankgunnersight"		, "0" ,true,false)
 
 local TAB_PRESS = {FCVAR_ARCHIVE,FCVAR_USERINFO}
 gred.CVars["gred_cl_simfphys_key_changeshell"]				= CreateConVar("gred_cl_simfphys_key_changeshell"			, "21",TAB_PRESS)
@@ -61,11 +66,34 @@ if gred.CVars["gred_cl_resourceprecache"]:GetBool() then
 end
 
 
-local Created
-local NextThink = 0
-local NextFind = 0
-local id = 0
-local SIMFPHYS_COLOR = Color(255,235,0)
+local OverrideHAB 		= gred.CVars["gred_sv_override_hab"]
+local Tracers 			= gred.CVars["gred_sv_tracers"]
+local BulletDMG 		= gred.CVars["gred_sv_bullet_dmg"]
+local HE12MM 			= gred.CVars["gred_sv_12mm_he_impact"]
+local HE7MM 			= gred.CVars["gred_sv_7mm_he_impact"]
+local HERADIUS 			= gred.CVars["gred_sv_bullet_radius"]
+local Effect = util.Effect
+local TraceLine = util.TraceLine
+local QuickTrace = util.QuickTrace
+local tr = { collisiongroup = COLLISION_GROUP_WORLD }
+local BulletID = 0
+local vector_zero = Vector()
+local WorldMin,WorldMax
+
+local CAL_TABLE = {
+	["wac_base_7mm"] = 1,
+	["wac_base_12mm"] = 2,
+	["wac_base_20mm"] = 3,
+	["wac_base_30mm"] = 4,
+	["wac_base_40mm"] = 5,
+}
+local COL_TABLE = {
+	["none"]   = 0,
+	["red"]    = 1,
+	["green"]  = 2,
+	["white"]  = 3,
+	["yellow"] = 4,
+}
 
 surface.CreateFont( "SIMFPHYS_ARMED_HUDFONT", {
 	font = "Verdana",
@@ -85,23 +113,12 @@ surface.CreateFont( "SIMFPHYS_ARMED_HUDFONT", {
 	outline = false,
 })
 
-local function DrawCircle( X, Y, radius ) -- copyright LunasFlightSchool™
-	local segmentdist = 360 / ( 2 * math.pi * radius / 2 )
-	
-	for a = 0, 360 - segmentdist, segmentdist do
-		surface.DrawLine( X + math.cos( math.rad( a ) ) * radius, Y - math.sin( math.rad( a ) ) * radius, X + math.cos( math.rad( a + segmentdist ) ) * radius, Y - math.sin( math.rad( a + segmentdist ) ) * radius )
+local function IsInWorld(pos)
+	if not WorldMax then
+		WorldMin,WorldMax = game.GetWorld():GetModelBounds()
 	end
-end
-
-local function gred_settings(CPanel)
-	CPanel:ClearControls()
 	
-	local DButton = vgui.Create("DButton")
-	DButton:SetText("Options..")
-	DButton.DoClick = function(DButton)
-		gred.OpenOptions()
-	end
-	CPanel:AddItem(DButton)
+	return pos:WithinAABox(WorldMin,WorldMax)
 end
 
 local function CheckForConflicts()
@@ -172,6 +189,75 @@ local function CheckDXDiag()
 	end
 end
 
+local function CreateTracer(startpos,cal,tracercolor,endpos)
+	local effect = EffectData()
+	effect:SetOrigin(startpos)
+	effect:SetFlags(cal)
+	effect:SetMaterialIndex(tracercolor)
+	effect:SetStart(endpos)
+	Effect("gred_particle_tracer",effect)
+end
+
+local function CreateWaterImpact(pos,cal)
+	local effectdata = EffectData()
+	effectdata:SetOrigin(pos)
+	effectdata:SetAngles(angle_zero)
+	effectdata:SetSurfaceProp(0)
+	effectdata:SetMaterialIndex(0)
+	effectdata:SetFlags(cal)
+	Effect("gred_particle_impact",effectdata)
+end
+
+local function CreateImpact(pos,ang,surfaceprop,cal)
+	local effectdata = EffectData()
+	effectdata:SetOrigin(pos)
+	effectdata:SetAngles(ang)
+	effectdata:SetSurfaceProp(surfaceprop)
+	effectdata:SetMaterialIndex(1)
+	effectdata:SetFlags(cal)
+	
+	Effect("gred_particle_impact",effectdata)
+end
+
+local function BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime,IsShared)
+	ply = IsValid(ply) and ply or Entity(0)
+	local hitang
+	local hitpos
+	local HitSky = false
+	
+	if istable(tr) then -- if tr isn't a table, then it's a vector
+		hitang = tr.HitNormal:Angle()
+		hitpos = tr.HitPos
+		if cal == "wac_base_7mm" or cal == "wac_base_12mm" then
+			hitang.p = hitang.p + 90
+		end
+		HitSky = tr.HitSky
+	else
+		hitang = angle_zero
+		hitpos = tr
+		HitSky = true
+	end
+	
+	if not explodable then
+		if HitSky or NoParticle then return end
+		
+		CreateImpact(hitpos,hitang,gred.Mats[util.GetSurfacePropName(tr.SurfaceProps)] or 24,gred.CalTable[cal].ID)
+		
+		-- if cal == "wac_base_12mm" then
+			-- sound.Play("impactsounds/gun_impact_"..math.random(1,14)..".wav",hitpos,75,100,0.5)
+		-- end
+	else
+		if cal == "wac_base_30mm" then
+			sound.Play("impactsounds/30mm_old.wav",hitpos,110,math.random(90,110),1)
+		else
+			sound.Play("impactsounds/20mm_0"..math.random(1,5)..".wav",hitpos,100,100,0.7)
+		end
+		
+		if not NoParticle then
+			CreateImpact(hitpos,hitang,HitSky and 1 or 0,gred.CalTable[cal].ID,4)
+		end
+	end
+end
 
 
 gred.CheckConCommand = function(cmd,val)
@@ -182,242 +268,99 @@ gred.CheckConCommand = function(cmd,val)
 	net.SendToServer()
 end
 
-gred.UpdateBoneTable = function(self)
-	if self.CreatingBones then return end
-	self.Bones = nil
-	timer.Simple(0,function()
-		if !self or (self and !IsValid(self)) then return end
-		if self.CreatingBones then return end
-		self.CreatingBones = true
-		self:SetLOD(0)
-		self.Bones = {}
-		local name
-		for i=0, self:GetBoneCount()-1 do
-			name = self:GetBoneName(i)
-			if name == "__INVALIDBONE__" and ((self.BoneBlackList and !self.BoneBlackList[i]) or !self.BoneBlackList) and i != 0 then
-				-- print("["..self.ClassName.."] INVALID BONE : "..i)
-				self.Bones = nil
-				break
-			end
-			self.Bones[name] = i
-		end
-		self:SetLOD(-1)
-		self.CreatingBones = false
-	end)
-end
-
-gred.ManipulateBoneAngles = function(self,bone,angle)
-	if !self.Bones or (self.Bones and !self.Bones[bone]) then
-		gred.UpdateBoneTable(self)
-		return
-	end
-	
-	self:ManipulateBoneAngles(self.Bones[bone],angle)
-end
-
-gred.ManipulateBonePosition = function(self,bone,pos)
-	if !self.Bones or (self.Bones and !self.Bones[bone]) then
-		gred.UpdateBoneTable(self)
-		return
-	end
-	
-	self:ManipulateBonePosition(self.Bones[bone],pos)
-end
-
-gred.ManipulateBoneScale = function(self,bone,scale)
-	if !self.Bones or (self.Bones and !self.Bones[bone]) then
-		gred.UpdateBoneTable(self)
-		return
-	end
-	
-	self:ManipulateBoneScale(self.Bones[bone],scale)
-end
-
-gred.HandleFlyBySound = function(self,ply,ct,minvel,maxdist,delay,snd)
-	ply.NGPLAY = ply.NGPLAY or 0
-	ply.lfsGetPlane = ply.lfsGetPlane or function() return nil end
-	if ply:lfsGetPlane() != self and (ply.NGPLAY < ct) and self:GetEngineActive() then
-		local vel = self:GetVelocity():Length()
-		if vel >= minvel then
-			local plypos = ply:GetPos()
-			local pos = self:GetPos()
-			local dist = pos:Distance(plypos)
-			if dist < maxdist then
-				ply.NGPLAY = ct + delay
-				ply:EmitSound(snd)
-			end
-		end
-	end
-end
-
-gred.HandleVoiceLines = function(self,ply,ct,hp)
-	ply.lfsGetPlane = ply.lfsGetPlane or function() return nil end
-	self.BumpSound = self.BumpSound or ct
-	if self.BumpSound < ct then
-		for k,v in pairs(self.SoundQueue) do
-			ply:EmitSound(v)
+gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg,radius)
+	if hab and hab.Module.PhysBullet and OverrideHAB:GetInt() == 0 then
+		phybullet.AmmoType		= cal..(tracer and tracer or "")
+		phybullet.Num 			= 1
+		phybullet.Src 			= pos
+		phybullet.Dir 			= ang:Forward()
+		phybullet.Spread 		= vector_zero
+		phybullet.Tracer		= 0--tracer and 0 or 1
+		phybullet.IsNetworked	= false
+		phybullet.IgnoreEntity = filter
+		phybullet.Distance		= false
+		phybullet.Damage		= ((cal == "wac_base_7mm" and HE7MM:GetBool()) or (cal == "wac_base_12mm" and HE12MM:GetBool())) and 0 or (dmg and dmg or (cal == "wac_base_7mm" and 40 or (cal == "wac_base_12mm" and 60 or (cal == "wac_base_20mm" and 80 or (cal == "wac_base_30mm" and 100 or (cal == "wac_base_40mm" and 120)))))) * BulletDMG:GetFloat()
+		phybullet.Force		= phybullet.Damage*0.1
+		
+		ply:FirePhysicalBullets(phybullet)
+	else
+		World = IsValid(World) or Entity(0)
+		BulletID = BulletID + 1
+		
+		local caltab = gred.CalTable[cal]
+		local speed = caltab.Speed
+		local dmg = (dmg or caltab.Damage) * BulletDMG:GetFloat()
+		local radius = (radius or 70) * caltab.RadiusMul * HERADIUS:GetFloat()
+		local expltime = fusetime and CurTime() + fusetime
+		
+		local fwd = ang:Forward()
+		local explodable = caltab.Explodeable
+		
+		local dir = fwd * speed
+		local endpos = pos + Vector()
+		
+		local NoParticle
+		local oldbullet = BulletID
+		
+		if tracer then
+			tracer = tracer:lower()
 			
-			table.RemoveByValue(self.SoundQueue,v)
-			self.BumpSound = ct + 4
-			break
+			if COL_TABLE[tracer] then
+				CreateTracer(pos,CAL_TABLE[cal],COL_TABLE[tracer],QuickTrace(pos,expltime and fwd*(fusetime*speed) or fwd*99999999999999,filter).HitPos)
+			end
 		end
-	end
-	
-	if self.IsDead then
-		local Driver = self:GetDriver()
-		if self.CheckDriver and Driver != self.OldDriver and !IsValid(Driver) then
-			for k,v in pairs(player.GetAll()) do
-				if v:lfsGetAITeam() == self.OldDriver:lfsGetAITeam() and (IsValid(v:lfsGetPlane()) or v == self.OldDriver) then
-					v:EmitSound("GRED_VO_BAILOUT_0"..math.random(1,3))
+		
+		local BulletTrTab = {}
+		
+		timer.Create("gred_bullet_"..oldbullet,0,0,function()
+			endpos:Add(dir)
+			
+			BulletTrTab.start = pos
+			BulletTrTab.endpos = endpos
+			BulletTrTab.filter = filter
+			BulletTrTab.mask = MASK_ALL
+			
+			-- local lifetime = 3
+			-- local add = ang:Right()*100 * 0
+			-- local debugpos = pos + add
+			-- debugoverlay.Line(debugpos,endpos + add,lifetime,color_white)
+			-- debugoverlay.Cross(debugpos,30,lifetime,color_white)
+			-- debugoverlay.EntityTextAtPosition(debugpos,1,SysTime(),lifetime,color_white)
+			
+			local tr = TraceLine(BulletTrTab)
+			
+			pos.x = endpos.x
+			pos.y = endpos.y
+			pos.z = endpos.z
+			
+			if tr.MatType == 83 then
+				CreateWaterImpact(tr.HitPos,caltab.ID,3)
+				
+				NoParticle = true
+				sound.Play("impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",tr.HitPos,75,100,1)
+			end
+			
+			if tr.Hit then
+				BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime,IsShared)
+				timer.Remove("gred_bullet_"..oldbullet)
+				return
+			else
+				if !IsInWorld(pos) then
+					if explodable then 
+						BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime,IsShared)
+					end
+					timer.Remove("gred_bullet_"..oldbullet)
+				else
+					pos = pos
 				end
 			end
-		end
-		self.CheckDriver = true
-		self.OldDriver = Driver
-	end
-	if ply:lfsGetPlane() == self then
-		if self.EmitNow.wing_r and self.EmitNow.wing_r != "CEASE" then
-			self.EmitNow.wing_r = "CEASE"
-			table.insert(self.SoundQueue,"GRED_VO_HOLE_RIGHT_WING_0"..math.random(1,3))
-		end
-		if self.EmitNow.wing_l and self.EmitNow.wing_l != "CEASE" then
-			self.EmitNow.wing_l = "CEASE"
-			table.insert(self.SoundQueue,"GRED_VO_HOLE_LEFT_WING_0"..math.random(1,3))
-		end
-		if hp == 0 then
-			self.IsDead = true
-		end
-	end
-end
-
-gred.LFSHUDPaintFilterParts = function(self)
-	local partnum = {}
-	local a = 1
-	if self.Parts then
-		for k,v in pairs(self.Parts) do
-			partnum[a] = v
-			a = a + 1
-		end
-	end
-	partnum[a] = self
-	
-	return partnum
-end
-
-gred.CalcViewThirdPersonLFSParts = function(self,view,ply)
-	view.origin = ply:EyePos()
-	local Parent = ply:lfsGetPlane()
-	local Pod = ply:GetVehicle()
-	local radius = 550
-	radius = radius + radius * Pod:GetCameraDistance()
-	local TargetOrigin = view.origin - view.angles:Forward() * radius  + view.angles:Up() * radius * 0.2
-	local WallOffset = 4
-	local tr = util.TraceHull( {
-		start = view.origin,
-		endpos = TargetOrigin,
-		filter = function( e )
-			local c = e:GetClass()
-			local collide = not c:StartWith( "prop_physics" ) and not c:StartWith( "prop_dynamic" ) and not c:StartWith( "prop_ragdoll" ) and not e:IsVehicle() and not c:StartWith( "gmod_" ) and not c:StartWith( "player" ) and not e.LFS and Parent:GetCalcViewFilter(e)
 			
-			return collide
-		end,
-		mins = Vector( -WallOffset, -WallOffset, -WallOffset ),
-		maxs = Vector( WallOffset, WallOffset, WallOffset ),
-	} )
-	view.origin = tr.HitPos
-	
-	if tr.Hit and not tr.StartSolid then
-		view.origin = view.origin + tr.HitNormal * WallOffset
-	end
-	
-	return view
-end
-
-gred.GunnersInit = function(self)
-	local ATT
-	local seat
-	for k,v in pairs(self.Gunners) do
-		for a,b in pairs(v.att) do
-			v.att[a] = self:LookupAttachment(b)
-		end
-	end
-end
-
-gred.GunnersDriverHUDPaint = function(self,ply)
-	if !self.Initialized then
-		gred.GunnersInit(self)
-		self.Initialized = true
-	end
-	
-	local att
-	local tr
-	local filter = self:GetCrosshairFilterEnts()
-	local ScrW,ScrH = ScrW(),ScrH()
-	local pparam1
-	local pparam2
-	local alpha
-	
-	for k,v in pairs(self.Gunners) do
-		att = self:GetAttachment(v.att[1])
-		tr = TraceLine({
-			start = att.Pos,
-			endpos = (att.Pos + att.Ang:Forward() * 50000),
-			filter = filter
-		})
-		
-		alpha = !IsValid(self["GetGunner"..k](self)) and 255 or 0
-		
-		pparam1,pparam2 = self:GetPoseParameter(v.poseparams[1]),self:GetPoseParameter(v.poseparams[2])
-		
-		if pparam1 == 1 or pparam2 == 1 or pparam1 == 0 or pparam2 == 0 then -- yea but shut up ok
-			surface.SetDrawColor(255,0,0,alpha)
-		else
-			surface.SetDrawColor(0,255,0,alpha)
-		end
-		
-		tr.ScreenPos = tr.HitPos:ToScreen()
-		tr.ScreenPos.x = tr.ScreenPos.x > ScrW and tr.ScreenPosW or (tr.ScreenPos.x < 0 and 0 or tr.ScreenPos.x)
-		tr.ScreenPos.y = tr.ScreenPos.y > ScrH and tr.ScreenPosH or (tr.ScreenPos.y < 0 and 0 or tr.ScreenPos.y)
-		DrawCircle(tr.ScreenPos.x,tr.ScreenPos.y,5)
-	end
-end
-
-gred.GunnersHUDPaint = function(self,ply)
-	if !self.Initialized then
-		gred.GunnersInit(self)
-		self.Initialized = true
-	end
-	
-	local att
-	local tr
-	local filter = self:GetCrosshairFilterEnts()
-	local ScrW,ScrH = ScrW(),ScrH()
-	local pparam1
-	local pparam2
-	local veh = ply:GetVehicle()
-	for k,v in pairs(self.Gunners) do
-		if veh == self["GetGunnerSeat"..k](self) then
-			att = self:GetAttachment(v.att[1])
-			tr = TraceLine({
-				start = att.Pos,
-				endpos = (att.Pos + att.Ang:Forward() * 50000),
-				filter = filter
-			})
-			
-			pparam1,pparam2 = self:GetPoseParameter(v.poseparams[1]),self:GetPoseParameter(v.poseparams[2])
-			
-			if pparam1 == 1 or pparam2 == 1 or pparam1 == 0 or pparam2 == 0 then -- yea but shut up ok
-				surface.SetDrawColor(255,0,0,255)
-			else
-				surface.SetDrawColor(0,255,0,255)
+			if expltime and CurTime() >= expltime then
+				BulletExplode(ply,NoBullet,pos,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime,IsShared)
+				timer.Remove("gred_bullet_"..oldbullet)
+				return
 			end
-			
-			tr.ScreenPos = tr.HitPos:ToScreen()
-			tr.ScreenPos.x = tr.ScreenPos.x > ScrW and tr.ScreenPosW or (tr.ScreenPos.x < 0 and 0 or tr.ScreenPos.x)
-			tr.ScreenPos.y = tr.ScreenPos.y > ScrH and tr.ScreenPosH or (tr.ScreenPos.y < 0 and 0 or tr.ScreenPos.y)
-			DrawCircle(tr.ScreenPos.x,tr.ScreenPos.y,5)
-			break
-		end
+		end)
 	end
 end
 
@@ -429,8 +372,16 @@ hook.Add("PopulateToolMenu","gred_menu",function()
 								"Options",
 								"",
 								"",
-								gred_settings
-	)
+								function(CPanel)
+									CPanel:ClearControls()
+									
+									local DButton = vgui.Create("DButton")
+									DButton:SetText("Options..")
+									DButton.DoClick = function(DButton)
+										gred.OpenOptions()
+									end
+									CPanel:AddItem(DButton)
+								end)
 end)
 
 local BulletID = 0
@@ -493,28 +444,6 @@ net.Receive("gred_net_createbullet",function()
 	end)
 	
 	BulletID = BulletID + 1
-end)
-
-net.Receive("gred_lfs_setparts",function()
-	local self = net.ReadEntity()
-	if not self then print("[LFS] ERROR! ENTITY NOT INITALIZED CLIENT SIDE! PLEASE, RE-SPAWN!") return end
-	self.Parts = {}
-	for k,v in pairs(net.ReadTable()) do
-		self.Parts[k] = v
-	end
-end)
-
-net.Receive("gred_lfs_remparts",function()
-	local self = net.ReadEntity()
-	local k = net.ReadString()
-	
-	self.EmitNow = istable(self.EmitNow) and self.EmitNow or {}
-	if self.EmitNow and (k == "wing_l" or k == "wing_r") and self.EmitNow[k] != "CEASE" then
-		self.EmitNow[k] = true
-	end
-	if self.Parts then
-		self.Parts[k] = nil
-	end
 end)
 
 net.Receive("gred_net_send_ply_hint_key",function()
@@ -585,39 +514,22 @@ net.Receive("gred_net_nw_var",function()
 end)
 
 net.Receive("gred_net_createtracer",function()
-	local effect = EffectData()
-	effect:SetOrigin(net.ReadVector())
-	effect:SetFlags(net.ReadUInt(3))
-	effect:SetMaterialIndex(net.ReadUInt(3))
-	effect:SetStart(net.ReadVector())
-	Effect("gred_particle_tracer",effect)
+	CreateTracer(net.ReadVector(),net.ReadUInt(3),net.ReadUInt(3),net.ReadVector())
 end)
 
 net.Receive("gred_net_createimpact",function()
-	local effectdata = EffectData()
-	effectdata:SetOrigin(net.ReadVector())
-	effectdata:SetAngles(net.ReadAngle())
-	effectdata:SetSurfaceProp(net.ReadUInt(5))
-	effectdata:SetMaterialIndex(1)
-	effectdata:SetFlags(net.ReadUInt(4))
-	Effect("gred_particle_impact",effectdata)
+	CreateImpact(net.ReadVector(),net.ReadAngle(),net.ReadUInt(5),net.ReadUInt(4))
 end)
 
 local angle_zero = Angle()
 
 net.Receive("gred_net_createwaterimpact",function()
-	local effectdata = EffectData()
-	effectdata:SetOrigin(net.ReadVector())
-	effectdata:SetAngles(angle_zero)
-	effectdata:SetSurfaceProp(0)
-	effectdata:SetMaterialIndex(0)
-	effectdata:SetFlags(net.ReadUInt(3))
-	Effect("gred_particle_impact",effectdata)
+	CreateWaterImpact(net.ReadVector(),net.ReadUInt(3))
 end)
 
 net.Receive("gred_net_createparticle",function()
 	local effectdata = EffectData()
-	effectdata:SetFlags(table.KeyFromValue(gred.Particles,net.ReadString()))
+	effectdata:SetFlags(table.KeyFromValue(gred.Particles,net.ReadString()) or "")
 	effectdata:SetOrigin(net.ReadVector())
 	effectdata:SetAngles(net.ReadAngle())
 	effectdata:SetSurfaceProp(net.ReadBool() and 1 or 0)
@@ -662,5 +574,7 @@ timer.Simple(5,function()
 	CheckDXDiag()
 end)
 
+include("gredwitch/gred_cl_lfs_functions.lua")
 include("gredwitch/gred_cl_simfphys_functions.lua")
 include("gredwitch/gred_cl_menu.lua")
+include("gredwitch/gred_sh_simfphys_functions.lua")

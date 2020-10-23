@@ -16,6 +16,7 @@ ENT.ShellType						=	""
 ENT.EffectWater						=	"ins_water_explosion"
 ENT.Normalization					=	0
 ENT.NextUse 						=	0
+ENT.Mass							=	1
 
 ENT.TRACERCOLOR_TO_INT = {
 	["white"] = 1,

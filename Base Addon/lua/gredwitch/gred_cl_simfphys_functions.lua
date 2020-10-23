@@ -85,6 +85,28 @@ end
 gred.TankID = gred.TankID or 0
 gred.DrawCircle = DrawCircle
 
+simfphys = simfphys or {}
+
+function simfphys.RegisterCamera( ent, offset_firstperson, offset_thirdperson, bLocalAng, attachment )
+	simfphys.CameraRegister( ent, offset_firstperson, offset_thirdperson, bLocalAng, attachment )
+end
+
+
+function simfphys.CameraRegister( ent, offset_firstperson, offset_thirdperson, bLocalAng, attachment ) -- sorry luna :(
+	if not IsValid( ent ) then return end
+	
+	offset_firstperson = isvector( offset_firstperson ) and offset_firstperson or Vector(0,0,0)
+	offset_thirdperson = isvector( offset_thirdperson ) and offset_thirdperson or Vector(0,0,0)
+	
+	ent:SetNWBool( "simfphys_SpecialCam", true )
+	ent:SetNWBool( "SpecialCam_LocalAngles",  bLocalAng or false )
+	ent:SetNWVector( "SpecialCam_Firstperson", offset_firstperson )
+	ent:SetNWVector( "SpecialCam_Thirdperson", offset_thirdperson )
+	
+	if isstring( attachment ) then 
+		ent:SetNWString( "SpecialCam_Attachment", attachment )
+	end
+end
 
 
 gred.InitializeSimfphys = function(vehicle,callback)
@@ -267,9 +289,27 @@ gred.TankInitVars = function(vehicle,VehicleTab)
 	vehicle.trackspin_l = 0
 	vehicle.trackspin_r = 0
 	
+	
+	vehicle:SetNWBool("simfphys_NoRacingHud",true)
+	
+	
+	vehicle.FILTER = {}
+	table.Add(vehicle.FILTER,vehicle.pSeat)
+	table.Add(vehicle.FILTER,vehicle.GhostWheels)
+	table.Add(vehicle.FILTER,vehicle.Wheels)
+	table.insert(vehicle.FILTER,vehicle)
+	table.insert(vehicle.FILTER,vehicle:GetDriverSeat())
+	table.insert(vehicle.FILTER,vehicle.SteerMaster)
+	table.insert(vehicle.FILTER,vehicle.SteerMaster2)
+	table.insert(vehicle.FILTER,vehicle.MassOffset)
+	
+	vehicle.GearsBackup = table.Copy(vehicle.Gears)
+	vehicle.filterEntities = player.GetAll()
+	
 	vehicle.filterEntities = player.GetAll()
 	table.insert(vehicle.filterEntities,vehicle)
 	table.Add(vehicle.filterEntities,ents.FindByClass("gmod_sent_vehicle_fphysics_wheel"))
+	table.Add(vehicle.filterEntities,vehicle.FILTER)
 	vehicle.OnCSTick = VehicleTab.OnCSTick or function() end
 	
 end
@@ -400,16 +440,17 @@ gred.TankInitSeats = function(vehicle,Mode,VehicleSeatTab,LocalPly)
 				SeatTab = v[Mode]
 				seat = k == 0 and vehicle:GetDriverSeat() or (vehicle.pSeat and vehicle.pSeat[k] or nil)
 				if IsValid(seat) then
-					if v[Mode].Sight then
-						seat.SightAttachment = vehicle:LookupAttachment(SeatTab.Sight.SightAttachment)
-					end
-					
 					if SeatTab.MuzzleAttachment then
 						seat.MuzzleAttachment = vehicle:LookupAttachment(SeatTab.MuzzleAttachment)
 					end
 					
+					if v[Mode].Sight then
+						seat.SightAttachment = (gred.CVars.gred_sv_simfphys_camera_tankgunnersight:GetBool() and gred.CVars.gred_cl_simfphys_camera_tankgunnersight:GetBool() and seat.MuzzleAttachment) and seat.MuzzleAttachment or vehicle:LookupAttachment(SeatTab.Sight.SightAttachment)
+					end
+					
 					seat.FirstPersonViewPosIsInside = SeatTab.FirstPersonViewPosIsInside
 					seat.LocalView = SeatTab.LocalView != nil and SeatTab.LocalView or ((SeatTab.ViewAttachment or SeatTab.Attachment) and true or false)
+					simfphys.RegisterCamera(seat,SeatTab.FirstPersonViewPos,SeatTab.ThirdPersonViewPos,seat.LocalView,SeatTab.ViewAttachment)
 					
 					if SeatTab.Hatches then
 						local HatchesTab = SeatTab.Hatches
@@ -449,11 +490,56 @@ gred.TankInitSeats = function(vehicle,Mode,VehicleSeatTab,LocalPly)
 								gred.TankInitMuzzleAttachments(vehicle,seat,k,seat.Primary[WepID],WepTab,WepID)
 							end
 						end
+						
+						-- seat:SetNWVarProxy("SlotID",function(ent,name,oldval,newval)
+							-- if oldval != newval then
+								
+							-- end
+						-- end)
+						
+						local SlotID
+						local SeatSlotTab
+						local WeaponTab
+						local SeatTab = SeatTab
+						local Ammo
+						
+						seat:SetNWVarProxy("IsPrimaryAttacking",function(ent,name,oldval,newval)
+							if oldval != newval then
+								if newval == false then
+									SlotID = ent:GetNWInt("SlotID",1)
+									SeatSlotTab = ent.Primary[SlotID]
+									WeaponTab = SeatTab.Primary[SlotID]
+									
+									if SeatSlotTab and SeatSlotTab.CurrentMuzzle and WeaponTab.Type == "MG" then
+										Ammo = ent:GetNWInt(SlotID.."CurAmmo",WeaponTab.Ammo or 0)
+										SeatSlotTab.CurrentMuzzle = (Ammo % #WeaponTab.Muzzles) + 1
+										SeatSlotTab.Ammo = Ammo
+									end
+								end
+							end
+						end)
 					end
 					
 					if SeatTab.Secondary then
 						seat.Secondary = {}
 						gred.TankInitMuzzleAttachments(vehicle,seat,k,seat.Secondary,SeatTab.Secondary)
+					
+						local SeatSlotTab
+						local WeaponTab
+						local Ammo
+						
+						seat:SetNWVarProxy("IsSecondaryAttacking",function(ent,name,oldval,newval)
+							if oldval != newval then
+								SeatSlotTab = ent.Secondary
+								WeaponTab = SeatTab.Secondary
+								
+								if SeatSlotTab and WeaponTab and SeatSlotTab.CurrentMuzzle and WeaponTab.Type == "MG" then
+									Ammo = ent:GetNWInt("SecondaryAmmo",WeaponTab.Ammo or 0)
+									SeatSlotTab.CurrentMuzzle = (Ammo % #WeaponTab.Muzzles) + 1
+									SeatSlotTab.Ammo = Ammo
+								end
+							end
+						end)
 					end
 					
 					seat.ZoomVal = 0
@@ -481,6 +567,12 @@ gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatID,SeatSlotTab,Weapon
 	
 	if WeaponTab.Muzzles then
 		SeatSlotTab.Muzzles = {}
+		SeatSlotTab.CurrentMuzzle = 1
+		SeatSlotTab.NextShot = 0
+		SeatSlotTab.Ammo = 0
+		SeatSlotTab.UpdateTracers = {}
+		SeatSlotTab.Tracers = {}
+		
 		local v
 		
 		for k = 1,#WeaponTab.Muzzles do
@@ -488,6 +580,16 @@ gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatID,SeatSlotTab,Weapon
 			
 			if v then
 				SeatSlotTab.Muzzles[k] = vehicle:LookupAttachment(v)
+				SeatSlotTab.Tracers[k] = 0
+				SeatSlotTab.UpdateTracers[k] = function()
+					SeatSlotTab.Tracers[k] = SeatSlotTab.Tracers[k] + 1
+					if SeatSlotTab.Tracers[k] >= gred.CVars.gred_sv_tracers:GetInt() then
+						SeatSlotTab.Tracers[k] = 0
+						return WeaponTab.TracerColor
+					else
+						return false
+					end
+				end
 			end
 		end
 		
@@ -518,6 +620,8 @@ gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatID,SeatSlotTab,Weapon
 					end
 				end
 			end)
+		elseif WeaponTab.Type == "MG" then
+			SeatSlotTab.FireRate = (60 / WeaponTab.FireRate) / (WeaponTab.Sequential and #WeaponTab.Muzzles or 1)
 		end
 	end
 end
@@ -580,6 +684,7 @@ gred.TankHandleSuspensions = function(vehicle,ply,SusDataTab,up,pos,v,tr_table,c
 			vehicle.susOnGround = nil
 			
 			up = vehicle:GetUp() * -100
+			
 			for k = 1,#SusDataTab do
 				v = SusDataTab[k]
 				if v then
@@ -722,6 +827,99 @@ gred.TankHandleSeats = function(vehicle,Mode,ply,VehicleSeatTab,ViewPortsTab)
 					vehicle.LocalPlayerActiveSeat.ZoomVal = math.Clamp(vehicle.LocalPlayerActiveSeat.ZoomVal + (vehicle.LocalPlayerActiveSeat.ZoomToggle and 7 or -7)*FrameTime(),0,1)
 					vehicle.LocalPlayerActiveSeat.OldZoom = vehicle.LocalPlayerActiveSeat.Zoom
 				end
+			end
+		end
+	end
+	
+	local driver
+	local seat
+	local SeatTab
+	local PrimaryTab
+	local CanShoot
+	local IsShooting
+	local IsKeyDown
+	local SlotID
+	local HatchID
+	local ct = CurTime()
+	local v
+	
+	for k = 0,#VehicleSeatTab do
+		v = VehicleSeatTab[k]
+		SeatTab = v and v[Mode]
+		
+		if SeatTab then
+			seat = k == 0 and vehicle:GetDriverSeat() or (vehicle.pSeat and vehicle.pSeat[k] or nil)
+			
+			if IsValid(seat) then
+				driver = seat:GetDriver()
+				
+				if IsValid(driver) then
+					SlotID = seat:GetNWInt("SlotID",1)
+					HatchID = seat:GetNWInt("HatchID",0)
+					PrimaryTab = SeatTab.Primary and SeatTab.Primary[SlotID] or nil
+					SecondaryTab = SeatTab.Secondary
+					
+					if PrimaryTab and PrimaryTab.Type == "MG" then
+						CanShoot,IsShooting,IsKeyDown = nil,nil,driver == ply and ply:KeyDown(IN_ATTACK) or seat:GetNWBool("IsPrimaryAttacking",false)
+						
+						if IsKeyDown then
+							seat.Primary[SlotID].Ammo = seat:GetNWInt(SlotID.."CurAmmo",0)
+							CanShoot,IsShooting = gred.TankCanShootMG(vehicle,seat,driver,ct,SeatTab,PrimaryTab,k,seat.Primary[SlotID],SlotID,HatchID)
+							if CanShoot then
+								gred.TankShootMG(seat,k,vehicle,true)
+								seat.PrimaryAttacking = true
+							end
+						end
+						
+						if (IsKeyDown and !IsShooting) or !IsKeyDown then
+							if seat.PrimaryAttacking then
+								gred.TankStopMG(seat,k,vehicle,true)
+							end
+							
+							seat.PrimaryAttacking = false
+						end
+					end
+					
+					if SecondaryTab and SecondaryTab.Type == "MG" then
+						CanShoot,IsShooting,IsKeyDown = nil,nil,driver == ply and ply:KeyDown(IN_ATTACK2) or seat:GetNWBool("IsSecondaryAttacking",false)
+						
+						if IsKeyDown then
+							seat.Secondary.Ammo = seat:GetNWInt("SecondaryAmmo",0)
+							CanShoot,IsShooting = gred.TankCanShootMG(vehicle,seat,driver,ct,SeatTab,SecondaryTab,k,seat.Secondary,nil,HatchID)
+							
+							if CanShoot then
+								gred.TankShootMG(seat,k,vehicle,false)
+								seat.SecondaryAttacking = true
+							end
+						end
+						
+						if (IsKeyDown and !IsShooting) or !IsKeyDown then
+							if seat.SecondaryAttacking then
+								gred.TankStopMG(seat,k,vehicle,false)
+							end
+							
+							seat.SecondaryAttacking = false
+						end
+					end
+				elseif driver != seat.PrevDriver and IsValid(seat.PrevDriver) then
+					SlotID = seat:GetNWInt("SlotID",1)
+					HatchID = seat:GetNWInt("HatchID",0)
+					PrimaryTab = SeatTab.Primary and SeatTab.Primary[SlotID] or nil
+					SecondaryTab = SeatTab.Secondary
+					
+					if seat.PrimaryAttacking and PrimaryTab and PrimaryTab.Type == "MG" then
+						gred.TankStopMG(seat,k,vehicle,true)
+					end
+					
+					if seat.SecondaryAttacking and SecondaryTab and SecondaryTab.Type == "MG" then
+						gred.TankStopMG(seat,k,vehicle,false)
+					end
+					
+					seat.PrimaryAttacking = false
+					seat.SecondaryAttacking = false
+				end
+				
+				seat.PrevDriver = driver
 			end
 		end
 	end
@@ -1210,11 +1408,13 @@ gred.TankShootMG = function(seat,SeatID,vehicle,IsPrimary,SequentialID)
 	end
 	
 	if WeaponTab.Sequential then
-		local att = vehicle:GetAttachment(vehicle:LookupAttachment(WeaponTab.Muzzles[SequentialID]))
+		local att = vehicle:GetAttachment(vehicle:LookupAttachment(WeaponTab.Muzzles[SeatSlotTab.CurrentMuzzle])) -- SequentialID
 		
 		if att then
 			att.Pos = (WeaponTab.MuzzlePosOffset and vehicle:LocalToWorld(vehicle:WorldToLocal(att.Pos) + WeaponTab.MuzzlePosOffset) or att.Pos) + add
 			att.Ang = WeaponTab.MuzzleAngOffset and att.Ang + WeaponTab.MuzzleAngOffset or att.Ang
+			
+			if WeaponTab.Type == "MG" then gred.CreateBullet(seat:GetDriver(),att.Pos,att.Ang + gred.TankGetRandomSpreadAngle(SeatID,vehicle,WeaponTab,SeatSlotTab.CurrentMuzzle),WeaponTab.Caliber,vehicle.FILTER,nil,nil,SeatSlotTab.UpdateTracers[k](),nil,nil,true) end
 			
 			effectdata:SetFlags(table.KeyFromValue(gred.Particles,WeaponTab.MuzzleFlash))
 			effectdata:SetOrigin(att.Pos)
@@ -1223,16 +1423,22 @@ gred.TankShootMG = function(seat,SeatID,vehicle,IsPrimary,SequentialID)
 			Effect("gred_particle_simple",effectdata)
 		end
 		
+		SeatSlotTab.CurrentMuzzle = #WeaponTab.Muzzles < SeatSlotTab.CurrentMuzzle and SeatSlotTab.CurrentMuzzle + 1 or 1
+		
 	elseif WeaponTab.Muzzles then
 		local v
+		
 		for k = 1,#WeaponTab.Muzzles do
 			v = WeaponTab.Muzzles[k]
+			
 			if v then
 				local att = vehicle:GetAttachment(vehicle:LookupAttachment(v))
 				
 				if att then
 					att.Pos = (WeaponTab.MuzzlePosOffset and vehicle:LocalToWorld(vehicle:WorldToLocal(att.Pos) + WeaponTab.MuzzlePosOffset) or att.Pos) + add
 					att.Ang = WeaponTab.MuzzleAngOffset and att.Ang + WeaponTab.MuzzleAngOffset or att.Ang
+					
+					if WeaponTab.Type == "MG" then gred.CreateBullet(seat:GetDriver(),att.Pos,att.Ang + gred.TankGetRandomSpreadAngle(SeatID,vehicle,WeaponTab,k),WeaponTab.Caliber,vehicle.FILTER,nil,nil,SeatSlotTab.UpdateTracers[k](),nil,nil,true) end
 					
 					effectdata:SetFlags(table.KeyFromValue(gred.Particles,WeaponTab.MuzzleFlash))
 					effectdata:SetOrigin(att.Pos)
@@ -1243,6 +1449,9 @@ gred.TankShootMG = function(seat,SeatID,vehicle,IsPrimary,SequentialID)
 			end
 		end
 	end
+	
+	if WeaponTab.Type == "MG" then SeatSlotTab.NextShot = CurTime() + SeatSlotTab.FireRate end
+	
 	gred.PlayShootSound(seat,SeatID,vehicle,WeaponTab,SeatSlotTab,LocalPlayer())
 end
 

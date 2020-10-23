@@ -6,6 +6,6 @@
 		$basetexture				"models/gredwitch/viewports/T_DriverPort_Panzer_IV_01_CS"
 		$bumpmap					"models/gredwitch/viewports/T_DriverPort_Panzer_IV_01_NX"
 		$nocull						"1"
-		$alphatest				"1"
+		// $alphatest				"1"
 	}
 }

@@ -1,4 +1,5 @@
 AddCSLuaFile("gredwitch/gred_autorun_shared.lua")
+AddCSLuaFile("gredwitch/gred_sh_simfphys_functions.lua")
 include("gredwitch/gred_autorun_shared.lua")
 
 local util = util
@@ -97,7 +98,7 @@ local function CreateExplosion(ply,pos,radius,dmg,cal)
 	end
 end
 
-local function BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime)
+local function BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime,IsShared)
 	ply = IsValid(ply) and ply or Entity(0)
 	local hitang
 	local hitpos
@@ -137,7 +138,7 @@ local function BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodabl
 			CreateExplosion(ply,hitpos,radius,dmg,cal)
 		end
 		
-		if !NoParticle then
+		if not IsShared and not NoParticle then
 			net.Start("gred_net_createimpact")
 				net.WriteVector(hitpos)
 				net.WriteAngle(hitang)
@@ -154,28 +155,25 @@ local function BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodabl
 			-- sound.Play("impactsounds/gun_impact_"..math.random(1,14)..".wav",hitpos,75,100,0.5)
 		-- end
 	else
-		if cal == "wac_base_30mm" then
-			sound.Play("impactsounds/30mm_old.wav",hitpos,110,math.random(90,110),1)
-		elseif cal == "wac_base_20mm" then
-			sound.Play("impactsounds/20mm_0"..math.random(1,5)..".wav",hitpos,100,100,0.7)
-		else
-			sound.Play("impactsounds/20mm_0"..math.random(1,5)..".wav",hitpos,100,100,0.7)
-		end
 		
-		if HitSky or NoBullet then
-			radius = radius * 2
-		end
-		
-		CreateExplosion(ply,hitpos,radius,dmg,cal)
+		CreateExplosion(ply,hitpos,(HitSky or NoBullet) and radius * 2 or radius,dmg,cal)
 		-- util.BlastDamage(ply,ply,hitpos,radius,dmg)
 		
-		if !NoParticle then
-			net.Start("gred_net_createimpact")
-				net.WriteVector(hitpos)
-				net.WriteAngle(hitang)
-				net.WriteUInt(HitSky and 1 or 0,5)
-				net.WriteUInt(gred.CalTable[cal].ID,4)
-			net.Broadcast()
+		if not IsShared then
+			if cal == "wac_base_30mm" then
+				sound.Play("impactsounds/30mm_old.wav",hitpos,110,math.random(90,110),1)
+			else
+				sound.Play("impactsounds/20mm_0"..math.random(1,5)..".wav",hitpos,100,100,0.7)
+			end
+			
+			if not NoParticle then
+				net.Start("gred_net_createimpact")
+					net.WriteVector(hitpos)
+					net.WriteAngle(hitang)
+					net.WriteUInt(HitSky and 1 or 0,5)
+					net.WriteUInt(gred.CalTable[cal].ID,4)
+				net.Broadcast()
+			end
 		end
 	end
 end
@@ -191,7 +189,6 @@ end
 local function IsSmall(k)
 	return startsWith(k,"gear") or startsWith(k,"wheel") or startsWith(k,"airbrake")
 end
-
 
 gred.CreateExplosion = function(pos,radius,damage,decal,trace,ply,bomb,DEFAULT_PHYSFORCE,DEFAULT_PHYSFORCE_PLYGROUND,DEFAULT_PHYSFORCE_PLYAIR)
 	local ConVar = gred.CVars["gred_sv_shockwave_unfreeze"]:GetBool()
@@ -217,10 +214,12 @@ gred.CreateExplosion = function(pos,radius,damage,decal,trace,ply,bomb,DEFAULT_P
 		v_pos = v:GetPos()
 		phys = v:GetPhysicsObject()
 		
-		if !badclass[v:GetClass()] and !v.IsOnPlane and IsValid(phys) and !IsValid(v:GetParent()) then
+		if !badclass[v:GetClass()] and !v.IsOnPlane and IsValid(phys) and !IsValid(v:GetParent()) and not hook.Run("GredExplosionShouldPreventMove",v) then
 			massmul = 1/phys:GetMass()
+			
 			phys:AddAngleVelocity(Vector(DEFAULT_PHYSFORCE, DEFAULT_PHYSFORCE, DEFAULT_PHYSFORCE) * math.Clamp((radius - (pos - v_pos):Length()) / radius,0,1) * massmul)
 			phys:AddVelocity((DEFAULT_PHYSFORCE and (v_pos - pos) * DEFAULT_PHYSFORCE or (v_pos - pos))*massmul)
+			
 			if ConVar and !v.isWacAircraft and !v.LFS then
 				phys:Wake()
 				phys:EnableMotion(true)
@@ -288,7 +287,8 @@ end
 local CurTime = CurTime
 
 local phybullet = {}
-gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg,radius)
+
+gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg,radius,IsShared)
 	if hab and hab.Module.PhysBullet and OverrideHAB:GetInt() == 0 then
 		phybullet.AmmoType		= cal..(tracer and tracer or "")
 		phybullet.Num 			= 1
@@ -296,7 +296,7 @@ gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg
 		phybullet.Dir 			= ang:Forward()
 		phybullet.Spread 		= vector_zero
 		phybullet.Tracer		= 0--tracer and 0 or 1
-		phybullet.IsNetworked	= true
+		phybullet.IsNetworked	= not IsShared
 		phybullet.IgnoreEntity = filter
 		phybullet.Distance		= false
 		phybullet.Damage		= ((cal == "wac_base_7mm" and HE7MM:GetBool()) or (cal == "wac_base_12mm" and HE12MM:GetBool())) and 0 or (dmg and dmg or (cal == "wac_base_7mm" and 40 or (cal == "wac_base_12mm" and 60 or (cal == "wac_base_20mm" and 80 or (cal == "wac_base_30mm" and 100 or (cal == "wac_base_40mm" and 120)))))) * BulletDMG:GetFloat()
@@ -330,7 +330,7 @@ gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg
 			-- net.WriteUInt(fusetime and math.floor(fusetime * 100) or 0,7)
 		-- net.Broadcast()
 		
-		if COL_TABLE[tracer] then
+		if COL_TABLE[tracer] and not IsShared then
 			net.Start("gred_net_createtracer")
 				net.WriteVector(pos)
 				net.WriteUInt(CAL_TABLE[cal],3)
@@ -349,13 +349,21 @@ gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg
 			BulletTrTab.filter = filter
 			BulletTrTab.mask = MASK_ALL
 			
+			-- local lifetime = 3
+			-- local color_red = Color(255,0,0)
+			-- local add = ang:Right()*-100 * 0
+			-- local debugpos = pos + add
+			-- debugoverlay.Line(debugpos,endpos + add,lifetime,color_red)
+			-- debugoverlay.Cross(debugpos,30,lifetime,color_red)
+			-- debugoverlay.EntityTextAtPosition(debugpos,1,SysTime(),lifetime,color_red)
+			
 			local tr = TraceLine(BulletTrTab)
 			
 			pos.x = endpos.x
 			pos.y = endpos.y
 			pos.z = endpos.z
 			
-			if tr.MatType == 83 then
+			if not IsShared and tr.MatType == 83 then
 				net.Start("gred_net_createwaterimpact")
 					net.WriteVector(tr.HitPos)
 					net.WriteUInt(caltab.ID,3)
@@ -366,13 +374,13 @@ gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg
 			end
 			
 			if tr.Hit then
-				BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime)
+				BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime,IsShared)
 				timer.Remove("gred_bullet_"..oldbullet)
 				return
 			else
 				if !IsInWorld(pos) then
 					if explodable then 
-						BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime)
+						BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime,IsShared)
 					end
 					timer.Remove("gred_bullet_"..oldbullet)
 				else
@@ -381,7 +389,7 @@ gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg
 			end
 			
 			if expltime and CurTime() >= expltime then
-				BulletExplode(ply,NoBullet,pos,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime)
+				BulletExplode(ply,NoBullet,pos,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime,IsShared)
 				timer.Remove("gred_bullet_"..oldbullet)
 				return
 			end
@@ -389,27 +397,36 @@ gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg
 	end
 end
 
-gred.CreateShell = function(pos,ang,ply,filter,caliber,shelltype,muzzlevelocity,mass,color,dmg,callback,tntequivalent,explosivemass,linearpenetration,normalization,CoreMass,ForceDragCoef) -- EXPLOSIVE MASS AND TNT EQUIVALENT IN KILOGRAMS!
+gred.CreateShell = function(pos,ang,ply,filter,caliber,shelltype,muzzlevelocity,mass,color,dmg,callback,tntequivalent,explosivemass,linearpenetration,normalization,CoreMass,ForceDragCoef,DamageAdd) -- EXPLOSIVE MASS AND TNT EQUIVALENT IN KILOGRAMS!
 	local ent = ents.Create("base_shell")
 	ent:SetPos(pos)
 	ent:SetAngles(ang)
 	ent:SetOwner(ply)
 	
-	ent.Caliber = caliber
-	ent.ShellType = shelltype
+	ent.Caliber = caliber or 75
+	ent.ShellType = shelltype or "HE"
 	ent.MuzzleVelocity = muzzlevelocity
 	ent.TNTEquivalent = tntequivalent
 	ent.ExplosiveMass = explosivemass
 	ent.LinearPenetration = linearpenetration
-	ent.Normalization = normalization or 0
+	ent.Normalization = normalization
 	ent.CoreMass = CoreMass
 	ent.Mass = mass
-	ent.Filter = filter
+	ent.DamageAdd = DamageAdd or 0
+	ent.Filter = ent.Filter or {[ent] = true}
+	
+	for k,v in pairs(filter) do
+		if IsEntity(k) then
+			ent.Filter[k] = true
+		elseif IsEntity(v) then
+			ent.Filter[v] = true
+		end
+	end
+	
 	ent.IsOnPlane = true
 	ent.ForceDragCoef = ForceDragCoef
 	ent.TracerColor = color or "white"
 	ent.ExplosionDamageOverride = dmg
-	ent:SetModelScale(caliber / 75)
 	
 	if callback then
 		callback(ent)
@@ -419,24 +436,33 @@ gred.CreateShell = function(pos,ang,ply,filter,caliber,shelltype,muzzlevelocity,
 	ent:Activate()
 	ent:SetBodygroup(1,ent.IS_AP[shelltype] and 0 or 1)
 	
-	for k,v in pairs(filter) do
-		NoCollide(v,ent,0,0)
-	end
-	
 	return ent
 end
 
-hook.Add("KeyPress","gred_keypress_shellhold",function(ply,key)
-	if key != IN_USE then return end
-	timer.Simple(0,function()
-		if !IsValid(ply) then return end
-		local ent = ply:GetNWEntity("PickedUpObject")
-		if !IsValid(ent) then return end
-		if !ent:IsPlayerHolding() then 
-			ply:SetNWEntity("PickedUpObject",Entity(0))
-		end
-	end)
+local ShellCollisionFilter = {
+	["gmod_sent_vehicle_fphysics_wheel"] = true,
+}
+
+hook.Add("ShouldCollide","gred_shells_collisions",function(ent1,ent2)
+	if (ent1.IsRocket or ent1.IsShell) and (ShellCollisionFilter[ent2:GetClass()] or ent1.Filter[ent2] or ent1.Filter[ent2:GetClass()]) then
+		return false
+	end
 end)
+
+-- hook.Add("KeyPress","gred_keypress_shellhold",function(ply,key)
+	-- if key != IN_USE then return end
+	
+	-- timer.Simple(0,function()
+		-- if !IsValid(ply) then return end
+		
+		-- local ent = ply:GetNWEntity("PickedUpObject")
+		-- if !IsValid(ent) then return end
+		
+		-- if !ent:IsPlayerHolding() then 
+			-- ply:SetNWEntity("PickedUpObject",Entity(0))
+		-- end
+	-- end)
+-- end)
 
 hook.Add("PlayerDeath","gred_playerdeath_shellhold",function(ply)
 	ply:SetNWEntity("PickedUpObject",Entity(0))
@@ -498,18 +524,6 @@ hook.Add("PlayerEnteredVehicle","gred_player_entervehicle_hint",function(ply,sea
 	end
 end)
 
-hook.Add("InitPostEntity","gred_InitPostEntity_bomb",function()
-	timer.Simple(5,function()
-		local tbl = physenv.GetPerformanceSettings()
-		
-		tbl.MaxVelocity = 200000000
-		
-		physenv.SetPerformanceSettings(tbl)
-		
-	end)
-end)
-
-
 gred.Precache()
 
 if gred.CVars["gred_sv_resourceprecache"]:GetBool() then
@@ -569,6 +583,7 @@ net.Receive("gred_net_applyfloatonsimfphys",function(len,ply)
 	net.Broadcast()
 end)
 
+AddCSLuaFile("gredwitch/gred_cl_lfs_functions.lua")
 AddCSLuaFile("gredwitch/gred_cl_simfphys_functions.lua")
 AddCSLuaFile("gredwitch/gred_cl_menu.lua")
 AddCSLuaFile("xml2lua/xml2lua.lua")
@@ -579,3 +594,4 @@ AddCSLuaFile("xml2lua/xmlhandler/tree.lua")
 
 include("gredwitch/gred_sv_lfs_functions.lua")
 include("gredwitch/gred_sv_simfphys_functions.lua")
+include("gredwitch/gred_sh_simfphys_functions.lua")

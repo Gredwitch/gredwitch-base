@@ -262,6 +262,31 @@ sound.Add({
 	sound = "mg/reload_mg34.ogg"
 })
 
+
+------------------------------ DShK ------------------------------
+
+sound.Add({
+	name = "GRED_DSHK_LOOP",
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = 130,
+	sound = "^mg/loop_dshk.wav"
+})
+sound.Add({
+	name = "GRED_DSHK_LOOP_INSIDE",
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = 0,
+	sound = "mg/loop_dshk-001_interior.wav"
+})
+sound.Add({
+	name = "GRED_DSHK_RELOAD",
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = 80,
+	sound = "mg/reload_m2hb.ogg"
+})
+
 for i = 1,3 do
 	sound.Add({
 		name = "GRED_MG_8MM_LASTSHOT_0"..i,

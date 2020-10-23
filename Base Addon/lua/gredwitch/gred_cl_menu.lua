@@ -12,6 +12,8 @@ local COL_BLUE_HIGHLIGHT		= Color(20,200,250,255)
 local COL_DARK_BLUE_HIGHLIGHT	= Color(10,100,150,255)
 local COL_TRANSPARENT_GREY 		= Color(100,100,100,100)
 
+
+
 local ExplosivesMaterial		= Material("gredwitch/bombicon.png")
 local BulletMaterial			= Material("gredwitch/bulleticon.png")
 local HomeMaterial				= Material("gredwitch/homeicon.png")
@@ -19,8 +21,6 @@ local LFSMaterial				= Material("gredwitch/lfsicon.png")
 local PlusMaterial				= Material("gredwitch/plusicon.png")
 local SimfphysMaterial			= Material("gredwitch/simfphysicon.png")
 local WACMaterial				= Material("gredwitch/wacicon.png")
-local ArtilleryMaterial			= Material("gredwitch/artilleryicon.png")
-local EmplacementMaterial		= Material("gredwitch/emplacementicon.png")
 
 local xml2lua 					= include("xml2lua/xml2lua.lua")
 
@@ -381,38 +381,97 @@ local function CreateBindPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,ConVarName,C
 	DLabel:DockMargin(45,0,0,0)
 end
 
+local function CreateResetButton(DFrame,DPanel,DScrollPanel,Panel,x,y,Server)
+	local DButton = vgui.Create("DButton",Panel)
+	DButton:SetText("Reset every "..(Server and "server" or "client").." side convars to their default values")
+	DButton:SetSize(x*0.2,y*0.5)
+	DButton:SetPos(x*0.5 - x*0.2*0.5,y*0.25)
+	
+	DButton.DoClick = function(DButton)
+		local ConfirmFrame = vgui.Create("DFrame")
+		local OldPaint = ConfirmFrame.Paint
+		local BlurTime = SysTime()
+		local Index = table.insert(DFrame.RemoveOnRemove,ConfirmFrame)
+		ConfirmFrame:SetSize(450,128)
+		ConfirmFrame:SetTitle("Reset the "..(Server and "server" or "client").." side convars to their default values? This can't be undone!")
+		ConfirmFrame:Center()
+		ConfirmFrame:MakePopup()
+		
+		ConfirmFrame.OnRemove = function(ConfirmFrame)
+			if IsValid(DFrame) then
+				table.remove(DFrame.RemoveOnRemove,Index)
+			end
+		end
+		
+		ConfirmFrame.Paint = function(ConfirmFrame,w,h)
+			Derma_DrawBackgroundBlur(ConfirmFrame,BlurTime)
+			OldPaint(ConfirmFrame,w,h)
+		end
+		
+		local DButton = vgui.Create("DButton",ConfirmFrame)
+		DButton:SetPos(20,40)
+		DButton:SetSize(128,64)
+		DButton:SetText("Yes")
+		DButton.DoClick = function(DButton)
+			if not IsValid(DPanel) then return end
+			
+			DFrame:Remove()
+			
+			if Server then
+				for k,v in pairs(gred.CVars) do
+					if string.StartWith(k,"gred_sv") then
+						gred.CheckConCommand(k,v:GetDefault())
+					end
+				end
+			else
+				for k,v in pairs(gred.CVars) do
+					if string.StartWith(k,"gred_cl") then
+						local default = v:GetDefault()
+						
+						if isstring(default) then
+							v:SetString(default)
+						else
+							v:SetFloat(default)
+						end
+					end
+				end
+			end
+		end
+		
+		local DButton = vgui.Create("DButton",ConfirmFrame)
+		DButton:SetPos(302,40)
+		DButton:SetSize(128,64)
+		DButton:SetText("No")
+		DButton.DoClick = function(DButton)
+			if not IsValid(DPanel) then return end
+			
+			ConfirmFrame:Remove()
+		end
+		
+	end
+end
+
 if IsValid(gred.OptionsMenuFrame) then
 	gred.OptionsMenuFrame:Remove()
 end
 
-
---[[
-gred.FeaturedServers = {
-	["war-and-history.com:27015"] = {
-		ToolTip = "French Military RP server settled in 1940 and built around on what they call 'the Stalingrad of France'.\nWehrmacht vs. French Army\nPretty much everything that is custom made there is made by me, including a bunch of 1940 era tanks and emplacements.\nIt's French, but non-French speakers can still play as British Paratroopers.",
-		Collection = "https://steamcommunity.com/sharedfiles/filedetails/?id=1969557645",
-		Discord = "https://discord.gg/5ax3yNN",
-	},
-	["havok.tech:27011"] = {
-		ToolTip = "Simple Sandbox server where we shoot each other with my addons, including the un-released, server-only content such as the LFS WW2 USAAF pack and the LFS Vietnam Helicopter pack.",
-		Collection = "https://steamcommunity.com/sharedfiles/filedetails/?id=1801117139",
-		Discord = "https://discord.gg/eneGmMz",
-	},
-	["havok.tech:27010"] = {
-		ToolTip = "Berlin 1942RP server I've been working on for a while.",
-		Collection = "https://steamcommunity.com/sharedfiles/filedetails/?id=1790800349",
-		Discord = "https://discord.gg/eneGmMz",
-	},
-	["havok.tech:27015"] = {
-		ToolTip = "Axis vs. Allies server, mostly TDM but with some RP.",
-		Collection = "https://steamcommunity.com/sharedfiles/filedetails/?id=1790800349",
-		Discord = "https://discord.gg/eneGmMz",
-	},
-	["104.153.105.70:27015"] = {
-		ToolTip = "niggerland",
-		Collection = "https://steamcommunity.com/sharedfiles/filedetails/?id=1817732146",
-	},
-}]]
+gred.Menu = {}
+gred.Menu.CreateOptions = CreateOptions
+gred.Menu.CreateCheckBoxPanel = CreateCheckBoxPanel
+gred.Menu.CreateSliderPanel = CreateSliderPanel
+gred.Menu.DrawEmptyRect = DrawEmptyRect
+gred.Menu.CreateBindPanel = CreateBindPanel
+gred.Menu.COL_WHITE					= COL_WHITE					
+gred.Menu.COL_GREY					= COL_GREY					
+gred.Menu.COL_LIGHT_GREY			= COL_LIGHT_GREY			
+gred.Menu.COL_LIGHT_GREY1			= COL_LIGHT_GREY1			
+gred.Menu.COL_RED					= COL_RED					
+gred.Menu.COL_GREEN					= COL_GREEN					
+gred.Menu.COL_DARK_GREY 			= COL_DARK_GREY 			
+gred.Menu.COL_DARK_GREY1 			= COL_DARK_GREY1 			
+gred.Menu.COL_BLUE_HIGHLIGHT		= COL_BLUE_HIGHLIGHT		
+gred.Menu.COL_DARK_BLUE_HIGHLIGHT	= COL_DARK_BLUE_HIGHLIGHT	
+gred.Menu.COL_TRANSPARENT_GREY 		= COL_TRANSPARENT_GREY
 
 gred.ServerBanners = gred.ServerBanners or {}
 gred.NewsMaterials = gred.NewsMaterials or {}
@@ -688,6 +747,9 @@ gred.AddOthers = function(DFrame,DPanel,DScrollPanel,X,Y,X_DPanel,y_DPanel)
 			CreateOptions(DFrame,DPanel,X,Y,{
 			["CLIENT"] = {
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
+					CreateResetButton(DFrame,DPanel,DScrollPanel,Panel,x,y,false)
+				end,
+				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_cl_altmuzzleeffect","Use a high quality muzzle flash effect","Toggle this if you have performance issues",false)
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
@@ -759,6 +821,9 @@ gred.AddOthers = function(DFrame,DPanel,DScrollPanel,X,Y,X_DPanel,y_DPanel)
 			},
 			["SERVER"] = {
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
+					CreateResetButton(DFrame,DPanel,DScrollPanel,Panel,x,y,true)
+				end,
+				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_resourceprecache","Resources precaching","[NOTE : Increases loading times]",true)
 				end,
 			},
@@ -822,6 +887,14 @@ gred.OpenOptions = function()
 	DFrame:SetDraggable(false)
 	DFrame:Center()
 	DFrame:MakePopup()
+	
+	DFrame.RemoveOnRemove = {}
+	
+	DFrame.OnRemove = function(DFrame)
+		for k,v in pairs(DFrame.RemoveOnRemove) do
+			v:Remove()
+		end
+	end
 	
 	DFrame.SelectLateralMenuOption = function(DFrame,OptionID)
 		if !OptionID then return end
@@ -934,6 +1007,9 @@ hook.Add("GredOptionsAddLateralMenuOption","AddSimfphys",function(DFrame,DPanel,
 					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_cl_simfphys_suspensions","Enable suspensions","Uncheck this if you have extreme lags.",true,false)
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
+					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_cl_simfphys_camera_tankgunnersight","Camera from tank gunner sight","Moves the camera to the muzzle of your main gun when possible in sight mode",false,false)
+				end,
+				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_cl_simfphys_enablecrosshair","Enable crosshair","Toggles the crosshair [NOTE : This is ignored if the crosshairs are disabled server side]",false,false)
 				end,
 				-- function(DFrame,DPanel,DScrollPanel,Panel,x,y)
@@ -973,6 +1049,9 @@ hook.Add("GredOptionsAddLateralMenuOption","AddSimfphys",function(DFrame,DPanel,
 			["SERVER"] = {
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_arcade","Turret driver control","Gives the ability to the drive to operate the main gun by himself.",false,true)
+				end,
+				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
+					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_camera_tankgunnersight","Allow camera from tank gunner sight","Allows player to have their camera to the muzzle of their main gun in sight mode",false,true)
 				end,
 				vFireIsVFireEnt and function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateSimfphysCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_simfphys_vfire_thrower","vFire flame tanks","Gives the ability to tanks to throw vFire if vFire is installed and enabled.",false,true)
@@ -1211,7 +1290,7 @@ hook.Add("GredOptionsAddLateralMenuOption","AddExplosives",function(DFrame,DPane
 	end
 	
 	DFrame.LateralOptionList["EXPLOSIVES OPTIONS"] = function(DFrame,DPanel,X,Y)
-			CreateOptions(DFrame,DPanel,X,Y,{
+		CreateOptions(DFrame,DPanel,X,Y,{
 			["CLIENT"] = {
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_cl_sound_shake","Explosions shake your screen","",false)
@@ -1267,57 +1346,7 @@ hook.Add("GredOptionsAddLateralMenuOption","AddExplosives",function(DFrame,DPane
 		})
 	end
 end)
---[[
-hook.Add("GredOptionsAddLateralMenuOption","AddArtillery",function(DFrame,DPanel,DScrollPanel,X,Y,X_DPanel,y_DPanel)
-	local DButton = DScrollPanel:Add("DButton")
-	DButton:SetText("")
-	DButton:Dock(TOP)
-	DButton:DockMargin(0,0,0,10)
-	DButton:SetSize(X_DPanel,y_DPanel*0.15)
-	DButton.Paint = function(DButton,w,h)
-		local col = DButton:IsHovered() and COL_BLUE_HIGHLIGHT or COL_WHITE
-		surface.SetDrawColor(col.r,col.g,col.b,col.a)
-		DrawEmptyRect(0,0,w,h,2,2,0)
-		surface.SetMaterial(ArtilleryMaterial)
-		local H = h - 24
-		surface.DrawTexturedRect((w - H)*0.5,0,H,H)
-		
-		draw.DrawText("ARTILLERY SWEPS OPTIONS","Trebuchet24",w*0.5,h-24,col,TEXT_ALIGN_CENTER)
-	end
-	DButton.DoClick = function()
-		DFrame:SelectLateralMenuOption("ARTILLERY SWEPS OPTIONS")
-		DPanel.ToggleButton:DoClick(true)
-	end
-	
-	DFrame.LateralOptionList["ARTILLERY SWEPS OPTIONS"] = function(DFrame,DPanel,X,Y)
-	end
-end)
 
-hook.Add("GredOptionsAddLateralMenuOption","AddEmplacement",function(DFrame,DPanel,DScrollPanel,X,Y,X_DPanel,y_DPanel)
-	local DButton = DScrollPanel:Add("DButton")
-	DButton:SetText("")
-	DButton:Dock(TOP)
-	DButton:DockMargin(0,0,0,10)
-	DButton:SetSize(X_DPanel,y_DPanel*0.15)
-	DButton.Paint = function(DButton,w,h)
-		local col = DButton:IsHovered() and COL_BLUE_HIGHLIGHT or COL_WHITE
-		surface.SetDrawColor(col.r,col.g,col.b,col.a)
-		DrawEmptyRect(0,0,w,h,2,2,0)
-		surface.SetMaterial(EmplacementMaterial)
-		local H = h - 24
-		surface.DrawTexturedRect((w - H)*0.5,0,H,H)
-		
-		draw.DrawText("EMPLACEMENT OPTIONS","Trebuchet24",w*0.5,h-24,col,TEXT_ALIGN_CENTER)
-	end
-	DButton.DoClick = function()
-		DFrame:SelectLateralMenuOption("EMPLACEMENT OPTIONS")
-		DPanel.ToggleButton:DoClick(true)
-	end
-	
-	DFrame.LateralOptionList["EMPLACEMENT OPTIONS"] = function(DFrame,DPanel,X,Y)
-	end
-end)
-]]
 
 list.Set("DesktopWindows","GredwitchOptionsMenu",{
 	title = "GB Options",

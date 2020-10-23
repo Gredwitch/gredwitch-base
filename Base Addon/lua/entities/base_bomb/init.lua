@@ -1,5 +1,5 @@
 AddCSLuaFile("shared.lua")
-AddCSLuaFile("init.lua")
+AddCSLuaFile("cl_init.lua")
 include("shared.lua")
 
 -- I didn't make the WireMod code
@@ -9,6 +9,10 @@ local Normal2 = Vector(0.1,1,1)
 local trlength = Vector(0,0,9000)
 local angle_zero = Angle()
 local angle_1 = Angle(-90,0,0)
+
+function ENT:GravGunPickupAllowed(ply)
+	return not self.Fired
+end
 
 function ENT:Initialize()
 	if gred.CVars["gred_sv_spawnable_bombs"]:GetInt() == 0 and not self.IsOnPlane then
@@ -22,7 +26,7 @@ function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
-	self:SetUseType(ONOFF_USE)
+	self:SetUseType(SIMPLE_USE)
 	
 	local phys = self:GetPhysicsObject()
 	local skincount = self:SkinCount()
@@ -31,6 +35,16 @@ function ENT:Initialize()
 		phys:SetMass(self.Mass)
 		self:InitPhysics(phys)
 		phys:Wake()
+	end
+	
+	if not gred.MaxVelocityChanged then
+		gred.MaxVelocityChanged = true
+		
+		local tbl = physenv.GetPerformanceSettings()
+		
+		tbl.MaxVelocity = 200000000
+		
+		physenv.SetPerformanceSettings(tbl)
 	end
 	
 	self:SetSkin(math.random(0,skincount-1))

@@ -281,17 +281,19 @@ function ENT:AddOnInit()
 	self.EnginePower 			= self:ConvertMetersToUnits(self.MuzzleVelocity) -- m/s
 	self.EffectAir 				= self.Effect
 	self.Smoke 					= self.ShellType == "Smoke"
+	self.ModelScale				= self.Caliber / 75
+	
 	self:SetTracerColor(self.TRACERCOLOR_TO_INT[self.TracerColor] or 0)
 	self:SetCaliber(self.Caliber)
 	self:SetShellType(self.ShellType)
+	self:SetModelScale(self.ModelScale)
+	self:Activate()
 	
-	self.Filter = {self}
-	for k,v in pairs(ents.FindByClass("gmod_sent_vehicle_fphysics_wheel")) do
-		constraint.NoCollide(self,v,0,0)
-		table.insert(self.Filter,v)
+	self:InitCollisionFilter()
+	
+	if WireAddon then 
+		self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) 
 	end
-	
-	if !(WireAddon == nil) then self.Inputs = Wire_CreateInputs(self, { "Arm", "Detonate", "Launch" }) end
 end
 
 function ENT:PostLaunch(phys)
@@ -310,7 +312,12 @@ function ENT:PostLaunch(phys)
 end
 
 function ENT:Think()
+	-- local mins,maxs = self:GetModelBounds()
+	-- print(mins,maxs)
+	-- debugoverlay.BoxAngles(self:GetPos(),mins,maxs,self:GetAngles(),1/30,color_white)
 	
+	-- self:NextThink(CurTime())
+	-- return true
 end
 
 function ENT:InitPhysics(phys)
@@ -318,9 +325,10 @@ function ENT:InitPhysics(phys)
 	ShellRadiusSquared = self.Caliber*0.5
 	ShellRadiusSquared = ShellRadiusSquared * ShellRadiusSquared
 	CylinderLength = CYLINDER_LENGTH * self.CaliberMul
+	self.ShellLength = CylinderLength + CONE_LENGTH * self.CaliberMul
 	FlowRate = (0.25 * MATH_PI * self.Caliber*self.Caliber * self.MuzzleVelocity) * 1000000 -- cubic millimeters/s
 	
-	self.DragCoefficient = ((2 * -((FlowRate*TO_METERS_PER_SEC*0.001 * 4) / (MATH_PI * (self.Caliber*0.001)^2))) / ((self.Mass/((ONE_THIRD * MATH_PI * ShellRadiusSquared * CONE_LENGTH * 0.001) + (MATH_PI * ShellRadiusSquared * CylinderLength))) * (FlowRate*FlowRate) * CONE_AREA))  -- density = kg/cubic centimeters | volume = cone volume + cylinder volume
+	self.DragCoefficient = ((2 * -((FlowRate*TO_METERS_PER_SEC*0.001 * 4) / (MATH_PI * (self.Caliber*0.001)^2))) / ((self.Mass/((ONE_THIRD * MATH_PI * ShellRadiusSquared * CONE_LENGTH * self.CaliberMul * 0.001) + (MATH_PI * ShellRadiusSquared * CylinderLength))) * (FlowRate*FlowRate) * CONE_AREA))  -- density = kg/cubic centimeters | volume = cone volume + cylinder volume
 	
 	CylinderLength = CylinderLength * CylinderLength
 	
@@ -331,8 +339,6 @@ end
 function ENT:Use(ply)
 	if self.Fired then return end
 	
-	local ct = CurTime()
-	if self.NextUse >= ct then return end
 	if self:IsPlayerHolding() then return end
 	
 	ply:PickupObject(self)
@@ -349,8 +355,6 @@ function ENT:Use(ply)
 	net.Start("gred_net_shell_pickup_add")
 		net.WriteEntity(self)
 	net.Send(ply)
-	
-	self.NextUse = ct + 0.1
 end
 
 function ENT:OnRemove()
@@ -361,3 +365,4 @@ function ENT:OnRemove()
 	end
 	self:StopParticles()
 end
+

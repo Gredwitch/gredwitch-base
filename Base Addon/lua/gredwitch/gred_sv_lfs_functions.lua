@@ -228,29 +228,37 @@ end
 
 gred.PartThink = function(self,skin)
 	if self.LOADED == 1 then
-		for k,v in pairs(self.Parts) do
-			self:DeleteOnRemove(v)
-			NoCollide(v,self,0,0)
-			NoCollide(v,self.wheel_R,0,0)
-			NoCollide(v,self.wheel_L,0,0)
-			NoCollide(v,self.wheel_C,0,0)
-			NoCollide(v,self.wheel_C_master,0,0)
-			if k == "tail" or k == "wing_l" or k == "wing_r" then
-				v:SetParent(nil)
-				v:SetPos(self:GetAttachment(self.Attachements[k]).Pos)
-				v.Weld = constraint.Weld(v,self,0,0,0,true,false)
-			end
-			for a,p in pairs(self.Parts) do
-				NoCollide(v,p,0,0)
-			end
-			v.LOADED = true
-			v.PartName = k
-		end
-		net.Start("gred_lfs_setparts")
-			net.WriteEntity(self)
-			net.WriteTable(self.Parts)
-		net.Broadcast()
 		self.LOADED = true
+		timer.Simple(0,function()
+			if !IsValid(self) then return end
+			for k,v in pairs(self.Parts) do
+				if IsValid(v) then
+					self:DeleteOnRemove(v)
+					NoCollide(v,self,0,0)
+					NoCollide(v,self.wheel_R,0,0)
+					NoCollide(v,self.wheel_L,0,0)
+					NoCollide(v,self.wheel_C,0,0)
+					NoCollide(v,self.wheel_C_master,0,0)
+					
+					if k == "tail" or k == "wing_l" or k == "wing_r" then
+						v:SetParent(nil)
+						v:SetPos(self:GetAttachment(self.Attachements[k]).Pos)
+						v.Weld = constraint.Weld(v,self,0,0,0,true,false)
+					end
+					
+					for a,p in pairs(self.Parts) do
+						NoCollide(v,p,0,0)
+					end
+					
+					v.LOADED = true
+					v.PartName = k
+				end
+			end
+			net.Start("gred_lfs_setparts")
+				net.WriteEntity(self)
+				net.WriteTable(self.Parts)
+			net.Broadcast()
+		end)
 	end
 	skin = skin and skin or self:GetSkin()
 	for k,v in pairs(self.Parts) do

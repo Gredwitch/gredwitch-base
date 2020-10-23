@@ -7,7 +7,7 @@ ENT.Author			    =	"Gredwitch"
 ENT.Contact			    =	"contact.gredwitch@gmail.com"
 ENT.Category            =	"Gredwitch's Stuff"
 ENT.Base 				=	"base_bomb"
-ENT.IsGredBomb			=	true
+ENT.IsRocket			=	true
 
 ENT.RocketTrail         =	""
 ENT.RocketBurnoutTrail  =	""
@@ -21,13 +21,15 @@ ENT.FuelBurnoutTime     =	0
 ENT.IgnitionDelay       =	0
 ENT.MaxVelocity         =	0 -- in m/s
 ENT.ImpactSpeed         =	200
-ENT.RotationalForce     =	0 -- angular velocity
+ENT.RotationalForce     =	500 -- angular velocity
 ENT.Drag				=	1
 
 ENT.Caliber				=	0
 ENT.ShellType			=	"HE"
 ENT.TNTEquivalent		=	0 -- in kg
 ENT.ExplosiveMass		=	0 -- in kg
+ENT.CoreMass			=	0 -- in kg
+ENT.DamageAdd			=	0
 
 ENT.RicochetWhitelist = {
 	["LeftTrack"] = true,
@@ -112,6 +114,17 @@ ENT.IS_APCR = {
 ENT.IS_HEAT = {
 	["HEAT"] = true,
 	["HEATFS"] = true,
+}
+
+ENT.IS_HE = {
+	["HE"] = true,
+	["HESH"] = true,
+}
+
+ENT.IS_CAPPED = {
+	["APHECBC"] = true,
+	["APCBC"] = true,
+	["APC"] = true,
 }
 
 gred = gred or {}
@@ -321,6 +334,7 @@ ENT.SLOPE_MULTIPLIERS = { -- https://docs.google.com/spreadsheets/d/e/2PACX-1vTt
 	},
 }
 ENT.SLOPE_MULTIPLIERS.APHE = ENT.SLOPE_MULTIPLIERS.AP
+ENT.SLOPE_MULTIPLIERS.APCR = ENT.SLOPE_MULTIPLIERS.AP
 ENT.SLOPE_MULTIPLIERS.APC = ENT.SLOPE_MULTIPLIERS.APCBC
 ENT.SLOPE_MULTIPLIERS.APHECBC = ENT.SLOPE_MULTIPLIERS.APCBC
 ENT.SLOPE_MULTIPLIERS.APHEBC = ENT.SLOPE_MULTIPLIERS.APBC

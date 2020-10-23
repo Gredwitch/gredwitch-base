@@ -1,14 +1,16 @@
 "VertexlitGeneric"
 {
-	"$lightwarptexture" 	"models/gredwitch/common/lightwarp"
+	"$lightwarptexture"			"models/gredwitch/common/lightwarp"
 	
-	"$detailblendmode" 		"4"
+	"$detailblendmode" 			"4"
 	
-	"$phong" 				"1"
-	"$phongboost"			"3"
-	"$phongexponent" 		"15"
-	"$phongfresnelranges"	"[0.3 1 4]"
+	"$envmap" 					"env_cubemap"
+	"$envmaptint" 				"[0.3 0.3 0.3]"
 	
-	// "$envmap" 						"env_cubemap"
-	// "$envmaptint" 					"[0.20 0.20 0.20]"
+	"$normalmapalphaenvmapmask"	"1"
+	
+	"$phong" 					"1"
+	"$phongboost"				"3"
+	"$phongexponent" 			"15"
+	"$phongfresnelranges"		"[0.3 1 4]"
 }

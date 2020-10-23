@@ -53,20 +53,25 @@ net.Receive("gred_net_ammobox_sv_createshell",function(len,ply)
 					net.ReadUInt(10),
 					net.ReadString(),
 					500,
-					10
+					1
 	)
 	
 	Shell.ImpactSpeed = 1000
+	
 	timer.Simple(0.1,function()
 		if !IsValid(Shell) then return end
+		
 		local phy = Shell:GetPhysicsObject()
+		
 		if IsValid(phy) then
 			phy:EnableDrag(false)
 			phy:Wake()
 		end
 		
-		Shell:Use(ply,self,2,1)
+		ply:PickupObject(Shell)
+		-- Shell:Use(ply,self,2,1)
 	end)
+	
 	self:ResetSequence("close")
 end)
 
