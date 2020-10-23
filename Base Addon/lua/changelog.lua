@@ -1,4 +1,5 @@
 --[[ 23/10/2020
+[HOTFIX] Fixed the shells breaking when simfphys is not enabled
 - Added a hook so GChem stops overrding the explosion function
 - Added a button to reset all the convars to their default value in the other options tab
 - Added the "Camera from tank gunner sight" option

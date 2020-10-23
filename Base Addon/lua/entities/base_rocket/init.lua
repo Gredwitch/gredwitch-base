@@ -356,7 +356,7 @@ function ENT:PhysicsCollide(data,physobj)
 				data.TheirSurfaceProps = data.TheirSurfaceProps or 0
 				local surfaceprop = util.GetSurfacePropName(data.TheirSurfaceProps)
 				
-				if surfaceprop and gred.Mats[surfaceprop] and gred.MatsStr[gred.Mats[surfaceprop]] and not NO_RICOCHET[gred.MatsStr[gred.Mats[surfaceprop]]] and (self.IS_HE[self.ShellType] and simfphys and simfphys.IsCar(data.HitEntity)) then
+				if surfaceprop and gred.Mats[surfaceprop] and gred.MatsStr[gred.Mats[surfaceprop]] and not NO_RICOCHET[gred.MatsStr[gred.Mats[surfaceprop]]] and (self.IS_HE[self.ShellType] and simfphys and simfphys.IsCar and simfphys.IsCar(data.HitEntity)) then
 					local HitAng = self:WorldToLocalAngles(data.HitNormal:Angle())
 					local c = os.clock()
 					self.RicochetCount = self.RicochetCount or 0
