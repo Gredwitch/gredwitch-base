@@ -1,4 +1,19 @@
---[[ 23/10/2020
+--[[30/10/2020
+- Added a few materials
+- Fixed errors with sequencial machineguns
+- Fixed errors with vehicles without a seats table
+- Updated the base WT material
+
+
+If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
+If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
+Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
+
+If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
+
+OLDER CHANGES
+
+23/10/2020
 [HOTFIX] Fixed the shells breaking when simfphys is not enabled
 - Added a hook so GChem stops overrding the explosion function
 - Added a button to reset all the convars to their default value in the other options tab
@@ -21,15 +36,6 @@
 - Optimized the bullets : made them shared so they feel more responsive in multiplayer
 - Updated the base War Thunder material so tanks look better
 - Recoded the shell damage
-
-
-If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
-If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
-Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
-
-If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
-
-OLDER CHANGES
 
 02/09/2020
 - Fixed an error for entities that may not have a surfaceprop with rockets

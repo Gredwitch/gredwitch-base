@@ -808,6 +808,7 @@ gred.TankInitMuzzleAttachments = function(vehicle,seat,SeatSlotTab,WeaponTab,Wep
 	if WeaponTab.Muzzles then
 		SeatSlotTab.Muzzles = {}
 		SeatSlotTab.NextShot = 0
+		SeatSlotTab.CurrentMuzzle = 1
 		SeatSlotTab.UpdateTracers = {}
 		SeatSlotTab.Tracers = {}
 		
