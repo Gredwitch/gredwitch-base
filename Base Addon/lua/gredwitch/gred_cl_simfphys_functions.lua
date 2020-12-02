@@ -444,6 +444,14 @@ gred.TankInitSeats = function(vehicle,Mode,VehicleSeatTab,LocalPly)
 						seat.MuzzleAttachment = vehicle:LookupAttachment(SeatTab.MuzzleAttachment)
 					end
 					
+					if SeatTab.Sight and SeatTab.Sight.SightMaterial then
+						seat.SightTextureID = surface.GetTextureID(SeatTab.Sight.SightMaterial)
+					end
+					
+					if SeatTab.MuzzleAttachment then
+						seat.MuzzleAttachment = vehicle:LookupAttachment(SeatTab.MuzzleAttachment)
+					end
+					
 					if v[Mode].Sight then
 						seat.SightAttachment = (gred.CVars.gred_sv_simfphys_camera_tankgunnersight:GetBool() and gred.CVars.gred_cl_simfphys_camera_tankgunnersight:GetBool() and seat.MuzzleAttachment) and seat.MuzzleAttachment or vehicle:LookupAttachment(SeatTab.Sight.SightAttachment)
 					end
@@ -1104,7 +1112,7 @@ gred.TankDrawHUD = function(vehicle,seat,SeatID,SeatTab,Mode,ply,ScrW,ScrH,Loadi
 			if vehicle.LocalPlayerActiveSeat.SightToggle then
 				EyeAng = seat.LocalView and ply:EyeAngles() or (seat.LocalView and ply:EyeAngles() or seat:LocalToWorldAngles(ply:EyeAngles()))
 				surface.SetDrawColor(255,255,255,255)
-				surface.SetTexture(surface.GetTextureID(SeatTab.Sight.SightMaterial))
+				surface.SetTexture(seat.SightTextureID)
 				local Ang = EyeAng - att.Ang
 				Ang:Normalize()
 				local Yaw   = 0 -- math.Clamp(Ang.y / 10,-1,1) * 200
@@ -1425,7 +1433,7 @@ gred.TankShootMG = function(seat,SeatID,vehicle,IsPrimary,SequentialID)
 			Effect("gred_particle_simple",effectdata)
 		end
 		
-		SeatSlotTab.CurrentMuzzle = #WeaponTab.Muzzles < SeatSlotTab.CurrentMuzzle and SeatSlotTab.CurrentMuzzle + 1 or 1
+		SeatSlotTab.CurrentMuzzle = SeatSlotTab.CurrentMuzzle < #WeaponTab.Muzzles and SeatSlotTab.CurrentMuzzle + 1 or 1
 		
 	elseif WeaponTab.Muzzles then
 		local v

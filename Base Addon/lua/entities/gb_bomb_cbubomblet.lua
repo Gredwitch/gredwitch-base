@@ -10,7 +10,7 @@ ENT.Author			                 =  ""
 ENT.Contact		                     =  "contact.gredwitch@gmail.com"
 ENT.Category                         =  "Gredwitch's Stuff"
 
-ENT.Model                            =  "models/mm1/box.mdl"                      
+ENT.Model                            =  "models/gbombs/cbomb_small.mdl"                      
 ENT.Effect                           =  "high_explosive_air"                  
 ENT.EffectAir                        =  "high_explosive_air_2"                   
 ENT.EffectWater                      =  "water_medium"
@@ -53,12 +53,16 @@ function ENT:SpawnFunction( ply, tr )
     ent:SetPos( tr.HitPos + tr.HitNormal * 16 ) 
     ent:Spawn()
     ent:Activate()
-	ent:TimedExplosion()
+	-- ent:SetCustomCollisionCheck(true)
+	-- ent:TimedExplosion()
+	
     return ent
 end
 
 function ENT:TimedExplosion()
 	timer.Simple(5,function() 
-		if IsValid(self) then self:Explode() end 
+		if IsValid(self) then 
+			self:Explode() 
+		end 
 	end)
 end

@@ -51,6 +51,7 @@ gred.CVars["gred_cl_shell_blur"] 							= CreateClientConVar("gred_cl_shell_blur
 gred.CVars["gred_cl_shell_blur_invehicles"] 				= CreateClientConVar("gred_cl_shell_blur_invehicles"				, "1" ,true,false)
 gred.CVars["gred_cl_shell_enable_killcam"] 					= CreateClientConVar("gred_cl_shell_enable_killcam"					, "1" ,true,false)
 gred.CVars["gred_cl_simfphys_camera_tankgunnersight"] 		= CreateClientConVar("gred_cl_simfphys_camera_tankgunnersight"		, "0" ,true,false)
+gred.CVars["gred_cl_explosionvolume"] 						= CreateClientConVar("gred_cl_explosionvolume"						, "1" ,true,false)
 
 local TAB_PRESS = {FCVAR_ARCHIVE,FCVAR_USERINFO}
 gred.CVars["gred_cl_simfphys_key_changeshell"]				= CreateConVar("gred_cl_simfphys_key_changeshell"			, "21",TAB_PRESS)
@@ -311,14 +312,14 @@ gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg
 		end
 		
 		local BulletTrTab = {}
+		BulletTrTab.filter = filter
+		BulletTrTab.mask = MASK_SHOT
 		
 		timer.Create("gred_bullet_"..oldbullet,0,0,function()
 			endpos:Add(dir)
 			
 			BulletTrTab.start = pos
 			BulletTrTab.endpos = endpos
-			BulletTrTab.filter = filter
-			BulletTrTab.mask = MASK_ALL
 			
 			-- local lifetime = 3
 			-- local add = ang:Right()*100 * 0
@@ -340,7 +341,7 @@ gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg
 				sound.Play("impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",tr.HitPos,75,100,1)
 			end
 			
-			if tr.Hit then
+			if tr.Hit and not (IsValid(tr.Entity) and tr.Entity:GetClass() == "func_breakable") then
 				BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime,IsShared)
 				timer.Remove("gred_bullet_"..oldbullet)
 				return
@@ -560,6 +561,124 @@ net.Receive("gred_net_applyfloatonsimfphys_cl",function()
 	end
 end)
 
+local soundSpeed 		= 18005.25*18005.25 -- 343m/s
+
+local Level = {
+	[1] = {
+		112,
+		150,
+		150,
+	},
+	[2] = {
+		-- 100,
+		-- 120,
+		-- 130,
+		112,
+		150,
+		150,
+	},
+	[3] = {
+		-- 90,
+		-- 110,
+		-- 110,
+		112,
+		150,
+		150,
+	},
+}
+
+local BigExplosionSounds = {
+	["explosions/gbomb_2.mp3"] = true,
+	["impactsounds/Tank_shell_impact_ricochet_w_whizz_01.ogg"] = true,
+	["impactsounds/Tank_shell_impact_ricochet_w_whizz_02.ogg"] = true,
+	["impactsounds/Tank_shell_impact_ricochet_w_whizz_03.ogg"] = true,
+	["impactsounds/Tank_shell_impact_ricochet_w_whizz_01_mid.ogg"] = true,
+	["impactsounds/Tank_shell_impact_ricochet_w_whizz_02_mid.ogg"] = true,
+	["impactsounds/Tank_shell_impact_ricochet_w_whizz_03_mid.ogg"] = true,
+}
+
+local BigExplosionSoundLevels = {
+	[1] = {
+		150,
+		150,
+		150,
+	},
+	[2] = {
+		150,
+		150,
+		150,
+	},
+	[3] = {
+		150,
+		150,
+		150,
+	},
+}
+
+net.Receive("gred_net_sound_new",function()
+	local pos = net.ReadVector()
+	local tab = net.ReadTable()
+	
+	if not tab[1] then return end
+	
+	local e1 = tab[1]
+	local e2 = tab[2] or e1
+	local e3 = tab[3] or e2
+	
+	-- PrintTable(tab)
+	
+	local div = math.Clamp(math.ceil(gred.CVars["gred_sv_soundspeed_divider"]:GetInt()),1,#Level)
+	local vol = gred.CVars["gred_cl_explosionvolume"]:GetFloat()
+	local currange = 1000 / div
+	
+	local curRange_min = currange*5
+	curRange_min = curRange_min*curRange_min
+	local curRange_mid = currange*14
+	curRange_mid = curRange_mid * curRange_mid
+	local curRange_max = currange*40
+	curRange_max = curRange_max * curRange_max
+	
+	local ply = LocalPlayer():GetViewEntity()
+	local plypos = ply:GetPos()
+	local distance = ply:GetPos():DistToSqr(pos)
+	
+	local ShakeScreen = gred.CVars["gred_cl_sound_shake"]:GetBool()
+	
+	if distance <= curRange_min then
+		if not LocalPlayer():InVehicle() and ShakeScreen then
+			util.ScreenShake(pos,10,75,2,math.sqrt(curRange_min))
+		end
+		
+		if BigExplosionSounds[e1] then
+			sound.Play(e1,pos,BigExplosionSoundLevels[div][1],100,1 * vol)
+		else
+			sound.Play(e1,pos,Level[div][1],100,1 * vol)
+		end
+		
+	elseif distance <= curRange_mid then
+		timer.Simple(distance/soundSpeed,function()
+			if not LocalPlayer():InVehicle() and ShakeScreen then
+				util.ScreenShake(pos,3,75,1.5,math.sqrt(curRange_mid))
+			end
+			
+			if BigExplosionSounds[e3] then
+				sound.Play(e2,pos,BigExplosionSoundLevels[div][2],100,1 * vol)
+			else
+				sound.Play(e2,pos,Level[div][2],100,0.5 * vol)
+			end
+		end)
+	else -- if distance <= curRange_max then
+		timer.Simple(distance/soundSpeed,function()
+			if BigExplosionSounds[e2] then
+				sound.Play(e1,pos,BigExplosionSoundLevels[div][3],100,1 * vol)
+			else
+				sound.Play(e3,pos,Level[div][3],100,1 * vol)
+			end
+		end)
+	end
+	
+end)
+
 timer.Simple(5,function()
 	local singleplayerIPs = {
 		["loopback"] = true,
@@ -567,7 +686,7 @@ timer.Simple(5,function()
 		["0.0.0.0:port"] = true,
 	}
 	if singleplayerIPs[game.GetIPAddress()] then
-		CheckForUpdates()
+		-- CheckForUpdates()
 		-- CheckForConflicts()
 	end
 	

@@ -1,10 +1,12 @@
 "patch"
 {
-	include "materials/models/gredwitch/common/base_wt.vmt"
-	insert
-	{
+include "materials/models/gredwitch/common/base_wt.vmt"
+insert
+{
 $basetexture				"models/gredwitch/common/m85_c"
-$bumpmap					"models/gredwitch/common/m85_n"
+$bumpmap				"models/gredwitch/common/m85_n"
 
+// $detail                     "models/gredwitch/common/TEST_camo"
+// $detailscale                1.5
 }
 }

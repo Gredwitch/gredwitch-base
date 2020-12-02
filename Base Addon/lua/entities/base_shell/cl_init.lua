@@ -357,10 +357,12 @@ function ENT:Think()
 	local ent = self.ply:GetViewEntity()
 	local l
 	
+	l = (l and l or v:Length()) *0.001
+	
 	if !self.SoundEmited and self.StartPos then
 		local EntPos
 		
-		if ((ent != self.GBOWNER and ent != self.Owner) or self.shouldOwnerHearSnd) and !self.EntIsTooClose and v != vector_zero and self:GetFired() then
+		if ((ent != self.GBOWNER and ent != self.Owner) or self.shouldOwnerHearSnd) and !self.EntIsTooClose and v != vector_zero and l > 5 then
 			
 			local l_sqr = v:LengthSqr()
 			EntPos = EntPos or ent:GetPos()
@@ -377,7 +379,7 @@ function ENT:Think()
 					self.WhizzMin = SMALL_WHIZZ_SQR
 				-- end
 			end
-			
+			-- print(LengthSqr < l_sqr*self.SoundMul)
 			if LengthSqr < l_sqr*self.SoundMul then
 				self.SoundEmited = true
 				self.Sound = CreateSound(ent,"shells/shell_passby_"..self.SoundType.."00_"..math.random(1,3)..".wav")
@@ -388,14 +390,15 @@ function ENT:Think()
 				if lpos.x > 0 and volume > 0 then self.Sound:ChangeVolume(volume,self.SoundType == 3 and 0.4 or nil) end
 				
 				if (ent.InVehicle and (ent:InVehicle() and gred.CVars.gred_cl_shell_blur_invehicles:GetBool() or !ent:InVehicle()) or !ent.InVehicle) and gred.CVars.gred_cl_shell_blur:GetBool() then
-					timer.Simple(0.1,function()
-						if !IsValid(self) then return end
+					-- timer.Simple(0.1,function()
 						local Start = CurTime()
 						local Num = 0.2
-						hook.Add("GetMotionBlurValues","gred_shell_GetMotionBlurValues",function(x,y,f,spin)
+						-- print("star")
+						hook.Add("GetMotionBlurValues","gred_shell_GetMotionBlurValues2",function(x,y,f,spin)
 							local val = (CurTime() - Num - Start) / Num
-							if val > 1 or !IsValid(self) then
-								hook.Remove("GetMotionBlurValues","gred_shell_GetMotionBlurValues")
+							
+							if val > 1 then
+								hook.Remove("GetMotionBlurValues","gred_shell_GetMotionBlurValues2")
 							else
 								val = (1 - math.abs(val)) * (volume^2) * 1.5
 								f = f + val
@@ -404,7 +407,7 @@ function ENT:Think()
 								return x,y,f,spin
 							end
 						end)
-					end)
+					-- end)
 				end
 			end
 			
@@ -418,7 +421,9 @@ function ENT:Think()
 	end
 	-- if !self.TracerColor then self.TracerColor = colors["white"] end
 	
-	l = (l and l or v:Length()) *0.001
+	
+	-- l = (l and l or v:Length()) *0.001
+	
 	if self.Tracer and l > 5 then
 		local fwd = self:GetForward()
 		
@@ -451,7 +456,6 @@ function ENT:Think()
 		end
 	end
 end
-
 
 net.Receive("gred_net_shell_pickup_rem",function()
 	local ent = net.ReadEntity()

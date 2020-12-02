@@ -40,17 +40,28 @@ net.Receive("gred_net_ammobox_sv_createammo",function(len,ply)
 	self:ResetSequence("close")
 end)
 
+ENT.Players = {}
+
 net.Receive("gred_net_ammobox_sv_createshell",function(len,ply)
 	local self = net.ReadEntity()
 	
 	if !IsValid(self) then return end
+	
+	if not self.Players[ply] then return end
+	
+	if ply:GetPos():Distance(self:GetPos()) > 300 then
+		self.Players[ply] = false
+		
+		return
+	end
+	
 	if self:GetClass() != "gred_ammobox" then return end
 	
 	local Shell = gred.CreateShell(self:GetPos() + AmmoSpawnOffset,
 					self:GetAngles(),
 					ply,
 					self.FILTER,
-					net.ReadUInt(10),
+					net.ReadUInt(8),
 					net.ReadString(),
 					500,
 					1
@@ -72,6 +83,8 @@ net.Receive("gred_net_ammobox_sv_createshell",function(len,ply)
 		-- Shell:Use(ply,self,2,1)
 	end)
 	
+	self.Players[ply] = false
+	
 	self:ResetSequence("close")
 end)
 
@@ -79,6 +92,8 @@ net.Receive("gred_net_ammobox_sv_close",function()
 	local self = net.ReadEntity()
 	if !IsValid(self) then return end
 	if self:GetClass() != "gred_ammobox" then return end
+	
+	self.Players[ply] = false
 	
 	self:ResetSequence("close")
 end)
@@ -104,7 +119,11 @@ end
 
 function ENT:Use(ply,cal)
 	if self.NextUse >= CurTime() then return end
+	
+	self.Players[ply] = true
+	
 	self:ResetSequence("open")
+	
 	net.Start("gred_net_ammobox_cl_gui")
 			net.WriteEntity(self)
 	net.Send(ply)

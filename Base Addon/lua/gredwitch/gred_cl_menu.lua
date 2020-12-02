@@ -1307,6 +1307,9 @@ hook.Add("GredOptionsAddLateralMenuOption","AddExplosives",function(DFrame,DPane
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateCheckBoxPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_cl_shell_blur_invehicles","Shell suppresion effects in vehicles","[NOTE : Only works when Shell suppresion effects is enabled]",false)
 				end,
+				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
+					CreateSliderPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_cl_explosionvolume","Explosion sounds volume","",0,1,2,false)
+				end,
 			},
 			["SERVER"] = {
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
@@ -1341,6 +1344,9 @@ hook.Add("GredOptionsAddLateralMenuOption","AddExplosives",function(DFrame,DPane
 				end,
 				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
 					CreateSliderPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_shell_heat_damagemultiplier","HEAT shells damage multiplier","",0,10,2,true)
+				end,
+				function(DFrame,DPanel,DScrollPanel,Panel,x,y)
+					CreateSliderPanel(DFrame,DPanel,DScrollPanel,Panel,x,y,"gred_sv_soundspeed_divider","Explosion sound distance preset","The higher this value is, the lower the explosion sounds will be from far away",1,3,0,true)
 				end,
 			},
 		})

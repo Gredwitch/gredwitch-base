@@ -1378,14 +1378,8 @@ gred.TankShootCannon = function(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,Sea
 				WeaponTab.PreFire(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID,k,v,att)
 			end
 			
-			local shell = gred.CreateShell(att.Pos,att.Ang,ply,vehicle.FILTER,ShellTab.Caliber,ShellTab.ShellType,ShellTab.MuzzleVelocity,ShellTab.Mass,ShellTab.TracerColor,ShellTab.CustomDamage,ShellTab.CallBack,ShellTab.TNTEquivalent,ShellTab.ExplosiveMass,ShellTab.LinearPenetration,ShellTab.Normalization,ShellTab.CoreMass,ShellTab.ForceDragCoef,ShellTab.DamageAdd)
+			local shell = gred.CreateShell(att.Pos,att.Ang,ply,vehicle.FILTER,ShellTab.Caliber,ShellTab.ShellType,ShellTab.MuzzleVelocity,ShellTab.Mass,ShellTab.TracerColor,ShellTab.CustomDamage,ShellTab.CallBack,ShellTab.TNTEquivalent,ShellTab.ExplosiveMass,ShellTab.LinearPenetration,ShellTab.Normalization,ShellTab.CoreMass,ShellTab.ForceDragCoef,ShellTab.DamageAdd,vehicle:GetVelocity())
 			shell:Launch()
-			
-			local phy = GetPhysicsObject(shell)
-			
-			if IsValid(phy) then
-				phy:AddVelocity(vehicle:GetVelocity())
-			end
 			
 			ApplyForceOffset(GetPhysicsObject(vehicle),-Forward(att.Ang) * WeaponTab.RecoilForce,att.Pos)
 			
@@ -1395,7 +1389,7 @@ gred.TankShootCannon = function(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,Sea
 			end
 			
 			if WeaponTab.OnFire then
-				WeaponTab.OnFire(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID,k,v,shell,phy)
+				WeaponTab.OnFire(vehicle,seat,ply,ct,SeatTab,WeaponTab,SeatID,SeatSlotTab,SlotID,k,v,shell)
 			end
 			
 			if SeatSlotTab.ShellTypes[SeatSlotTab.CurShellID] < 1 then break end

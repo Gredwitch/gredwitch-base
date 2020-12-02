@@ -356,7 +356,7 @@ function ENT:PhysicsCollide(data,physobj)
 				data.TheirSurfaceProps = data.TheirSurfaceProps or 0
 				local surfaceprop = util.GetSurfacePropName(data.TheirSurfaceProps)
 				
-				if surfaceprop and gred.Mats[surfaceprop] and gred.MatsStr[gred.Mats[surfaceprop]] and not NO_RICOCHET[gred.MatsStr[gred.Mats[surfaceprop]]] and (self.IS_HE[self.ShellType] and simfphys and simfphys.IsCar and simfphys.IsCar(data.HitEntity)) then
+				if surfaceprop and gred.Mats[surfaceprop] and gred.MatsStr[gred.Mats[surfaceprop]] and not NO_RICOCHET[gred.MatsStr[gred.Mats[surfaceprop]]] and (self.IS_HE[self.ShellType] and simfphys and simfphys.IsCar and simfphys.IsCar(data.HitEntity) or not self.IS_HE[self.ShellType]) then
 					local HitAng = self:WorldToLocalAngles(data.HitNormal:Angle())
 					local c = os.clock()
 					self.RicochetCount = self.RicochetCount or 0
@@ -370,12 +370,18 @@ function ENT:PhysicsCollide(data,physobj)
 					end
 				end
 			end
-			
 		end
 		
-		if IsValid(data.HitEntity) and data.HitEntity.CachedSpawnList then
-			data.HitObject:SetVelocityInstantaneous(data.TheirOldVelocity)
-			data.HitObject:AddAngleVelocity(-data.HitObject :GetAngleVelocity() + data.TheirOldAngularVelocity)
+		if IsValid(data.HitEntity) then
+			if data.HitEntity.CachedSpawnList then
+				data.HitObject:SetVelocityInstantaneous(data.TheirOldVelocity)
+				data.HitObject:AddAngleVelocity(-data.HitObject :GetAngleVelocity() + data.TheirOldAngularVelocity)
+			elseif data.HitEntity:GetClass() == "func_breakable" then -- and not self.IS_HE[self.ShellType] and not self.IS_HEAT[self.ShellType] then
+				data.HitEntity:Fire("break")
+				physobj:SetVelocityInstantaneous(data.OurOldVelocity)
+				
+				return
+			end
 		end
 		
 		self.PhysObj = physobj
@@ -389,6 +395,8 @@ end
 
 function ENT:Launch()
 	if self.Exploded or self.Burnt or self.Fired then return end
+	
+	self:SetCollisionGroup(COLLISION_GROUP_PROJECTILE)
 	
 	local phys = self:GetPhysicsObject()
 	

@@ -1,8 +1,17 @@
---[[30/10/2020
-- Added a few materials
-- Fixed errors with sequencial machineguns
-- Fixed errors with vehicles without a seats table
-- Updated the base WT material
+--[[02/12/2020
+- Added a new sound system for the explosions : volume now fades away depending on how far you are from the explosion
+- Added a volume slider for the explosion sounds
+- Added a missing texture
+- Bullets can now destroy and go through func_breakable entities (they can destroy glass now)
+- Bullets have been given the correct trace mask
+- Fixed shells not ricochetting
+- Fixed the KK's CW2 SWEPs conflicting with the shells' max velocity
+- Fixed the shell woosh sound effect not playing
+- Fixed an exploit with the ammo box (poorly but I don't really care)
+- Optimized the sight texture rendering code
+- Made it so shells and rockets can destroy and go through func_breakable entities (they can destroy glass now)
+- Reworked the CBU so it's less retarded
+
 
 
 If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
@@ -12,6 +21,12 @@ Make sure you have read the descriptions of my addons and that other people did 
 If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
 
 OLDER CHANGES
+
+30/10/2020
+- Added a few materials
+- Fixed errors with sequencial machineguns
+- Fixed errors with vehicles without a seats table
+- Updated the base WT material
 
 23/10/2020
 [HOTFIX] Fixed the shells breaking when simfphys is not enabled

@@ -37,7 +37,7 @@ function ENT:Initialize()
 		phys:Wake()
 	end
 	
-	if not gred.MaxVelocityChanged then
+	if not gred.MaxVelocityChanged or CustomizableWeaponry_KK then
 		gred.MaxVelocityChanged = true
 		
 		local tbl = physenv.GetPerformanceSettings()

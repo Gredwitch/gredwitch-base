@@ -45,20 +45,37 @@ ENT.DEFAULT_PHYSFORCE_PLYGROUND      = 1000
 
 function ENT:AddOnExplode()
 	local pos = self:LocalToWorld(self:OBBCenter())
-	local up = self:GetUp()
-	for i=0, (30-1) do
-		local ent1 = ents.Create("gb_bomb_cbubomblet") 
-		local phys = ent1:GetPhysicsObject()
-		ent1:SetPos(pos) 
-		ent1:Spawn()
-		ent1:Activate()
-		ent1:Arm()
-		ent1:SetVar("GBOWNER", self.GBOWNER)
-		local bphys = ent1:GetPhysicsObject()
-		local phys = self:GetPhysicsObject()
-		if bphys:IsValid() and phys:IsValid() then
-			bphys:ApplyForceCenter(up*155)
-			bphys:AddVelocity(phys:GetVelocity()/2)
+	
+	local entities = {}
+	
+	for i = 1,10 do
+		local ent = ents.Create("gb_bomb_cbubomblet") 
+		ent:SetPos(pos) 
+		ent.Owner = self.Owner
+		ent.ang = Angle(math.random(-160,-20),math.random(-70,70),math.random(-70,70))
+		-- ent:SetModelScale(0.1)
+		-- ent:SetAngles(ent.ang)
+		ent:SetNoDraw(true)
+		ent:Spawn()
+		ent:Activate()
+		constraint.NoCollide(ent,self,0,0)
+		
+		table.insert(entities,ent)
+	end
+	
+	for i = 1,#entities do
+		
+		for k = 1,#entities do
+			constraint.NoCollide(entities[i],entities[k],0,0)
+		end
+		
+		entities[i]:Arm()
+		entities[i]:TimedExplosion()
+		
+		local bphys = entities[i]:GetPhysicsObject()
+		
+		if IsValid(bphys) then
+			bphys:SetVelocityInstantaneous(entities[i].ang:Forward() * 500)
 		end
 	end
 end

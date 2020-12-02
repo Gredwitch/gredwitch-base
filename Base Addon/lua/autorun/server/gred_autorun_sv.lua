@@ -38,6 +38,7 @@ AddNetworkString("gred_net_applyboolonsimfphys")
 AddNetworkString("gred_net_applyboolonsimfphys_cl")
 AddNetworkString("gred_net_applyfloatonsimfphys")
 AddNetworkString("gred_net_applyfloatonsimfphys_cl")
+AddNetworkString("gred_net_sound_new")
 
 local OverrideHAB 		= gred.CVars["gred_sv_override_hab"]
 local Tracers 			= gred.CVars["gred_sv_tracers"]
@@ -199,7 +200,7 @@ gred.CreateExplosion = function(pos,radius,damage,decal,trace,ply,bomb,DEFAULT_P
 		net.WriteVector(pos-Vector(0,0,trace))
 	net.Broadcast()
 	
-	debugoverlay.Sphere(pos,radius,3,color_white)
+	-- debugoverlay.Sphere(pos,radius,3,color_white)
 	
 	local bombvalid = IsValid(bomb)
 	ply = IsValid(ply) and ply or (bombvalid and bomb or Entity(0))
@@ -241,47 +242,57 @@ gred.CreateExplosion = function(pos,radius,damage,decal,trace,ply,bomb,DEFAULT_P
 	end
 end
 
+local tab = {}
 gred.CreateSound = function(pos,rsound,e1,e2,e3)
-	local currange = 1000 / gred.CVars["gred_sv_soundspeed_divider"]:GetInt()
+	tab[1] = e1 or nil
+	tab[2] = e2 or nil
+	tab[3] = e3 or nil
 	
-	local curRange_min = currange*5
-	curRange_min = curRange_min*curRange_min
-	local curRange_mid = currange*14
-	curRange_mid = curRange_mid * curRange_mid
-	local curRange_max = currange*40
-	curRange_max = curRange_max * curRange_max
+	net.Start("gred_net_sound_new")
+		net.WriteVector(pos)
+		net.WriteTable(tab)
+	net.Broadcast()
 	
-	for k,v in pairs(player.GetHumans()) do
-		local ply = v:GetViewEntity()
-		local distance = ply:GetPos():DistToSqr(pos)
+	-- local currange = 1000 / gred.CVars["gred_sv_soundspeed_divider"]:GetInt()
+	
+	-- local curRange_min = currange*5
+	-- curRange_min = curRange_min*curRange_min
+	-- local curRange_mid = currange*14
+	-- curRange_mid = curRange_mid * curRange_mid
+	-- local curRange_max = currange*40
+	-- curRange_max = curRange_max * curRange_max
+	
+	-- for k,v in pairs(player.GetHumans()) do
+		-- local ply = v:GetViewEntity()
+		-- local distance = ply:GetPos():DistToSqr(pos)
 		
-		if distance <= curRange_min then
+		-- if distance <= curRange_min then
 		
-			if !v:InVehicle() and v:GetInfoNum("gred_sound_shake",1) == 1 then
-				util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
-			end
+			-- if !v:InVehicle() and v:GetInfoNum("gred_sound_shake",1) == 1 then
+				-- util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+			-- end
 			
-			net.Start("gred_net_sound_lowsh")
-				net.WriteString(e1)
-			net.Send(v)
+			-- net.Start("gred_net_sound_lowsh")
+				-- net.WriteString(e1)
+			-- net.Send(v)
 			
-		elseif distance <= curRange_mid then
-			timer.Simple(distance/soundSpeed,function()
-				if !v:InVehicle() and v:GetInfoNum("gred_sound_shake",1) == 1 then
-					util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
-				end
-				net.Start("gred_net_sound_lowsh")
-					net.WriteString(e2 and e2 or e1)
-				net.Send(v)
-			end)
-		elseif distance <= curRange_max then
-			timer.Simple(distance/soundSpeed,function()
-				net.Start("gred_net_sound_lowsh")
-					net.WriteString(e3 and e3 or (e2 and e2 or e1))
-				net.Send(v)
-			end)
-		end
-	end
+		-- elseif distance <= curRange_mid then
+			-- timer.Simple(distance/soundSpeed,function()
+				-- if !v:InVehicle() and v:GetInfoNum("gred_sound_shake",1) == 1 then
+					-- util.ScreenShake(v:GetPos(),9999999,55,1.5,50)
+				-- end
+				-- net.Start("gred_net_sound_lowsh")
+					-- net.WriteString(e2 and e2 or e1)
+				-- net.Send(v)
+			-- end)
+		-- elseif distance <= curRange_max then
+			-- timer.Simple(distance/soundSpeed,function()
+				-- net.Start("gred_net_sound_lowsh")
+					-- net.WriteString(e3 and e3 or (e2 and e2 or e1))
+				-- net.Send(v)
+			-- end)
+		-- end
+	-- end
 end
 
 local CurTime = CurTime
@@ -340,14 +351,18 @@ gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg
 		end
 		
 		local BulletTrTab = {}
+		local tr
+		
+		BulletTrTab.filter = filter
+		BulletTrTab.mask = MASK_SHOT
+		
+		local HitBreakable
 		
 		timer.Create("gred_bullet_"..oldbullet,0,0,function()
 			endpos:Add(dir)
 			
 			BulletTrTab.start = pos
 			BulletTrTab.endpos = endpos
-			BulletTrTab.filter = filter
-			BulletTrTab.mask = MASK_ALL
 			
 			-- local lifetime = 3
 			-- local color_red = Color(255,0,0)
@@ -357,7 +372,7 @@ gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg
 			-- debugoverlay.Cross(debugpos,30,lifetime,color_red)
 			-- debugoverlay.EntityTextAtPosition(debugpos,1,SysTime(),lifetime,color_red)
 			
-			local tr = TraceLine(BulletTrTab)
+			tr = TraceLine(BulletTrTab)
 			
 			pos.x = endpos.x
 			pos.y = endpos.y
@@ -373,7 +388,13 @@ gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg
 				sound.Play("impactsounds/water_bullet_impact_0"..math.random(1,5)..".wav",tr.HitPos,75,100,1)
 			end
 			
-			if tr.Hit then
+			HitBreakable = tr.Hit and IsValid(tr.Entity) and tr.Entity:GetClass() == "func_breakable"
+			
+			if HitBreakable then
+				tr.Entity:Fire("break")
+			end
+			
+			if tr.Hit and not HitBreakable then
 				BulletExplode(ply,NoBullet,tr,cal,filter,ang,NoParticle,explodable,dmg,radius,fusetime,IsShared)
 				timer.Remove("gred_bullet_"..oldbullet)
 				return
@@ -397,7 +418,7 @@ gred.CreateBullet = function(ply,pos,ang,cal,filter,fusetime,NoBullet,tracer,dmg
 	end
 end
 
-gred.CreateShell = function(pos,ang,ply,filter,caliber,shelltype,muzzlevelocity,mass,color,dmg,callback,tntequivalent,explosivemass,linearpenetration,normalization,CoreMass,ForceDragCoef,DamageAdd) -- EXPLOSIVE MASS AND TNT EQUIVALENT IN KILOGRAMS!
+gred.CreateShellOld = function(pos,ang,ply,filter,caliber,shelltype,muzzlevelocity,mass,color,dmg,callback,tntequivalent,explosivemass,linearpenetration,normalization,CoreMass,ForceDragCoef,DamageAdd) -- EXPLOSIVE MASS AND TNT EQUIVALENT IN KILOGRAMS!
 	local ent = ents.Create("base_shell")
 	ent:SetPos(pos)
 	ent:SetAngles(ang)
@@ -595,3 +616,207 @@ AddCSLuaFile("xml2lua/xmlhandler/tree.lua")
 include("gredwitch/gred_sv_lfs_functions.lua")
 include("gredwitch/gred_sv_simfphys_functions.lua")
 include("gredwitch/gred_sh_simfphys_functions.lua")
+
+
+local kfbr = 1900^1.43
+local MATH_PI = math.pi
+local ONE_THIRD = 1/3
+local CONE_LENGTH = 102.384225 -- millimeters
+local CYLINDER_LENGTH = 107.866815 -- millimeters
+local TO_METERS_PER_SEC = 1/3.6
+local kfbrAPCR = 3000^1.43
+local ShellRadiusSquared
+local FlowRate
+local CylinderLength
+
+
+
+gred.GetPenetration = function(ShellType,TNTEquivalent,Caliber,Mass,CoreMass,vel)
+	local Penetration = 0
+	
+	if not gred.IS_APCR[ShellType] then
+		Penetration = (((vel^1.43)*(Mass^0.71))/(kfbr*((Caliber*0.01)^1.07)))*100*(TNTEquivalent < 0.65 and 1 or (TNTEquivalent < 1.6 and 1 + (TNTEquivalent-0.65)*-0.07/0.95 or (TNTEquivalent < 2 and 0.93 + (TNTEquivalent-1.6) * -0.03 / 0.4 or (TNTEquivalent < 3 and 0.9+(TNTEquivalent-2)*-0.05 or TNTEquivalent < 4 and 0.85+(TNTEquivalent-3)*-0.1 or 0.75))))*((ShellType == "APCBC" or ShellType == "APHECBC") and 1 or 0.9)
+		
+	else
+		Penetration = ((vel^1.43)*((CoreMass + (((((CoreMass/Mass)*100) > 36.0) and 0.5 or 0.4) * (Mass - CoreMass)))^0.71))/(kfbrAPCR*((Caliber*0.0001)^1.07))
+	end
+	
+	return Penetration
+end
+
+gred.CreateShell = function(pos,ang,ply,filter,Caliber,ShellType,MuzzleVelocity,Mass,color,dmg,callback,TNTEquivalent,ExplosiveMass,LinearPenetration,normalization,CoreMass,ForceDragCoef,DamageAdd)
+	local done = false
+	
+	timer.Create("shell",0,0,function()
+	local trtab = {
+		start = pos + Vector(),
+		starttime = CurTime(),
+		filter = filter,
+		mask = MASK_SHOT + CONTENTS_WATER,
+	}
+	
+	local tr = {}
+	
+	
+	
+	------------------------------
+	-- Shell penetration data
+	
+	
+	ExplosiveMass = (!ExplosiveMass and TNTEquivalent) and (TNTEquivalent * Mass) * 0.01 or 0
+	TNTEquivalent = !TNTEquivalent and (ExplosiveMass and (ExplosiveMass/Mass)*100 or 0) or TNTEquivalent
+	
+	
+	-----------------------------
+	-- Shell physical properties
+	
+	local caliberMul = Caliber / 75
+	local ShellRadius = Caliber*0.5
+	local ShellRadiusSquared = ShellRadius * ShellRadius
+	
+	local ShellLength = CONE_LENGTH * caliberMul
+	local ShellArea = (ShellLength * 70.31355) * 0.5
+	local ShellVolume = ONE_THIRD * MATH_PI * ShellRadiusSquared * ShellLength * caliberMul
+	
+	local Density = (Mass + (CoreMass or 0)) / ShellVolume -- p
+	
+	
+	
+	-----------------------------
+	-- Environnment physics
+	
+	
+	local Scale = 0.01
+	local Ticks = 0
+	local Gravity = 9.81 / 0.01905 -- GetConVar("sv_gravity"):GetInt()
+	local AirDensity = 1.29 -- physenv.GetAirDensity()
+	
+	
+	-----------------------------
+	-- Shell physics
+	
+	
+	local Inertia = Vector((Mass * ShellLength) * 0.5,(Mass * ShellRadiusSquared) * 0.5,(Mass * ShellRadiusSquared) / 12):Length()
+	
+	local OgiveCaliber = 2.24 * Caliber
+	local FormCoef = (2 / OgiveCaliber) * math.sqrt((4 * Caliber - 1) / Caliber)
+	local BallisticCoef = (Mass / (Caliber * Caliber * FormCoef)) * 10^-3
+	
+	local CurSpeed = (MuzzleVelocity / 0.01905)
+	
+	
+	-----------------------------
+	-- Flight data
+	
+	
+	local vx = CurSpeed * math.cos(math.rad(ang.p))
+	local vy = CurSpeed * math.sin(math.rad(ang.p))
+	
+	local magnitude = math.sqrt(vx*vx + vy*vy)
+	local drag = BallisticCoef * magnitude*magnitude
+
+	local ax = -(drag * math.cos(math.rad(ang.p))) / Mass
+	local ay = -Gravity - (drag * math.sin(math.rad(ang.p))) / Mass
+	
+	local FlightData = {}
+	
+	-- local mu = 0.5 * BallisticCoef * ShellArea * AirDensity
+	
+	
+	while not tr.Hit do
+		debugoverlay.Cross(trtab.start,50,FrameTime()+0.05,Color(255,0,0),true)
+		-- print(math.floor(ax))
+		trtab.endpos = trtab.start + (ang:Forward() * vx * Scale)
+		trtab.endpos.z = trtab.endpos.z + ay * Scale
+		
+		tr = util.TraceLine(trtab)
+		
+		table.insert(FlightData,tr.StartPos:Distance(tr.HitPos))
+		 
+		debugoverlay.Line(tr.StartPos,tr.HitPos,FrameTime()+0.05,Color(255,255,255,255),true)
+		
+		if tr.Hit then
+			local FinalVelocity = math.sqrt(vx*vx + vy*vy)
+			local FinalVelocityMeters = FinalVelocity * 0.01905
+			
+			local Penetration = LinearPenetration or gred.GetPenetration(ShellType,TNTEquivalent,Caliber,Mass,CoreMass,FinalVelocityMeters)
+			
+			local FullDistance = 0
+			
+			for k,v in pairs(FlightData) do
+				FullDistance = FullDistance + v
+			end
+			
+			if not done then
+				local PenRem = (gred.IS_APCR[ShellType] and 16 or 2) * 0
+				print(math.Round(Penetration,2) - PenRem.."mm",math.floor(FullDistance * 0.01905).."m",math.floor(FinalVelocityMeters).."m/s")
+				-- print("vx:")
+				-- PrintTable(vx)
+				
+				-- print(BallisticCoef,Gravity,Mass,MuzzleVelocity)
+			end
+			
+			done = true
+			
+			break
+		end
+		
+		trtab.start = trtab.endpos
+		
+		if math.floor(FlightVector:Length()) <= 0 then
+			error("Shell's velocity is null")
+			break
+		end
+		
+		vx = vx + Scale * ax
+		vy = vy + Scale * ay
+		
+		magnitude = math.sqrt(vx*vx + vy*vy)
+		-- print(magnitude,Inertia*3)
+		drag = BallisticCoef * magnitude*magnitude
+		
+		ax = -(drag * math.cos(math.rad(ang.p))) / Mass
+		ay = -Gravity - (drag * math.sin(math.rad(ang.p))) / Mass
+		
+		Ticks = Ticks + 1
+	end
+	
+	end)
+	
+	return ent
+end
+
+-- local BallisticCoef,Gravity,Mass,Speed,Scale = 0.050811153326163,600,6.8,740,1 
+-- local BallisticCoef,Gravity,Mass,Speed,Scale = 0.005,9.8,1,80,0.5 
+
+-- local ang = Angle()
+
+-- local t = {0}
+-- local vx = {Speed * math.cos(math.rad(ang.p))} 
+-- local vy = {Speed * math.sin(math.rad(ang.p))}
+
+-- local drag = BallisticCoef * Speed^2
+
+-- local ax = {-(drag * math.cos(math.rad(ang.p))) / Mass}
+-- local ay = {-Gravity - (drag * math.sin(math.rad(ang.p))) / Mass}
+
+
+-- for Ticks = 1,10 do
+	-- table.insert(t,t[Ticks] + Scale)
+	
+	-- table.insert(vx,vx[Ticks] + Scale * ax[Ticks])
+	-- table.insert(vy,vy[Ticks] + Scale * ay[Ticks])
+	
+	-- local vel = math.sqrt(vx[Ticks + 1]^2 + vy[Ticks + 1]^2)
+	-- local drag = BallisticCoef * vel^2
+	
+	-- table.insert(ax,-(drag * math.cos(math.rad(ang.p))) / Mass)
+	-- table.insert(ay,-Gravity - (drag * math.sin(math.rad(ang.p))) / Mass)
+-- end
+
+-- print("vx")
+-- PrintTable(vx)
+-- print("ax")
+-- PrintTable(ax)
+
+gred.CreateShell = gred.CreateShellOld
