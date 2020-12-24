@@ -1,4 +1,20 @@
---[[02/12/2020
+--[[24/12/2020
+- Added new British assets
+- Fixed issues with ricochet angle calculations
+- Fixed the glass material being a mirror
+- Tweaked shell damage a lot ; capped shells no longer get a boost, non capped explosive shells now do ; nerfed HEAT rounds
+
+
+
+If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
+If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
+Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
+
+If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
+
+OLDER CHANGES
+
+02/12/2020
 - Added a new sound system for the explosions : volume now fades away depending on how far you are from the explosion
 - Added a volume slider for the explosion sounds
 - Added a missing texture
@@ -11,16 +27,6 @@
 - Optimized the sight texture rendering code
 - Made it so shells and rockets can destroy and go through func_breakable entities (they can destroy glass now)
 - Reworked the CBU so it's less retarded
-
-
-
-If you want to stay updated about my other addons, make sure you join my group : https://steamcommunity.com/groups/gredcancer
-If you are experiencing LUA errors, please make sure you are subscribed to everything that is required. If you do, uninstall / re-install the addons that have issues.
-Make sure you have read the descriptions of my addons and that other people did not complain about the errors you are experiencing in the comments.
-
-If you want to play with other people with exclusive addons I made, you can join my Sandbox server at havok.tech:27012 and join the Discord : https://discord.gg/eneGmMz
-
-OLDER CHANGES
 
 30/10/2020
 - Added a few materials

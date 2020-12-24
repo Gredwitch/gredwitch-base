@@ -254,8 +254,13 @@ end
 -- Ricochet stuff
 
 function ENT:CalculateRicochetChance(AbsAng,C000,C050,C100)
-	if AbsAng < C050 then
+	-- print(AbsAng,C000,C050,C100)
+	if AbsAng < C000 then
+		return 1
+	elseif AbsAng < C050 then
 		return 1 - (0.5 - ((C050 - AbsAng) / (C050 - C000)) * 0.5)
+	elseif AbsAng >= C100 then
+		return 0
 	elseif AbsAng > C050 then
 		return 1 - (0.5 + ((AbsAng - C050) / (C100 - C050)) * 0.5)
 	else
@@ -266,12 +271,12 @@ end
 function ENT:CanRicochet(ang)
 	if self.RICOCHET_ANGLES[self.ShellType] then
 		local abs_p,abs_y = math.abs(ang.p),math.abs(ang.y)
-		if abs_p <= self.RICOCHET_ANGLES[self.ShellType][1] and abs_y <= self.RICOCHET_ANGLES[self.ShellType][1] then 
-			return false
-		end
-		if abs_p >= self.RICOCHET_ANGLES[self.ShellType][3] or abs_y >= self.RICOCHET_ANGLES[self.ShellType][3] then 
-			return true
-		end
+		-- if abs_p <= self.RICOCHET_ANGLES[self.ShellType][1] and abs_y <= self.RICOCHET_ANGLES[self.ShellType][1] then 
+			-- return false
+		-- end
+		-- if abs_p >= self.RICOCHET_ANGLES[self.ShellType][3] or abs_y >= self.RICOCHET_ANGLES[self.ShellType][3] then 
+			-- return true
+		-- end
 		
 		if math.Rand(0,1) > self:CalculateRicochetChance(abs_p,self.RICOCHET_ANGLES[self.ShellType][1],self.RICOCHET_ANGLES[self.ShellType][2],self.RICOCHET_ANGLES[self.ShellType][3]) then return true end
 		if math.Rand(0,1) > self:CalculateRicochetChance(abs_y,self.RICOCHET_ANGLES[self.ShellType][1],self.RICOCHET_ANGLES[self.ShellType][2],self.RICOCHET_ANGLES[self.ShellType][3]) then return true end
@@ -555,8 +560,8 @@ function ENT:AddOnExplode(pos)
 	
 	local BaseDamage = (0.5 * self.Mass * vel*vel) / (self.Caliber^1.75) + self.Caliber + self.Mass
 	local SubCaliberAP = ((self.IS_APCR[self.ShellType] and self.ShellType != "APCR") and self.CoreMass or 0 / self.Mass) * (self.ShellType == "APFSDS" and 10 or 1) * self.Caliber * 0.3
-	local TNTDamage = self.TNTEquivalent * self.Mass * 1400
-	local CapBonus = self.IS_CAPPED[self.ShellType] and shelllength^1.5 or 0
+	local TNTDamage = self.TNTEquivalent * self.Mass * (self.ShellType == "HEAT" and 700 or 1400) + ((self.TNTEquivalent > 0 and self.IS_AP[self.ShellType]) and shelllength^1.5 or 0)
+	local CapBonus = 0 -- self.IS_CAPPED[self.ShellType] and shelllength^1.5 or 0
 	local TotalDamage = BaseDamage + SubCaliberAP + CapBonus + TNTDamage + self.DamageAdd
 	
 	self.ExplosionDamage = TotalDamage

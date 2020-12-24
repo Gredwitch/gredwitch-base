@@ -69,6 +69,30 @@ sound.Add({
 	sound = "mg/reload_20mm.ogg"
 })
 
+----------------------------- BESA -----------------------------
+
+sound.Add({
+	name = "GRED_BESA_LOOP",
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = 130,
+	sound = "^mg/loop_besa.wav"
+})
+sound.Add({
+	name = "GRED_BESA_LOOP_INSIDE",
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = 0,
+	sound = "mg/loop_rps10_besa_origin-001_interior.wav"
+})
+sound.Add({
+	name = "GRED_BESA_RELOAD",
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = 80,
+	sound = "mg/reload_m1919.ogg"
+})
+
 ----------------------------- M1919A4 -----------------------------
 
 sound.Add({
@@ -381,6 +405,21 @@ for i = 1,3 do
 		volume = 1.0,
 		level = 140,
 		sound = "^cannon/cannon_88mm_kwk36_0"..i..".ogg"
+	})
+	
+	sound.Add({
+		name = "40MM_QF2_"..i,
+		channel = CHAN_AUTO,
+		volume = 1.0,
+		level = 140,
+		sound = "^cannon/cannon_40mm_qf2_shot_0"..i..".ogg"
+	})
+	sound.Add({
+		name = "57MM_QF6_"..i,
+		channel = CHAN_AUTO,
+		volume = 1.0,
+		level = 140,
+		sound = "^cannon/cannon_57mm_qf6_shot_0"..i..".ogg"
 	})
 	
 	sound.Add({

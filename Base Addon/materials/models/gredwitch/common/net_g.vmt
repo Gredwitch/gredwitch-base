@@ -1,0 +1,12 @@
+"patch"
+{
+include "materials/models/gredwitch/common/base_wt.vmt"
+insert
+{
+$basetexture				"models/gredwitch/common/net_g_c"
+$bumpmap				"models/gredwitch/common/net_g_n"
+
+$alphatest 1
+$nocull 1
+}
+}
