@@ -3,5 +3,10 @@
       "ToolTip":"Simple Sandbox server where we shoot each other with my addons, including the un-released, server-only content such as the LFS WW2 USAAF pack and extra tanks.",
       "Collection":"https://steamcommunity.com/sharedfiles/filedetails/?id=1801117139",
       "Discord":"https://discord.gg/eneGmMz"
+   },
+   "war-and-history.com:27015":{
+      "ToolTip":"French WW2 server I made settled in 1940, featuring a custom gamemode, custom tanks and playermodel modifications",
+      "Collection":"https://steamcommunity.com/sharedfiles/filedetails/?id=2282113070",
+      "Discord":"https://discord.gg/5ax3yNN"
    }
 }
